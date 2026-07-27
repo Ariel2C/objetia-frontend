@@ -535,6 +535,21 @@ function MiEspacioContent() {
             huboErrores = true;
             showToast(`No se pudo subir el banner "${item.title || 'sin título'}".`, "error");
           }
+        } else if (item.id && typeof item.id === 'number' && item.id > 0) {
+          // Actualizar banner existente en la base de datos PostgreSQL
+          await fetch(`${getApiUrl()}/cms/banner/${item.id}`, {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              'Authorization': `Bearer ${localStorage.getItem('vamaar_token') || token}`
+            },
+            body: JSON.stringify({
+              title: item.title || "",
+              subtitle: item.subtitle || "",
+              link_url: item.link_url || "/catalog",
+              is_active: item.is_active !== false
+            })
+          });
         }
       }
 
