@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { Banner } from '../lib/types';
+import { getApiUrl } from '../lib/config';
 
 export default function BannerCarousel({ banners }: { banners: Banner[] }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -45,9 +46,21 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
         }}
       >
         {banners.map((banner, index) => {
-          const isProcessing = !banner.cloudfront_url || banner.cloudfront_url === "procesando..." || banner.cloudfront_url.includes("procesando...");
-          const bgImageDesktop = isProcessing ? "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1200" : banner.cloudfront_url;
-          const bgImageMobile = banner.mobile_cloudfront_url || bgImageDesktop;
+          const apiURL = getApiUrl();
+          const isProcessing = !banner.cloudfront_url && !banner.image_url;
+          
+          const resolveUrl = (rawUrl?: string) => {
+            if (!rawUrl || rawUrl === "procesando..." || rawUrl.includes("procesando...")) {
+              return "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1200";
+            }
+            if (rawUrl.startsWith("http://") || rawUrl.startsWith("https://")) {
+              return rawUrl;
+            }
+            return `${apiURL}${rawUrl.startsWith("/") ? "" : "/"}${rawUrl}`;
+          };
+
+          const bgImageDesktop = resolveUrl(banner.cloudfront_url || banner.image_url);
+          const bgImageMobile = resolveUrl(banner.mobile_cloudfront_url || banner.image_url) || bgImageDesktop;
 
           const SlideContent = (
             <div className="h-full w-full flex items-center relative overflow-hidden bg-black">

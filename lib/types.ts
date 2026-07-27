@@ -22,6 +22,8 @@ export interface Banner {
   link_url?: string;
   cloudfront_url: string;
   mobile_cloudfront_url?: string | null;
+  image_url?: string;
+  mobile_image_url?: string | null;
   is_active: boolean;
 }
 
