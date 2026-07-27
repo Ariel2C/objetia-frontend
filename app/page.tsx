@@ -5,15 +5,17 @@ import ProductCarousel from '../components/ProductCarousel';
 import { getApiUrl } from '../lib/config';
 import type { Producto, Banner, SeccionInicio } from '../lib/types';
 
-// Data Fetching asíncrono con revalidación cada 60 segundos
+export const revalidate = 0;
+
+// Data Fetching en tiempo real sin caché estático
 async function getHomepageData(): Promise<{ productos: Producto[]; banners: Banner[]; secciones: SeccionInicio[] }> {
   try {
     const apiURL = getApiUrl(); 
     
     const [resProducts, resLayout, resSections] = await Promise.all([
-      fetch(`${apiURL}/products/featured`, { next: { revalidate: 60 } }),
-      fetch(`${apiURL}/cms/layout/`, { next: { revalidate: 60 } }),
-      fetch(`${apiURL}/cms/sections/`, { next: { revalidate: 60 } })
+      fetch(`${apiURL}/products/featured`, { cache: 'no-store' }),
+      fetch(`${apiURL}/cms/layout/`, { cache: 'no-store' }),
+      fetch(`${apiURL}/cms/sections/`, { cache: 'no-store' })
     ]);
 
     if (!resProducts.ok || !resLayout.ok) throw new Error(`API respondió ${resProducts.status}/${resLayout.status}`);
@@ -27,7 +29,6 @@ async function getHomepageData(): Promise<{ productos: Producto[]; banners: Bann
       secciones: secciones
     };
   } catch (error) {
-    // Sin datos inventados: se muestra el banner por defecto y ninguna sección de productos
     console.error("Error cargando datos de la home:", error);
     return { productos: [], banners: [], secciones: [] };
   }
