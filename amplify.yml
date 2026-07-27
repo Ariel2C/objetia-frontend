@@ -6,7 +6,7 @@ frontend:
         - npm ci --legacy-peer-deps || npm install
     build:
       commands:
-        - echo "NEXT_PUBLIC_API_URL=http://32.196.242.14:8000" > .env.production
+        - echo "NEXT_PUBLIC_API_URL=https://32-196-242-14.sslip.io" > .env.production
         - npm run build
   artifacts:
     baseDirectory: .next
