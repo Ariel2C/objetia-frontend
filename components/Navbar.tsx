@@ -1,6 +1,6 @@
 // components/Navbar.tsx
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
@@ -42,18 +42,37 @@ export default function Navbar({ logoUrl }: NavbarProps) {
   const [brandNameState, setBrandNameState] = useState("OBJETIA");
   const [brandFontSizeState, setBrandFontSizeState] = useState("1.5rem");
   const [brandFontFamilyState, setBrandFontFamilyState] = useState("Outfit");
+  const [navBgColorState, setNavBgColorState] = useState("#FFFFFF");
+  const [navbarSearch, setNavbarSearch] = useState('');
 
   useEffect(() => {
+    const checkBgColor = () => {
+      const el = document.querySelector('nav');
+      if (el) {
+        const bg = window.getComputedStyle(el).backgroundColor;
+        if (bg && bg !== 'rgba(0, 0, 0, 0)' && bg !== 'transparent') {
+          setNavBgColorState(bg);
+        }
+      }
+    };
+    checkBgColor();
+    const timer = setInterval(checkBgColor, 500);
+
     const handleBrandingUpdated = (e: any) => {
       if (e.detail) {
         if (e.detail.brandName !== undefined) setBrandNameState(e.detail.brandName);
         if (e.detail.logoUrl !== undefined) setLogoUrlState(e.detail.logoUrl);
         if (e.detail.brandFontSize !== undefined) setBrandFontSizeState(e.detail.brandFontSize);
         if (e.detail.brandFontFamily !== undefined) setBrandFontFamilyState(e.detail.brandFontFamily);
+        if (e.detail.bgNavbar !== undefined) setNavBgColorState(e.detail.bgNavbar);
       }
+      checkBgColor();
     };
     window.addEventListener('branding_updated', handleBrandingUpdated);
-    return () => window.removeEventListener('branding_updated', handleBrandingUpdated);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener('branding_updated', handleBrandingUpdated);
+    };
   }, []);
 
   const getStoredToken = () => localStorage.getItem('vamaar_token') || token;
@@ -65,11 +84,8 @@ export default function Navbar({ logoUrl }: NavbarProps) {
       return;
     }
     try {
-      // El backend deriva el usuario del token JWT
       const res = await fetch(`${getApiUrl()}/chat/unread-count/`, {
-        headers: {
-          'Authorization': `Bearer ${authToken}`
-        }
+        headers: { 'Authorization': `Bearer ${authToken}` }
       });
       if (res.status === 401) {
         logout();
@@ -92,9 +108,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     }
     try {
       const res = await fetch(`${getApiUrl()}/cart/`, {
-        headers: {
-          'Authorization': `Bearer ${authToken}`
-        }
+        headers: { 'Authorization': `Bearer ${authToken}` }
       });
       if (res.status === 401) {
         logout();
@@ -117,18 +131,13 @@ export default function Navbar({ logoUrl }: NavbarProps) {
       fetchCartCount();
       
       const interval = setInterval(() => {
-        // No consultar cuando la pestaña está en segundo plano
         if (document.visibilityState !== 'visible') return;
         fetchUnreadChatsCount();
         fetchCartCount();
       }, 15000);
 
-      const handleRefresh = () => {
-        fetchUnreadChatsCount();
-      };
-      const handleCartRefresh = () => {
-        fetchCartCount();
-      };
+      const handleRefresh = () => fetchUnreadChatsCount();
+      const handleCartRefresh = () => fetchCartCount();
       const handleVisibility = () => {
         if (document.visibilityState === 'visible') {
           fetchUnreadChatsCount();
@@ -149,9 +158,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
   }, [usuario, cargando]);
 
   useEffect(() => {
-    if (logoUrl) {
-      setLogoUrlState(logoUrl);
-    }
+    if (logoUrl) setLogoUrlState(logoUrl);
   }, [logoUrl]);
 
   useEffect(() => {
@@ -166,13 +173,10 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     };
   }, []);
 
-  // Sin datos simulados: cuando exista el endpoint de notificaciones, cargarlas acá
   interface Notificacion { id: number; texto: string; leida: boolean; fecha: string; }
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
-
   const unreadNotifsCount = notificaciones.filter(n => !n.leida).length;
 
-  // Cerrar menú al hacer click afuera
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -188,7 +192,6 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     };
   }, []);
 
-  // Carga de favoritos desde localStorage
   useEffect(() => {
     const favs = localStorage.getItem("vamaar_favorites");
     if (favs) {
@@ -201,13 +204,9 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     }
   }, []);
 
-
-
   const marcarTodasComoLeidas = () => {
     setNotificaciones(prev => prev.map(n => ({ ...n, leida: true })));
   };
-
-  const [navbarSearch, setNavbarSearch] = useState('');
 
   const handleNavbarSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -216,42 +215,87 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     }
   };
 
+  const esNavOscuro = useMemo(() => {
+    if (!navBgColorState) return false;
+    const val = navBgColorState.toLowerCase().trim();
+    // Si es blanco puro o transparente, usar íconos y texto oscuros por defecto
+    if (val === '#ffffff' || val === '#fff' || val === 'rgb(255, 255, 255)' || val === 'rgb(255,255,255)' || val === 'white' || val === 'transparent') {
+      return false;
+    }
+    // Si es rgb(r, g, b)
+    if (val.startsWith('rgb')) {
+      const match = val.match(/\d+/g);
+      if (match && match.length >= 3) {
+        const r = parseInt(match[0]);
+        const g = parseInt(match[1]);
+        const b = parseInt(match[2]);
+        const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+        return yiq < 220;
+      }
+    }
+    let hex = val.replace('#', '').trim();
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    if (hex.length === 6) {
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
+      const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+      return yiq < 220;
+    }
+    // Cualquier otro color de fondo personalizado (ej: "black", "#000", "#111")
+    return true;
+  }, [navBgColorState]);
+
+  const iconClass = esNavOscuro 
+    ? "relative text-white hover:text-gray-100 transition p-1 cursor-pointer" 
+    : "relative text-gray-700 hover:text-gray-900 transition p-1 cursor-pointer";
+
   return (
-    <nav style={{ backgroundColor: 'var(--bg-navbar)' }} className="border-b border-gray-100 sticky top-0 z-50 shadow-sm">
+    <nav style={{ backgroundColor: 'var(--bg-navbar)' }} className="border-b border-gray-100/30 sticky top-0 z-50 shadow-sm transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center gap-4">
           
-          {/* LOGO DE MARCA Y TIPOGRAFÍA DINÁMICA */}
+          {/* LOGO DE MARCA Y TIPOGRAFÍA DINÁMICA CON CONTRASTE ADAPTABLE */}
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="text-xl font-bold tracking-tight transition hover:opacity-95 flex items-center gap-2.5 group">
               <img 
                 src={logoUrlState && logoUrlState !== "" && logoUrlState !== "https://" ? logoUrlState : "/objetia_logo.png"} 
                 alt="Logo" 
-                className="h-10 w-10 sm:h-11 sm:w-11 object-contain rounded-xl border border-purple-100 shadow-xs group-hover:scale-105 transition-transform" 
+                className="h-10 w-10 sm:h-11 sm:w-11 object-contain group-hover:scale-105 transition-transform" 
               />
               <span 
                 style={{ 
                   fontFamily: `var(--font-family-brand, ${brandFontFamilyState})`,
                   fontSize: `var(--font-size-brand, ${brandFontSizeState})`
                 }} 
-                className="font-black tracking-wider text-purple-900 uppercase leading-none"
+                className={`font-black tracking-wider uppercase leading-none ${
+                  esNavOscuro ? "text-white drop-shadow-xs" : "text-gray-900"
+                }`}
               >
                 {brandNameState || 'OBJETIA'}
               </span>
             </Link>
           </div>
 
-          {/* CUADRO DE BÚSQUEDA INTEGRADO EN EL NAVBAR */}
+          {/* CUADRO DE BÚSQUEDA INTEGRADO CON DIVISOR EN EL NAVBAR */}
           <div className="flex-1 max-w-md mx-4 hidden md:block">
-            <form onSubmit={handleNavbarSearch} className="relative">
+            <form onSubmit={handleNavbarSearch} className="flex items-stretch bg-white border border-gray-300 rounded-none focus-within:border-gray-500 transition shadow-2xs">
               <input 
                 type="text" 
                 value={navbarSearch}
                 onChange={(e) => setNavbarSearch(e.target.value)}
                 placeholder="Buscar muebles, iluminación, decoración..." 
-                className="w-full bg-gray-50 border border-gray-200/90 rounded-full pl-10 pr-4 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-purple-600 focus:bg-white transition shadow-2xs"
+                className="w-full bg-transparent pl-3.5 pr-2 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none"
               />
-              <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-gray-400" />
+              {/* DIVISOR VERTICAL INTERNO */}
+              <div className="w-[1px] bg-gray-300 my-1.5" />
+              <button 
+                type="submit"
+                aria-label="Buscar"
+                className="px-3.5 flex items-center justify-center text-gray-500 hover:text-gray-900 transition cursor-pointer bg-transparent"
+              >
+                <Search className="h-4 w-4" />
+              </button>
             </form>
           </div>
 
@@ -269,8 +313,8 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               </Link>
             )}
 
-            {/* BOTÓN FAVORITOS (Corazón con un indicador de punto único limpio) */}
-            <Link href="/products/favorites" className="relative text-gray-500 hover:text-red-500 transition p-1 hidden md:block">
+            {/* BOTÓN FAVORITOS */}
+            <Link href="/products/favorites" className={`${iconClass} hidden md:block`}>
               <Heart className="h-5.5 w-5.5" />
               {favoritosCount > 0 && (
                 <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white animate-pulse" />
@@ -278,7 +322,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
             </Link>
 
             {/* BOTÓN CHAT */}
-            <Link href="/chat" className="relative text-gray-500 hover:text-[var(--color-primary)] transition p-1 hidden md:block">
+            <Link href="/chat" className={`${iconClass} hidden md:block`}>
               <MessageSquare className="h-5.5 w-5.5" />
               {unreadChatsCount > 0 && (
                 <span 
@@ -290,7 +334,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
             </Link>
 
             {/* BOTÓN CARRITO */}
-            <Link href="/cart" className="relative text-gray-500 hover:text-[var(--color-primary)] transition p-1 hidden md:block">
+            <Link href="/cart" className={`${iconClass} hidden md:block`}>
               <ShoppingCart className="h-5.5 w-5.5" />
               {cartCount > 0 && (
                 <span 
@@ -301,12 +345,12 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               )}
             </Link>
 
-            {/* BOTÓN NOTIFICACIONES FUNCIONAL */}
+            {/* BOTÓN NOTIFICACIONES */}
             <div className="relative" ref={notifRef}>
               <button 
                 onClick={() => setNotifAbierto(!notifAbierto)}
                 aria-label="Notificaciones"
-                className="relative text-gray-500 hover:text-[var(--color-primary)] transition p-1 cursor-pointer focus:outline-none"
+                className={`${iconClass} focus:outline-none`}
               >
                 <Bell className="h-5.5 w-5.5" />
                 {unreadNotifsCount > 0 && (
@@ -364,131 +408,86 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         <img src={usuario.avatar_url} alt="Avatar" className="h-8 w-8 rounded-full border border-gray-100 object-cover" />
                       ) : (
                         <div className="h-8 w-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 font-extrabold border border-gray-200">
-                          {usuario.full_name.charAt(0).toUpperCase()}
+                          {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
                         </div>
                       )}
-                      <span className="text-sm font-semibold text-gray-700 hidden md:inline-block">
-                        {usuario.full_name.split(" ")[0]} {usuario.full_name.split(" ")[1] || ""}
+                      <span className={`text-xs font-bold ${esNavOscuro ? "text-white" : "text-gray-800"}`}>
+                        {usuario.full_name?.split(" ")[0]}
                       </span>
-                      <ChevronDown className="h-4 w-4 text-gray-400" />
+                      <ChevronDown className={`h-3.5 w-3.5 transition-transform ${esNavOscuro ? "text-gray-300" : "text-gray-500"} ${menuAbierto ? 'rotate-180' : ''}`} />
                     </button>
 
-                    {/* MENÚ FLOTANTE DROPDOWN */}
+                    {/* MENÚ DESPLEGABLE DE PERFIL */}
                     {menuAbierto && (
-                      <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-2 overflow-hidden animate-scale-in origin-top-right">
-                        
-                        <button 
-                          onClick={() => { setMenuAbierto(false); router.push("/mi-espacio"); }}
-                          className="w-full text-left py-2 px-3 rounded-lg hover:bg-gray-50 font-bold text-xs text-gray-700 flex items-center gap-2 transition cursor-pointer"
+                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in origin-top-right">
+                        <div className="px-3 py-2 border-b border-gray-50">
+                          <p className="text-xs font-bold text-gray-900 truncate">{usuario.full_name}</p>
+                          <p className="text-[10px] text-gray-400 truncate">{usuario.email}</p>
+                          {usuario.role === 'ADMIN' && (
+                            <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-purple-100 text-purple-700">
+                              Administrador
+                            </span>
+                          )}
+                        </div>
+
+                        <Link 
+                          href="/mi-espacio" 
+                          onClick={() => setMenuAbierto(false)}
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-purple-700 transition"
                         >
-                          <User className="h-4 w-4 text-gray-500" /> Mi Espacio
-                        </button>
+                          <User className="h-4 w-4 text-gray-400" /> Mi Espacio
+                        </Link>
 
-                        <hr className="border-gray-100 my-1" />
+                        <Link 
+                          href="/products/favorites" 
+                          onClick={() => setMenuAbierto(false)}
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-purple-700 transition md:hidden"
+                        >
+                          <Heart className="h-4 w-4 text-gray-400" /> Favoritos
+                        </Link>
+
+                        <Link 
+                          href="/chat" 
+                          onClick={() => setMenuAbierto(false)}
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-purple-700 transition md:hidden"
+                        >
+                          <MessageSquare className="h-4 w-4 text-gray-400" /> Mis Mensajes
+                        </Link>
 
                         <button 
-                          onClick={() => { setMenuAbierto(false); logout(); }}
-                          className="w-full text-left py-2 px-3 rounded-lg hover:bg-red-50 font-bold text-xs text-red-500 flex items-center gap-2 transition cursor-pointer"
+                          onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition cursor-pointer text-left"
                         >
-                          <LogOut className="h-4 w-4 text-[#4D5E4F]" /> Cerrar sesión
+                          <LogOut className="h-4 w-4 text-red-400" /> Cerrar Sesión
                         </button>
-
                       </div>
                     )}
-
                   </div>
                 ) : (
-                  <Link href="/auth" className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-[var(--color-primary)] border border-gray-300 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition">
-                    <User className="h-4 w-4" /> Ingresar
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link 
+                      href="/auth" 
+                      className={`text-xs font-bold px-3 py-2 transition ${
+                        esNavOscuro ? "text-white hover:text-gray-200" : "text-gray-700 hover:text-purple-700"
+                      }`}
+                    >
+                      Ingresar
+                    </Link>
+                    <Link 
+                      href="/auth" 
+                      style={{ backgroundColor: 'var(--color-primary, #2C3E50)', color: '#FFFFFF' }}
+                      className="text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-xs hover:opacity-90"
+                    >
+                      Registrarse
+                    </Link>
+                  </div>
                 )
               )}
             </div>
 
-            {/* Shimmer de carga para mitigar el flash de UI */}
-            {cargando && (
-              <div className="h-8 w-24 bg-gray-100 animate-pulse rounded-xl hidden md:block" />
-            )}
-
           </div>
 
         </div>
-      </div>
-
-      {/* BARRA DE NAVEGACIÓN INFERIOR PARA MÓVILES (ESTILO MERCADO LIBRE) */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-gray-100 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] md:hidden flex justify-around items-center h-16 px-2">
-        <Link href="/" className="flex flex-col items-center justify-center flex-1 py-1 text-gray-500 hover:text-[var(--color-primary)] transition">
-          <Home className="h-5 w-5" />
-          <span className="text-[9px] font-extrabold mt-1">Inicio</span>
-        </Link>
-        
-        <Link href="/catalog" className="flex flex-col items-center justify-center flex-1 py-1 text-gray-500 hover:text-[var(--color-primary)] transition">
-          <Search className="h-5 w-5" />
-          <span className="text-[9px] font-extrabold mt-1">Buscar</span>
-        </Link>
-
-        {usuario && (
-          <Link href="/products/new" className="flex flex-col items-center justify-center flex-1 py-1 text-gray-500 hover:text-[var(--color-primary)] transition">
-            <div className="h-8 w-8 rounded-full bg-[var(--color-primary)] text-white flex items-center justify-center shadow-md">
-              <PlusCircle className="h-4.5 w-4.5 text-white" />
-            </div>
-            <span className="text-[8px] font-extrabold mt-0.5">Vender</span>
-          </Link>
-        )}
-
-        <Link href="/products/favorites" className="relative flex flex-col items-center justify-center flex-1 py-1 text-gray-500 hover:text-red-500 transition">
-          <Heart className="h-5 w-5" />
-          {favoritosCount > 0 && (
-            <span className="absolute top-1 right-5 h-2 w-2 rounded-full bg-red-500 border border-white animate-pulse" />
-          )}
-          <span className="text-[9px] font-extrabold mt-1">Favoritos</span>
-        </Link>
-
-        <Link href="/chat" className="relative flex flex-col items-center justify-center flex-1 py-1 text-gray-500 hover:text-[var(--color-primary)] transition">
-          <div className="relative">
-            <MessageSquare className="h-5 w-5" />
-            {unreadChatsCount > 0 && (
-              <span 
-                className="absolute -top-1.5 -right-2 h-4 w-4 rounded-full text-[8px] font-bold text-white flex items-center justify-center border border-white bg-red-500 animate-pulse"
-              >
-                {unreadChatsCount}
-              </span>
-            )}
-          </div>
-          <span className="text-[9px] font-extrabold mt-1">Chats</span>
-         </Link>
-
-        <Link href="/cart" className="relative flex flex-col items-center justify-center flex-1 py-1 text-gray-500 hover:text-[var(--color-primary)] transition">
-          <div className="relative">
-            <ShoppingCart className="h-5 w-5" />
-            {cartCount > 0 && (
-              <span 
-                className="absolute -top-1.5 -right-2 h-4 w-4 rounded-full text-[8px] font-bold text-white flex items-center justify-center border border-white bg-red-500 animate-pulse"
-              >
-                {cartCount}
-              </span>
-            )}
-          </div>
-          <span className="text-[9px] font-extrabold mt-1">Carrito</span>
-        </Link>
-
-        <Link 
-          href={usuario ? "/mi-espacio" : "/auth"} 
-          className="flex flex-col items-center justify-center flex-1 py-1 text-gray-500 hover:text-[var(--color-primary)] transition"
-        >
-          {usuario ? (
-            usuario.avatar_url ? (
-              <img src={usuario.avatar_url} alt="Avatar" className="h-5.5 w-5.5 rounded-full object-cover border border-gray-200" />
-            ) : (
-              <div className="h-5.5 w-5.5 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 font-extrabold text-[9px] border border-gray-200">
-                {usuario.full_name.charAt(0).toUpperCase()}
-              </div>
-            )
-          ) : (
-            <User className="h-5 w-5" />
-          )}
-          <span className="text-[9px] font-extrabold mt-1">{usuario ? "Mi Panel" : "Ingresar"}</span>
-        </Link>
       </div>
     </nav>
   );
