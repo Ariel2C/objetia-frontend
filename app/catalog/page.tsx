@@ -114,7 +114,7 @@ function CatalogContent() {
                     className={`text-left text-sm sm:text-[14px] transition-colors cursor-pointer block py-1 ${
                       category === cat
                         ? "font-bold text-gray-900"
-                        : "text-gray-700 hover:text-blue-600 hover:underline font-normal"
+                        : "text-gray-600 hover:text-gray-900 font-normal"
                     }`}
                   >
                     {cat}
@@ -141,7 +141,7 @@ function CatalogContent() {
                   <button 
                     type="button"
                     onClick={() => { setSearch(''); setCategory('Todos'); }}
-                    className="text-xs font-medium text-blue-600 hover:underline cursor-pointer block mt-1"
+                    className="text-xs font-medium text-gray-500 hover:text-gray-900 cursor-pointer block mt-1"
                   >
                     Limpiar filtros
                   </button>
