@@ -52,7 +52,6 @@ export default function ProductCard({
     }
 
     try {
-      // El contexto aplica UI optimista y sincroniza todas las tarjetas
       await toggleFavorito(producto.id);
     } catch (err: any) {
       if (err?.status === 401) {
@@ -101,7 +100,6 @@ export default function ProductCard({
       } else if (res.ok) {
         setEstadoStock('RESERVED');
         toast.success("Reservado y agregado a tu carrito.", formatearTituloProducto(producto.title));
-        // Notificar al Navbar para que actualice el contador del carrito
         window.dispatchEvent(new Event('cart_updated'));
       }
     } catch (err) {
@@ -127,23 +125,28 @@ export default function ProductCard({
     return () => window.removeEventListener('objetia_campaign_changed', handleCampaignChanged);
   }, []);
 
+  const cuotasVal = campanaActiva?.cuotasSinInteres || 3;
+
   return (
     <Link
       href={`/products/${producto.id}`}
-      className="group relative bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between h-full cursor-pointer"
+      className="group relative bg-white border border-gray-100 rounded-none overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between h-full cursor-pointer select-none"
     >
-      <div className="relative aspect-square bg-gray-100 overflow-hidden">
+      {/* SECCIÓN DE IMAGEN DE PRODUCTO (Fotografía vertical 4:5 un poco más alta) */}
+      <div className="relative aspect-[4/5] w-full bg-gray-50 overflow-hidden">
         <Image
           src={producto.image_url || "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600"}
           alt={formatearTituloProducto(producto.title)}
           fill
           priority={priority}
           sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 25vw"
-          className={`object-cover object-center group-hover:scale-102 transition-transform duration-500 ${estadoStock !== 'AVAILABLE' ? 'blur-[2px] grayscale-[30%]' : ''}`}
+          className={`object-cover object-center group-hover:scale-103 transition-transform duration-500 ease-out ${
+            estadoStock !== 'AVAILABLE' ? 'blur-[2px] grayscale-[30%]' : ''
+          }`}
         />
         
-        {/* Etiquetas en Cascada */}
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
+        {/* PARTE SUPERIOR: BADGES CREMA Y BOTÓN FAVORITO */}
+        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 z-10">
           {(() => {
             if (!campanaActiva || !campanaActiva.activa || !campanaActiva.badgeTexto) return null;
             const now = Date.now();
@@ -151,77 +154,55 @@ export default function ProductCard({
             const end = new Date(campanaActiva.fin).getTime();
             if (now < start || now > end) return null;
             return (
-              <span className="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded-full bg-amber-400 text-gray-900 shadow-sm border border-amber-500 animate-pulse">
+              <span className="px-2 py-0.5 text-[8.5px] sm:text-[9px] font-bold uppercase tracking-wider rounded-full bg-[#F5F0E1] text-gray-900 shadow-xs border border-amber-200/50">
                 {campanaActiva.badgeTexto}
               </span>
             );
           })()}
           {producto.is_new && (
-            <span className="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded-full bg-[#4F46E5] text-white shadow-sm border border-indigo-500">
-              Nuevo ingreso
+            <span className="px-2 py-0.5 text-[8.5px] sm:text-[9px] font-bold uppercase tracking-wider rounded-full bg-[#F5F0E1] text-gray-900 shadow-xs border border-amber-200/50">
+              NUEVO INGRESO
             </span>
           )}
           {producto.condition === "USED" && (
-            <span className="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded-full shadow-sm bg-amber-50 text-amber-800 border border-amber-200">
-              Usado único
+            <span className="px-2 py-0.5 text-[8.5px] sm:text-[9px] font-bold uppercase tracking-wider rounded-full bg-[#F5F0E1] text-gray-900 shadow-xs border border-amber-200/50">
+              USADO ÚNICO
             </span>
           )}
         </div>
 
-        {/* Indicador de Estado del Motor de Stock */}
-        {estadoStock === 'RESERVED' && (
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex flex-col items-center justify-center text-white font-bold gap-2 z-10 animate-fade-in">
-            <Lock className="h-5 w-5 text-amber-400" />
-            <span className="text-xs uppercase tracking-widest bg-amber-500/20 px-3 py-1 rounded-md border border-amber-400/30">Reservado (10 min)</span>
-          </div>
-        )}
-
-        {/* Favorito Async */}
+        {/* BOTÓN FAVORITO FLOTANTE CIRCULAR BLANCO */}
         <button 
           onClick={handleFavorito}
           aria-label={esFavorito ? "Quitar de favoritos" : "Agregar a favoritos"}
-          className="absolute top-3 right-3 p-2.5 bg-white/90 backdrop-blur-md rounded-full text-gray-400 hover:text-red-500 hover:bg-white transition-all shadow-sm z-20"
+          className="absolute top-2.5 right-2.5 p-1.5 bg-white/90 backdrop-blur-xs rounded-full text-gray-700 hover:text-red-500 transition-all shadow-sm z-20 cursor-pointer flex items-center justify-center"
         >
-          <Heart className={`h-4 w-4 transition-colors ${esFavorito ? "fill-red-500 text-red-500" : ""}`} />
+          <Heart className={`h-3.5 w-3.5 transition-colors ${esFavorito ? "fill-red-500 text-red-500" : ""}`} />
         </button>
+
+        {/* INDICADOR DE STOCK RESERVADO */}
+        {estadoStock === 'RESERVED' && (
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex flex-col items-center justify-center text-white font-bold gap-2 z-20 animate-fade-in">
+            <Lock className="h-4 w-4 text-amber-400" />
+            <span className="text-[9px] font-black uppercase tracking-widest bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-400/40">Reservado</span>
+          </div>
+        )}
       </div>
 
-      <div className="p-2.5 sm:p-3 flex-grow flex flex-col justify-between items-center text-center">
-        <div className="w-full flex flex-col items-center">
-          <h3 className="text-xs sm:text-sm font-bold text-gray-800 text-center group-hover:text-purple-700 transition line-clamp-2 leading-snug">
-            {formatearTituloProducto(producto.title)}
-          </h3>
-          {showSeller && producto.seller_name && (
-            <span className="text-[10px] text-gray-500 font-medium block mt-0.5 text-center">
-              {producto.seller_name}
-            </span>
-          )}
-          {showCategory && producto.category && (
-            <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-full bg-gray-100 text-gray-500 border border-gray-200 text-center">
-              {producto.category}
-            </span>
-          )}
-        </div>
-        
-        <div className="w-full flex flex-col justify-center items-center mt-2 pt-1.5 border-t border-gray-100/80 text-center">
-          <FormattedPrice price={producto.price} showCents={false} className="text-sm sm:text-base font-black text-gray-900 text-center" />
-          <span className="text-[9.5px] font-bold text-emerald-700 mt-0.5 block tracking-tight">
-            {campanaActiva?.cuotasSinInteres || 3} cuotas sin interés de <span className="font-extrabold">${Math.round(producto.price / (campanaActiva?.cuotasSinInteres || 3)).toLocaleString('es-AR')}</span>
+      {/* SECCIÓN INFERIOR DE TEXTO (TÍTULO -> PRECIO -> TEXTO VERDE DE CUOTAS) */}
+      <div className="p-2 sm:p-2.5 bg-white flex flex-col justify-between flex-grow space-y-0.5 text-left">
+        {/* TÍTULO DEL PRODUCTO */}
+        <h3 className="text-xs sm:text-sm font-semibold text-gray-900 text-left line-clamp-1 leading-tight tracking-tight group-hover:text-purple-700 transition">
+          {formatearTituloProducto(producto.title)}
+        </h3>
+
+        {/* PRECIO Y CUOTAS EN TEXTO VERDE SIN PASTILLA */}
+        <div className="flex flex-col text-left space-y-0.5">
+          <FormattedPrice price={producto.price} showCents={false} className="text-sm sm:text-base font-extrabold text-gray-900 text-left tracking-tight leading-none" />
+          
+          <span className="text-[9px] sm:text-[10px] font-bold text-[#0D8A6F] text-left leading-none tracking-tight block">
+            {cuotasVal} cuotas sin interés
           </span>
-          {showBuyButton && (
-            <button 
-              onClick={handleAgregarAlCarrito}
-              disabled={estadoStock !== 'AVAILABLE' || cargandoCarrito}
-              aria-label="Agregar al carrito"
-              className={`p-2 rounded-lg transition-all duration-200 shadow-xs mt-1.5 ${
-                estadoStock === 'AVAILABLE' 
-                  ? "bg-gray-900 text-white hover:bg-amber-500 hover:text-gray-900" 
-                  : "bg-gray-100 text-gray-400 cursor-not-allowed"
-              }`}
-            >
-              <ShoppingCart className="h-3.5 w-3.5" />
-            </button>
-          )}
         </div>
       </div>
     </Link>

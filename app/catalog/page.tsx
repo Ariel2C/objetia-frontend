@@ -179,7 +179,7 @@ function CatalogContent() {
               <p className="text-sm text-gray-400 mt-1">Intentá ajustando los filtros de búsqueda o categoría.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-6 stagger-children">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 stagger-children">
               {productos.map((prod) => (
                 <div key={prod.id} className="transform hover:-translate-y-1 transition duration-300">
                   <ProductCard producto={prod} />

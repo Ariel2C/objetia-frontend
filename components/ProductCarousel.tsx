@@ -155,9 +155,9 @@ export default function ProductCarousel({ title, categoryFilter, productos }: Pr
             {productos.map((producto, index) => (
               <div 
                 key={producto.id} 
-                className="flex-shrink-0 w-[80%] sm:w-[calc(50%-8px)] lg:w-[calc(25%-12px)] snap-start"
+                className="flex-shrink-0 w-[46%] sm:w-[calc(33.33%-10px)] md:w-[calc(25%-12px)] lg:w-[calc(20%-13px)] xl:w-[calc(16.66%-14px)] snap-start"
               >
-                <ProductCard producto={producto} priority={index < 4} />
+                <ProductCard producto={producto} priority={index < 5} />
               </div>
             ))}
           </div>
