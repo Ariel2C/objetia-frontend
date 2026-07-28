@@ -158,31 +158,18 @@ function CatalogContent() {
               </div>
             </div>
 
-            {/* Buscador Rápido (Limpio y Sobrio) */}
-            <div className="pt-3 border-t border-gray-200/70 space-y-2">
-              <h4 className="text-sm font-bold text-gray-900">Búsqueda</h4>
-              <form onSubmit={manejarBusqueda} className="space-y-2">
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Buscar..."
-                    className="w-full bg-white border border-gray-300 rounded-md pl-8 pr-2 py-2 text-xs sm:text-sm text-gray-900 focus:outline-none focus:border-gray-500 shadow-2xs"
-                  />
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-                </div>
-                {(search || category !== 'Todos') && (
-                  <button 
-                    type="button"
-                    onClick={limpiarFiltros}
-                    className="text-xs font-medium text-gray-500 hover:text-gray-900 cursor-pointer block mt-1"
-                  >
-                    Limpiar filtros
-                  </button>
-                )}
-              </form>
-            </div>
+            {/* Opción Limpiar Filtros */}
+            {(search || category !== 'Todos') && (
+              <div className="pt-2 border-t border-gray-200/70">
+                <button 
+                  type="button"
+                  onClick={limpiarFiltros}
+                  className="text-xs font-medium text-gray-500 hover:text-gray-900 cursor-pointer block"
+                >
+                  Limpiar filtros
+                </button>
+              </div>
+            )}
           </aside>
 
           {/* CONTENIDO PRINCIPAL: CABECERA CON CONTEO Y ORDENAMIENTO + GRILLA DE PRODUCTOS */}
