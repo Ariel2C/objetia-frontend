@@ -190,7 +190,7 @@ function CatalogContent() {
             )}
 
             {loading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-5 animate-pulse">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-4 gap-2.5 sm:gap-3 animate-pulse">
                 {[...Array(8)].map((_, i) => (
                   <SkeletonCard key={i} />
                 ))}
@@ -202,7 +202,7 @@ function CatalogContent() {
                 <p className="text-xs text-gray-400 mt-1">Intentá ajustando los filtros de búsqueda o categoría.</p>
               </div>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-4 gap-4 sm:gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-4 gap-2.5 sm:gap-3">
                 {productos.map((prod) => (
                   <div key={prod.id} className="transform hover:-translate-y-1 transition duration-300">
                     <ProductCard producto={prod} />
