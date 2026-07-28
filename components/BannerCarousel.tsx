@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Banner } from '../lib/types';
 import { getApiUrl } from '../lib/config';
 
@@ -15,6 +16,18 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
     }, 5000);
     return () => clearInterval(interval);
   }, [banners]);
+
+  const handlePrev = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev === 0 ? banners.length - 1 : prev - 1));
+  };
+
+  const handleNext = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setCurrentIndex((prev) => (prev + 1) % banners.length);
+  };
 
   if (!banners || banners.length === 0) {
     return (
@@ -36,7 +49,7 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
   }
 
   return (
-    <div className="relative w-full aspect-square md:aspect-[1920/432] overflow-hidden shadow-inner bg-black">
+    <div className="relative w-full aspect-square md:aspect-[1920/432] overflow-hidden shadow-inner bg-black group/hero">
       {/* CONTENEDOR DE DESLIZAMIENTO (SLIDER) */}
       <div 
         className="flex h-full transition-transform duration-500 ease-in-out" 
@@ -47,7 +60,6 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
       >
         {banners.map((banner, index) => {
           const apiURL = getApiUrl();
-          const isProcessing = !banner.cloudfront_url && !banner.image_url;
           
           const resolveUrl = (rawUrl?: string) => {
             if (!rawUrl || rawUrl === "procesando..." || rawUrl.includes("procesando...")) {
@@ -117,6 +129,28 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
           );
         })}
       </div>
+
+      {/* FLECHAS DE NAVEGACIÓN LATERALES (VISIBLES SOLO AL PASAR EL MOUSE POR EL BANNER) */}
+      {banners.length > 1 && (
+        <>
+          <button 
+            type="button"
+            onClick={handlePrev}
+            aria-label="Banner anterior"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-black/40 hover:bg-black/75 text-white backdrop-blur-md transition-all duration-300 opacity-0 group-hover/hero:opacity-100 pointer-events-none group-hover/hero:pointer-events-auto cursor-pointer border border-white/20 shadow-lg group/btn active:scale-95"
+          >
+            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 group-hover/btn:-translate-x-0.5 transition-transform" />
+          </button>
+          <button 
+            type="button"
+            onClick={handleNext}
+            aria-label="Banner siguiente"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-black/40 hover:bg-black/75 text-white backdrop-blur-md transition-all duration-300 opacity-0 group-hover/hero:opacity-100 pointer-events-none group-hover/hero:pointer-events-auto cursor-pointer border border-white/20 shadow-lg group/btn active:scale-95"
+          >
+            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 group-hover/btn:translate-x-0.5 transition-transform" />
+          </button>
+        </>
+      )}
 
       {/* DOTS DE NAVEGACIÓN (PUNTOS DEL MEDIO) */}
       {banners.length > 1 && (
