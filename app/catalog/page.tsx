@@ -1,46 +1,66 @@
 "use client";
-import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { getApiUrl } from '../../lib/config';
 import ProductCard from '../../components/ProductCard';
 import SkeletonCard from '../../components/SkeletonCard';
-import { Search, Filter, RefreshCw, ChevronRight, ChevronDown } from 'lucide-react';
+import { Search, Filter, RefreshCw, ChevronDown } from 'lucide-react';
 import type { Producto } from '../../lib/types';
 
-const CATEGORIES = ["Todos", "Sillones", "Iluminación", "Mesas", "Adornos", "Otros"];
+const BASE_CATEGORIES = ["Todos", "Sillones", "Iluminación", "Mesas", "Adornos", "Otros"];
 
 function CatalogContent() {
   const searchParams = useSearchParams();
-  const categoryParam = searchParams.get('category');
-  const initialCategory = categoryParam && CATEGORIES.includes(categoryParam) ? categoryParam : 'Todos';
+  const router = useRouter();
 
+  const categoryParam = searchParams.get('category');
+  const searchParam = searchParams.get('search');
+
+  const [search, setSearch] = useState(searchParam || '');
+  const [category, setCategory] = useState(categoryParam || 'Todos');
   const [productos, setProductos] = useState<Producto[]>([]);
+  const [allSearchProducts, setAllSearchProducts] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState('');
-  const [category, setCategory] = useState(initialCategory);
   const [error, setError] = useState<string | null>(null);
   const [orden, setOrden] = useState('relevantes');
+
+  // Sincronizar parámetros de la URL si cambian externamente (ej: desde el buscador del Navbar)
+  useEffect(() => {
+    if (searchParam !== null && searchParam !== search) {
+      setSearch(searchParam);
+    }
+    if (categoryParam !== null && categoryParam !== category) {
+      setCategory(categoryParam);
+    }
+  }, [searchParam, categoryParam]);
 
   const fetchProductos = async () => {
     setLoading(true);
     setError(null);
     try {
-      const queryParams = new URLSearchParams();
-      if (category !== 'Todos') queryParams.append('category', category);
-      if (search.trim() !== '') queryParams.append('search', search.trim());
+      // 1. Petición completa del resultado de búsqueda (sin filtro de categoría) para calcular las categorías dinámicas
+      const querySearch = new URLSearchParams();
+      if (search.trim() !== '') querySearch.append('search', search.trim());
 
-      const res = await fetch(`${getApiUrl()}/products/?${queryParams.toString()}`);
-      if (!res.ok) throw new Error("Error al cargar los productos del servidor.");
-      let data = await res.json();
+      const resBase = await fetch(`${getApiUrl()}/products/?${querySearch.toString()}`);
+      if (!resBase.ok) throw new Error("Error al cargar los productos del servidor.");
+      const baseData: Producto[] = await resBase.json();
+      setAllSearchProducts(baseData);
 
-      // Ordenamiento local opcional
-      if (orden === 'menor-precio') {
-        data = [...data].sort((a, b) => a.price - b.price);
-      } else if (orden === 'mayor-precio') {
-        data = [...data].sort((a, b) => b.price - a.price);
+      // 2. Filtrar por categoría seleccionada
+      let filteredData = baseData;
+      if (category !== 'Todos') {
+        filteredData = baseData.filter(p => p.category?.toLowerCase() === category.toLowerCase());
       }
 
-      setProductos(data);
+      // 3. Ordenamiento local
+      if (orden === 'menor-precio') {
+        filteredData = [...filteredData].sort((a, b) => a.price - b.price);
+      } else if (orden === 'mayor-precio') {
+        filteredData = [...filteredData].sort((a, b) => b.price - a.price);
+      }
+
+      setProductos(filteredData);
     } catch (err: any) {
       setError(err.message || "No se pudo conectar con el catálogo.");
     } finally {
@@ -50,17 +70,32 @@ function CatalogContent() {
 
   useEffect(() => {
     fetchProductos();
-  }, [category, orden]);
+  }, [search, category, orden]);
 
-  useEffect(() => {
-    if (categoryParam && CATEGORIES.includes(categoryParam)) {
-      setCategory(categoryParam);
-    }
-  }, [categoryParam]);
+  // CATEGORÍAS DINÁMICAS: solo muestra las categorías que existen en los resultados de la búsqueda
+  const categoriasDinamicas = useMemo(() => {
+    if (!search.trim()) return BASE_CATEGORIES;
+    const setCats = new Set<string>();
+    setCats.add("Todos");
+    allSearchProducts.forEach(p => {
+      if (p.category) setCats.add(p.category);
+    });
+    return Array.from(setCats);
+  }, [search, allSearchProducts]);
 
   const manejarBusqueda = (e: React.FormEvent) => {
     e.preventDefault();
+    const queryParams = new URLSearchParams();
+    if (search.trim()) queryParams.append('search', search.trim());
+    if (category !== 'Todos') queryParams.append('category', category);
+    router.push(`/catalog?${queryParams.toString()}`);
     fetchProductos();
+  };
+
+  const limpiarFiltros = () => {
+    setSearch('');
+    setCategory('Todos');
+    router.push('/catalog');
   };
 
   return (
@@ -80,7 +115,7 @@ function CatalogContent() {
             <Search className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
           </form>
           <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4">
-            {CATEGORIES.map((cat) => (
+            {categoriasDinamicas.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}
@@ -96,18 +131,18 @@ function CatalogContent() {
           </div>
         </div>
 
-        {/* CONTENEDOR FLEX: FILTROS COMPACTOS A LA IZQUIERDA (240px) + CONTENIDO A LA DERECHA */}
+        {/* CONTENEDOR FLEX: FILTROS TRANSPARENTES Y DINÁMICOS A LA IZQUIERDA + CONTENIDO A LA DERECHA */}
         <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
           
           {/* PANEL LATERAL DE FILTROS (ALINEADO A LA ALTURA DE LAS IMÁGENES DE PRODUCTO) */}
           <aside className="hidden lg:block w-[220px] flex-shrink-0 space-y-6 sticky top-24 select-none pt-12 lg:pt-14">
-            {/* Bloque de Categorías */}
+            {/* Bloque de Categorías Dinámicas */}
             <div>
               <h3 className="text-base font-bold text-gray-900 mb-3 tracking-tight">
                 Categorías
               </h3>
               <div className="flex flex-col space-y-1.5">
-                {CATEGORIES.map((cat) => (
+                {categoriasDinamicas.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setCategory(cat)}
@@ -140,7 +175,7 @@ function CatalogContent() {
                 {(search || category !== 'Todos') && (
                   <button 
                     type="button"
-                    onClick={() => { setSearch(''); setCategory('Todos'); }}
+                    onClick={limpiarFiltros}
                     className="text-xs font-medium text-gray-500 hover:text-gray-900 cursor-pointer block mt-1"
                   >
                     Limpiar filtros
@@ -150,14 +185,14 @@ function CatalogContent() {
             </div>
           </aside>
 
-          {/* CONTENIDO PRINCIPAL: CABECERA CON CONTEO Y ORDENAMIENTO + GRILLA DE PRODUCTOS AMPLIA (4 COLUMNAS) */}
+          {/* CONTENIDO PRINCIPAL: CABECERA CON CONTEO Y ORDENAMIENTO + GRILLA DE PRODUCTOS */}
           <main className="flex-1 w-full min-w-0">
             
-            {/* Cabecera Superior: Título de Categoría + Total de Resultados a la Izquierda | Ordenamiento a la Derecha */}
+            {/* Cabecera Superior: Título de Categoría/Búsqueda + Total de Resultados a la Izquierda | Ordenamiento a la Derecha */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-5 pb-3 border-b border-gray-200/80">
               <div>
                 <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight uppercase" style={{ fontFamily: 'var(--font-family-brand, Outfit)' }}>
-                  {category === "Todos" ? "Catálogo Exclusivo" : category}
+                  {search ? `Resultados para "${search}"` : (category === "Todos" ? "Catálogo Exclusivo" : category)}
                 </h1>
                 <span className="text-xs text-gray-500 font-medium">
                   {loading ? "Cargando..." : `${productos.length} resultados`}
@@ -182,7 +217,7 @@ function CatalogContent() {
               </div>
             </div>
 
-            {/* Grilla de Productos de 4 Columnas con Spacing Armonioso (RÉPLICA DE LA SEGUNDA IMAGEN DE REFERENCIA) */}
+            {/* Grilla de Productos */}
             {error && (
               <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-none text-xs mb-6 font-semibold">
                 ⚠️ Error: {error}
@@ -199,7 +234,9 @@ function CatalogContent() {
               <div className="text-center py-20 bg-white border border-gray-200 rounded-none shadow-xs">
                 <Filter className="h-10 w-10 text-gray-300 mx-auto mb-3" />
                 <h3 className="text-base font-bold text-gray-700">No se encontraron productos</h3>
-                <p className="text-xs text-gray-400 mt-1">Intentá ajustando los filtros de búsqueda o categoría.</p>
+                <p className="text-xs text-gray-400 mt-1">
+                  {search ? `No encontramos coincidencias para "${search}".` : 'Intentá ajustando los filtros de búsqueda.'}
+                </p>
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-4 gap-2.5 sm:gap-3">

@@ -207,10 +207,19 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     setNotificaciones(prev => prev.map(n => ({ ...n, leida: true })));
   };
 
+  const [navbarSearch, setNavbarSearch] = useState('');
+
+  const handleNavbarSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (navbarSearch.trim()) {
+      router.push(`/catalog?search=${encodeURIComponent(navbarSearch.trim())}`);
+    }
+  };
+
   return (
     <nav style={{ backgroundColor: 'var(--bg-navbar)' }} className="border-b border-gray-100 sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
+        <div className="flex justify-between h-16 items-center gap-4">
           
           {/* LOGO DE MARCA Y TIPOGRAFÍA DINÁMICA */}
           <div className="flex-shrink-0 flex items-center">
@@ -230,6 +239,20 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                 {brandNameState || 'OBJETIA'}
               </span>
             </Link>
+          </div>
+
+          {/* CUADRO DE BÚSQUEDA INTEGRADO EN EL NAVBAR */}
+          <div className="flex-1 max-w-md mx-4 hidden md:block">
+            <form onSubmit={handleNavbarSearch} className="relative">
+              <input 
+                type="text" 
+                value={navbarSearch}
+                onChange={(e) => setNavbarSearch(e.target.value)}
+                placeholder="Buscar muebles, iluminación, decoración..." 
+                className="w-full bg-gray-50 border border-gray-200/90 rounded-full pl-10 pr-4 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-purple-600 focus:bg-white transition shadow-2xs"
+              />
+              <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-gray-400" />
+            </form>
           </div>
 
           {/* MENÚ DE ACCIONES */}
