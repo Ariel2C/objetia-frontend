@@ -189,18 +189,18 @@ export default function ProductCard({
         )}
       </div>
 
-      {/* SECCIÓN INFERIOR DE TEXTO (TÍTULO -> PRECIO -> TEXTO VERDE DE CUOTAS) */}
-      <div className="p-2 sm:p-2.5 bg-white flex flex-col justify-between flex-grow space-y-0.5 text-left">
-        {/* TÍTULO DEL PRODUCTO */}
-        <h3 className="text-xs sm:text-sm font-semibold text-gray-900 text-left line-clamp-1 leading-tight tracking-tight group-hover:text-purple-700 transition">
+      {/* SECCIÓN INFERIOR DE TEXTO (ESTILO E-COMMERCE MODERNO COMO LA FOTO) */}
+      <div className="p-2.5 sm:p-3 bg-white flex flex-col justify-between flex-grow space-y-1 text-left">
+        {/* TÍTULO DEL PRODUCTO EN 2 LÍNEAS LIMPIAS */}
+        <h3 className="text-xs sm:text-[13px] font-normal text-gray-700 text-left line-clamp-2 leading-snug tracking-normal group-hover:text-purple-700 transition">
           {formatearTituloProducto(producto.title)}
         </h3>
 
-        {/* PRECIO Y CUOTAS EN TEXTO VERDE SIN PASTILLA */}
-        <div className="flex flex-col text-left space-y-0.5">
-          <FormattedPrice price={producto.price} showCents={false} className="text-sm sm:text-base font-extrabold text-gray-900 text-left tracking-tight leading-none" />
+        {/* PRECIO + CUOTAS EN VERDE #00A650 */}
+        <div className="flex flex-col text-left space-y-0.5 pt-0.5">
+          <FormattedPrice price={producto.price} showCents={false} className="text-base sm:text-lg font-semibold text-gray-900 text-left tracking-tight leading-none" />
           
-          <span className="text-[9px] sm:text-[10px] font-bold text-[#0D8A6F] text-left leading-none tracking-tight block">
+          <span className="text-[10px] sm:text-[11px] font-medium text-[#00A650] text-left leading-tight block">
             {cuotasVal} cuotas sin interés
           </span>
         </div>
