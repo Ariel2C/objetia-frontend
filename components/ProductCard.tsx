@@ -144,11 +144,18 @@ export default function ProductCard({
         
         {/* Etiquetas en Cascada */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10">
-          {campanaActiva && campanaActiva.badgeTexto && (
-            <span className="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded-full bg-amber-400 text-gray-900 shadow-sm border border-amber-500 animate-pulse">
-              {campanaActiva.badgeTexto}
-            </span>
-          )}
+          {(() => {
+            if (!campanaActiva || !campanaActiva.activa || !campanaActiva.badgeTexto) return null;
+            const now = Date.now();
+            const start = new Date(campanaActiva.inicio).getTime();
+            const end = new Date(campanaActiva.fin).getTime();
+            if (now < start || now > end) return null;
+            return (
+              <span className="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded-full bg-amber-400 text-gray-900 shadow-sm border border-amber-500 animate-pulse">
+                {campanaActiva.badgeTexto}
+              </span>
+            );
+          })()}
           {producto.is_new && (
             <span className="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider rounded-full bg-[#4F46E5] text-white shadow-sm border border-indigo-500">
               Nuevo ingreso

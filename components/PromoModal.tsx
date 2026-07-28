@@ -6,16 +6,29 @@ import { X, Gift, Sparkles, ArrowRight } from 'lucide-react';
 
 export default function PromoModal() {
   const [abierto, setAbierto] = useState(false);
+  const [campanaState, setCampanaState] = useState<any>(null);
 
   useEffect(() => {
-    // Mostrar modal solo si el usuario no lo ha cerrado previamente en este navegador
-    const visto = localStorage.getItem('objetia_promo_visto');
-    if (!visto) {
-      const timer = setTimeout(() => {
-        setAbierto(true);
-      }, 1500); // 1.5 segundos después de entrar
-      return () => clearTimeout(timer);
-    }
+    try {
+      const stored = localStorage.getItem('objetia_active_campaign');
+      if (stored) {
+        const campana = JSON.parse(stored);
+        const now = Date.now();
+        const start = new Date(campana.inicio).getTime();
+        const end = new Date(campana.fin).getTime();
+
+        if (campana.activa && campana.mostrarModalPromo !== false && now >= start && now <= end) {
+          setCampanaState(campana);
+          const visto = localStorage.getItem('objetia_promo_visto');
+          if (!visto) {
+            const timer = setTimeout(() => {
+              setAbierto(true);
+            }, 1500);
+            return () => clearTimeout(timer);
+          }
+        }
+      }
+    } catch {}
   }, []);
 
   const cerrarModal = () => {
@@ -23,7 +36,7 @@ export default function PromoModal() {
     localStorage.setItem('objetia_promo_visto', 'true');
   };
 
-  if (!abierto) return null;
+  if (!abierto || !campanaState) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
@@ -60,11 +73,11 @@ export default function PromoModal() {
           <div className="space-y-2">
             <div className="flex justify-between items-start">
               <span className="text-[10px] font-bold text-purple-600 uppercase tracking-widest flex items-center gap-1">
-                <Sparkles className="h-3 w-3" /> Bienvenido
+                <Sparkles className="h-3 w-3" /> Evento Especial
               </span>
               <button 
                 onClick={cerrarModal}
-                className="p-1 text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition cursor-pointer"
+                className="text-gray-400 hover:text-gray-600 p-1 transition cursor-pointer"
                 aria-label="Cerrar modal"
               >
                 <X className="h-4 w-4" />
@@ -72,31 +85,30 @@ export default function PromoModal() {
             </div>
 
             <h3 className="text-lg font-black text-gray-900 leading-tight">
-              ¡Obtené <span className="text-purple-600">$15.000 OFF</span> en tu primera compra!
+              {campanaState.nombre || "¡Beneficio Exclusivo!"}
             </h3>
 
-            <p className="text-xs text-gray-500 leading-relaxed">
-              Únete a la comunidad de decoración y diseño. Registrate en menos de 1 minuto y aplica tu cupón promocional.
+            <p className="text-xs text-gray-600">
+              {campanaState.slogan || "Aprovechá nuestros descuentos especiales por tiempo limitado."}
             </p>
           </div>
 
-          <div className="space-y-2 pt-2">
-            <Link
-              href="/auth"
-              onClick={cerrarModal}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-2 shadow-md transition"
-            >
-              Reclamar mi Cupón
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-
-            <button
-              onClick={cerrarModal}
-              className="w-full py-1.5 text-[10px] font-bold text-gray-400 hover:text-gray-600 transition text-center cursor-pointer"
-            >
-              No volver a mostrar
-            </button>
+          {/* Código de Cupón Copiable */}
+          <div className="bg-purple-50 p-3 rounded-2xl border border-purple-100 space-y-1 text-center">
+            <span className="text-[9px] font-extrabold text-purple-800 uppercase tracking-wider block">Tu Cupón Promocional</span>
+            <div className="font-mono font-black text-sm text-purple-900 tracking-wider">
+              {campanaState.codigoCupon || "OBJETIAOFF"}
+            </div>
           </div>
+
+          <Link
+            href="/catalog"
+            onClick={cerrarModal}
+            className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2 group cursor-pointer"
+          >
+            <span>Usar Cupón en Catálogo</span>
+            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+          </Link>
         </div>
       </div>
     </div>
