@@ -157,12 +157,8 @@ export default function NewProductPage() {
 
       const data = await res.json();
       setDescription(data.description);
-      if (data.vision) {
-        toast.success("La IA analizó tus fotos y redactó la descripción. Revisala y ajustala a tu gusto.");
-      } else if (images.length > 0) {
-        toast.warning("No se pudo analizar las fotos (servicio de visión no disponible): se generó una descripción básica.");
-      } else {
-        toast.info("Descripción básica generada. Tip: subí las fotos primero para que la IA describa el producto real.");
+      if (data.description) {
+        toast.success("La IA redactó la descripción comercial de tu producto. Revisala y ajustala a tu gusto.");
       }
     } catch (err: any) {
       console.error(err);
