@@ -125,15 +125,45 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     }
   };
 
+  const fetchAdminModerationCount = async () => {
+    if (usuario?.role !== 'ADMIN') return;
+    try {
+      const authToken = localStorage.getItem("vamaar_token") || token;
+      if (!authToken) return;
+      const res = await fetch(`${getApiUrl()}/products/admin/moderation/`, {
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const pendientesORechazados = data.filter((p: any) => p.moderation_status === 'rejected' || p.moderation_status === 'pending');
+        if (pendientesORechazados.length > 0) {
+          setNotificaciones([
+            {
+              id: 999,
+              texto: `⚠️ Atención Administrador: Hay ${pendientesORechazados.length} producto(s) en revisión o rechazado(s) por la IA.`,
+              leida: false,
+              fecha: "Reciente",
+              link: "/mi-espacio?tab=moderation"
+            }
+          ]);
+        }
+      }
+    } catch (err) {
+      console.error("Error al obtener moderación admin:", err);
+    }
+  };
+
   useEffect(() => {
     if (!cargando) {
       fetchUnreadChatsCount();
       fetchCartCount();
+      fetchAdminModerationCount();
       
       const interval = setInterval(() => {
         if (document.visibilityState !== 'visible') return;
         fetchUnreadChatsCount();
         fetchCartCount();
+        fetchAdminModerationCount();
       }, 15000);
 
       const handleRefresh = () => fetchUnreadChatsCount();
@@ -142,6 +172,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
         if (document.visibilityState === 'visible') {
           fetchUnreadChatsCount();
           fetchCartCount();
+          fetchAdminModerationCount();
         }
       };
       window.addEventListener('chat_messages_read', handleRefresh);
@@ -173,7 +204,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     };
   }, []);
 
-  interface Notificacion { id: number; texto: string; leida: boolean; fecha: string; }
+  interface Notificacion { id: number; texto: string; leida: boolean; fecha: string; link?: string; }
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const unreadNotifsCount = notificaciones.filter(n => !n.leida).length;
 
@@ -382,9 +413,20 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                       <p className="text-[11px] text-gray-400 text-center py-4">No tienes notificaciones.</p>
                     ) : (
                       notificaciones.map(n => (
-                        <div key={n.id} className={`p-2.5 rounded-xl text-[11px] leading-tight transition ${n.leida ? 'bg-white text-gray-500' : 'bg-gray-50 text-gray-800 font-medium border-l-4 border-[#4D5E4F]'}`}>
+                        <div 
+                          key={n.id} 
+                          onClick={() => {
+                            if (n.link) {
+                              setNotifAbierto(false);
+                              router.push(n.link);
+                            }
+                          }}
+                          className={`p-2.5 rounded-xl text-[11px] leading-tight transition cursor-pointer ${
+                            n.leida ? 'bg-white text-gray-500' : 'bg-amber-50/90 text-amber-950 font-bold border-l-4 border-amber-500'
+                          }`}
+                        >
                           <p>{n.texto}</p>
-                          <span className="text-[9px] text-gray-400 mt-1 block">{n.fecha}</span>
+                          <span className="text-[9px] text-amber-700/80 mt-1 block font-normal">{n.fecha}</span>
                         </div>
                       ))
                     )}

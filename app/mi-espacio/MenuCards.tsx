@@ -14,7 +14,8 @@ import {
   PlusCircle,
   MessageSquare,
   Heart,
-  Calendar
+  Calendar,
+  ShieldAlert
 } from 'lucide-react';
 
 interface CardItem {
@@ -65,6 +66,12 @@ export default function MenuCards({ tabActual, setTabActual, esAdmin, onSelectCa
           label: "Personalización",
           icon: Sliders,
           iconColor: "text-purple-700"
+        },
+        {
+          id: "moderation",
+          label: "Productos en revisión",
+          icon: ShieldAlert,
+          iconColor: "text-amber-600"
         },
         {
           id: "banners",

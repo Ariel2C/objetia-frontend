@@ -18,10 +18,11 @@ import PurchasesTab from './PurchasesTab';
 import SalesTab from './SalesTab';
 import PublicationsTab from './PublicationsTab';
 import CampaignsTab from './CampaignsTab';
+import ModerationTab from './ModerationTab';
 
 const TABS_VALIDOS = new Set([
   "menu", "dashboard", "appearance", "campanas", "secciones", "banners",
-  "billetera", "perfil", "purchases", "sales", "publications",
+  "billetera", "perfil", "purchases", "sales", "publications", "moderation"
 ]);
 
 export default function MiEspacioPage() {
@@ -840,6 +841,13 @@ function MiEspacioContent() {
         {tabActual === "publications" && (
           <PublicationsTab 
             token={token}
+          />
+        )}
+
+        {/* TAB: MODERACIÓN DE PRODUCTOS (ADMIN) */}
+        {tabActual === "moderation" && (
+          <ModerationTab 
+            token={token || ""}
           />
         )}
 

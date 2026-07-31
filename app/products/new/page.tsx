@@ -1,5 +1,6 @@
 // app/products/new/page.tsx
 "use client";
+
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -12,12 +13,25 @@ import {
   Upload, 
   X, 
   Sparkles, 
-  Plus, 
   Loader2, 
   AlertTriangle,
   ArrowRight,
-  ChevronDown
+  ChevronDown,
+  CheckCircle2,
+  XCircle,
+  Trash2,
+  Image as ImageIcon,
+  Tag,
+  Check
 } from "lucide-react";
+
+interface SecondaryPhotoState {
+  id: string;
+  file: File;
+  preview: string;
+  status: "pending" | "ok" | "error";
+  reason?: string;
+}
 
 export default function NewProductPage() {
   const { usuario, token, cargando } = useAuth();
@@ -25,34 +39,39 @@ export default function NewProductPage() {
   const toast = useToast();
 
   // --- PASOS DEL WIZARD ---
-  const [pasoActual, setPasoActual] = useState(1); // 1: Info, 2: Fotos, 3: Detalles, 4: Revisión
+  const [pasoActual, setPasoActual] = useState(1); // 1: Fotos & IA, 2: Info, 3: Medidas & Precio, 4: Revisión
 
-  // --- ESTADOS DEL FORMULARIO ---
-  // Paso 1: Info
+  // --- FOTO PRINCIPAL (Paso 1) ---
+  const [primaryFile, setPrimaryFile] = useState<File | null>(null);
+  const [primaryPreview, setPrimaryPreview] = useState<string | null>(null);
+  const [analizandoPrincipal, setAnalizandoPrincipal] = useState(false);
+  const [principalAnalizada, setPrincipalAnalizada] = useState(false);
+  const primaryInputRef = useRef<HTMLInputElement>(null);
+
+  // --- FOTOS SECUNDARIAS (Paso 1b - Máx. 5 fotos en total contando la principal) ---
+  const [secundarias, setSecundarias] = useState<SecondaryPhotoState[]>([]);
+  const secondaryInputRef = useRef<HTMLInputElement>(null);
+
+  // --- FORMULARIO PRODUCTO ---
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("Sillones y Sofás");
+  const [category, setCategory] = useState("Iluminación");
   const [condition, setCondition] = useState("USED"); // USED or NEW
   const [description, setDescription] = useState("");
+  const [tags, setTags] = useState("");
   const [price, setPrice] = useState("");
   const [priceDisplay, setPriceDisplay] = useState("");
   const [stock, setStock] = useState("1");
 
-  // Paso 2: Fotos
-  const [images, setImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [dragActive, setDragActive] = useState(false);
+  // --- EMBALAJE Y ENVÍO (Correo Argentino) ---
+  const [weight, setWeight] = useState("2.5");
+  const [height, setHeight] = useState("40");
+  const [width, setWidth] = useState("25");
+  const [length, setLength] = useState("25");
 
-  // Paso 3: Detalles (Embalaje)
-  const [weight, setWeight] = useState("1.0");
-  const [height, setHeight] = useState("15");
-  const [width, setWidth] = useState("15");
-  const [length, setLength] = useState("15");
-
-  // Estados de carga e interfaz
-  const [cargandoCopilot, setCargandoCopilot] = useState(false);
+  // ESTADOS DE CARGA E INTERFAZ
   const [errorSubmit, setErrorSubmit] = useState<string | null>(null);
   const [publicando, setPublicando] = useState(false);
+
   // Escudo de autenticación
   useEffect(() => {
     if (!cargando && !usuario) {
@@ -68,104 +87,144 @@ export default function NewProductPage() {
     );
   }
 
-  // --- GESTIÓN DE DRAG & DROP FOTOS ---
-  const handleDrag = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const procesarArchivos = (filesList: FileList) => {
-    const nuevosArchivos = Array.from(filesList).filter(file => file.type.startsWith("image/"));
-    
-    if (images.length + nuevosArchivos.length > 8) {
-      toast.warning("La plataforma permite un máximo de 8 imágenes por producto.");
+  // --- 1. PROCESAR FOTO PRINCIPAL DE PORTADA ---
+  const handlePrimaryFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const file = e.target.files[0];
+    if (!file.type.startsWith("image/")) {
+      toast.error("El archivo debe ser una imagen (JPG, PNG, WEBP).");
       return;
     }
 
-    const nuevosFiles = [...images, ...nuevosArchivos];
-    setImages(nuevosFiles);
-
-    const previews = nuevosArchivos.map(file => URL.createObjectURL(file));
-    setImagePreviews([...imagePreviews, ...previews]);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      procesarArchivos(e.dataTransfer.files);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      procesarArchivos(e.target.files);
-    }
-  };
-
-  const removerImagen = (index: number) => {
-    const nuevosFiles = [...images];
-    nuevosFiles.splice(index, 1);
-    setImages(nuevosFiles);
-
-    const nuevasPreviews = [...imagePreviews];
-    URL.revokeObjectURL(nuevasPreviews[index]);
-    nuevasPreviews.splice(index, 1);
-    setImagePreviews(nuevasPreviews);
-  };
-
-  // --- AYUDANTE DE IA (COPILOT) ---
-  // Si hay fotos cargadas, la IA las analiza para describir lo que realmente se ve.
-  const handleCopilotoIA = async () => {
-    if (!title) {
-      toast.info("Escribí un título antes de redactar con IA.");
-      return;
-    }
-    setCargandoCopilot(true);
+    if (primaryPreview) URL.revokeObjectURL(primaryPreview);
+    const newPreview = URL.createObjectURL(file);
+    setPrimaryFile(file);
+    setPrimaryPreview(newPreview);
+    setPrincipalAnalizada(false);
     setErrorSubmit(null);
 
+    // Auto-analizar foto principal con IA inmediatamente
+    await analizarFotoPrincipal(file);
+  };
+
+  const analizarFotoPrincipal = async (file: File) => {
+    setAnalizandoPrincipal(true);
+    setErrorSubmit(null);
     try {
       const formData = new FormData();
-      formData.append("title", title);
-      formData.append("category", category);
-      formData.append("condition", condition.toLowerCase());
-      images.slice(0, 3).forEach((file) => {
-        formData.append("files", file);
-      });
+      formData.append("file", file);
 
-      const res = await fetch(`${getApiUrl()}/products/copilot`, {
+      const res = await fetch(`${getApiUrl()}/products/analyze-primary-photo`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${localStorage.getItem("vamaar_token") || token}`
+          Authorization: `Bearer ${localStorage.getItem("vamaar_token") || token}`
         },
         body: formData
       });
 
-      if (res.status === 401) {
-        toast.warning("Tu sesión expiró. Iniciá sesión nuevamente.");
-        window.location.href = "/auth";
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.detail || "Error al analizar la foto principal.");
+      }
+
+      const data = await res.json();
+      if (data.title) setTitle(data.title);
+      if (data.category) setCategory(data.category);
+      if (data.description) setDescription(data.description);
+      if (data.tags) setTags(data.tags);
+      if (data.weight_kg) setWeight(String(data.weight_kg));
+      if (data.height_cm) setHeight(String(data.height_cm));
+      if (data.width_cm) setWidth(String(data.width_cm));
+      if (data.length_cm) setLength(String(data.length_cm));
+
+      setPrincipalAnalizada(true);
+      toast.success("¡Foto principal analizada con IA! Datos auto-completados exitosamente.");
+    } catch (err: any) {
+      console.error(err);
+      setErrorSubmit(err.message || "No se pudo realizar el análisis de la foto principal.");
+      toast.error(err.message || "Error al escanear la foto principal.");
+    } finally {
+      setAnalizandoPrincipal(false);
+    }
+  };
+
+  const eliminarFotoPrincipal = () => {
+    if (primaryPreview) URL.revokeObjectURL(primaryPreview);
+    setPrimaryFile(null);
+    setPrimaryPreview(null);
+    setPrincipalAnalizada(false);
+  };
+
+  // --- 2. PROCESAR FOTOS SECUNDARIAS Y OCR EN TIEMPO REAL ---
+  const handleSecondaryFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    const nuevosArchivos = Array.from(e.target.files).filter(f => f.type.startsWith("image/"));
+    
+    // Máximo 5 fotos en total (1 principal + 4 secundarias)
+    const espacioDisponible = 5 - (1 + secundarias.length);
+    if (espacioDisponible <= 0) {
+      toast.warning("Se permite un máximo de 5 fotografías por publicación.");
+      return;
+    }
+
+    const archivosAceptados = nuevosArchivos.slice(0, espacioDisponible);
+    const nuevasItems: SecondaryPhotoState[] = archivosAceptados.map(file => ({
+      id: `${Date.now()}-${Math.random()}`,
+      file,
+      preview: URL.createObjectURL(file),
+      status: "pending"
+    }));
+
+    setSecundarias(prev => [...prev, ...nuevasItems]);
+
+    // Ejecutar verificación OCR para cada nueva foto
+    nuevasItems.forEach(item => verificarOcrFoto(item));
+  };
+
+  const verificarOcrFoto = async (item: SecondaryPhotoState) => {
+    try {
+      const formData = new FormData();
+      formData.append("file", item.file);
+
+      const res = await fetch(`${getApiUrl()}/products/check-photo-ocr`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("vamaar_token") || token}`
+        },
+        body: formData
+      });
+
+      if (!res.ok) {
+        setSecundarias(prev =>
+          prev.map(s => (s.id === item.id ? { ...s, status: "error", reason: "Error de servidor al validar OCR" } : s))
+        );
         return;
       }
 
-      if (!res.ok) throw new Error("Fallo al obtener la sugerencia de la IA.");
-
       const data = await res.json();
-      setDescription(data.description);
-      if (data.description) {
-        toast.success("La IA redactó la descripción comercial de tu producto. Revisala y ajustala a tu gusto.");
+      if (data.ok) {
+        setSecundarias(prev =>
+          prev.map(s => (s.id === item.id ? { ...s, status: "ok" } : s))
+        );
+      } else {
+        setSecundarias(prev =>
+          prev.map(s => (s.id === item.id ? { ...s, status: "error", reason: data.reason } : s))
+        );
+        toast.error(`Foto rechazada: ${data.reason}`);
       }
     } catch (err: any) {
-      console.error(err);
-      toast.error("Error al contactar con el Copiloto de IA.");
-    } finally {
-      setCargandoCopilot(false);
+      setSecundarias(prev =>
+        prev.map(s => (s.id === item.id ? { ...s, status: "error", reason: "Error de red" } : s))
+      );
     }
+  };
+
+  const eliminarFotoSecundaria = (id: string) => {
+    setSecundarias(prev => {
+      const item = prev.find(s => s.id === id);
+      if (item) URL.revokeObjectURL(item.preview);
+      return prev.filter(s => s.id !== id);
+    });
   };
 
   // --- FORMATEADOR DE PRECIO EN CALIENTE ---
@@ -182,40 +241,50 @@ export default function NewProductPage() {
     setPriceDisplay(`$ ${parsedNum.toLocaleString("es-AR")}`);
   };
 
-  // --- NAVEGACIÓN Y VALIDACIÓN ---
+  // --- VALIDACIÓN Y NAVEGACIÓN DE PASOS ---
   const irAlSiguiente = () => {
     setErrorSubmit(null);
     if (pasoActual === 1) {
-      if (images.length === 0) {
-        setErrorSubmit("Sube al menos 1 fotografía de tu mueble o decoración.");
+      if (!primaryFile) {
+        setErrorSubmit("Debes subir la foto principal de portada de tu producto.");
+        return;
+      }
+      if (analizandoPrincipal) {
+        setErrorSubmit("Espere a que la IA termine de analizar la foto principal.");
+        return;
+      }
+      const hayFotosConError = secundarias.some(s => s.status === "error");
+      if (hayFotosConError) {
+        setErrorSubmit("Debes eliminar las fotografías secundarias que no pasaron la verificación OCR.");
+        return;
+      }
+      const hayFotosPendientes = secundarias.some(s => s.status === "pending");
+      if (hayFotosPendientes) {
+        setErrorSubmit("Esperá a que terminen de verificarse las fotos secundarias en proceso.");
         return;
       }
       setPasoActual(2);
     } else if (pasoActual === 2) {
       if (!title.trim()) {
-        setErrorSubmit("Escribe el nombre del producto.");
+        setErrorSubmit("Escribe el título comercial del producto.");
         return;
       }
       if (!description.trim()) {
-        setErrorSubmit("Falta la descripción: escribila o generala con IA a partir de tus fotos.");
-        return;
-      }
-      if (!price || parseFloat(price) <= 0) {
-        setErrorSubmit("El precio debe ser un número positivo.");
-        return;
-      }
-      if (!stock || parseInt(stock) <= 0) {
-        setErrorSubmit("El stock debe ser al menos 1.");
+        setErrorSubmit("Ingresa una descripción para tu producto.");
         return;
       }
       setPasoActual(3);
     } else if (pasoActual === 3) {
-      if (!weight || parseFloat(weight) <= 0) {
-        setErrorSubmit("Ingresa un peso de embalaje válido.");
+      if (!price || parseFloat(price) <= 0) {
+        setErrorSubmit("El precio debe ser mayor a $0.");
         return;
       }
-      if (!height || parseInt(height) <= 0 || !width || parseInt(width) <= 0 || !length || parseInt(length) <= 0) {
-        setErrorSubmit("Ingresa dimensiones de embalaje válidas.");
+      if (!stock || parseInt(stock) <= 0) {
+        setErrorSubmit("Ingresa un stock disponible de al menos 1.");
+        return;
+      }
+      if (!weight || parseFloat(weight) <= 0) {
+        setErrorSubmit("Ingresa un peso válido de embalaje.");
         return;
       }
       setPasoActual(4);
@@ -241,21 +310,35 @@ export default function NewProductPage() {
       dataForm.append("price", price);
       dataForm.append("category", category);
       dataForm.append("condition", condition.toLowerCase());
-      dataForm.append("description", description);
+
+      // Incluir las tags dentro de la descripción para búsquedas y filtros
+      const descripcionFinal = tags.trim()
+        ? `${description.trim()}\n\nEtiquetas: ${tags.trim()}`
+        : description.trim();
+
+      dataForm.append("description", descripcionFinal);
       dataForm.append("stock", stock);
       dataForm.append("weight_kg", weight);
       dataForm.append("height_cm", height);
       dataForm.append("width_cm", width);
       dataForm.append("length_cm", length);
 
-      images.forEach((file) => {
-        dataForm.append("files", file);
+      // 1. Agregar foto principal
+      if (primaryFile) {
+        dataForm.append("files", primaryFile);
+      }
+
+      // 2. Agregar fotos secundarias aprobadas
+      secundarias.forEach(sec => {
+        if (sec.status === "ok") {
+          dataForm.append("files", sec.file);
+        }
       });
 
       const res = await fetch(`${getApiUrl()}/products/create/`, {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${tokenSesion}`
+          Authorization: `Bearer ${tokenSesion}`
         },
         body: dataForm
       });
@@ -271,7 +354,7 @@ export default function NewProductPage() {
         throw new Error(errorData.detail || "Error al registrar la publicación.");
       }
 
-      toast.success("Tu publicación fue recibida y está en revisión automática.", "¡Producto enviado!");
+      toast.success("Tu publicación fue recibida y está activa en el catálogo.", "¡Producto publicado!");
 
       setTimeout(() => {
         router.push("/mi-espacio?tab=publications");
@@ -279,13 +362,13 @@ export default function NewProductPage() {
 
     } catch (err: any) {
       setPublicando(false);
-      setErrorSubmit(err.message || "Ocurrió un error de red al contactar con el servidor.");
+      setErrorSubmit(err.message || "Ocurrió un error al enviar el producto al servidor.");
       toast.error(err.message || "No se pudo publicar el producto.");
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 select-none animate-fade-in">
+    <div className="max-w-3xl mx-auto px-4 py-6 select-none animate-fade-in">
       {/* Botón Volver */}
       <div className="mb-4">
         <Link href="/mi-espacio" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 transition">
@@ -293,118 +376,64 @@ export default function NewProductPage() {
         </Link>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-6 md:p-8 space-y-6">
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:p-8 space-y-6">
         
-        {/* CABECERA Y STEPPER HEADER */}
+        {/* CABECERA Y STEPPER */}
         <div className="space-y-6">
           <div>
-            <h1 className="text-base font-semibold leading-7 text-slate-900">Publicar producto</h1>
+            <h1 className="text-lg font-bold text-slate-900">Publicar un Producto</h1>
+            <p className="text-xs text-slate-500 mt-1">
+              Subí primero la foto principal de tu mueble o decoración para que la IA auto-complete los datos.
+            </p>
           </div>
 
           {/* Línea de Pasos */}
-          <div className="relative flex items-center justify-between w-full max-w-lg mx-auto px-4 mt-4">
-            {/* Barra de progreso de fondo */}
-            <div className="absolute left-8 right-8 top-4 h-[2px] bg-slate-100 z-0 flex w-[84%] sm:w-[88%]">
+          <div className="relative flex items-center justify-between w-full max-w-lg mx-auto px-2 mt-4">
+            <div className="absolute left-6 right-6 top-4 h-[2px] bg-slate-100 z-0 w-[84%]">
               <div 
-                className="h-full bg-[#4F46E5] transition-all duration-300" 
+                className="h-full bg-purple-600 transition-all duration-300" 
                 style={{ width: `${((pasoActual - 1) / 3) * 100}%` }}
               />
             </div>
 
             {/* Paso 1: Fotos */}
-            <div className="flex flex-col items-center gap-2 relative z-10">
-              <span className={`h-8 w-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                pasoActual > 1 
-                  ? "bg-[#4F46E5] border-[#4F46E5] text-white text-xs font-bold" 
-                  : pasoActual === 1 
-                    ? "bg-white border-[#4F46E5] text-[#4F46E5] flex items-center justify-center" 
-                    : "bg-white border-slate-200"
+            <div className="flex flex-col items-center gap-1.5 relative z-10">
+              <span className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${
+                pasoActual > 1 ? "bg-purple-600 border-purple-600 text-white" : pasoActual === 1 ? "bg-white border-purple-600 text-purple-600" : "bg-white border-slate-200 text-slate-400"
               }`}>
-                {pasoActual > 1 ? (
-                  "✓"
-                ) : pasoActual === 1 ? (
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#4F46E5]" />
-                ) : null}
+                {pasoActual > 1 ? "✓" : "1"}
               </span>
-              <span 
-                className="text-sm font-medium transition-colors duration-300"
-                style={{
-                  color: pasoActual === 1 ? "#4F46E5" : pasoActual > 1 ? "oklch(21% 0.034 264.665)" : "oklch(60% 0.02 264.665)"
-                }}
-              >
-                Fotos
-              </span>
+              <span className={`text-xs font-semibold ${pasoActual === 1 ? "text-purple-600" : "text-slate-500"}`}>Fotos & IA</span>
             </div>
 
             {/* Paso 2: Info */}
-            <div className="flex flex-col items-center gap-2 relative z-10">
-              <span className={`h-8 w-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                pasoActual > 2 
-                  ? "bg-[#4F46E5] border-[#4F46E5] text-white text-xs font-bold" 
-                  : pasoActual === 2 
-                    ? "bg-white border-[#4F46E5] text-[#4F46E5] flex items-center justify-center" 
-                    : "bg-white border-slate-200"
+            <div className="flex flex-col items-center gap-1.5 relative z-10">
+              <span className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${
+                pasoActual > 2 ? "bg-purple-600 border-purple-600 text-white" : pasoActual === 2 ? "bg-white border-purple-600 text-purple-600" : "bg-white border-slate-200 text-slate-400"
               }`}>
-                {pasoActual > 2 ? (
-                  "✓"
-                ) : pasoActual === 2 ? (
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#4F46E5]" />
-                ) : null}
+                {pasoActual > 2 ? "✓" : "2"}
               </span>
-              <span 
-                className="text-sm font-medium transition-colors duration-300"
-                style={{
-                  color: pasoActual === 2 ? "#4F46E5" : pasoActual > 2 ? "oklch(21% 0.034 264.665)" : "oklch(60% 0.02 264.665)"
-                }}
-              >
-                Info
-              </span>
+              <span className={`text-xs font-semibold ${pasoActual === 2 ? "text-purple-600" : "text-slate-500"}`}>Información</span>
             </div>
 
-            {/* Paso 3: Detalles */}
-            <div className="flex flex-col items-center gap-2 relative z-10">
-              <span className={`h-8 w-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                pasoActual > 3 
-                  ? "bg-[#4F46E5] border-[#4F46E5] text-white text-xs font-bold" 
-                  : pasoActual === 3 
-                    ? "bg-white border-[#4F46E5] text-[#4F46E5] flex items-center justify-center" 
-                    : "bg-white border-slate-200"
+            {/* Paso 3: Medidas & Precio */}
+            <div className="flex flex-col items-center gap-1.5 relative z-10">
+              <span className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${
+                pasoActual > 3 ? "bg-purple-600 border-purple-600 text-white" : pasoActual === 3 ? "bg-white border-purple-600 text-purple-600" : "bg-white border-slate-200 text-slate-400"
               }`}>
-                {pasoActual > 3 ? (
-                  "✓"
-                ) : pasoActual === 3 ? (
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#4F46E5]" />
-                ) : null}
+                {pasoActual > 3 ? "✓" : "3"}
               </span>
-              <span 
-                className="text-sm font-medium transition-colors duration-300"
-                style={{
-                  color: pasoActual === 3 ? "#4F46E5" : pasoActual > 3 ? "oklch(21% 0.034 264.665)" : "oklch(60% 0.02 264.665)"
-                }}
-              >
-                Detalles
-              </span>
+              <span className={`text-xs font-semibold ${pasoActual === 3 ? "text-purple-600" : "text-slate-500"}`}>Precio & Envío</span>
             </div>
 
             {/* Paso 4: Revisión */}
-            <div className="flex flex-col items-center gap-2 relative z-10">
-              <span className={`h-8 w-8 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                pasoActual === 4 
-                  ? "bg-white border-[#4F46E5] text-[#4F46E5] flex items-center justify-center" 
-                  : "bg-white border-slate-200"
+            <div className="flex flex-col items-center gap-1.5 relative z-10">
+              <span className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold border-2 transition-all ${
+                pasoActual === 4 ? "bg-white border-purple-600 text-purple-600" : "bg-white border-slate-200 text-slate-400"
               }`}>
-                {pasoActual === 4 ? (
-                  <span className="h-2.5 w-2.5 rounded-full bg-[#4F46E5]" />
-                ) : null}
+                4
               </span>
-              <span 
-                className="text-sm font-medium transition-colors duration-300"
-                style={{
-                  color: pasoActual === 4 ? "#4F46E5" : "oklch(60% 0.02 264.665)"
-                }}
-              >
-                Revisión
-              </span>
+              <span className={`text-xs font-semibold ${pasoActual === 4 ? "text-purple-600" : "text-slate-500"}`}>Publicar</span>
             </div>
           </div>
         </div>
@@ -417,339 +446,405 @@ export default function NewProductPage() {
           </div>
         )}
 
-        {/* --- CONTENIDO PRINCIPAL POR PASO --- */}
-        <div className="mt-6">
-          
-          {/* PASO 2: INFORMACIÓN BÁSICA */}
-          {pasoActual === 2 && (
-            <div className="space-y-6 animate-fade-in">
-              
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-slate-700 block">Nombre del producto *</label>
-                <input 
-                  type="text" 
-                  required
-                  placeholder="Ej: Lámpara de mesa Nórdica"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] font-normal text-slate-800 bg-white transition"
-                />
+        {/* --- PASO 1: FOTO PRINCIPAL Y FOTOS SECUNDARIAS --- */}
+        {pasoActual === 1 && (
+          <div className="space-y-8 animate-fade-in">
+            
+            {/* SECCIÓN 1: FOTO PRINCIPAL DE PORTADA */}
+            <div className="bg-purple-50/50 border-2 border-dashed border-purple-200 rounded-2xl p-5 md:p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                    <ImageIcon className="h-4 w-4 text-purple-600" />
+                    1. Foto Principal de Portada (Obligatoria)
+                  </h3>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Subí una foto donde el producto se aprecie completo y nítido (ej: si es un velador de dormitorio, que se vean los dos).
+                  </p>
+                </div>
               </div>
 
+              {!primaryPreview ? (
+                <div
+                  onClick={() => primaryInputRef.current?.click()}
+                  className="bg-white rounded-xl p-8 text-center cursor-pointer border border-purple-200 hover:border-purple-500 transition space-y-3 group"
+                >
+                  <input
+                    ref={primaryInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePrimaryFileSelect}
+                    className="hidden"
+                  />
+                  <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center mx-auto text-purple-600 group-hover:scale-110 transition-transform">
+                    <Upload className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800">Hacé clic para seleccionar la Foto Principal</p>
+                    <p className="text-[11px] text-slate-400 mt-1">Formato JPG, PNG o WEBP (Máx. 8 MB)</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-white rounded-xl p-4 border border-purple-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 w-full sm:w-auto">
+                    <img
+                      src={primaryPreview}
+                      alt="Foto Principal"
+                      className="h-24 w-24 object-cover rounded-xl border border-slate-200 flex-shrink-0"
+                    />
+                    <div className="space-y-1">
+                      <p className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                        Foto Principal Cargada
+                        {principalAnalizada && <CheckCircle2 className="h-4 w-4 text-emerald-500" />}
+                      </p>
+                      <p className="text-[11px] text-slate-500 truncate max-w-[200px]">{primaryFile?.name}</p>
+
+                      {analizandoPrincipal ? (
+                        <div className="flex items-center gap-1.5 text-xs text-purple-700 font-bold mt-2">
+                          <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          Escaneando con IA (Título, Categoría, Tags y Medidas)...
+                        </div>
+                      ) : principalAnalizada ? (
+                        <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                          ✨ Datos extraídos e inferidos por IA
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                    <button
+                      type="button"
+                      onClick={() => primaryFile && analizarFotoPrincipal(primaryFile)}
+                      disabled={analizandoPrincipal}
+                      className="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 text-xs font-bold rounded-lg transition flex items-center gap-1"
+                    >
+                      <Sparkles className="h-3.5 w-3.5" /> Re-analizar con IA
+                    </button>
+                    <button
+                      type="button"
+                      onClick={eliminarFotoPrincipal}
+                      className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* SECCIÓN 2: GALERÍA DE FOTOS SECUNDARIAS CON OCR EN TIEMPO REAL */}
+            {primaryFile && (
+              <div className="space-y-4 pt-2 border-t border-slate-100">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900">
+                      2. Fotos Secundarias (Máximo 5 fotos en total)
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Subí fotos adicionales mostrando detalles, ángulos y terminaciones. Cada foto se valida con OCR en tiempo real.
+                    </p>
+                  </div>
+                  <span className="text-xs font-extrabold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-100">
+                    {1 + secundarias.length} / 5 Fotos
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                  {/* FOTO PRINCIPAL DENTRO DE LA GRILLA */}
+                  <div className="relative bg-slate-50 rounded-xl border-2 border-purple-500 p-2 text-center flex flex-col items-center justify-between">
+                    <img src={primaryPreview!} alt="Portada" className="h-24 w-full object-cover rounded-lg" />
+                    <span className="mt-2 px-2 py-0.5 text-[9px] font-extrabold bg-purple-600 text-white rounded-full uppercase">
+                      Portada
+                    </span>
+                  </div>
+
+                  {/* FOTOS SECUNDARIAS */}
+                  {secundarias.map(item => (
+                    <div key={item.id} className="relative bg-slate-50 rounded-xl border border-slate-200 p-2 flex flex-col justify-between items-center text-center space-y-2">
+                      <img src={item.preview} alt="Secundaria" className="h-24 w-full object-cover rounded-lg" />
+
+                      {/* INDICADOR OCR EN TIEMPO REAL */}
+                      {item.status === "pending" && (
+                        <div className="w-full flex items-center justify-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 py-1 rounded-lg">
+                          <Loader2 className="h-3 w-3 animate-spin text-amber-600" />
+                          <span>Verificando OCR...</span>
+                        </div>
+                      )}
+
+                      {item.status === "ok" && (
+                        <div className="w-full flex items-center justify-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 py-1 rounded-lg">
+                          <Check className="h-3 w-3 text-emerald-600" />
+                          <span>Foto Limpia</span>
+                        </div>
+                      )}
+
+                      {item.status === "error" && (
+                        <div className="w-full flex flex-col items-center gap-1 text-[10px] font-bold text-red-700 bg-red-50 border border-red-200 p-1 rounded-lg">
+                          <div className="flex items-center gap-1">
+                            <XCircle className="h-3.5 w-3.5 text-red-600 flex-shrink-0" />
+                            <span>Contacto Detectado</span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => eliminarFotoSecundaria(item.id)}
+                            className="mt-0.5 px-2 py-0.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition text-[9px] flex items-center gap-1"
+                          >
+                            <Trash2 className="h-2.5 w-2.5" /> Eliminar Foto
+                          </button>
+                        </div>
+                      )}
+
+                      {/* BOTÓN BASURA DE ESQUINA */}
+                      <button
+                        type="button"
+                        onClick={() => eliminarFotoSecundaria(item.id)}
+                        className="absolute top-1 right-1 p-1 bg-white/90 text-slate-600 hover:text-red-600 rounded-full shadow-xs transition"
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+
+                  {/* BOTÓN AÑADIR MÁS FOTOS */}
+                  {1 + secundarias.length < 5 && (
+                    <div
+                      onClick={() => secondaryInputRef.current?.click()}
+                      className="bg-slate-50 border-2 border-dashed border-slate-300 rounded-xl p-4 text-center cursor-pointer hover:border-purple-500 hover:bg-purple-50/30 transition flex flex-col items-center justify-center gap-2 h-36"
+                    >
+                      <input
+                        ref={secondaryInputRef}
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleSecondaryFilesSelect}
+                        className="hidden"
+                      />
+                      <Upload className="h-5 w-5 text-slate-400" />
+                      <span className="text-xs font-bold text-slate-600">Añadir otra foto</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* --- PASO 2: INFORMACIÓN BÁSICA DEL PRODUCTO --- */}
+        {pasoActual === 2 && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700 block">Título del Producto *</label>
+              <input 
+                type="text" 
+                required
+                placeholder="Ej: Juego de 2 Veladores de Noche en Madera Maciza"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 font-normal text-slate-800 bg-white transition"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
                 <label className="text-sm font-medium text-slate-700 block">Categoría *</label>
                 <div className="relative">
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] font-normal text-slate-800 bg-white cursor-pointer appearance-none pr-10 transition"
+                    className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 font-normal text-slate-800 bg-white cursor-pointer appearance-none pr-10 transition"
                   >
-                    <option value="Sillones y Sofás">Sillones y Sofás</option>
-                    <option value="Mesas y Escritorios">Mesas y Escritorios</option>
-                    <option value="Sillas y Bancos">Sillas y Bancos</option>
-                    <option value="Almacenamiento">Almacenamiento</option>
                     <option value="Iluminación">Iluminación</option>
-                    <option value="Decoración">Decoración</option>
+                    <option value="Sillones">Sillones</option>
+                    <option value="Mesas">Mesas</option>
+                    <option value="Sillas">Sillas</option>
+                    <option value="Placards y Armarios">Placards y Armarios</option>
+                    <option value="Camas y Respaldos">Camas y Respaldos</option>
+                    <option value="Estanterías">Estanterías</option>
+                    <option value="Espejos">Espejos</option>
+                    <option value="Vajilleros y Racks">Vajilleros y Racks</option>
+                    <option value="Jardín y Exterior">Jardín y Exterior</option>
+                    <option value="Adornos y Cuadros">Adornos y Cuadros</option>
                   </select>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                    <ChevronDown className="h-4 w-4 text-gray-405" />
-                  </div>
+                  <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex justify-between items-center">
-                  <label className="text-sm font-medium text-slate-700 block">Descripción *</label>
-                  <button
-                    type="button"
-                    onClick={handleCopilotoIA}
-                    disabled={cargandoCopilot || images.length === 0}
-                    title={images.length === 0 ? "Subí al menos una foto para que la IA pueda analizarla" : "La IA analiza tus fotos y redacta la descripción"}
-                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100/80 px-2.5 py-1 rounded-md transition border border-purple-200 disabled:opacity-50 cursor-pointer shadow-sm"
-                  >
-                    {cargandoCopilot ? (
-                      <>
-                        <Loader2 className="h-3.5 w-3.5 animate-spin text-purple-700" /> Analizando fotos...
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles className="h-3.5 w-3.5 text-purple-600" /> Generar con IA desde las fotos
-                      </>
-                    )}
-                  </button>
-                </div>
-                <div className="relative">
-                  <textarea
-                    rows={4}
-                    maxLength={500}
-                    placeholder="Generá la descripción con IA a partir de tus fotos, o escribila a mano..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] font-normal leading-relaxed text-slate-800 bg-white transition"
-                  />
-                  <span className="absolute bottom-2.5 right-2.5 text-[10px] text-slate-400 font-semibold bg-white px-1">
-                    {description.length}/500
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-400">
-                  La IA describe materiales, colores, estilo y estado según lo que se ve en las fotos que subiste en el paso anterior.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-700 block">Precio (ARS) *</label>
-                  <input 
-                    type="text" 
-                    required
-                    placeholder="$ 48.900"
-                    value={priceDisplay}
-                    onChange={handlePrecioChange}
-                    className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] font-medium text-slate-800 bg-white transition"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-sm font-medium text-slate-700 block">Stock disponible *</label>
-                  <input 
-                    type="number" 
-                    required
-                    min="1"
-                    placeholder="5"
-                    value={stock}
-                    onChange={(e) => setStock(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] font-medium text-slate-800 bg-white transition"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2.5 pt-2">
-                <label className="text-sm font-medium text-slate-700 block">Condición del artículo *</label>
-                <div className="flex items-center gap-6">
-                  <label className="flex items-center gap-2.5 cursor-pointer select-none">
-                    <input 
-                      type="radio" 
-                      name="condition"
-                      value="NEW"
-                      checked={condition === "NEW"}
-                      onChange={() => setCondition("NEW")}
-                      className="h-4 w-4 border-gray-300 text-[#4F46E5] focus:ring-[#4F46E5] cursor-pointer"
-                    />
-                    <span className="text-sm text-slate-800 font-medium">Sin Uso (Nuevo)</span>
+                <label className="text-sm font-medium text-slate-700 block">Condición *</label>
+                <div className="flex items-center gap-3 pt-1">
+                  <label className={`flex-1 p-2.5 rounded-xl border text-xs font-bold text-center cursor-pointer transition ${condition === 'USED' ? 'border-purple-600 bg-purple-50 text-purple-700' : 'border-gray-200 text-slate-600'}`}>
+                    <input type="radio" name="condition" value="USED" checked={condition === 'USED'} onChange={() => setCondition('USED')} className="hidden" />
+                    Usado
                   </label>
-
-                  <label className="flex items-center gap-2.5 cursor-pointer select-none">
-                    <input 
-                      type="radio" 
-                      name="condition"
-                      value="USED"
-                      checked={condition === "USED"}
-                      onChange={() => setCondition("USED")}
-                      className="h-4 w-4 border-gray-300 text-[#4F46E5] focus:ring-[#4F46E5] cursor-pointer"
-                    />
-                    <span className="text-sm text-slate-800 font-medium">Usado único</span>
+                  <label className={`flex-1 p-2.5 rounded-xl border text-xs font-bold text-center cursor-pointer transition ${condition === 'NEW' ? 'border-purple-600 bg-purple-50 text-purple-700' : 'border-gray-200 text-slate-600'}`}>
+                    <input type="radio" name="condition" value="NEW" checked={condition === 'NEW'} onChange={() => setCondition('NEW')} className="hidden" />
+                    Nuevo
                   </label>
                 </div>
               </div>
             </div>
-          )}
 
-          {/* PASO 1: CARGA DE FOTOS */}
-          {pasoActual === 1 && (
-            <div className="space-y-6 animate-fade-in">
-              <h2 className="text-base font-semibold leading-7 text-slate-900">Fotos del Artículo</h2>
-              
-              <div 
-                onDragEnter={handleDrag}
-                onDragOver={handleDrag}
-                onDragLeave={handleDrag}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition flex flex-col items-center justify-center min-h-[180px] ${
-                  dragActive 
-                    ? "border-[#4F46E5] bg-slate-50" 
-                    : "border-slate-300 hover:border-slate-400 bg-slate-50/50"
-                }`}
-              >
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700 block">Descripción Comercial *</label>
+              <textarea 
+                rows={4}
+                required
+                placeholder="Describí los detalles del producto, materiales, estado y terminaciones..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 font-normal text-slate-800 bg-white transition"
+              />
+            </div>
+
+            {/* ETIQUETAS / TAGS DE BÚSQUEDA */}
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700 flex items-center gap-1.5">
+                <Tag className="h-4 w-4 text-purple-600" />
+                Tags y Palabras Clave para Filtros y Búsqueda
+              </label>
+              <input 
+                type="text" 
+                placeholder="Ej: velador, madera, noche, dormitorio, luz cálida, par"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 font-normal text-slate-800 bg-white transition"
+              />
+              <p className="text-[11px] text-slate-400">Separar por comas. Estas etiquetas ayudan a que tu producto aparezca en los filtros de la izquierda.</p>
+            </div>
+          </div>
+        )}
+
+        {/* --- PASO 3: PRECIO, STOCK Y DATOS DE EMBALAJE (CORREO ARGENTINO) --- */}
+        {pasoActual === 3 && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700 block">Precio de Venta (ARS) *</label>
                 <input 
-                  ref={fileInputRef}
-                  type="file" 
-                  multiple 
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden" 
+                  type="text" 
+                  required
+                  placeholder="$ 0"
+                  value={priceDisplay}
+                  onChange={handlePrecioChange}
+                  className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 font-extrabold text-slate-900 bg-white transition"
                 />
-                <Upload className="h-8 w-8 text-slate-400 mb-2" />
-                <p className="text-xs font-semibold text-slate-700">
-                  Arrastra tus imágenes aquí o <span className="text-[#4F46E5] underline">explora tus archivos</span>
-                </p>
-                <p className="text-[11px] text-slate-400 mt-1">Límite de 8 fotos. Formatos soportados: JPG, PNG, WebP.</p>
               </div>
 
-              {/* Previews en Grid */}
-              {imagePreviews.length > 0 && (
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3 mt-4">
-                  {imagePreviews.map((preview, index) => (
-                    <div key={index} className="relative aspect-square rounded-xl overflow-hidden bg-slate-50 border border-slate-200 shadow-sm group">
-                      <img 
-                        src={preview} 
-                        alt={`Preview ${index}`} 
-                        className="w-full h-full object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removerImagen(index)}
-                        className="absolute top-1.5 right-1.5 p-1.5 bg-white/95 text-slate-500 rounded-full hover:text-red-600 shadow-sm hover:bg-white transition cursor-pointer"
-                      >
-                        <X className="h-3 w-3 stroke-[3]" />
-                      </button>
-                    </div>
-                  ))}
-                  {imagePreviews.length < 8 && (
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="aspect-square rounded-xl border-2 border-dashed border-slate-200 hover:border-slate-355 flex flex-col items-center justify-center gap-1 text-slate-400 hover:text-slate-600 bg-slate-50/50 transition cursor-pointer"
-                    >
-                      <Plus className="h-5 w-5" />
-                      <span className="text-[10px] font-semibold tracking-wider">Añadir</span>
-                    </button>
-                  )}
-                </div>
-              )}
-
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-slate-700 block">Stock Disponible *</label>
+                <input 
+                  type="number" 
+                  min="1"
+                  required
+                  value={stock}
+                  onChange={(e) => setStock(e.target.value)}
+                  className="w-full px-3 py-2.5 text-sm rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 font-normal text-slate-800 bg-white transition"
+                />
+              </div>
             </div>
-          )}
 
-          {/* PASO 3: DETALLES DE EMBALAJE (Logística) */}
-          {pasoActual === 3 && (
-            <div className="space-y-6 animate-fade-in">
-              <div className="bg-amber-50/60 border border-amber-250 p-4 rounded-xl text-xs text-amber-800 leading-relaxed font-medium">
-                ⚠️ Las medidas de embalaje son obligatorias y se utilizan para cotizar automáticamente la etiqueta de envío de Correo Argentino. Por favor sé lo más preciso posible.
-              </div>
+            {/* SECCIÓN EMBALAJE DE ENVÍO */}
+            <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4">
+              <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wider">
+                Datos de Embalaje y Envíos (Calculador Correo Argentino)
+              </h3>
+              <p className="text-xs text-slate-500">
+                La IA estimó las medidas iniciales a partir de tu foto. Podés ajustarlas si querés precisión exacta.
+              </p>
 
-              <h2 className="text-base font-semibold leading-7 text-slate-900">Medidas de Embalaje</h2>
-              
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-700 block text-center">Peso (kg)</label>
-                  <input 
-                    type="number" 
+                  <label className="text-[11px] font-bold text-slate-600 block">Peso (kg) *</label>
+                  <input
+                    type="number"
                     step="0.1"
-                    min="0.1"
-                    required
                     value={weight}
                     onChange={(e) => setWeight(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] font-medium text-center transition"
+                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-200 font-bold text-slate-800 bg-white"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-700 block text-center">Alto (cm)</label>
-                  <input 
-                    type="number" 
-                    min="1"
-                    required
+                  <label className="text-[11px] font-bold text-slate-600 block">Alto (cm) *</label>
+                  <input
+                    type="number"
                     value={height}
                     onChange={(e) => setHeight(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] font-medium text-center transition"
+                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-200 font-bold text-slate-800 bg-white"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-700 block text-center">Ancho (cm)</label>
-                  <input 
-                    type="number" 
-                    min="1"
-                    required
+                  <label className="text-[11px] font-bold text-slate-600 block">Ancho (cm) *</label>
+                  <input
+                    type="number"
                     value={width}
                     onChange={(e) => setWidth(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] font-medium text-center transition"
+                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-200 font-bold text-slate-800 bg-white"
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-slate-700 block text-center">Largo (cm)</label>
-                  <input 
-                    type="number" 
-                    min="1"
-                    required
+                  <label className="text-[11px] font-bold text-slate-600 block">Largo (cm) *</label>
+                  <input
+                    type="number"
                     value={length}
                     onChange={(e) => setLength(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] font-medium text-center transition"
+                    className="w-full px-2.5 py-2 text-xs rounded-lg border border-slate-200 font-bold text-slate-800 bg-white"
                   />
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* PASO 4: REVISIÓN DE PUBLICACIÓN */}
-          {pasoActual === 4 && (
-            <div className="space-y-6 animate-fade-in">
-              <h2 className="text-base font-semibold leading-7 text-slate-900">Revisar publicación</h2>
-              
-              <div className="border border-slate-200 bg-slate-50/50 rounded-xl p-5 md:p-6 space-y-4 shadow-sm">
-                <div className="flex gap-4">
-                  {imagePreviews[0] && (
-                    <img 
-                      src={imagePreviews[0]} 
-                      alt="Miniatura" 
-                      className="h-16 w-16 object-cover rounded-lg border border-slate-200"
-                    />
-                  )}
-                  <div>
-                    <span className="text-xs text-slate-400 font-semibold uppercase tracking-wider">{category}</span>
-                    <h3 className="text-sm font-bold text-slate-900 mt-0.5 line-clamp-1">{formatearTituloProducto(title)}</h3>
-                    <p className="text-base font-bold text-[#4F46E5] mt-1">${parseFloat(price || "0").toLocaleString('es-AR')}</p>
-                  </div>
-                </div>
+        {/* --- PASO 4: REVISIÓN Y PUBLICACIÓN --- */}
+        {pasoActual === 4 && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="bg-purple-50/40 p-5 rounded-2xl border border-purple-100 space-y-4">
+              <h3 className="text-xs font-bold text-purple-900 uppercase tracking-wider">Resumen de tu Publicación</h3>
 
-                <div className="border-t border-slate-200 pt-4 grid grid-cols-2 gap-y-3 gap-x-4 text-xs font-medium text-slate-700">
-                  <div>
-                    <span className="text-slate-450 block text-[11px] font-bold uppercase tracking-wider">Condición</span>
-                    <span>{condition === 'NEW' ? 'Sin Uso (Nuevo)' : 'Usado único'}</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-450 block text-[11px] font-bold uppercase tracking-wider">Stock a vender</span>
-                    <span>{stock} unidades</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-450 block text-[11px] font-bold uppercase tracking-wider">Imágenes</span>
-                    <span>{images.length} fotos cargadas</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-450 block text-[11px] font-bold uppercase tracking-wider">Medidas de envío</span>
-                    <span>{weight}kg / {height}x{width}x{length} cm</span>
-                  </div>
-                </div>
-
-                <div className="border-t border-slate-200 pt-4 space-y-1">
-                  <span className="text-slate-450 block text-[11px] font-bold uppercase tracking-wider">Reseña del objeto</span>
-                  <p className="text-xs text-slate-600 leading-relaxed font-normal">{description}</p>
+              <div className="flex items-start gap-4">
+                {primaryPreview && (
+                  <img src={primaryPreview} alt="Portada" className="h-20 w-20 object-cover rounded-xl border border-slate-200" />
+                )}
+                <div className="space-y-1">
+                  <h4 className="text-sm font-bold text-slate-900">{title}</h4>
+                  <p className="text-xs text-purple-700 font-extrabold">$ {parseFloat(price).toLocaleString("es-AR")}</p>
+                  <p className="text-xs text-slate-500">{category} | {condition === 'NEW' ? 'Nuevo' : 'Usado'}</p>
+                  <p className="text-[11px] text-slate-400">{1 + secundarias.filter(s => s.status === 'ok').length} fotos adjuntas y verificadas</p>
                 </div>
               </div>
+
+              <div className="text-xs text-slate-600 space-y-1 pt-2 border-t border-purple-100/60">
+                <p><span className="font-bold">Descripción:</span> {description}</p>
+                {tags && <p><span className="font-bold">Tags:</span> {tags}</p>}
+                <p><span className="font-bold">Envío estimado:</span> {weight} kg | {height}x{width}x{length} cm</p>
+              </div>
             </div>
-          )}
+          </div>
+        )}
 
-        </div>
-
-        {/* --- PANEL DE BOTONES (Atrás / Siguiente) --- */}
-        <div className="mt-8 pt-6 border-t border-slate-100 flex justify-end gap-3">
-          {pasoActual > 1 && (
+        {/* CONTROLES DE BOTONES INFERIORES */}
+        <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+          {pasoActual > 1 ? (
             <button
               type="button"
               onClick={irAlAtras}
-              className="px-5 py-2.5 border border-slate-300 text-slate-700 hover:bg-slate-50 rounded-lg text-sm font-semibold transition cursor-pointer text-center select-none shadow-sm active:scale-98"
+              className="px-4 py-2.5 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-xl transition"
             >
               Atrás
             </button>
+          ) : (
+            <div />
           )}
 
           {pasoActual < 4 ? (
             <button
               type="button"
               onClick={irAlSiguiente}
-              className="px-6 py-2.5 bg-[#4F46E5] hover:bg-[#4F46E5]/90 text-white rounded-lg text-sm font-semibold transition shadow-sm cursor-pointer flex items-center justify-center gap-1 select-none active:scale-98"
+              className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-2 cursor-pointer"
             >
               Siguiente <ArrowRight className="h-4 w-4" />
             </button>
@@ -758,15 +853,10 @@ export default function NewProductPage() {
               type="button"
               onClick={handlePublicarProducto}
               disabled={publicando}
-              className="px-6 py-2.5 bg-[#4F46E5] hover:bg-[#4F46E5]/90 text-white rounded-lg text-sm font-semibold transition shadow-sm cursor-pointer flex items-center justify-center gap-1.5 select-none active:scale-98 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center gap-2 cursor-pointer"
             >
-              {publicando ? (
-                <>
-                  <Loader2 className="h-4 w-4 animate-spin" /> Publicando...
-                </>
-              ) : (
-                "Publicar Artículo"
-              )}
+              {publicando ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+              {publicando ? "Publicando..." : "Confirmar y Publicar"}
             </button>
           )}
         </div>
