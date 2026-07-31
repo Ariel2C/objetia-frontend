@@ -19,8 +19,20 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: 'Objetia | Decoración Premium Híbrida',
-  description: 'Marketplace de grado empresarial de decoración de interiores nuevos y usados.',
+  title: 'Objetia | Muebles y Decoración',
+  description: 'Descubrí, comprá y vendé muebles, iluminación y artículos de decoración de diseño.',
+  openGraph: {
+    title: 'Objetia | Muebles y Decoración',
+    description: 'Descubrí, comprá y vendé muebles, iluminación y artículos de decoración de diseño.',
+    siteName: 'Objetia',
+    locale: 'es_AR',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Objetia | Muebles y Decoración',
+    description: 'Descubrí, comprá y vendé muebles, iluminación y artículos de decoración de diseño.',
+  },
 };
 
 // 1. Contrato de tipo estricto alineado con tu tabla 'store_branding' de PostgreSQL
