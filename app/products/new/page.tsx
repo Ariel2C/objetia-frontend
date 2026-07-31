@@ -33,13 +33,24 @@ interface SecondaryPhotoState {
   reason?: string;
 }
 
+const MAX_IA_SCANS_PER_SESSION = 3;
+
 export default function NewProductPage() {
   const { usuario, token, cargando } = useAuth();
   const router = useRouter();
   const toast = useToast();
 
   // --- PASOS DEL WIZARD ---
-  const [pasoActual, setPasoActual] = useState(1); // 1: Fotos & IA, 2: Info, 3: Medidas & Precio, 4: Revisión
+  const [pasoActual, setPasoActual] = useState(1); // 1: Fotos, 2: Info, 3: Medidas & Precio, 4: Revisión
+
+  // --- CONTADOR DE ESCANEOS CON IA (Persistente en sessionStorage) ---
+  const [scanCount, setScanCount] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const saved = sessionStorage.getItem("vamaar_ia_scans_count");
+      return saved ? parseInt(saved, 10) : 0;
+    }
+    return 0;
+  });
 
   // --- FOTO PRINCIPAL (Paso 1) ---
   const [primaryFile, setPrimaryFile] = useState<File | null>(null);
@@ -103,7 +114,21 @@ export default function NewProductPage() {
     setPrincipalAnalizada(false);
     setErrorSubmit(null);
 
-    // Auto-analizar foto principal con IA inmediatamente
+    // Verificar límite estricto de escaneos por sesión
+    if (scanCount >= MAX_IA_SCANS_PER_SESSION) {
+      toast.info("Has alcanzado el límite de 3 análisis automáticos de fotos por sesión. Ingresá la información del producto manualmente.");
+      setPrincipalAnalizada(true);
+      return;
+    }
+
+    // Incrementar contador y guardar en sessionStorage para evitar bypass con F5
+    const newCount = scanCount + 1;
+    setScanCount(newCount);
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("vamaar_ia_scans_count", String(newCount));
+    }
+
+    // Auto-analizar foto principal con IA
     await analizarFotoPrincipal(file);
   };
 
@@ -143,6 +168,7 @@ export default function NewProductPage() {
       console.error(err);
       setErrorSubmit(err.message || "No se pudo realizar el análisis de la foto principal.");
       toast.error(err.message || "Error al escanear la foto principal.");
+      setPrincipalAnalizada(true);
     } finally {
       setAnalizandoPrincipal(false);
     }
@@ -196,7 +222,7 @@ export default function NewProductPage() {
 
       if (!res.ok) {
         setSecundarias(prev =>
-          prev.map(s => (s.id === item.id ? { ...s, status: "error", reason: "Error de servidor al validar OCR" } : s))
+          prev.map(s => (s.id === item.id ? { ...s, status: "error", reason: "Error al validar la foto" } : s))
         );
         return;
       }
@@ -246,21 +272,21 @@ export default function NewProductPage() {
     setErrorSubmit(null);
     if (pasoActual === 1) {
       if (!primaryFile) {
-        setErrorSubmit("Debes subir la foto principal de portada de tu producto.");
+        setErrorSubmit("Debes subir la foto principal de tu producto.");
         return;
       }
       if (analizandoPrincipal) {
-        setErrorSubmit("Espere a que la IA termine de analizar la foto principal.");
+        setErrorSubmit("Esperá a que termine el análisis de la foto principal.");
         return;
       }
       const hayFotosConError = secundarias.some(s => s.status === "error");
       if (hayFotosConError) {
-        setErrorSubmit("Debes eliminar las fotografías secundarias que no pasaron la verificación OCR.");
+        setErrorSubmit("Debes eliminar las fotografías rechazadas antes de continuar.");
         return;
       }
       const hayFotosPendientes = secundarias.some(s => s.status === "pending");
       if (hayFotosPendientes) {
-        setErrorSubmit("Esperá a que terminen de verificarse las fotos secundarias en proceso.");
+        setErrorSubmit("Esperá a que termine la verificación de las fotos secundarias.");
         return;
       }
       setPasoActual(2);
@@ -311,7 +337,6 @@ export default function NewProductPage() {
       dataForm.append("category", category);
       dataForm.append("condition", condition.toLowerCase());
 
-      // Incluir las tags dentro de la descripción para búsquedas y filtros
       const descripcionFinal = tags.trim()
         ? `${description.trim()}\n\nEtiquetas: ${tags.trim()}`
         : description.trim();
@@ -323,12 +348,10 @@ export default function NewProductPage() {
       dataForm.append("width_cm", width);
       dataForm.append("length_cm", length);
 
-      // 1. Agregar foto principal
       if (primaryFile) {
         dataForm.append("files", primaryFile);
       }
 
-      // 2. Agregar fotos secundarias aprobadas
       secundarias.forEach(sec => {
         if (sec.status === "ok") {
           dataForm.append("files", sec.file);
@@ -383,7 +406,7 @@ export default function NewProductPage() {
           <div>
             <h1 className="text-lg font-bold text-slate-900">Publicar un Producto</h1>
             <p className="text-xs text-slate-500 mt-1">
-              Subí primero la foto principal de tu mueble o decoración para que la IA auto-complete los datos.
+              Subí primero la foto principal de tu mueble o decoración para auto-completar los datos.
             </p>
           </div>
 
@@ -403,7 +426,7 @@ export default function NewProductPage() {
               }`}>
                 {pasoActual > 1 ? "✓" : "1"}
               </span>
-              <span className={`text-xs font-semibold ${pasoActual === 1 ? "text-purple-600" : "text-slate-500"}`}>Fotos & IA</span>
+              <span className={`text-xs font-semibold ${pasoActual === 1 ? "text-purple-600" : "text-slate-500"}`}>Fotos</span>
             </div>
 
             {/* Paso 2: Info */}
@@ -456,7 +479,7 @@ export default function NewProductPage() {
                 <div>
                   <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                     <ImageIcon className="h-4 w-4 text-purple-600" />
-                    1. Foto Principal de Portada (Obligatoria)
+                    1. Foto Principal (Obligatoria)
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
                     Subí una foto donde el producto se aprecie completo y nítido (ej: si es un velador de dormitorio, que se vean los dos).
@@ -502,11 +525,11 @@ export default function NewProductPage() {
                       {analizandoPrincipal ? (
                         <div className="flex items-center gap-1.5 text-xs text-purple-700 font-bold mt-2">
                           <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          Escaneando con IA (Título, Categoría, Tags y Medidas)...
+                          Escaneando foto...
                         </div>
                       ) : principalAnalizada ? (
                         <div className="flex items-center gap-1 text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                          ✨ Datos extraídos e inferidos por IA
+                          ✨ Información extraída exitosamente
                         </div>
                       ) : null}
                     </div>
@@ -515,18 +538,10 @@ export default function NewProductPage() {
                   <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                     <button
                       type="button"
-                      onClick={() => primaryFile && analizarFotoPrincipal(primaryFile)}
-                      disabled={analizandoPrincipal}
-                      className="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 text-xs font-bold rounded-lg transition flex items-center gap-1"
-                    >
-                      <Sparkles className="h-3.5 w-3.5" /> Re-analizar con IA
-                    </button>
-                    <button
-                      type="button"
                       onClick={eliminarFotoPrincipal}
-                      className="p-1.5 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                      className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition flex items-center gap-1 text-xs font-semibold"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-4 w-4" /> Cambiar foto
                     </button>
                   </div>
                 </div>
@@ -542,7 +557,7 @@ export default function NewProductPage() {
                       2. Fotos Secundarias (Máximo 5 fotos en total)
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
-                      Subí fotos adicionales mostrando detalles, ángulos y terminaciones. Cada foto se valida con OCR en tiempo real.
+                      Subí fotos adicionales mostrando detalles, ángulos y terminaciones.
                     </p>
                   </div>
                   <span className="text-xs font-extrabold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-100">
@@ -564,18 +579,18 @@ export default function NewProductPage() {
                     <div key={item.id} className="relative bg-slate-50 rounded-xl border border-slate-200 p-2 flex flex-col justify-between items-center text-center space-y-2">
                       <img src={item.preview} alt="Secundaria" className="h-24 w-full object-cover rounded-lg" />
 
-                      {/* INDICADOR OCR EN TIEMPO REAL */}
+                      {/* INDICADOR OCR EN TIEMPO REAL CON NOMBRES EXACTOS */}
                       {item.status === "pending" && (
                         <div className="w-full flex items-center justify-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-200 py-1 rounded-lg">
                           <Loader2 className="h-3 w-3 animate-spin text-amber-600" />
-                          <span>Verificando OCR...</span>
+                          <span>Verificando foto...</span>
                         </div>
                       )}
 
                       {item.status === "ok" && (
                         <div className="w-full flex items-center justify-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 py-1 rounded-lg">
                           <Check className="h-3 w-3 text-emerald-600" />
-                          <span>Foto Limpia</span>
+                          <span>Foto aceptada</span>
                         </div>
                       )}
 
@@ -583,14 +598,14 @@ export default function NewProductPage() {
                         <div className="w-full flex flex-col items-center gap-1 text-[10px] font-bold text-red-700 bg-red-50 border border-red-200 p-1 rounded-lg">
                           <div className="flex items-center gap-1">
                             <XCircle className="h-3.5 w-3.5 text-red-600 flex-shrink-0" />
-                            <span>Contacto Detectado</span>
+                            <span>Foto rechazada</span>
                           </div>
                           <button
                             type="button"
                             onClick={() => eliminarFotoSecundaria(item.id)}
                             className="mt-0.5 px-2 py-0.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition text-[9px] flex items-center gap-1"
                           >
-                            <Trash2 className="h-2.5 w-2.5" /> Eliminar Foto
+                            <Trash2 className="h-2.5 w-2.5" /> Eliminar foto
                           </button>
                         </div>
                       )}
