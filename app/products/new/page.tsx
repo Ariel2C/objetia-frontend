@@ -378,10 +378,8 @@ export default function NewProductPage() {
       }
 
       toast.success("Tu publicación fue recibida y está activa en el catálogo.", "¡Producto publicado!");
-
-      setTimeout(() => {
-        router.push("/mi-espacio?tab=publications");
-      }, 1500);
+      router.push("/mi-espacio?tab=publications");
+      router.refresh();
 
     } catch (err: any) {
       setPublicando(false);
