@@ -324,6 +324,63 @@ export default function NewProductPage() {
     }
   };
 
+  // --- COMPRESOR ULTRA-RÁPIDO EN EL NAVEGADOR ---
+  const comprimirImagenCliente = async (file: File): Promise<File> => {
+    return new Promise((resolve) => {
+      if (file.size <= 300 * 1024) {
+        resolve(file);
+        return;
+      }
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const canvas = document.createElement("canvas");
+        const MAX_SIZE = 1024;
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > MAX_SIZE) {
+            height = Math.round((height * MAX_SIZE) / width);
+            width = MAX_SIZE;
+          }
+        } else {
+          if (height > MAX_SIZE) {
+            width = Math.round((width * MAX_SIZE) / height);
+            height = MAX_SIZE;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const fileComprimido = new File([blob], file.name, {
+                  type: "image/jpeg",
+                  lastModified: Date.now(),
+                });
+                resolve(fileComprimido);
+              } else {
+                resolve(file);
+              }
+            },
+            "image/jpeg",
+            0.8
+          );
+        } else {
+          resolve(file);
+        }
+      };
+      img.onerror = () => resolve(file);
+      img.src = url;
+    });
+  };
+
   // --- SUBMIT REAL AL BACKEND ---
   const handlePublicarProducto = async () => {
     setErrorSubmit(null);
@@ -348,14 +405,19 @@ export default function NewProductPage() {
       dataForm.append("width_cm", width);
       dataForm.append("length_cm", length);
 
+      // Comprimir foto principal en tiempo récord
       if (primaryFile) {
-        dataForm.append("files", primaryFile);
+        const primaryOptim = await comprimirImagenCliente(primaryFile);
+        dataForm.append("files", primaryOptim);
       }
 
-      secundarias.forEach(sec => {
-        if (sec.status === "ok") {
-          dataForm.append("files", sec.file);
-        }
+      // Comprimir fotos secundarias en paralelo
+      const fotosAprobadas = secundarias.filter(sec => sec.status === "ok");
+      const secundariasOptims = await Promise.all(
+        fotosAprobadas.map(sec => comprimirImagenCliente(sec.file))
+      );
+      secundariasOptims.forEach(fOpt => {
+        dataForm.append("files", fOpt);
       });
 
       const res = await fetch(`${getApiUrl()}/products/create/`, {
