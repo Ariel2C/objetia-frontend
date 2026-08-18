@@ -9,24 +9,16 @@ export default function PromoModal() {
   const { usuario } = useAuth();
 
   useEffect(() => {
-    // Si el usuario ya inició sesión o ya cerró el cartel, no mostrar
+    // Si el usuario ya inició sesión, no mostrar
     if (usuario) return;
-    try {
-      const cerrado = localStorage.getItem('objetia_welcome_gift_closed');
-      if (!cerrado) {
-        const timer = setTimeout(() => {
-          setAbierto(true);
-        }, 1200);
-        return () => clearTimeout(timer);
-      }
-    } catch {}
+    const timer = setTimeout(() => {
+      setAbierto(true);
+    }, 1200);
+    return () => clearTimeout(timer);
   }, [usuario]);
 
   const cerrarModal = () => {
     setAbierto(false);
-    try {
-      localStorage.setItem('objetia_welcome_gift_closed', 'true');
-    } catch {}
   };
 
   if (!abierto || usuario) return null;
