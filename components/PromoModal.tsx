@@ -1,114 +1,100 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { X, Gift, Sparkles, ArrowRight } from 'lucide-react';
+import { X, Gift, Sparkles, ArrowRight, Tag } from 'lucide-react';
+import { useAuth } from './AuthContext';
 
 export default function PromoModal() {
   const [abierto, setAbierto] = useState(false);
-  const [campanaState, setCampanaState] = useState<any>(null);
+  const { usuario } = useAuth();
 
   useEffect(() => {
+    // Si el usuario ya inició sesión o ya cerró el cartel, no mostrar
+    if (usuario) return;
     try {
-      const stored = localStorage.getItem('objetia_active_campaign');
-      if (stored) {
-        const campana = JSON.parse(stored);
-        const now = Date.now();
-        const start = new Date(campana.inicio).getTime();
-        const end = new Date(campana.fin).getTime();
-
-        if (campana.activa && campana.mostrarModalPromo !== false && now >= start && now <= end) {
-          setCampanaState(campana);
-          const visto = localStorage.getItem('objetia_promo_visto');
-          if (!visto) {
-            const timer = setTimeout(() => {
-              setAbierto(true);
-            }, 1500);
-            return () => clearTimeout(timer);
-          }
-        }
+      const cerrado = localStorage.getItem('objetia_welcome_gift_closed');
+      if (!cerrado) {
+        const timer = setTimeout(() => {
+          setAbierto(true);
+        }, 1200);
+        return () => clearTimeout(timer);
       }
     } catch {}
-  }, []);
+  }, [usuario]);
 
   const cerrarModal = () => {
     setAbierto(false);
-    localStorage.setItem('objetia_promo_visto', 'true');
+    try {
+      localStorage.setItem('objetia_welcome_gift_closed', 'true');
+    } catch {}
   };
 
-  if (!abierto || !campanaState) return null;
+  if (!abierto || usuario) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/65 backdrop-blur-xs animate-fade-in"
+      onClick={cerrarModal}
+    >
       <div 
-        className="relative w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 flex flex-col sm:flex-row transform transition-all animate-scale-up"
+        className="relative w-full max-w-md bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 p-6 md:p-8 space-y-6 animate-scale-up text-center"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Imagen Promocional */}
-        <div className="relative sm:w-1/2 h-48 sm:h-auto bg-gradient-to-br from-purple-900 via-indigo-900 to-black p-6 flex flex-col justify-between text-white overflow-hidden">
-          <div className="absolute inset-0 opacity-40">
-            <Image
-              src="/objetia_logo.png"
-              alt="Promo Banner"
-              fill
-              className="object-cover"
-            />
-          </div>
-          <div className="relative z-10">
-            <span className="px-3 py-1 bg-amber-400 text-gray-900 text-[9px] font-black uppercase tracking-wider rounded-full shadow-sm inline-flex items-center gap-1">
-              <Gift className="h-3 w-3" /> Regalo Exclusivo
-            </span>
-          </div>
+        {/* BOTÓN CERRAR ESQUINA */}
+        <button 
+          onClick={cerrarModal}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 p-1.5 rounded-full hover:bg-gray-100 transition cursor-pointer"
+          aria-label="Cerrar modal"
+        >
+          <X className="h-5 w-5" />
+        </button>
 
-          <div className="relative z-10 space-y-1 mt-auto">
-            <h4 className="text-xl font-black tracking-tight text-white uppercase" style={{ fontFamily: 'var(--font-family-brand, Outfit)' }}>
-              OBJETIA
-            </h4>
-            <p className="text-[11px] text-purple-200">Decoración & Muebles Premium</p>
-          </div>
+        {/* ÍCONO REGALO DESTACADO */}
+        <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-purple-500 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/30 transform -rotate-3">
+          <Gift className="h-8 w-8" />
         </div>
 
-        {/* Contenido del Modal */}
-        <div className="p-6 sm:w-1/2 flex flex-col justify-between space-y-4">
-          <div className="space-y-2">
-            <div className="flex justify-between items-start">
-              <span className="text-[10px] font-bold text-purple-600 uppercase tracking-widest flex items-center gap-1">
-                <Sparkles className="h-3 w-3" /> Evento Especial
-              </span>
-              <button 
-                onClick={cerrarModal}
-                className="text-gray-400 hover:text-gray-600 p-1 transition cursor-pointer"
-                aria-label="Cerrar modal"
-              >
-                <X className="h-4 w-4" />
-              </button>
-            </div>
+        {/* BADGE Y TÍTULOS */}
+        <div className="space-y-2">
+          <span className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 text-amber-800 text-[10px] font-extrabold uppercase tracking-widest rounded-full border border-amber-200">
+            <Sparkles className="h-3 w-3 text-amber-600" /> Regalo de Bienvenida
+          </span>
 
-            <h3 className="text-lg font-black text-gray-900 leading-tight">
-              {campanaState.nombre || "¡Beneficio Exclusivo!"}
-            </h3>
+          <h3 className="text-xl md:text-2xl font-black text-gray-900 leading-tight">
+            “Tu primera buena elección viene con regalo”
+          </h3>
 
-            <p className="text-xs text-gray-600">
-              {campanaState.slogan || "Aprovechá nuestros descuentos especiales por tiempo limitado."}
-            </p>
-          </div>
+          <p className="text-xs md:text-sm text-gray-600 leading-relaxed max-w-xs mx-auto pt-1">
+            Registrate y recibí <span className="font-extrabold text-purple-700">$5.000 de regalo</span> para tu primera compra superior a <span className="font-bold text-gray-900">$50.000</span>.
+          </p>
+        </div>
 
-          {/* Código de Cupón Copiable */}
-          <div className="bg-purple-50 p-3 rounded-2xl border border-purple-100 space-y-1 text-center">
-            <span className="text-[9px] font-extrabold text-purple-800 uppercase tracking-wider block">Tu Cupón Promocional</span>
-            <div className="font-mono font-black text-sm text-purple-900 tracking-wider">
-              {campanaState.codigoCupon || "OBJETIAOFF"}
-            </div>
-          </div>
+        {/* CÓDIGO DESTACADO */}
+        <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 p-3.5 rounded-2xl border border-purple-100 flex items-center justify-center gap-2">
+          <Tag className="h-4 w-4 text-purple-600" />
+          <span className="text-xs font-bold text-gray-700">Cupón de regalo:</span>
+          <span className="font-mono font-black text-sm text-purple-800 tracking-wider uppercase bg-white px-2 py-0.5 rounded-md border border-purple-200 shadow-xs">
+            BIENVENIDA5K
+          </span>
+        </div>
 
+        {/* BOTÓN ACTIVAR MI REGALO */}
+        <div className="space-y-2 pt-1">
           <Link
-            href="/catalog"
+            href="/auth"
             onClick={cerrarModal}
-            className="w-full py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2 group cursor-pointer"
+            className="w-full py-3.5 bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-500 hover:to-indigo-600 text-white rounded-2xl text-xs font-extrabold uppercase tracking-wider transition shadow-lg shadow-purple-600/25 flex items-center justify-center gap-2 group cursor-pointer"
           >
-            <span>Usar Cupón en Catálogo</span>
-            <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
+            <span>ACTIVAR MI REGALO</span>
+            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Link>
+
+          <button
+            onClick={cerrarModal}
+            className="text-[11px] font-semibold text-gray-400 hover:text-gray-600 transition"
+          >
+            Continuar sin regalo
+          </button>
         </div>
       </div>
     </div>
