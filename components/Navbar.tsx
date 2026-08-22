@@ -9,17 +9,11 @@ import {
   Heart, 
   LogOut, 
   User, 
-  Sliders, 
   Bell, 
   ChevronDown,
-  ArrowRight,
-  ArrowUpRight,
-  ArrowDownRight,
-  UserCheck,
-  Loader2,
-  Home,
   Search,
-  PlusCircle
+  PlusCircle,
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '../lib/config';
@@ -33,6 +27,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
   const router = useRouter();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [notifAbierto, setNotifAbierto] = useState(false);
+  const [descubrirAbierto, setDescubrirAbierto] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const [favoritosCount, setFavoritosCount] = useState(0);
@@ -246,14 +241,21 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     }
   };
 
+  // Manejo del botón VENDER (Directo a /products/new si logueado, o /auth si offline)
+  const handleBotonVender = () => {
+    if (usuario) {
+      router.push("/products/new");
+    } else {
+      router.push("/auth?redirect=/products/new");
+    }
+  };
+
   const esNavOscuro = useMemo(() => {
     if (!navBgColorState) return false;
     const val = navBgColorState.toLowerCase().trim();
-    // Si es blanco puro o transparente, usar íconos y texto oscuros por defecto
     if (val === '#ffffff' || val === '#fff' || val === 'rgb(255, 255, 255)' || val === 'rgb(255,255,255)' || val === 'white' || val === 'transparent') {
       return false;
     }
-    // Si es rgb(r, g, b)
     if (val.startsWith('rgb')) {
       const match = val.match(/\d+/g);
       if (match && match.length >= 3) {
@@ -273,7 +275,6 @@ export default function Navbar({ logoUrl }: NavbarProps) {
       const yiq = (r * 299 + g * 587 + b * 114) / 1000;
       return yiq < 220;
     }
-    // Cualquier otro color de fondo personalizado (ej: "black", "#000", "#111")
     return true;
   }, [navBgColorState]);
 
@@ -286,7 +287,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center gap-4">
           
-          {/* LOGO DE MARCA Y TIPOGRAFÍA DINÁMICA CON CONTRASTE ADAPTABLE */}
+          {/* LOGO DE MARCA */}
           <div className="flex-shrink-0 flex items-center">
             <Link href="/" className="text-xl font-bold tracking-tight transition hover:opacity-95 flex items-center gap-2.5 group">
               <img 
@@ -308,80 +309,129 @@ export default function Navbar({ logoUrl }: NavbarProps) {
             </Link>
           </div>
 
-          {/* CUADRO DE BÚSQUEDA INTEGRADO CON DIVISOR EN EL NAVBAR */}
+          {/* CUADRO DE BÚSQUEDA INTEGRADO */}
           <div className="flex-1 max-w-md mx-4 hidden md:block">
-            <form onSubmit={handleNavbarSearch} className="flex items-stretch bg-white border border-gray-300 rounded-none focus-within:border-gray-500 transition shadow-2xs">
+            <form onSubmit={handleNavbarSearch} className="flex items-stretch bg-white border border-gray-300 rounded-xl focus-within:border-purple-600 transition shadow-2xs">
               <input 
                 type="text" 
                 value={navbarSearch}
                 onChange={(e) => setNavbarSearch(e.target.value)}
                 placeholder="Buscar muebles, iluminación, decoración..." 
-                className="w-full bg-transparent pl-3.5 pr-2 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none"
+                className="w-full bg-transparent pl-3.5 pr-2 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none"
               />
-              {/* DIVISOR VERTICAL INTERNO */}
-              <div className="w-[1px] bg-gray-300 my-1.5" />
+              <div className="w-[1px] bg-gray-200 my-1.5" />
               <button 
                 type="submit"
                 aria-label="Buscar"
-                className="px-3.5 flex items-center justify-center text-gray-500 hover:text-gray-900 transition cursor-pointer bg-transparent"
+                className="px-3.5 flex items-center justify-center text-gray-500 hover:text-purple-700 transition cursor-pointer bg-transparent"
               >
                 <Search className="h-4 w-4" />
               </button>
             </form>
           </div>
 
-          {/* MENÚ DE ACCIONES */}
-          <div className="flex items-center space-x-6">
+          {/* SECCIÓN USUARIO Y ACCIONES DE CABECERA (VENDER / FAVORITOS / PERFIL / CARRITO / CAMPANA) */}
+          <div className="flex items-center space-x-5 sm:space-x-6">
             
-            {/* BOTÓN VENDER */}
-            {!cargando && usuario && (
-              <Link 
-                href="/products/new" 
-                className="hidden sm:inline-flex items-center justify-center text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-sm hover:opacity-90"
-                style={{ backgroundColor: 'var(--color-primary)' }}
-              >
-                Vender
-              </Link>
-            )}
+            {/* 1. BOTÓN VENDER */}
+            <button 
+              onClick={handleBotonVender}
+              className="inline-flex items-center justify-center text-white text-xs font-extrabold px-4 py-2 rounded-xl transition shadow-xs hover:opacity-90 cursor-pointer"
+              style={{ backgroundColor: 'var(--color-primary, #2C3E50)' }}
+            >
+              Vender
+            </button>
 
-            {/* BOTÓN FAVORITOS */}
-            <Link href="/products/favorites" className={`${iconClass} hidden md:block`}>
+            {/* 2. FAVORITOS */}
+            <Link href="/products/favorites" className={iconClass} title="Mis Favoritos">
               <Heart className="h-5.5 w-5.5" />
               {favoritosCount > 0 && (
-                <span className="absolute top-0 right-0 h-2.5 w-2.5 rounded-full bg-red-500 border-2 border-white animate-pulse" />
-              )}
-            </Link>
-
-            {/* BOTÓN CHAT */}
-            <Link href="/chat" className={`${iconClass} hidden md:block`}>
-              <MessageSquare className="h-5.5 w-5.5" />
-              {unreadChatsCount > 0 && (
-                <span 
-                  className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-white bg-red-500 animate-pulse"
-                >
-                  {unreadChatsCount}
+                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center border border-white animate-pulse">
+                  {favoritosCount}
                 </span>
               )}
             </Link>
 
-            {/* BOTÓN CARRITO */}
-            <Link href="/cart" className={`${iconClass} hidden md:block`}>
+            {/* 3. PERFIL (ENCENDIDO ONLINE / AGRISADO OFFLINE) */}
+            <div className="relative" ref={dropdownRef}>
+              {usuario ? (
+                /* ONLINE: ENCENDIDO CON AVATAR Y PUNTO VERDE */
+                <button 
+                  onClick={() => setMenuAbierto(!menuAbierto)}
+                  className="flex items-center gap-1.5 cursor-pointer focus:outline-none p-1 rounded-xl hover:bg-gray-100/50 transition group"
+                  title="Mi Perfil"
+                >
+                  <div className="relative">
+                    {usuario.avatar_url ? (
+                      <img src={usuario.avatar_url} alt="Avatar" className="h-8 w-8 rounded-full border-2 border-emerald-500 object-cover shadow-xs" />
+                    ) : (
+                      <div className="h-8 w-8 rounded-full bg-purple-100 text-purple-700 font-extrabold flex items-center justify-center border-2 border-emerald-500 shadow-xs text-xs">
+                        {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
+                      </div>
+                    )}
+                    <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-white" title="En línea" />
+                  </div>
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${esNavOscuro ? "text-gray-300" : "text-gray-600"} ${menuAbierto ? 'rotate-180' : ''}`} />
+                </button>
+              ) : (
+                /* OFFLINE: AGRISADO CON REDIRECCIÓN A LOGIN/REGISTRO */
+                <Link
+                  href="/auth"
+                  className="flex items-center gap-1 text-gray-400 hover:text-purple-700 opacity-60 hover:opacity-100 transition p-1 cursor-pointer"
+                  title="Ingresar o Registrarse"
+                >
+                  <User className="h-5.5 w-5.5" />
+                </Link>
+              )}
+
+              {/* MENÚ DESPLEGABLE DE PERFIL AL ESTAR LOGUEADO */}
+              {usuario && menuAbierto && (
+                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in origin-top-right">
+                  <div className="px-3 py-2 border-b border-gray-50">
+                    <p className="text-xs font-bold text-gray-900 truncate">{usuario.full_name}</p>
+                    <p className="text-[10px] text-gray-400 truncate">{usuario.email}</p>
+                    {usuario.role === 'ADMIN' && (
+                      <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-purple-100 text-purple-700">
+                        Administrador
+                      </span>
+                    )}
+                  </div>
+
+                  <Link 
+                    href="/mi-espacio" 
+                    onClick={() => setMenuAbierto(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                  >
+                    <User className="h-4 w-4 text-purple-600" /> Mi Espacio
+                  </Link>
+
+                  <button 
+                    onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition cursor-pointer text-left"
+                  >
+                    <LogOut className="h-4 w-4 text-red-400" /> Cerrar Sesión
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* 4. CARRITO */}
+            <Link href="/cart" className={iconClass} title="Carrito">
               <ShoppingCart className="h-5.5 w-5.5" />
               {cartCount > 0 && (
-                <span 
-                  className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-white bg-red-500 animate-pulse"
-                >
+                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-white bg-red-500 animate-pulse">
                   {cartCount}
                 </span>
               )}
             </Link>
 
-            {/* BOTÓN NOTIFICACIONES */}
+            {/* 5. CAMPANITA DE NOTIFICACIONES */}
             <div className="relative" ref={notifRef}>
               <button 
                 onClick={() => setNotifAbierto(!notifAbierto)}
                 aria-label="Notificaciones"
                 className={`${iconClass} focus:outline-none`}
+                title="Notificaciones"
               >
                 <Bell className="h-5.5 w-5.5" />
                 {unreadNotifsCount > 0 && (
@@ -394,7 +444,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                 )}
               </button>
 
-              {/* DROPDOWN DE NOTIFICACIONES */}
+              {/* DROPDOWN NOTIFICACIONES */}
               {notifAbierto && (
                 <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-4 space-y-3 animate-scale-in origin-top-right">
                   <div className="flex justify-between items-center text-xs pb-1 border-b border-gray-50">
@@ -435,100 +485,83 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               )}
             </div>
 
-            {/* BARRA DE PERFIL Y DROPDOWN (SOLO DESKTOP) */}
-            <div className="hidden md:block">
-              {!cargando && (
-                usuario ? (
-                  <div className="relative" ref={dropdownRef}>
-                    
-                    {/* BOTÓN DE PERFIL */}
-                    <button 
-                      onClick={() => setMenuAbierto(!menuAbierto)}
-                      className="flex items-center gap-2 cursor-pointer focus:outline-none hover:opacity-90 transition p-1.5 rounded-xl"
-                    >
-                      {usuario.avatar_url ? (
-                        <img src={usuario.avatar_url} alt="Avatar" className="h-8 w-8 rounded-full border border-gray-100 object-cover" />
-                      ) : (
-                        <div className="h-8 w-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-600 font-extrabold border border-gray-200">
-                          {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
-                        </div>
-                      )}
-                      <span className={`text-xs font-bold ${esNavOscuro ? "text-white" : "text-gray-800"}`}>
-                        {usuario.full_name?.split(" ")[0]}
-                      </span>
-                      <ChevronDown className={`h-3.5 w-3.5 transition-transform ${esNavOscuro ? "text-gray-300" : "text-gray-500"} ${menuAbierto ? 'rotate-180' : ''}`} />
-                    </button>
+          </div>
 
-                    {/* MENÚ DESPLEGABLE DE PERFIL */}
-                    {menuAbierto && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in origin-top-right">
-                        <div className="px-3 py-2 border-b border-gray-50">
-                          <p className="text-xs font-bold text-gray-900 truncate">{usuario.full_name}</p>
-                          <p className="text-[10px] text-gray-400 truncate">{usuario.email}</p>
-                          {usuario.role === 'ADMIN' && (
-                            <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-purple-100 text-purple-700">
-                              Administrador
-                            </span>
-                          )}
-                        </div>
+        </div>
+      </div>
 
-                        <Link 
-                          href="/mi-espacio" 
-                          onClick={() => setMenuAbierto(false)}
-                          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-purple-700 transition"
-                        >
-                          <User className="h-4 w-4 text-gray-400" /> Mi Espacio
-                        </Link>
+      {/* SUB-BARRA DE MENÚ DE NAVEGACIÓN (Nuevos ingresos / Descubrir / Decoración / Iluminación / Alfombras / Exterior) */}
+      <div className="border-t border-gray-100/60 bg-white/95 backdrop-blur-xs hidden md:block">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center space-x-8 py-2.5 text-xs font-extrabold tracking-wide text-gray-700">
+            
+            {/* 1. Nuevos ingresos */}
+            <Link href="/catalog?sort=newest" className="hover:text-purple-700 transition flex items-center gap-1">
+              Nuevos ingresos
+            </Link>
 
-                        <Link 
-                          href="/products/favorites" 
-                          onClick={() => setMenuAbierto(false)}
-                          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-purple-700 transition md:hidden"
-                        >
-                          <Heart className="h-4 w-4 text-gray-400" /> Favoritos
-                        </Link>
+            {/* 2. Descubrir (Dropdown) */}
+            <div 
+              className="relative" 
+              onMouseEnter={() => setDescubrirAbierto(true)} 
+              onMouseLeave={() => setDescubrirAbierto(false)}
+            >
+              <button className="hover:text-purple-700 transition flex items-center gap-1 cursor-pointer py-1">
+                <span>Descubrir</span>
+                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${descubrirAbierto ? 'rotate-180 text-purple-700' : ''}`} />
+              </button>
 
-                        <Link 
-                          href="/chat" 
-                          onClick={() => setMenuAbierto(false)}
-                          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-gray-50 hover:text-purple-700 transition md:hidden"
-                        >
-                          <MessageSquare className="h-4 w-4 text-gray-400" /> Mis Mensajes
-                        </Link>
-
-                        <button 
-                          onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}
-                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition cursor-pointer text-left"
-                        >
-                          <LogOut className="h-4 w-4 text-red-400" /> Cerrar Sesión
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <Link 
-                      href="/auth" 
-                      className={`text-xs font-bold px-3 py-2 transition ${
-                        esNavOscuro ? "text-white hover:text-gray-200" : "text-gray-700 hover:text-purple-700"
-                      }`}
-                    >
-                      Ingresar
-                    </Link>
-                    <Link 
-                      href="/auth" 
-                      style={{ backgroundColor: 'var(--color-primary, #2C3E50)', color: '#FFFFFF' }}
-                      className="text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-xs hover:opacity-90"
-                    >
-                      Registrarse
-                    </Link>
-                  </div>
-                )
+              {descubrirAbierto && (
+                <div className="absolute left-0 top-full w-64 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in origin-top-left">
+                  <Link
+                    href="/catalog?filter=selected"
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                  >
+                    ⭐ Seleccionados de Objetia
+                  </Link>
+                  <Link
+                    href="/catalog?max_price=50000"
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                  >
+                    🏷️ Hallazgos por menos de $50.000
+                  </Link>
+                  <Link
+                    href="/catalog?condition=used"
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                  >
+                    📜 Vintage & Usados Selección
+                  </Link>
+                  <Link
+                    href="/catalog?sort=popular"
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                  >
+                    🔥 Tendencias
+                  </Link>
+                </div>
               )}
             </div>
 
-          </div>
+            {/* 3. Decoración */}
+            <Link href="/catalog?category=Adornos+y+Cuadros" className="hover:text-purple-700 transition">
+              Decoración
+            </Link>
 
+            {/* 4. Iluminación */}
+            <Link href="/catalog?category=Iluminación" className="hover:text-purple-700 transition">
+              Iluminación
+            </Link>
+
+            {/* 5. Alfombras */}
+            <Link href="/catalog?category=Alfombras" className="hover:text-purple-700 transition">
+              Alfombras
+            </Link>
+
+            {/* 6. Exterior */}
+            <Link href="/catalog?category=Jardín+y+Exterior" className="hover:text-purple-700 transition">
+              Exterior
+            </Link>
+
+          </div>
         </div>
       </div>
     </nav>
