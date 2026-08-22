@@ -23,9 +23,11 @@ function LoginContent() {
   const [viewMode, setViewMode] = useState<'auth' | 'vendedor_intro' | 'forgot_password'>('auth');
   const [esLogin, setEsLogin] = useState(true);
 
-  // Campos de formulario (Email con desplegable inteligente al escribir @)
+  // Campos de formulario (Email con autocompletado por teclado/mouse al escribir @)
   const [emailInput, setEmailInput] = useState('');
   const [mostrarSugerenciasEmail, setMostrarSugerenciasEmail] = useState(false);
+  const [indiceSeleccionadoEmail, setIndiceSeleccionadoEmail] = useState(0);
+
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [aceptoTerminos, setAceptoTerminos] = useState(false);
@@ -65,26 +67,42 @@ function LoginContent() {
 
     if (val.includes('@')) {
       const parts = val.split('@');
-      // Mostrar sugerencias si aún no completó un dominio válido completo
       const domExacto = dominiosSugeridos.find(d => d.toLowerCase() === `@${parts[1]}`.toLowerCase());
       if (domExacto) {
         setMostrarSugerenciasEmail(false);
       } else {
         setMostrarSugerenciasEmail(true);
+        setIndiceSeleccionadoEmail(0);
       }
     } else {
       setMostrarSugerenciasEmail(false);
     }
   };
 
-  // Al hacer clic en un servidor del desplegable inteligente
+  // Navegación con teclado (Flechas arriba/abajo y Enter)
+  const manejarKeyDownEmail = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (!mostrarSugerenciasEmail) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setIndiceSeleccionadoEmail((prev) => (prev + 1) % dominiosSugeridos.length);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setIndiceSeleccionadoEmail((prev) => (prev - 1 + dominiosSugeridos.length) % dominiosSugeridos.length);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (dominiosSugeridos[indiceSeleccionadoEmail]) {
+        seleccionarDominioEmail(dominiosSugeridos[indiceSeleccionadoEmail]);
+      }
+    } else if (e.key === 'Escape') {
+      setMostrarSugerenciasEmail(false);
+    }
+  };
+
+  // Al hacer clic o presionar Enter en una sugerencia
   const seleccionarDominioEmail = (dominio: string) => {
     const prefix = emailInput.split('@')[0].trim();
-    if (dominio === 'otro') {
-      setEmailInput(prefix ? `${prefix}@` : '');
-    } else {
-      setEmailInput(`${prefix}${dominio}`);
-    }
+    setEmailInput(`${prefix}${dominio}`);
     setMostrarSugerenciasEmail(false);
   };
 
@@ -347,7 +365,7 @@ function LoginContent() {
             ) : (
               <form onSubmit={manejarRecuperacionPassword} className="space-y-4">
                 
-                {/* CAMPO EMAIL */}
+                {/* CAMPO EMAIL CON DESPLEGABLE INTELIGENTE */}
                 <div className="relative">
                   <label className="block text-xs font-bold text-gray-700 mb-1">Email</label>
                   <div className="relative">
@@ -357,37 +375,36 @@ function LoginContent() {
                       required
                       value={emailInput}
                       onChange={manejarInputEmail}
+                      onKeyDown={manejarKeyDownEmail}
                       placeholder="Tu correo electrónico"
                       className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition font-medium"
                     />
                   </div>
 
-                  {/* DESPLEGABLE INTELIGENTE AL ESCRIBIR @ */}
+                  {/* DESPLEGABLE DE SERVIDORES CON PREVIEW Y TECLADO/MOUSE */}
                   {mostrarSugerenciasEmail && (
-                    <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-purple-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in">
-                      <p className="text-[10px] font-extrabold text-purple-900 px-2 py-0.5 uppercase tracking-wider">
-                        Seleccioná tu servidor:
-                      </p>
-                      {dominiosSugeridos.map((dom) => (
-                        <button
-                          key={dom}
-                          type="button"
-                          onClick={() => seleccionarDominioEmail(dom)}
-                          className="w-full text-left px-3 py-1.5 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition flex justify-between items-center cursor-pointer"
-                        >
-                          <span>{dom}</span>
-                          <span className="text-[10px] text-purple-400 font-normal">
-                            {emailInput.split('@')[0]}{dom}
-                          </span>
-                        </button>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => seleccionarDominioEmail('otro')}
-                        className="w-full text-left px-3 py-1.5 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition block border-t border-gray-100 mt-1 cursor-pointer"
-                      >
-                        Otro servidor...
-                      </button>
+                    <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-purple-100 rounded-2xl shadow-xl z-50 p-1.5 space-y-1 animate-scale-in">
+                      {dominiosSugeridos.map((dom, index) => {
+                        const prefix = emailInput.split('@')[0];
+                        const fullEmailOption = `${prefix}${dom}`;
+                        const esSeleccionado = index === indiceSeleccionadoEmail;
+
+                        return (
+                          <button
+                            key={dom}
+                            type="button"
+                            onMouseEnter={() => setIndiceSeleccionadoEmail(index)}
+                            onClick={() => seleccionarDominioEmail(dom)}
+                            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-between ${
+                              esSeleccionado 
+                                ? 'bg-purple-100 text-purple-900 shadow-2xs font-extrabold' 
+                                : 'text-gray-700 hover:bg-purple-50 hover:text-purple-700'
+                            }`}
+                          >
+                            <span>{fullEmailOption}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -521,7 +538,7 @@ function LoginContent() {
                     </div>
                   )}
 
-                  {/* 2. CAMPO EMAIL (CON DESPLEGABLE INTELIGENTE AL ESCRIBIR @) */}
+                  {/* 2. CAMPO EMAIL (CON AUTOCOMPLETADO POR TECLADO/MOUSE AL ESCRIBIR @) */}
                   <div className="relative">
                     <label className="block text-xs font-bold text-gray-700 mb-1">Email</label>
                     <div className="relative">
@@ -531,37 +548,36 @@ function LoginContent() {
                         required
                         value={emailInput}
                         onChange={manejarInputEmail}
+                        onKeyDown={manejarKeyDownEmail}
                         placeholder="Tu correo electrónico"
                         className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition font-medium"
                       />
                     </div>
 
-                    {/* MENU DESPLEGABLE DE SERVIDORES DE CORREO (SOLO AL ESCRIBIR @) */}
+                    {/* MENU DESPLEGABLE DE SERVIDORES DE CORREO CON PREVIEW COMPLETO */}
                     {mostrarSugerenciasEmail && (
-                      <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-purple-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in">
-                        <p className="text-[10px] font-extrabold text-purple-900 px-2 py-0.5 uppercase tracking-wider">
-                          Seleccioná tu servidor:
-                        </p>
-                        {dominiosSugeridos.map((dom) => (
-                          <button
-                            key={dom}
-                            type="button"
-                            onClick={() => seleccionarDominioEmail(dom)}
-                            className="w-full text-left px-3 py-1.5 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition flex justify-between items-center cursor-pointer"
-                          >
-                            <span>{dom}</span>
-                            <span className="text-[10px] text-purple-400 font-normal">
-                              {emailInput.split('@')[0]}{dom}
-                            </span>
-                          </button>
-                        ))}
-                        <button
-                          type="button"
-                          onClick={() => seleccionarDominioEmail('otro')}
-                          className="w-full text-left px-3 py-1.5 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 hover:text-gray-900 transition block border-t border-gray-100 mt-1 cursor-pointer"
-                        >
-                          Otro servidor...
-                        </button>
+                      <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-purple-100 rounded-2xl shadow-xl z-50 p-1.5 space-y-1 animate-scale-in">
+                        {dominiosSugeridos.map((dom, index) => {
+                          const prefix = emailInput.split('@')[0];
+                          const fullEmailOption = `${prefix}${dom}`;
+                          const esSeleccionado = index === indiceSeleccionadoEmail;
+
+                          return (
+                            <button
+                              key={dom}
+                              type="button"
+                              onMouseEnter={() => setIndiceSeleccionadoEmail(index)}
+                              onClick={() => seleccionarDominioEmail(dom)}
+                              className={`w-full text-left px-3 py-2 rounded-xl text-xs transition cursor-pointer flex items-center justify-between ${
+                                esSeleccionado 
+                                  ? 'bg-purple-100 text-purple-900 shadow-2xs font-black' 
+                                  : 'text-gray-700 font-bold hover:bg-purple-50 hover:text-purple-700'
+                              }`}
+                            >
+                              <span>{fullEmailOption}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -731,7 +747,7 @@ function LoginContent() {
                   <p className="font-bold text-gray-900">1. Aceptación de los Términos</p>
                   <p>Al registrarse y crear una cuenta en Objetia, el usuario acepta de manera libre e incondicional los presentes Términos y Condiciones de Uso del Marketplace.</p>
                   <p className="font-bold text-gray-900">2. Publicación de Productos y Reglas de la Comunidad</p>
-                  <p>Cada publicación debe incluir fotografías reales del producto. Queda estrictamente prohibida la divulgación de datos de contacto externo (teléfonos, WhatsApp, redes sociales) en las imágenes o descripciones de los artículos.</p>
+                  <p>Cada publicación debe incluir fotografías reales del producto. Queda strictly prohibida la divulgación de datos de contacto externo (teléfonos, WhatsApp, redes sociales) en las imágenes o descripciones de los artículos.</p>
                   <p className="font-bold text-gray-900">3. Auditoría de Seguridad y Modificaciones</p>
                   <p>Objetia almacena de forma inalterable la fecha, hora exacta y versión legal (v1.0) aceptada por cada cuenta registrada.</p>
                 </>
