@@ -60,19 +60,21 @@ function LoginContent() {
     }
   }, [modeParam, redirectUrl]);
 
-  // Al escribir en el cuadro de texto de email: activa sugerencias al presionar @
+  // Al escribir en el cuadro de texto de email: activa sugerencias ÚNICAMENTE si termina en @ (ej: marisa@)
   const manejarInputEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setEmailInput(val);
 
+    // La lista SOLO se muestra cuando el texto termina exactamente en '@'
+    // Si no tiene '@' o si el usuario sigue escribiendo cualquier letra después del '@' (ej: marisa@o o root@objetia.com), la lista desaparece inmediatamente.
     if (val.includes('@')) {
       const parts = val.split('@');
-      const domExacto = dominiosSugeridos.find(d => d.toLowerCase() === `@${parts[1]}`.toLowerCase());
-      if (domExacto) {
-        setMostrarSugerenciasEmail(false);
-      } else {
+      const domainPart = parts[1];
+      if (domainPart === '') {
         setMostrarSugerenciasEmail(true);
         setIndiceSeleccionadoEmail(0);
+      } else {
+        setMostrarSugerenciasEmail(false);
       }
     } else {
       setMostrarSugerenciasEmail(false);
