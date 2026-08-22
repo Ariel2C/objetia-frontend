@@ -132,6 +132,7 @@ function LoginContent() {
           email: emailFinal, 
           password: password, 
           full_name: fullName.trim(),
+          accepted_terms: aceptoTerminos,
           wants_newsletter: quieroNovedades
         });
       }
@@ -191,6 +192,10 @@ function LoginContent() {
   };
 
   const manejarExitoGoogle = async (credentialResponse: any) => {
+    if (!esLogin && !aceptoTerminos) {
+      toast.warning("Debés marcar la casilla de Acepto los Términos y Condiciones antes de registrarte con Google.");
+      return;
+    }
     setCargando(true);
     setMensajeError(null);
 
@@ -467,6 +472,7 @@ function LoginContent() {
                   <label className="flex items-start gap-2 cursor-pointer">
                     <input 
                       type="checkbox"
+                      required
                       checked={aceptoTerminos}
                       onChange={(e) => setAceptoTerminos(e.target.checked)}
                       className="mt-0.5 rounded text-purple-600 focus:ring-purple-500 cursor-pointer"
