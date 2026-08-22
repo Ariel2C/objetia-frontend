@@ -7,17 +7,27 @@ import { useRouter } from 'next/navigation';
 import { getApiUrl, getGoogleClientId } from '../../lib/config';
 import { Mail, Lock, User } from 'lucide-react';
 
+import { useSearchParams } from 'next/navigation';
+
 function LoginContent() {
   const { login } = useAuth();
   const toast = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const mode = searchParams.get('mode');
+  const redirectUrl = searchParams.get('redirect') || '/';
   const [montado, setMontado] = useState(false);
+  const [esLogin, setEsLogin] = useState(true);
 
   useEffect(() => {
     setMontado(true);
-  }, []);
+    if (mode === 'register') {
+      setEsLogin(false);
+    } else if (mode === 'login') {
+      setEsLogin(true);
+    }
+  }, [mode]);
 
-  const [esLogin, setEsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -63,12 +73,13 @@ function LoginContent() {
       if (esLogin) {
         toast.success(`Hola de nuevo, ${datos.user?.full_name?.split(" ")[0] || ""}.`, "¡Inicio de sesión exitoso!");
         login(datos.access_token, datos.user);
-        router.push("/");
+        router.push(redirectUrl);
       } else {
-        toast.success("Ya podés ingresar con tu correo y contraseña.", "¡Cuenta creada con éxito!");
-        setEsLogin(true); 
-        setEmail('');
-        setPassword('');
+        toast.success(`¡Bienvenido a Objetia, ${datos.user?.full_name?.split(" ")[0] || "" || ""}!`, "¡Cuenta creada e inicio automático!");
+        if (datos.access_token && datos.user) {
+          login(datos.access_token, datos.user);
+        }
+        router.push(redirectUrl);
       }
     } catch (error: any) {
       setMensajeError(error.message);

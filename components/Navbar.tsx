@@ -330,10 +330,10 @@ export default function Navbar({ logoUrl }: NavbarProps) {
             </form>
           </div>
 
-          {/* SECCIÓN USUARIO Y ACCIONES DE CABECERA (VENDER / FAVORITOS / PERFIL / CARRITO / CAMPANA) */}
-          <div className="flex items-center space-x-5 sm:space-x-6">
+          {/* SECCIÓN USUARIO Y ACCIONES DE CABECERA */}
+          <div className="flex items-center space-x-4 sm:space-x-5">
             
-            {/* 1. BOTÓN VENDER */}
+            {/* BOTÓN VENDER (SIEMPRE VISIBLE) */}
             <button 
               onClick={handleBotonVender}
               className="inline-flex items-center justify-center text-white text-xs font-extrabold px-4 py-2 rounded-xl transition shadow-xs hover:opacity-90 cursor-pointer"
@@ -342,148 +342,168 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               Vender
             </button>
 
-            {/* 2. FAVORITOS */}
-            <Link href="/products/favorites" className={iconClass} title="Mis Favoritos">
-              <Heart className="h-5.5 w-5.5" />
-              {favoritosCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center border border-white animate-pulse">
-                  {favoritosCount}
-                </span>
-              )}
-            </Link>
-
-            {/* 3. PERFIL (ENCENDIDO ONLINE / AGRISADO OFFLINE) */}
-            <div className="relative" ref={dropdownRef}>
-              {usuario ? (
-                /* ONLINE: ENCENDIDO CON AVATAR Y PUNTO VERDE */
-                <button 
-                  onClick={() => setMenuAbierto(!menuAbierto)}
-                  className="flex items-center gap-1.5 cursor-pointer focus:outline-none p-1 rounded-xl hover:bg-gray-100/50 transition group"
-                  title="Mi Perfil"
-                >
-                  <div className="relative">
-                    {usuario.avatar_url ? (
-                      <img src={usuario.avatar_url} alt="Avatar" className="h-8 w-8 rounded-full border-2 border-emerald-500 object-cover shadow-xs" />
-                    ) : (
-                      <div className="h-8 w-8 rounded-full bg-purple-100 text-purple-700 font-extrabold flex items-center justify-center border-2 border-emerald-500 shadow-xs text-xs">
-                        {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
-                      </div>
-                    )}
-                    <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-white" title="En línea" />
-                  </div>
-                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${esNavOscuro ? "text-gray-300" : "text-gray-600"} ${menuAbierto ? 'rotate-180' : ''}`} />
-                </button>
-              ) : (
-                /* OFFLINE: AGRISADO CON REDIRECCIÓN A LOGIN/REGISTRO */
-                <Link
-                  href="/auth"
-                  className="flex items-center gap-1 text-gray-400 hover:text-purple-700 opacity-60 hover:opacity-100 transition p-1 cursor-pointer"
-                  title="Ingresar o Registrarse"
-                >
-                  <User className="h-5.5 w-5.5" />
-                </Link>
-              )}
-
-              {/* MENÚ DESPLEGABLE DE PERFIL AL ESTAR LOGUEADO */}
-              {usuario && menuAbierto && (
-                <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in origin-top-right">
-                  <div className="px-3 py-2 border-b border-gray-50">
-                    <p className="text-xs font-bold text-gray-900 truncate">{usuario.full_name}</p>
-                    <p className="text-[10px] text-gray-400 truncate">{usuario.email}</p>
-                    {usuario.role === 'ADMIN' && (
-                      <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-purple-100 text-purple-700">
-                        Administrador
+            {!cargando && (
+              usuario ? (
+                /* ==================================================================== */
+                /* USUARIO LOGUEADO / ONLINE: APARICIÓN DE TODOS LOS ÍCONOS DE ACCIÓN */
+                /* ==================================================================== */
+                <>
+                  {/* 1. FAVORITOS (CORAZÓN) */}
+                  <Link href="/products/favorites" className={iconClass} title="Mis Favoritos">
+                    <Heart className="h-5.5 w-5.5" />
+                    {favoritosCount > 0 && (
+                      <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center border border-white animate-pulse">
+                        {favoritosCount}
                       </span>
                     )}
-                  </div>
-
-                  <Link 
-                    href="/mi-espacio" 
-                    onClick={() => setMenuAbierto(false)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
-                  >
-                    <User className="h-4 w-4 text-purple-600" /> Mi Espacio
                   </Link>
 
-                  <button 
-                    onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition cursor-pointer text-left"
-                  >
-                    <LogOut className="h-4 w-4 text-red-400" /> Cerrar Sesión
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {/* 4. CARRITO */}
-            <Link href="/cart" className={iconClass} title="Carrito">
-              <ShoppingCart className="h-5.5 w-5.5" />
-              {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-white bg-red-500 animate-pulse">
-                  {cartCount}
-                </span>
-              )}
-            </Link>
-
-            {/* 5. CAMPANITA DE NOTIFICACIONES */}
-            <div className="relative" ref={notifRef}>
-              <button 
-                onClick={() => setNotifAbierto(!notifAbierto)}
-                aria-label="Notificaciones"
-                className={`${iconClass} focus:outline-none`}
-                title="Notificaciones"
-              >
-                <Bell className="h-5.5 w-5.5" />
-                {unreadNotifsCount > 0 && (
-                  <span 
-                    className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-white"
-                    style={{ backgroundColor: '#4D5E4F' }}
-                  >
-                    {unreadNotifsCount}
-                  </span>
-                )}
-              </button>
-
-              {/* DROPDOWN NOTIFICACIONES */}
-              {notifAbierto && (
-                <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-4 space-y-3 animate-scale-in origin-top-right">
-                  <div className="flex justify-between items-center text-xs pb-1 border-b border-gray-50">
-                    <span className="font-extrabold text-gray-800">Notificaciones</span>
-                    {unreadNotifsCount > 0 && (
-                      <button 
-                        onClick={marcarTodasComoLeidas}
-                        className="text-[10px] text-[#4D5E4F] hover:underline font-bold"
-                      >
-                        Leer todas
-                      </button>
-                    )}
-                  </div>
-                  <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-                    {notificaciones.length === 0 ? (
-                      <p className="text-[11px] text-gray-400 text-center py-4">No tienes notificaciones.</p>
-                    ) : (
-                      notificaciones.map(n => (
-                        <div 
-                          key={n.id} 
-                          onClick={() => {
-                            if (n.link) {
-                              setNotifAbierto(false);
-                              router.push(n.link);
-                            }
-                          }}
-                          className={`p-2.5 rounded-xl text-[11px] leading-tight transition cursor-pointer ${
-                            n.leida ? 'bg-white text-gray-500' : 'bg-amber-50/90 text-amber-950 font-bold border-l-4 border-amber-500'
-                          }`}
+                  {/* 2. CAMPANITA DE NOTIFICACIONES */}
+                  <div className="relative" ref={notifRef}>
+                    <button 
+                      onClick={() => setNotifAbierto(!notifAbierto)}
+                      aria-label="Notificaciones"
+                      className={`${iconClass} focus:outline-none`}
+                      title="Notificaciones"
+                    >
+                      <Bell className="h-5.5 w-5.5" />
+                      {unreadNotifsCount > 0 && (
+                        <span 
+                          className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-white"
+                          style={{ backgroundColor: '#4D5E4F' }}
                         >
-                          <p>{n.texto}</p>
-                          <span className="text-[9px] text-amber-700/80 mt-1 block font-normal">{n.fecha}</span>
+                          {unreadNotifsCount}
+                        </span>
+                      )}
+                    </button>
+
+                    {/* DROPDOWN NOTIFICACIONES */}
+                    {notifAbierto && (
+                      <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-4 space-y-3 animate-scale-in origin-top-right">
+                        <div className="flex justify-between items-center text-xs pb-1 border-b border-gray-50">
+                          <span className="font-extrabold text-gray-800">Notificaciones</span>
+                          {unreadNotifsCount > 0 && (
+                            <button 
+                              onClick={marcarTodasComoLeidas}
+                              className="text-[10px] text-[#4D5E4F] hover:underline font-bold"
+                            >
+                              Leer todas
+                            </button>
+                          )}
                         </div>
-                      ))
+                        <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+                          {notificaciones.length === 0 ? (
+                            <p className="text-[11px] text-gray-400 text-center py-4">No tienes notificaciones.</p>
+                          ) : (
+                            notificaciones.map(n => (
+                              <div 
+                                key={n.id} 
+                                onClick={() => {
+                                  if (n.link) {
+                                    setNotifAbierto(false);
+                                    router.push(n.link);
+                                  }
+                                }}
+                                className={`p-2.5 rounded-xl text-[11px] leading-tight transition cursor-pointer ${
+                                  n.leida ? 'bg-white text-gray-500' : 'bg-amber-50/90 text-amber-950 font-bold border-l-4 border-amber-500'
+                                }`}
+                              >
+                                <p>{n.texto}</p>
+                                <span className="text-[9px] text-amber-700/80 mt-1 block font-normal">{n.fecha}</span>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
                     )}
                   </div>
+
+                  {/* 3. CARRITO DE COMPRAS */}
+                  <Link href="/cart" className={iconClass} title="Carrito">
+                    <ShoppingCart className="h-5.5 w-5.5" />
+                    {cartCount > 0 && (
+                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-white bg-red-500 animate-pulse">
+                        {cartCount}
+                      </span>
+                    )}
+                  </Link>
+
+                  {/* 4. PERFIL / MUÑEQUITO CON DROPDOWN */}
+                  <div className="relative" ref={dropdownRef}>
+                    <button 
+                      onClick={() => setMenuAbierto(!menuAbierto)}
+                      className="flex items-center gap-1.5 cursor-pointer focus:outline-none p-1 rounded-xl hover:bg-gray-100/50 transition group"
+                      title="Mi Perfil"
+                    >
+                      <div className="relative">
+                        {usuario.avatar_url ? (
+                          <img src={usuario.avatar_url} alt="Avatar" className="h-8 w-8 rounded-full border-2 border-emerald-500 object-cover shadow-xs" />
+                        ) : (
+                          <div className="h-8 w-8 rounded-full bg-purple-100 text-purple-700 font-extrabold flex items-center justify-center border-2 border-emerald-500 shadow-xs text-xs">
+                            {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
+                          </div>
+                        )}
+                        <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-white" title="En línea" />
+                      </div>
+                      <ChevronDown className={`h-3.5 w-3.5 transition-transform ${esNavOscuro ? "text-gray-300" : "text-gray-600"} ${menuAbierto ? 'rotate-180' : ''}`} />
+                    </button>
+
+                    {/* MENÚ DESPLEGABLE DE MI ESPACIO Y CONFIGURACIÓN */}
+                    {menuAbierto && (
+                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in origin-top-right">
+                        <div className="px-3 py-2 border-b border-gray-50">
+                          <p className="text-xs font-bold text-gray-900 truncate">{usuario.full_name}</p>
+                          <p className="text-[10px] text-gray-400 truncate">{usuario.email}</p>
+                          {usuario.role === 'ADMIN' && (
+                            <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-purple-100 text-purple-700">
+                              Administrador
+                            </span>
+                          )}
+                        </div>
+
+                        <Link 
+                          href="/mi-espacio" 
+                          onClick={() => setMenuAbierto(false)}
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                        >
+                          <User className="h-4 w-4 text-purple-600" /> Mi Espacio
+                        </Link>
+
+                        <button 
+                          onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition cursor-pointer text-left"
+                        >
+                          <LogOut className="h-4 w-4 text-red-400" /> Cerrar Sesión
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </>
+              ) : (
+                /* ==================================================================== */
+                /* USUARIO NO LOGUEADO / OFFLINE: MUESTRA CREA TU CUENTA E INGRESA */
+                /* ==================================================================== */
+                <div className="flex items-center space-x-3 text-xs font-extrabold">
+                  <Link 
+                    href="/auth?mode=register" 
+                    className={`transition hover:underline ${
+                      esNavOscuro ? "text-white hover:text-purple-200" : "text-purple-700 hover:text-purple-900"
+                    }`}
+                  >
+                    Crea tu cuenta
+                  </Link>
+                  <span className={esNavOscuro ? "text-gray-400" : "text-gray-300"}>|</span>
+                  <Link 
+                    href="/auth?mode=login" 
+                    className={`transition ${
+                      esNavOscuro ? "text-gray-200 hover:text-white" : "text-gray-700 hover:text-purple-700"
+                    }`}
+                  >
+                    Ingresa
+                  </Link>
                 </div>
-              )}
-            </div>
+              )
+            )}
 
           </div>
 
