@@ -484,108 +484,107 @@ function LoginContent() {
             {/* FORMULARIO */}
             <form onSubmit={manejarEnvioClasico} className="space-y-4">
               
-              {/* TARJETA DE FOTO DE GOOGLE SI PRECARGÓ DATOS NUEVOS */}
-              {!esLogin && googleAvatarUrl && (
-                <div className="bg-purple-50 p-3 rounded-2xl border border-purple-200 flex items-center gap-3 animate-scale-in">
-                  <img src={googleAvatarUrl} alt="Avatar Google" className="h-10 w-10 rounded-full border-2 border-purple-500 object-cover shadow-xs" />
-                  <div className="text-left text-xs">
-                    <p className="font-extrabold text-purple-950">Conectado con Google</p>
-                    <p className="text-[11px] text-purple-700">{fullName} ({emailInput})</p>
-                  </div>
-                </div>
-              )}
-
-              {/* 1. CAMPO NOMBRE */}
-              {!esLogin && (
-                <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Nombre</label>
-                  <p className="text-[10px] text-gray-400 mb-1">Así te vamos a identificar dentro de Objetia (ej: Marisa)</p>
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <input 
-                      type="text" 
-                      required
-                      readOnly={Boolean(googleCredential)}
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      placeholder="Marisa"
-                      className={`w-full pl-9 pr-3 py-2.5 border rounded-xl text-xs transition font-medium ${
-                        googleCredential ? "bg-gray-100 text-gray-700 border-gray-200 cursor-not-allowed" : "bg-gray-50 border-gray-200 focus:bg-white focus:border-purple-600 focus:outline-none"
-                      }`}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* 2. CAMPO EMAIL CON DROPDOWN INTEGRADO */}
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">Email</label>
-                {!esLogin && (
-                  <p className="text-[10px] text-gray-400 mb-1">Lo vas a usar para ingresar a tu cuenta</p>
-                )}
-                <div className={`relative flex items-center border rounded-xl transition overflow-hidden shadow-2xs ${
-                  googleCredential ? "bg-gray-100 border-gray-200" : "bg-gray-50 border-gray-200 focus-within:bg-white focus-within:border-purple-600"
-                }`}>
-                  <div className="pl-3 text-gray-400 flex items-center">
-                    <Mail className="h-4 w-4" />
-                  </div>
-                  <input 
-                    type={emailDomain === 'otro' ? "email" : "text"} 
-                    required
-                    readOnly={Boolean(googleCredential)}
-                    value={emailInput}
-                    onChange={manejarInputEmail}
-                    placeholder={emailDomain === 'otro' ? "tuemail@dominio.com" : "tuemail"}
-                    className="w-full pl-2.5 pr-2 py-2.5 bg-transparent text-xs text-gray-900 focus:outline-none font-medium"
-                  />
-                  <div className="border-l border-gray-200 bg-gray-100/90 px-2.5 py-2 flex items-center self-stretch">
-                    <select
-                      value={emailDomain}
-                      disabled={Boolean(googleCredential)}
-                      onChange={(e) => manejarCambioDominio(e.target.value)}
-                      className="bg-transparent text-xs font-extrabold text-purple-900 focus:outline-none cursor-pointer pr-1"
-                    >
-                      <option value="@gmail.com">@gmail.com</option>
-                      <option value="@hotmail.com">@hotmail.com</option>
-                      <option value="@outlook.com">@outlook.com</option>
-                      <option value="@yahoo.com">@yahoo.com</option>
-                      <option value="@icloud.com">@icloud.com</option>
-                      <option value="otro">Otro</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. CAMPO CONTRASEÑA (SI ES LOGIN O REGISTRO TRADICIONAL) */}
-              {(esLogin || !googleCredential) && (
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="block text-xs font-bold text-gray-700">Contraseña</label>
-                    {esLogin && (
-                      <button
-                        type="button"
-                        onClick={() => setViewMode('forgot_password')}
-                        className="text-[10px] font-bold text-purple-700 hover:underline cursor-pointer"
-                      >
-                        ¿Olvidaste tu contraseña?
-                      </button>
-                    )}
-                  </div>
-                  {!esLogin && (
-                    <p className="text-[10px] text-gray-400 mb-1">Creá una contraseña</p>
+              {/* VÍA A: REGISTRO CON GOOGLE (SOLO MUESTRA TARJETA CON FOTO, NOMBRE Y EMAIL) */}
+              {!esLogin && googleCredential ? (
+                <div className="bg-purple-50/80 p-4 rounded-2xl border border-purple-200 flex items-center gap-3.5 animate-scale-in shadow-2xs">
+                  {googleAvatarUrl && (
+                    <img src={googleAvatarUrl} alt="Avatar Google" className="h-12 w-12 rounded-full border-2 border-purple-500 object-cover shadow-xs" />
                   )}
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <input 
-                      type="password" 
-                      required={!googleCredential}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Tu contraseña"
-                      className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition"
-                    />
+                  <div className="text-left text-xs">
+                    <p className="font-black text-purple-950 text-sm">{fullName}</p>
+                    <p className="text-xs text-purple-700 font-medium">{emailInput}</p>
+                    <span className="inline-block mt-1 text-[10px] font-extrabold text-purple-600 bg-purple-100/90 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      Conectado con Google
+                    </span>
                   </div>
                 </div>
+              ) : (
+                /* VÍA B: REGISTRO O LOGIN CLÁSICO (MUESTRA TEXTBOXES) */
+                <>
+                  {/* 1. CAMPO NOMBRE */}
+                  {!esLogin && (
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-1">Nombre</label>
+                      <p className="text-[10px] text-gray-400 mb-1">Así te vamos a identificar dentro de Objetia (ej: Marisa)</p>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <input 
+                          type="text" 
+                          required
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          placeholder="Marisa"
+                          className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition font-medium"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 2. CAMPO EMAIL CON DROPDOWN INTEGRADO */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-1">Email</label>
+                    {!esLogin && (
+                      <p className="text-[10px] text-gray-400 mb-1">Lo vas a usar para ingresar a tu cuenta</p>
+                    )}
+                    <div className="relative flex items-center bg-gray-50 border border-gray-200 rounded-xl focus-within:bg-white focus-within:border-purple-600 transition overflow-hidden shadow-2xs">
+                      <div className="pl-3 text-gray-400 flex items-center">
+                        <Mail className="h-4 w-4" />
+                      </div>
+                      <input 
+                        type={emailDomain === 'otro' ? "email" : "text"} 
+                        required
+                        value={emailInput}
+                        onChange={manejarInputEmail}
+                        placeholder={emailDomain === 'otro' ? "tuemail@dominio.com" : "tuemail"}
+                        className="w-full pl-2.5 pr-2 py-2.5 bg-transparent text-xs text-gray-900 focus:outline-none font-medium"
+                      />
+                      <div className="border-l border-gray-200 bg-gray-100/90 px-2.5 py-2 flex items-center self-stretch">
+                        <select
+                          value={emailDomain}
+                          onChange={(e) => manejarCambioDominio(e.target.value)}
+                          className="bg-transparent text-xs font-extrabold text-purple-900 focus:outline-none cursor-pointer pr-1"
+                        >
+                          <option value="@gmail.com">@gmail.com</option>
+                          <option value="@hotmail.com">@hotmail.com</option>
+                          <option value="@outlook.com">@outlook.com</option>
+                          <option value="@yahoo.com">@yahoo.com</option>
+                          <option value="@icloud.com">@icloud.com</option>
+                          <option value="otro">Otro</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 3. CAMPO CONTRASEÑA */}
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="block text-xs font-bold text-gray-700">Contraseña</label>
+                      {esLogin && (
+                        <button
+                          type="button"
+                          onClick={() => setViewMode('forgot_password')}
+                          className="text-[10px] font-bold text-purple-700 hover:underline cursor-pointer"
+                        >
+                          ¿Olvidaste tu contraseña?
+                        </button>
+                      )}
+                    </div>
+                    {!esLogin && (
+                      <p className="text-[10px] text-gray-400 mb-1">Creá una contraseña</p>
+                    )}
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <input 
+                        type="password" 
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="Tu contraseña"
+                        className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition"
+                      />
+                    </div>
+                  </div>
+                </>
               )}
 
               {/* 4. OPCIÓN DE CONEXIÓN CON GOOGLE (SOLO SI NO TIENE TOKEN PRECARGADO) */}
