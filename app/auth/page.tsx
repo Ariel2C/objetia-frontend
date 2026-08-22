@@ -5,7 +5,7 @@ import { useAuth } from '../../components/AuthContext';
 import { useToast } from '../../components/ToastContext';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { getApiUrl, getGoogleClientId } from '../../lib/config';
-import { Mail, Lock, User, ArrowRight, Check, X, ShieldCheck, FileText, Sparkles, KeyRound } from 'lucide-react';
+import { Mail, Lock, User, ArrowRight, Check, X, ShieldCheck, FileText, Sparkles, KeyRound, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 
 function LoginContent() {
@@ -23,8 +23,9 @@ function LoginContent() {
   const [viewMode, setViewMode] = useState<'auth' | 'vendedor_intro' | 'forgot_password'>('auth');
   const [esLogin, setEsLogin] = useState(true);
 
-  // Campos de formulario
-  const [email, setEmail] = useState('');
+  // Campos de formulario (Email compuesto con Dropdown integrado)
+  const [emailUser, setEmailUser] = useState('');
+  const [emailDomain, setEmailDomain] = useState('@gmail.com');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [aceptoTerminos, setAceptoTerminos] = useState(false);
@@ -37,7 +38,7 @@ function LoginContent() {
   const [mensajeError, setMensajeError] = useState<string | null>(null);
   const [enlaceEnviado, setEnlaceEnviado] = useState(false);
 
-  const dominiosSugeridos = ['@gmail.com', '@hotmail.com', '@outlook.com', '@yahoo.com', '@icloud.com'];
+  const dominiosDisponibles = ['@gmail.com', '@hotmail.com', '@outlook.com', '@yahoo.com', '@icloud.com'];
 
   useEffect(() => {
     setMontado(true);
@@ -52,19 +53,26 @@ function LoginContent() {
     }
   }, [modeParam, redirectUrl]);
 
-  // Autocompletado rápido de dominio de email al hacer clic en un chip
-  const aplicarDominioEmail = (dominio: string) => {
-    const partePrev = email.split('@')[0];
-    if (partePrev.trim()) {
-      setEmail(`${partePrev.trim()}${dominio}`);
-    } else {
-      setEmail(`tuemail${dominio}`);
+  // Calcula el email completo final
+  const obtenerEmailCompleto = (): string => {
+    const raw = emailUser.trim();
+    if (emailDomain === 'otro') {
+      return raw;
     }
+    const prefix = raw.split('@')[0].trim();
+    return `${prefix}${emailDomain}`;
   };
 
   const manejarEnvioClasico = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensajeError(null);
+
+    const emailFinal = obtenerEmailCompleto();
+
+    if (!emailFinal || !emailFinal.includes('@')) {
+      toast.warning("Ingresá un correo electrónico válido.");
+      return;
+    }
 
     if (!esLogin && !aceptoTerminos) {
       toast.warning("Debés aceptar los Términos y Condiciones para continuar.");
@@ -84,13 +92,13 @@ function LoginContent() {
       if (esLogin) {
         encabezados["Content-Type"] = "application/x-www-form-urlencoded";
         cuerpoPeticion = new URLSearchParams({
-          username: email.trim(),
+          username: emailFinal,
           password: password
         }).toString();
       } else {
         encabezados["Content-Type"] = "application/json";
         cuerpoPeticion = JSON.stringify({ 
-          email: email.trim(), 
+          email: emailFinal, 
           password: password, 
           full_name: fullName.trim(),
           wants_newsletter: quieroNovedades
@@ -130,13 +138,13 @@ function LoginContent() {
 
   const manejarRecuperacionPassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email.trim()) {
-      toast.warning("Ingresá tu correo electrónico.");
+    const emailFinal = obtenerEmailCompleto();
+    if (!emailFinal || !emailFinal.includes('@')) {
+      toast.warning("Ingresá un correo electrónico válido.");
       return;
     }
     setCargando(true);
     try {
-      // Simulación de envío de enlace de recupero
       await new Promise(r => setTimeout(r, 1000));
       setEnlaceEnviado(true);
       toast.success("Te enviamos las instrucciones a tu correo electrónico.", "¡Enlace Enviado!");
@@ -240,7 +248,7 @@ function LoginContent() {
 
             {enlaceEnviado ? (
               <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-200 text-center space-y-3">
-                <p className="text-xs font-extrabold text-emerald-900">¡Enlace enviado a {email}!</p>
+                <p className="text-xs font-extrabold text-emerald-900">¡Enlace enviado a {obtenerEmailCompleto()}!</p>
                 <p className="text-[11px] text-emerald-700">Revisá tu bandeja de entrada o carpeta de Spam.</p>
                 <button
                   onClick={() => { setViewMode('auth'); setEsLogin(true); setEnlaceEnviado(false); }}
@@ -251,18 +259,53 @@ function LoginContent() {
               </div>
             ) : (
               <form onSubmit={manejarRecuperacionPassword} className="space-y-4">
+                
+                {/* CAMPO EMAIL CON DROPDOWN INTEGRADO */}
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Email</label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <div className="relative flex items-center bg-gray-50 border border-gray-200 rounded-xl focus-within:bg-white focus-within:border-purple-600 transition overflow-hidden shadow-2xs">
+                    <div className="pl-3 text-gray-400 flex items-center">
+                      <Mail className="h-4 w-4" />
+                    </div>
                     <input 
-                      type="email" 
+                      type={emailDomain === 'otro' ? "email" : "text"} 
                       required
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Tu email"
-                      className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition"
+                      value={emailUser}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (emailDomain !== 'otro' && val.includes('@')) {
+                          const parts = val.split('@');
+                          setEmailUser(parts[0]);
+                          if (parts[1]) {
+                            const domEncontrado = dominiosDisponibles.find(d => d.slice(1).toLowerCase() === parts[1].toLowerCase());
+                            if (domEncontrado) {
+                              setEmailDomain(domEncontrado);
+                            } else {
+                              setEmailDomain('otro');
+                              setEmailUser(val);
+                            }
+                          }
+                        } else {
+                          setEmailUser(val);
+                        }
+                      }}
+                      placeholder={emailDomain === 'otro' ? "tuemail@dominio.com" : "tuemail"}
+                      className="w-full pl-2.5 pr-2 py-2.5 bg-transparent text-xs text-gray-900 focus:outline-none"
                     />
+                    <div className="border-l border-gray-200 bg-gray-100/90 px-2.5 py-2 flex items-center self-stretch">
+                      <select
+                        value={emailDomain}
+                        onChange={(e) => setEmailDomain(e.target.value)}
+                        className="bg-transparent text-xs font-extrabold text-purple-900 focus:outline-none cursor-pointer pr-1"
+                      >
+                        <option value="@gmail.com">@gmail.com</option>
+                        <option value="@hotmail.com">@hotmail.com</option>
+                        <option value="@outlook.com">@outlook.com</option>
+                        <option value="@yahoo.com">@yahoo.com</option>
+                        <option value="@icloud.com">@icloud.com</option>
+                        <option value="otro">Otro</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
 
@@ -334,36 +377,56 @@ function LoginContent() {
                 </div>
               )}
 
-              {/* CAMPO EMAIL */}
+              {/* CAMPO EMAIL CON DROPDOWN INTEGRADO DENTRO DEL CUADRO DE TEXTO */}
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">Email</label>
                 {!esLogin && (
                   <p className="text-[10px] text-gray-400 mb-1">Lo vas a usar para ingresar a tu cuenta</p>
                 )}
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <div className="relative flex items-center bg-gray-50 border border-gray-200 rounded-xl focus-within:bg-white focus-within:border-purple-600 transition overflow-hidden shadow-2xs">
+                  <div className="pl-3 text-gray-400 flex items-center">
+                    <Mail className="h-4 w-4" />
+                  </div>
                   <input 
-                    type="email" 
+                    type={emailDomain === 'otro' ? "email" : "text"} 
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="tuemail@gmail.com"
-                    className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition"
+                    value={emailUser}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (emailDomain !== 'otro' && val.includes('@')) {
+                        const parts = val.split('@');
+                        setEmailUser(parts[0]);
+                        if (parts[1]) {
+                          const domEncontrado = dominiosDisponibles.find(d => d.slice(1).toLowerCase() === parts[1].toLowerCase());
+                          if (domEncontrado) {
+                            setEmailDomain(domEncontrado);
+                          } else {
+                            setEmailDomain('otro');
+                            setEmailUser(val);
+                          }
+                        }
+                      } else {
+                        setEmailUser(val);
+                      }
+                    }}
+                    placeholder={emailDomain === 'otro' ? "tuemail@dominio.com" : "tuemail"}
+                    className="w-full pl-2.5 pr-2 py-2.5 bg-transparent text-xs text-gray-900 focus:outline-none"
                   />
-                </div>
-
-                {/* CHIPS DE SUGERENCIA DE DOMINIO */}
-                <div className="flex flex-wrap gap-1 mt-1.5">
-                  {dominiosSugeridos.map((dom) => (
-                    <button
-                      key={dom}
-                      type="button"
-                      onClick={() => aplicarDominioEmail(dom)}
-                      className="text-[10px] font-bold px-2 py-0.5 bg-gray-100 hover:bg-purple-100 hover:text-purple-700 text-gray-600 rounded-md transition cursor-pointer"
+                  {/* DROPDOWN DESPLEGABLE INTEGRADO A LA DERECHA */}
+                  <div className="border-l border-gray-200 bg-gray-100/90 px-2.5 py-2 flex items-center self-stretch">
+                    <select
+                      value={emailDomain}
+                      onChange={(e) => setEmailDomain(e.target.value)}
+                      className="bg-transparent text-xs font-extrabold text-purple-900 focus:outline-none cursor-pointer pr-1"
                     >
-                      {dom}
-                    </button>
-                  ))}
+                      <option value="@gmail.com">@gmail.com</option>
+                      <option value="@hotmail.com">@hotmail.com</option>
+                      <option value="@outlook.com">@outlook.com</option>
+                      <option value="@yahoo.com">@yahoo.com</option>
+                      <option value="@icloud.com">@icloud.com</option>
+                      <option value="otro">Otro</option>
+                    </select>
+                  </div>
                 </div>
               </div>
 
