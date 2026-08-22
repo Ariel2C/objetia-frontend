@@ -13,7 +13,8 @@ import {
   ChevronDown,
   Search,
   PlusCircle,
-  Sparkles
+  Sparkles,
+  Shield
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '../lib/config';
@@ -459,7 +460,22 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                               Administrador
                             </span>
                           )}
+                          {(usuario.role === 'root' || usuario.role === 'ROOT') && (
+                            <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-amber-100 text-amber-800">
+                              Programador Root
+                            </span>
+                          )}
                         </div>
+
+                        {(usuario.role === 'root' || usuario.role === 'ROOT') && (
+                          <Link 
+                            href="/root/dashboard" 
+                            onClick={() => setMenuAbierto(false)}
+                            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black text-amber-900 bg-amber-50 hover:bg-amber-100 transition border border-amber-200/60"
+                          >
+                            <Shield className="h-4 w-4 text-amber-600" /> Panel Root / Auditoría
+                          </Link>
+                        )}
 
                         <Link 
                           href="/mi-espacio" 
