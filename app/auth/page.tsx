@@ -30,6 +30,10 @@ function LoginContent() {
   const [fullName, setFullName] = useState('');
   const [aceptoTerminos, setAceptoTerminos] = useState(false);
   const [quieroNovedades, setQuieroNovedades] = useState(true);
+
+  // Estado para registro con Google pendiente de confirmación
+  const [googleCredential, setGoogleCredential] = useState<string | null>(null);
+  const [googleAvatarUrl, setGoogleAvatarUrl] = useState<string | null>(null);
   
   // Modales legales (sin perder datos de inputs)
   const [modalLegalAbierto, setModalLegalAbierto] = useState<'terminos' | 'privacidad' | null>(null);
@@ -94,6 +98,7 @@ function LoginContent() {
     return `${raw}${emailDomain}`;
   };
 
+  // Formulario principal Submit (Crear Cuenta / Ingresar)
   const manejarEnvioClasico = async (e: React.FormEvent) => {
     e.preventDefault();
     setMensajeError(null);
@@ -106,12 +111,41 @@ function LoginContent() {
     }
 
     if (!esLogin && !aceptoTerminos) {
-      toast.warning("Debés aceptar los Términos y Condiciones para continuar.");
+      toast.warning("Debés aceptar los Términos y Condiciones marcando la casilla para continuar.");
       return;
     }
 
     setCargando(true);
 
+    // Si viene de precarga con Google y se le da a "CREAR MI CUENTA":
+    if (!esLogin && googleCredential) {
+      try {
+        const respuesta = await fetch(`${getApiUrl()}/auth/google`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            id_token: googleCredential,
+            wants_newsletter: quieroNovedades,
+            accepted_terms: aceptoTerminos
+          })
+        });
+        const datos = await respuesta.json();
+        if (!respuesta.ok) {
+          throw new Error(datos.detail || "Error al registrarse con Google.");
+        }
+        toast.success(`¡Bienvenido a Objetia, ${datos.user?.full_name?.split(" ")[0] || ""}!`, "¡Cuenta creada e inicio automático!");
+        login(datos.access_token, datos.user);
+        router.push(redirectUrl);
+      } catch (error: any) {
+        setMensajeError(error.message);
+        toast.error(error.message || "Falló el registro con Google.");
+      } finally {
+        setCargando(false);
+      }
+      return;
+    }
+
+    // Registro o Login tradicional
     const endpoint = esLogin 
       ? `${getApiUrl()}/auth/login/classic` 
       : `${getApiUrl()}/auth/register`;
@@ -191,34 +225,43 @@ function LoginContent() {
     }
   };
 
+  // Al seleccionar el botón de Google
   const manejarExitoGoogle = async (credentialResponse: any) => {
-    if (!esLogin && !aceptoTerminos) {
-      toast.warning("Debés marcar la casilla de Acepto los Términos y Condiciones antes de registrarte con Google.");
-      return;
-    }
-    setCargando(true);
-    setMensajeError(null);
-
-    try {
-      const respuesta = await fetch(`${getApiUrl()}/auth/google`, {
+    if (esLogin) {
+      // Si es Login directo, inicia sesión inmediatamente
+      setCargando(true);
+      try {
+        const respuesta = await fetch(`${getApiUrl()}/auth/google`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id_token: credentialResponse.credential })
-      });
-      const datos = await respuesta.json();
-
-      if (!respuesta.ok) {
-        throw new Error(datos.detail || "Error al autenticar con Google.");
+        });
+        const datos = await respuesta.json();
+        if (!respuesta.ok) throw new Error(datos.detail || "Error con Google.");
+        toast.success("Conexión exitosa.", "¡Bienvenido a Objetia!");
+        login(datos.access_token, datos.user);
+        router.push(redirectUrl);
+      } catch (err: any) {
+        toast.error(err.message || "Falló la autenticación.");
+      } finally {
+        setCargando(false);
       }
+    } else {
+      // Si es Registro con Google: Decodifica datos para precargar Nombre, Email y Foto sin grabar aún
+      try {
+        const tokenParts = credentialResponse.credential.split('.');
+        const payloadDecoded = JSON.parse(atob(tokenParts[1]));
+        
+        setGoogleCredential(credentialResponse.credential);
+        setFullName(payloadDecoded.name || '');
+        setEmailInput(payloadDecoded.email || '');
+        setEmailDomain('otro');
+        setGoogleAvatarUrl(payloadDecoded.picture || null);
 
-      toast.success("Conexión con Google exitosa. Redirigiendo...", "¡Bienvenido a Objetia!");
-      login(datos.access_token, datos.user);
-      router.push(redirectUrl);
-    } catch (error: any) {
-      setMensajeError(error.message);
-      toast.error(error.message || "Falló el inicio de sesión con Google.");
-    } finally {
-      setCargando(false);
+        toast.info("Datos de Google cargados. Marcá la casilla de Términos y hacé clic en CREAR MI CUENTA para finalizar.", "¡Casi listo!");
+      } catch {
+        toast.error("No pudimos leer los datos de tu cuenta de Google.");
+      }
     }
   };
 
@@ -371,6 +414,17 @@ function LoginContent() {
               </p>
             </div>
 
+            {/* FOTO Y DATOS DE GOOGLE SI PRE-CARGÓ SUS DATOS */}
+            {!esLogin && googleAvatarUrl && (
+              <div className="bg-purple-50 p-3 rounded-2xl border border-purple-200 flex items-center gap-3 animate-scale-in">
+                <img src={googleAvatarUrl} alt="Avatar Google" className="h-10 w-10 rounded-full border-2 border-purple-500 object-cover shadow-xs" />
+                <div className="text-left text-xs">
+                  <p className="font-extrabold text-purple-950">Datos de Google listos</p>
+                  <p className="text-[11px] text-purple-700">{fullName} ({emailInput})</p>
+                </div>
+              </div>
+            )}
+
             {/* MENSAJE DE ERROR */}
             {mensajeError && (
               <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-bold rounded-xl text-center">
@@ -378,10 +432,10 @@ function LoginContent() {
               </div>
             )}
 
-            {/* FORMULARIO CLÁSICO */}
+            {/* FORMULARIO CLÁSICO / PRE-CARGADO */}
             <form onSubmit={manejarEnvioClasico} className="space-y-4">
               
-              {/* CAMPO NOMBRE (SOLO EN REGISTRO) */}
+              {/* 1. CAMPO NOMBRE (EN REGISTRO) */}
               {!esLogin && (
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Nombre</label>
@@ -394,13 +448,13 @@ function LoginContent() {
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
                       placeholder="Marisa"
-                      className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition"
+                      className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition font-medium"
                     />
                   </div>
                 </div>
               )}
 
-              {/* CAMPO EMAIL CON DROPDOWN INTEGRADO DENTRO DEL CUADRO DE TEXTO */}
+              {/* 2. CAMPO EMAIL CON DROPDOWN INTEGRADO */}
               <div>
                 <label className="block text-xs font-bold text-gray-700 mb-1">Email</label>
                 {!esLogin && (
@@ -436,39 +490,57 @@ function LoginContent() {
                 </div>
               </div>
 
-              {/* CAMPO CONTRASEÑA */}
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <label className="block text-xs font-bold text-gray-700">Contraseña</label>
-                  {esLogin && (
-                    <button
-                      type="button"
-                      onClick={() => setViewMode('forgot_password')}
-                      className="text-[10px] font-bold text-purple-700 hover:underline cursor-pointer"
-                    >
-                      ¿Olvidaste tu contraseña?
-                    </button>
+              {/* 3. CAMPO CONTRASEÑA (SOLO SI NO ES MODO PRECARGA GOOGLE) */}
+              {(esLogin || !googleCredential) && (
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="block text-xs font-bold text-gray-700">Contraseña</label>
+                    {esLogin && (
+                      <button
+                        type="button"
+                        onClick={() => setViewMode('forgot_password')}
+                        className="text-[10px] font-bold text-purple-700 hover:underline cursor-pointer"
+                      >
+                        ¿Olvidaste tu contraseña?
+                      </button>
+                    )}
+                  </div>
+                  {!esLogin && (
+                    <p className="text-[10px] text-gray-400 mb-1">Creá una contraseña</p>
                   )}
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <input 
+                      type="password" 
+                      required={!googleCredential}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Tu contraseña"
+                      className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition"
+                    />
+                  </div>
                 </div>
-                {!esLogin && (
-                  <p className="text-[10px] text-gray-400 mb-1">Creá una contraseña</p>
-                )}
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <input 
-                    type="password" 
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Tu contraseña"
-                    className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition"
+              )}
+
+              {/* 4. OPCIÓN DE REGISTRO / LOGIN CON GOOGLE */}
+              <div className="space-y-2 pt-2 border-t border-gray-100">
+                <p className="text-[11px] font-bold text-gray-500 text-center uppercase tracking-wider">
+                  {esLogin ? "O ingresá directamente con" : "O registrate con Google"}
+                </p>
+                <div className="flex flex-col items-center justify-center">
+                  <GoogleLogin
+                    onSuccess={manejarExitoGoogle}
+                    onError={() => toast.error("Error al conectar con Google.")}
+                    useOneTap={false}
+                    shape="pill"
+                    text={esLogin ? "signin_with" : "signup_with"}
                   />
                 </div>
               </div>
 
-              {/* CHECKBOXES LEGALES Y DE NEWSLETTER (SOLO EN REGISTRO) */}
+              {/* 5. CHECKBOXES LEGALES Y DE NEWSLETTER ABAJO DE GOOGLE (SOLO EN REGISTRO) */}
               {!esLogin && (
-                <div className="space-y-2 pt-1 text-xs">
+                <div className="space-y-2 pt-3 border-t border-gray-100 text-xs">
                   <label className="flex items-start gap-2 cursor-pointer">
                     <input 
                       type="checkbox"
@@ -512,11 +584,11 @@ function LoginContent() {
                 </div>
               )}
 
-              {/* BOTÓN SUBMIT PRINCIPAL */}
+              {/* 6. BOTÓN SUBMIT FINAL (CREAR MI CUENTA / INGRESAR) ABAJO DE TODO */}
               <button
                 type="submit"
                 disabled={cargando}
-                className="w-full py-3.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full py-3.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-2"
               >
                 <span>{esLogin ? "INGRESAR" : "CREAR MI CUENTA"}</span>
                 <ArrowRight className="h-4 w-4" />
@@ -524,32 +596,13 @@ function LoginContent() {
 
             </form>
 
-            {/* SEPARADOR DE VÍA GOOGLE */}
-            <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200"></div></div>
-              <div className="relative flex justify-center text-xs">
-                <span className="px-2 bg-white text-gray-400 text-[10px] font-bold uppercase tracking-wider">O conectate directamente</span>
-              </div>
-            </div>
-
-            {/* BOTÓN REGISTRO/LOGIN POR CUENTA GOOGLE */}
-            <div className="flex flex-col items-center justify-center">
-              <GoogleLogin
-                onSuccess={manejarExitoGoogle}
-                onError={() => toast.error("Error al conectar con Google.")}
-                useOneTap={false}
-                shape="pill"
-                text={esLogin ? "signin_with" : "signup_with"}
-              />
-            </div>
-
             {/* PIE Y ALTERNANCIA LOGIN <-> REGISTRO */}
             <div className="text-center pt-2 border-t border-gray-100">
               {esLogin ? (
                 <p className="text-xs text-gray-600 font-medium">
                   ¿Todavía no tenés cuenta?{" "}
                   <button 
-                    onClick={() => setEsLogin(false)}
+                    onClick={() => { setEsLogin(false); setGoogleCredential(null); }}
                     className="font-black text-purple-700 hover:underline cursor-pointer ml-1"
                   >
                     CREAR MI CUENTA
@@ -559,7 +612,7 @@ function LoginContent() {
                 <p className="text-xs text-gray-600 font-medium">
                   ¿Ya tenés una cuenta?{" "}
                   <button 
-                    onClick={() => setEsLogin(true)}
+                    onClick={() => { setEsLogin(true); setGoogleCredential(null); }}
                     className="font-black text-purple-700 hover:underline cursor-pointer ml-1"
                   >
                     INGRESAR
@@ -603,7 +656,7 @@ function LoginContent() {
                   <p className="font-bold text-gray-900">1. Aceptación de los Términos</p>
                   <p>Al registrarse y crear una cuenta en Objetia, el usuario acepta de manera libre e incondicional los presentes Términos y Condiciones de Uso del Marketplace.</p>
                   <p className="font-bold text-gray-900">2. Publicación de Productos y Reglas de la Comunidad</p>
-                  <p>Cada publicación debe incluir fotografías reales del producto. Queda estrictamente prohibida la divulgación de datos de contacto externo (teléfonos, WhatsApp, redes sociales) en las imágenes o descripciones de los artículos.</p>
+                  <p>Cada publicación debe incluir fotografías reales del producto. Queda strictly prohibida la divulgación de datos de contacto externo (teléfonos, WhatsApp, redes sociales) en las imágenes o descripciones de los artículos.</p>
                   <p className="font-bold text-gray-900">3. Auditoría de Seguridad y Modificaciones</p>
                   <p>Objetia almacena de forma inalterable la fecha, hora exacta y versión legal (v1.0) aceptada por cada cuenta registrada.</p>
                 </>
