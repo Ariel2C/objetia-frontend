@@ -493,9 +493,6 @@ function LoginContent() {
                   <div className="text-left text-xs">
                     <p className="font-black text-purple-950 text-sm">{fullName}</p>
                     <p className="text-xs text-purple-700 font-medium">{emailInput}</p>
-                    <span className="inline-block mt-1 text-[10px] font-extrabold text-purple-600 bg-purple-100/90 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                      Conectado con Google
-                    </span>
                   </div>
                 </div>
               ) : (
