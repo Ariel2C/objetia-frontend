@@ -24,7 +24,7 @@ function LoginContent() {
   const [esLogin, setEsLogin] = useState(true);
 
   // Campos de formulario (Email compuesto con Dropdown integrado)
-  const [emailUser, setEmailUser] = useState('');
+  const [emailInput, setEmailInput] = useState('');
   const [emailDomain, setEmailDomain] = useState('@gmail.com');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
@@ -53,14 +53,45 @@ function LoginContent() {
     }
   }, [modeParam, redirectUrl]);
 
+  // Al cambiar la opción en el dropdown de email
+  const manejarCambioDominio = (nuevoDominio: string) => {
+    setEmailDomain(nuevoDominio);
+    if (nuevoDominio === 'otro') return;
+
+    const raw = emailInput.trim();
+    if (!raw) return;
+    const prefix = raw.split('@')[0].trim();
+    if (prefix) {
+      setEmailInput(`${prefix}${nuevoDominio}`);
+    }
+  };
+
+  // Al escribir en el input de texto de email
+  const manejarInputEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setEmailInput(val);
+
+    if (emailDomain !== 'otro' && val.includes('@')) {
+      const parts = val.split('@');
+      if (parts[1]) {
+        const domEncontrado = dominiosDisponibles.find(d => d.slice(1).toLowerCase() === parts[1].toLowerCase());
+        if (domEncontrado) {
+          setEmailDomain(domEncontrado);
+        } else {
+          setEmailDomain('otro');
+        }
+      }
+    }
+  };
+
   // Calcula el email completo final
   const obtenerEmailCompleto = (): string => {
-    const raw = emailUser.trim();
-    if (emailDomain === 'otro') {
+    const raw = emailInput.trim();
+    if (!raw) return '';
+    if (emailDomain === 'otro' || raw.includes('@')) {
       return raw;
     }
-    const prefix = raw.split('@')[0].trim();
-    return `${prefix}${emailDomain}`;
+    return `${raw}${emailDomain}`;
   };
 
   const manejarEnvioClasico = async (e: React.FormEvent) => {
@@ -264,7 +295,7 @@ function LoginContent() {
             ) : (
               <form onSubmit={manejarRecuperacionPassword} className="space-y-4">
                 
-                {/* CAMPO EMAIL CON DROPDOWN INTEGRADO */}
+                {/* CAMPO EMAIL CON DROPDOWN INTEGRADO DENTRO DEL CUADRO DE TEXTO */}
                 <div>
                   <label className="block text-xs font-bold text-gray-700 mb-1">Email</label>
                   <div className="relative flex items-center bg-gray-50 border border-gray-200 rounded-xl focus-within:bg-white focus-within:border-purple-600 transition overflow-hidden shadow-2xs">
@@ -274,32 +305,15 @@ function LoginContent() {
                     <input 
                       type={emailDomain === 'otro' ? "email" : "text"} 
                       required
-                      value={emailUser}
-                      onChange={(e) => {
-                        const val = e.target.value;
-                        if (emailDomain !== 'otro' && val.includes('@')) {
-                          const parts = val.split('@');
-                          setEmailUser(parts[0]);
-                          if (parts[1]) {
-                            const domEncontrado = dominiosDisponibles.find(d => d.slice(1).toLowerCase() === parts[1].toLowerCase());
-                            if (domEncontrado) {
-                              setEmailDomain(domEncontrado);
-                            } else {
-                              setEmailDomain('otro');
-                              setEmailUser(val);
-                            }
-                          }
-                        } else {
-                          setEmailUser(val);
-                        }
-                      }}
+                      value={emailInput}
+                      onChange={manejarInputEmail}
                       placeholder={emailDomain === 'otro' ? "tuemail@dominio.com" : "tuemail"}
-                      className="w-full pl-2.5 pr-2 py-2.5 bg-transparent text-xs text-gray-900 focus:outline-none"
+                      className="w-full pl-2.5 pr-2 py-2.5 bg-transparent text-xs text-gray-900 focus:outline-none font-medium"
                     />
                     <div className="border-l border-gray-200 bg-gray-100/90 px-2.5 py-2 flex items-center self-stretch">
                       <select
                         value={emailDomain}
-                        onChange={(e) => setEmailDomain(e.target.value)}
+                        onChange={(e) => manejarCambioDominio(e.target.value)}
                         className="bg-transparent text-xs font-extrabold text-purple-900 focus:outline-none cursor-pointer pr-1"
                       >
                         <option value="@gmail.com">@gmail.com</option>
@@ -394,33 +408,16 @@ function LoginContent() {
                   <input 
                     type={emailDomain === 'otro' ? "email" : "text"} 
                     required
-                    value={emailUser}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (emailDomain !== 'otro' && val.includes('@')) {
-                        const parts = val.split('@');
-                        setEmailUser(parts[0]);
-                        if (parts[1]) {
-                          const domEncontrado = dominiosDisponibles.find(d => d.slice(1).toLowerCase() === parts[1].toLowerCase());
-                          if (domEncontrado) {
-                            setEmailDomain(domEncontrado);
-                          } else {
-                            setEmailDomain('otro');
-                            setEmailUser(val);
-                          }
-                        }
-                      } else {
-                        setEmailUser(val);
-                      }
-                    }}
+                    value={emailInput}
+                    onChange={manejarInputEmail}
                     placeholder={emailDomain === 'otro' ? "tuemail@dominio.com" : "tuemail"}
-                    className="w-full pl-2.5 pr-2 py-2.5 bg-transparent text-xs text-gray-900 focus:outline-none"
+                    className="w-full pl-2.5 pr-2 py-2.5 bg-transparent text-xs text-gray-900 focus:outline-none font-medium"
                   />
                   {/* DROPDOWN DESPLEGABLE INTEGRADO A LA DERECHA */}
                   <div className="border-l border-gray-200 bg-gray-100/90 px-2.5 py-2 flex items-center self-stretch">
                     <select
                       value={emailDomain}
-                      onChange={(e) => setEmailDomain(e.target.value)}
+                      onChange={(e) => manejarCambioDominio(e.target.value)}
                       className="bg-transparent text-xs font-extrabold text-purple-900 focus:outline-none cursor-pointer pr-1"
                     >
                       <option value="@gmail.com">@gmail.com</option>
