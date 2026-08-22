@@ -129,8 +129,12 @@ function LoginContent() {
         router.push(redirectUrl);
       }
     } catch (error: any) {
-      setMensajeError(error.message);
-      toast.error(error.message || "No pudimos completar la operación.");
+      let msg = error.message || "No pudimos completar la operación.";
+      if (msg === "Failed to fetch") {
+        msg = "Correo electrónico o contraseña incorrectos, o el servidor no respondió.";
+      }
+      setMensajeError(msg);
+      toast.error(msg);
     } finally {
       setCargando(false);
     }
