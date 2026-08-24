@@ -765,13 +765,15 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                           onChange={(val) => cambiarRol(u.id, val)}
                         />
 
-                        {u.id !== usuario?.id && (
+                        {u.id !== usuario?.id ? (
                           <button
                             onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
                             className="px-3 h-[28px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[8px] text-xs font-medium transition cursor-pointer flex-shrink-0 whitespace-nowrap shadow-xs font-sans"
                           >
                             Eliminar
                           </button>
+                        ) : (
+                          <div className="w-[72px] flex-shrink-0 hidden sm:block" />
                         )}
                       </div>
 
