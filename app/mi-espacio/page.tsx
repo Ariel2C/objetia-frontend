@@ -856,7 +856,7 @@ function MiEspacioContent() {
 
         {/* TAB: PANEL DE PROGRAMADOR ROOT (TEMA GOOGLE AI STUDIO - PANTALLA COMPLETA 100vw x 100vh) */}
         {tabActual === "root" && esRoot && (
-          <div className="fixed inset-0 z-50 bg-[#121214] w-screen h-screen overflow-hidden flex flex-col animate-fade-in">
+          <div className="fixed inset-0 z-[999999] bg-[#121214] w-screen h-screen overflow-hidden flex flex-col animate-fade-in">
             <RootTab onVolverAMiEspacio={() => {
               setTabActual("menu");
               router.push('/mi-espacio?tab=menu');

@@ -1,13 +1,14 @@
 "use client";
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import RootTab from '../../mi-espacio/RootTab';
 
 export default function RootDashboardPage() {
+  const router = useRouter();
+
   return (
-    <div className="min-h-screen bg-[#0a0a0c] p-4 sm:p-6 md:p-8">
-      <div className="max-w-7xl mx-auto">
-        <RootTab />
-      </div>
+    <div className="fixed inset-0 z-[999999] bg-[#121214] w-screen h-screen overflow-hidden flex flex-col">
+      <RootTab onVolverAMiEspacio={() => router.push('/mi-espacio?tab=menu')} />
     </div>
   );
 }
