@@ -626,9 +626,9 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
               {/* VISTA ESCRITORIO CON TABLA OSCURA (DevTools CSS Mat-Table) */}
               <div className="hidden lg:block bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden">
-                <table className="w-full text-left text-[14px] leading-[20px] text-[#d4d4d4]">
+                <table className="w-full text-left text-[13px] leading-[20px] text-[#d4d4d4] font-sans">
                   <thead>
-                    <tr className="bg-[#1f1f1f] border-b border-[#262626] text-[#8c8c8c] font-medium text-[14px] leading-[21px]">
+                    <tr className="bg-[#1f1f1f] border-b border-[#262626] text-[#8c8c8c] font-medium text-[13px] leading-[21px] font-sans">
                       <th className="px-4 py-3 font-medium text-left">Usuario</th>
                       <th className="px-4 py-3 font-medium text-left">Email</th>
                       <th className="px-4 py-3 font-medium text-left">Rol / Jerarquía</th>
@@ -639,7 +639,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   <tbody className="divide-y divide-[#262626]">
                     {usuariosFiltrados.map((u) => (
                       <tr key={u.id} className="hover:bg-[#252525] transition-colors">
-                        <td className="px-4 py-3 font-medium text-[#d4d4d4] flex items-center gap-2">
+                        <td className="px-4 py-3 font-medium text-[#d4d4d4] flex items-center gap-2 font-sans">
                           {u.avatar_url ? (
                             <img src={u.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover border border-[#87a9ff]/40" />
                           ) : (
@@ -647,10 +647,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                               {u.full_name?.charAt(0).toUpperCase() || 'U'}
                             </div>
                           )}
-                          <span className="text-[#87a9ff] font-medium hover:underline cursor-pointer text-[14px]">{u.full_name}</span>
+                          <span className="text-[#87a9ff] font-medium hover:underline cursor-pointer text-[13px] font-sans">{u.full_name}</span>
                         </td>
-                        <td className="px-4 py-3 text-[#d4d4d4] font-mono text-[13px]">{u.email}</td>
-                        <td className="px-4 py-3">
+                        <td className="px-4 py-3 text-[#d4d4d4] font-sans text-xs">{u.email}</td>
+                        <td className="px-4 py-3 font-sans">
                           <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase ${
                             u.role === 'root' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
                             u.role === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' :
@@ -659,8 +659,8 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                             {u.role}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-[#8c8c8c] font-mono text-[13px]">{new Date(u.created_at).toLocaleDateString()}</td>
-                        <td className="px-4 py-3 text-left">
+                        <td suppressHydrationWarning className="px-4 py-3 text-[#8c8c8c] font-sans text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
+                        <td className="px-4 py-3 text-left font-sans">
                           <div className="inline-flex items-center gap-2">
                             <CustomSelect
                               value={u.role}
@@ -677,10 +677,9 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                             {u.id !== usuario?.id && (
                               <button
                                 onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
-                                className="p-1.5 text-red-400 hover:bg-red-500/20 rounded-[8px] transition"
-                                title="Eliminar usuario"
+                                className="px-3 h-[28px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[10px] text-xs font-medium transition cursor-pointer whitespace-nowrap shadow-xs"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                Eliminar
                               </button>
                             )}
                           </div>
