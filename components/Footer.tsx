@@ -1,6 +1,7 @@
 "use client";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { 
   ShieldCheck, 
@@ -16,6 +17,23 @@ import {
 } from 'lucide-react';
 
 export default function Footer() {
+  const pathname = usePathname();
+  const [isRootTab, setIsRootTab] = useState(false);
+
+  useEffect(() => {
+    const checkRoot = () => {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const isRoot = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && params.get('tab') === 'root');
+        setIsRootTab(isRoot);
+      }
+    };
+    checkRoot();
+    const interval = setInterval(checkRoot, 300);
+    return () => clearInterval(interval);
+  }, [pathname]);
+
+  if (isRootTab) return null;
   return (
     <footer className="bg-gray-900 text-gray-300 border-t border-gray-800 pt-12 pb-24 md:pb-12 mt-16">
       {/* SECCIÓN DE BENEFICIOS Y CONFIANZA */}

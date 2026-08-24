@@ -2,7 +2,7 @@
 "use client";
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { 
   ShoppingCart, 
   MessageSquare, 
@@ -26,9 +26,25 @@ interface NavbarProps {
 export default function Navbar({ logoUrl }: NavbarProps) {
   const { usuario, logout, token, cargando } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+
+  const [isRootTab, setIsRootTab] = useState(false);
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [notifAbierto, setNotifAbierto] = useState(false);
   const [descubrirAbierto, setDescubrirAbierto] = useState(false);
+
+  useEffect(() => {
+    const checkRoot = () => {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const isRoot = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && params.get('tab') === 'root');
+        setIsRootTab(isRoot);
+      }
+    };
+    checkRoot();
+    const interval = setInterval(checkRoot, 300);
+    return () => clearInterval(interval);
+  }, [pathname]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const [favoritosCount, setFavoritosCount] = useState(0);
@@ -282,6 +298,8 @@ export default function Navbar({ logoUrl }: NavbarProps) {
   const iconClass = esNavOscuro 
     ? "relative text-white hover:text-gray-100 transition p-1 cursor-pointer" 
     : "relative text-gray-700 hover:text-gray-900 transition p-1 cursor-pointer";
+
+  if (isRootTab) return null;
 
   return (
     <nav style={{ backgroundColor: 'var(--bg-navbar)' }} className="border-b border-gray-100/30 sticky top-0 z-50 shadow-sm transition-colors duration-300">
