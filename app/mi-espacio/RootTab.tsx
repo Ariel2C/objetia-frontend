@@ -7,7 +7,7 @@ import {
   Menu, X, Key, Users, Activity, FileText, Search, Trash2, 
   RefreshCw, ShieldAlert, CheckCircle2, XCircle, Crown, Shield, 
   Sliders, Database, Terminal, ChevronDown, ChevronUp, ChevronLeft, Bell, Settings, Copy, 
-  ExternalLink, Layers, ArrowUpRight, Lock, Eye
+  ExternalLink, Layers, ArrowUpRight, Lock, Eye, PanelLeftClose, PanelLeftOpen
 } from 'lucide-react';
 
 interface UserData {
@@ -125,6 +125,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
   const [activeConsoleTab, setActiveConsoleTab] = useState<'users' | 'sessions' | 'logs' | 'keys'>('users');
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
+  const [sidebarOculto, setSidebarOculto] = useState(false);
   const [cargando, setCargando] = useState(true);
 
   // Filtros y estados
@@ -261,13 +262,25 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             </span>
             <ChevronDown className="h-4 w-4 text-[#8c8c8c]" />
           </div>
-          {/* Botón cerrar en móvil */}
-          <button 
-            onClick={() => setMenuMovilAbierto(false)} 
-            className="lg:hidden text-[#8c8c8c] hover:text-white p-1 rounded-lg"
-          >
-            <X className="h-5 w-5" />
-          </button>
+
+          <div className="flex items-center gap-1">
+            {/* Botón Ocultar en Escritorio */}
+            <button 
+              onClick={() => setSidebarOculto(true)} 
+              className="hidden lg:flex p-1.5 text-[#8c8c8c] hover:text-white hover:bg-[#252525] rounded-[8px] transition cursor-pointer"
+              title="Ocultar menú lateral"
+            >
+              <PanelLeftClose className="h-4 w-4" />
+            </button>
+
+            {/* Botón cerrar en móvil */}
+            <button 
+              onClick={() => setMenuMovilAbierto(false)} 
+              className="lg:hidden text-[#8c8c8c] hover:text-white p-1 rounded-lg"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
         </div>
 
         {/* NAVEGACIÓN - GRUPO 1: SISTEMA */}
@@ -361,7 +374,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     >
       
       {/* 1. SIDEBAR ESCRITORIO (Google AI Studio Theme) */}
-      <aside className="hidden lg:block w-64 bg-[#191919] border-r border-[#262626] flex-shrink-0 min-h-screen">
+      <aside className={`hidden ${sidebarOculto ? 'lg:hidden' : 'lg:block'} w-64 bg-[#191919] border-r border-[#262626] flex-shrink-0 min-h-screen transition-all`}>
         {renderSidebarContent()}
       </aside>
 
@@ -393,6 +406,15 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
               title="Abrir menú de navegación"
             >
               <Menu className="h-5 w-5" />
+            </button>
+
+            {/* BOTÓN MOSTRAR SIDEBAR EN ESCRITORIO CUANDO ESTÁ OCULTO */}
+            <button
+              onClick={() => setSidebarOculto(false)}
+              className={`hidden ${sidebarOculto ? 'lg:flex' : 'lg:hidden'} p-2 rounded-[12px] bg-[#252525] text-[#d4d4d4] hover:text-white hover:bg-[#323232] transition cursor-pointer`}
+              title="Mostrar menú lateral"
+            >
+              <PanelLeftOpen className="h-5 w-5 text-current" />
             </button>
 
             <div>
