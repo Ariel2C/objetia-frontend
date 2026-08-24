@@ -148,6 +148,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   const [sessionsList, setSessionsList] = useState<SessionData[]>([]);
   const [sessionFilter, setSessionFilter] = useState<'todas' | 'activas' | 'revocadas'>('todas');
   const [logsList, setLogsList] = useState<LogData[]>([]);
+  const [searchLogEmail, setSearchLogEmail] = useState('');
+  const [logEventFilter, setLogEventFilter] = useState('');
+  const [logPage, setLogPage] = useState(1);
+  const LOGS_PER_PAGE = 10;
 
   const esRoot = usuario && (usuario.role?.toLowerCase() === 'root' || usuario.role === 'ROOT');
 
@@ -199,6 +203,34 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     if (sessionFilter === 'revocadas') return !s.is_active;
     return true;
   });
+
+  const eventosDisponiblesEnLogs = useMemo(() => {
+    const acciones = new Set(logsList.map(l => l.action).filter(Boolean));
+    const list: OptionItem[] = [{ value: '', label: 'Todos los eventos' }];
+    acciones.forEach(act => {
+      list.push({ value: act, label: act });
+    });
+    return list;
+  }, [logsList]);
+
+  const logsFiltrados = useMemo(() => {
+    return logsList.filter(l => {
+      if (logEventFilter && l.action.toLowerCase() !== logEventFilter.toLowerCase()) return false;
+      if (searchLogEmail) {
+        const q = searchLogEmail.toLowerCase();
+        const emailMatch = l.user_email?.toLowerCase().includes(q);
+        const detailsMatch = l.details?.toLowerCase().includes(q);
+        if (!emailMatch && !detailsMatch) return false;
+      }
+      return true;
+    });
+  }, [logsList, logEventFilter, searchLogEmail]);
+
+  const totalLogPages = Math.max(1, Math.ceil(logsFiltrados.length / LOGS_PER_PAGE));
+  const logsPaginados = useMemo(() => {
+    const start = (logPage - 1) * LOGS_PER_PAGE;
+    return logsFiltrados.slice(start, start + LOGS_PER_PAGE);
+  }, [logsFiltrados, logPage, LOGS_PER_PAGE]);
 
   const cargarDatos = async () => {
     setCargando(true);
@@ -584,6 +616,46 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           </div>
         )}
 
+        {/* BARRA SECUNDARIA DE FILTROS & BUSCADOR (Logs de Auditoría) */}
+        {activeConsoleTab === 'logs' && (
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 bg-[#1f1f1f]">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[12px] sm:text-[13px] font-medium text-[#8c8c8c] whitespace-nowrap">Agrupar por:</span>
+              <CustomSelect
+                value={logEventFilter || ''}
+                options={eventosDisponiblesEnLogs}
+                onChange={(val) => {
+                  setLogEventFilter(val);
+                  setLogPage(1);
+                }}
+              />
+            </div>
+
+            {/* BUSCADOR DE LOGS POR EMAIL */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#8c8c8c]" />
+                <input
+                  type="text"
+                  value={searchLogEmail}
+                  onChange={(e) => {
+                    setSearchLogEmail(e.target.value);
+                    setLogPage(1);
+                  }}
+                  placeholder="Buscar por email..."
+                  style={{ 
+                    color: '#ffffff', 
+                    WebkitTextFillColor: searchLogEmail ? '#ffffff' : undefined,
+                    backgroundColor: '#191919', 
+                    caretColor: '#ffffff' 
+                  }}
+                  className="w-full pl-8 pr-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[12px] text-white text-[13px] placeholder:text-[#8c8c8c] placeholder:opacity-100 focus:outline-none focus:border-[#87a9ff] transition font-sans caret-white"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* ÁREA DE CONTENIDO DINÁMICO */}
         <div className="p-4 sm:p-6 flex-1 overflow-y-auto bg-[#191919]">
 
@@ -776,28 +848,60 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           {activeConsoleTab === 'logs' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden p-4 space-y-3">
               <div className="space-y-2">
-                {logsList.map((l) => (
-                  <div key={l.id} className="p-3 bg-[#191919] border border-[#262626] rounded-[10px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 font-sans">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded-[6px] text-[11px] font-medium uppercase ${
-                          l.action === 'LOGIN' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
-                          l.action === 'CHANGE_ROLE' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
-                          'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                        }`}>
-                          {l.action}
-                        </span>
-                        <span className="text-[#d4d4d4] font-medium text-xs">{l.user_email || `User #${l.user_id}`}</span>
+                {logsPaginados.length === 0 ? (
+                  <p className="text-xs text-[#8c8c8c] text-center py-6 font-sans">No se encontraron registros de auditoría.</p>
+                ) : (
+                  logsPaginados.map((l) => (
+                    <div key={l.id} className="p-3 bg-[#191919] border border-[#262626] rounded-[10px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 font-sans">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2 py-0.5 rounded-[6px] text-[11px] font-medium uppercase ${
+                            l.action === 'LOGIN' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
+                            l.action === 'CHANGE_ROLE' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+                            'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                          }`}>
+                            {l.action}
+                          </span>
+                          <span className="text-[#d4d4d4] font-medium text-xs">{l.user_email || `User #${l.user_id}`}</span>
+                        </div>
+                        <p className="text-[#8c8c8c] font-sans text-xs">{l.details}</p>
                       </div>
-                      <p className="text-[#8c8c8c] font-sans text-xs">{l.details}</p>
+                      <div className="text-xs text-[#8c8c8c] font-sans text-left sm:text-right space-y-0.5">
+                        <p suppressHydrationWarning>{new Date(l.created_at).toLocaleString()}</p>
+                        {l.ip_address && <p>{l.ip_address}</p>}
+                      </div>
                     </div>
-                    <div className="text-xs text-[#8c8c8c] font-sans text-left sm:text-right space-y-0.5">
-                      <p>{new Date(l.created_at).toLocaleString()}</p>
-                      {l.ip_address && <p>{l.ip_address}</p>}
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
+
+              {/* CONTROLES DE PAGINACIÓN */}
+              {totalLogPages > 1 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-3 border-t border-[#262626] text-xs text-[#8c8c8c] font-sans">
+                  <span>
+                    Mostrando {logsPaginados.length} de {logsFiltrados.length} registros (Página {logPage} de {totalLogPages})
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      disabled={logPage <= 1}
+                      onClick={() => setLogPage(p => Math.max(1, p - 1))}
+                      className="px-3 h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[8px] hover:bg-[#323232] disabled:opacity-40 disabled:hover:bg-[#252525] transition cursor-pointer font-sans"
+                    >
+                      Anterior
+                    </button>
+                    <span className="text-[#d4d4d4] font-medium font-sans">
+                      {logPage} / {totalLogPages}
+                    </span>
+                    <button
+                      disabled={logPage >= totalLogPages}
+                      onClick={() => setLogPage(p => Math.min(totalLogPages, p + 1))}
+                      className="px-3 h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[8px] hover:bg-[#323232] disabled:opacity-40 disabled:hover:bg-[#252525] transition cursor-pointer font-sans"
+                    >
+                      Siguiente
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
