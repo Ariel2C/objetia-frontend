@@ -134,6 +134,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   const [roleFilter, setRoleFilter] = useState<string>('');
 
   const [sessionsList, setSessionsList] = useState<SessionData[]>([]);
+  const [sessionFilter, setSessionFilter] = useState<'todas' | 'activas' | 'revocadas'>('todas');
   const [logsList, setLogsList] = useState<LogData[]>([]);
 
   const esRoot = usuario && (usuario.role?.toLowerCase() === 'root' || usuario.role === 'ROOT');
@@ -152,6 +153,12 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
       const emailMatch = u.email?.toLowerCase().includes(q);
       if (!nameMatch && !emailMatch) return false;
     }
+    return true;
+  });
+
+  const sesionesFiltradas = sessionsList.filter(s => {
+    if (sessionFilter === 'activas') return s.is_active;
+    if (sessionFilter === 'revocadas') return !s.is_active;
     return true;
   });
 
@@ -511,6 +518,35 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           </div>
         )}
 
+        {/* BARRA SECUNDARIA DE FILTROS & PILLS (Monitor de Sesiones) */}
+        {activeConsoleTab === 'sessions' && (
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex items-center justify-between gap-2.5 bg-[#1f1f1f]">
+            <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
+              <span className="text-[12px] sm:text-[13px] font-medium text-[#8c8c8c] whitespace-nowrap mr-0.5">Estado:</span>
+              {[
+                { id: 'todas', label: 'Todas' },
+                { id: 'activas', label: 'Activas' },
+                { id: 'revocadas', label: 'Revocadas' },
+              ].map((f) => {
+                const isSelected = sessionFilter === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    onClick={() => setSessionFilter(f.id as any)}
+                    className={`px-2.5 sm:px-3 h-[25px] sm:h-[28px] rounded-full text-[11px] sm:text-[13px] font-medium transition cursor-pointer whitespace-nowrap ${
+                      isSelected
+                        ? 'bg-[#323232] text-[#ffffff] border border-[#555555]'
+                        : 'bg-[#191919] text-[#8c8c8c] border border-transparent hover:bg-[#252525] hover:text-[#d4d4d4]'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
         {/* ÁREA DE CONTENIDO DINÁMICO */}
         <div className="p-4 sm:p-6 flex-1 overflow-y-auto bg-[#191919]">
 
@@ -657,7 +693,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           {activeConsoleTab === 'sessions' && (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sessionsList.map((s) => (
+                {sesionesFiltradas.map((s) => (
                   <div key={s.id} className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 space-y-3 font-sans">
                     <div className="flex justify-between items-start">
                       <div>
