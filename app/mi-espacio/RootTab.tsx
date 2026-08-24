@@ -589,34 +589,36 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                     </div>
 
                     <div className="flex items-center gap-1.5 text-xs text-[#8c8c8c] font-sans pt-2 border-t border-[#262626]">
-                      <span className="text-[#666666]">Creado:</span>
+                      <span className="text-[#8c8c8c] font-sans">Creado:</span>
                       <span className="text-[#d4d4d4] font-sans">{new Date(u.created_at).toLocaleDateString()}</span>
                     </div>
 
-                    <div className="pt-2 border-t border-[#262626] space-y-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs text-[#8c8c8c] font-medium whitespace-nowrap">Rango & Acciones:</span>
-                        {u.id !== usuario?.id && (
-                          <button
-                            onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
-                            className="px-3 h-[28px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[10px] text-[11px] sm:text-xs font-medium transition cursor-pointer flex-shrink-0 whitespace-nowrap shadow-xs"
-                          >
-                            Eliminar
-                          </button>
-                        )}
+                    <div className="pt-2 border-t border-[#262626] flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 flex-1 min-w-0">
+                        <span className="text-xs text-[#8c8c8c] font-sans whitespace-nowrap">Cambiar rango:</span>
+                        <div className="flex-1 min-w-0">
+                          <CustomSelect
+                            value={u.role}
+                            disabled={u.id === usuario?.id}
+                            options={[
+                              { value: 'client', label: 'CLIENT', sublabel: 'Usuario comprador' },
+                              { value: 'financial', label: 'FINANCIAL', sublabel: 'Administrador financiero' },
+                              { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
+                              { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
+                            ]}
+                            onChange={(val) => cambiarRol(u.id, val)}
+                          />
+                        </div>
                       </div>
 
-                      <CustomSelect
-                        value={u.role}
-                        disabled={u.id === usuario?.id}
-                        options={[
-                          { value: 'client', label: 'CLIENT', sublabel: 'Usuario comprador' },
-                          { value: 'financial', label: 'FINANCIAL', sublabel: 'Administrador financiero' },
-                          { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
-                          { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
-                        ]}
-                        onChange={(val) => cambiarRol(u.id, val)}
-                      />
+                      {u.id !== usuario?.id && (
+                        <button
+                          onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
+                          className="px-3 h-[28px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[10px] text-[11px] sm:text-xs font-medium transition cursor-pointer flex-shrink-0 whitespace-nowrap shadow-xs"
+                        >
+                          Eliminar
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
