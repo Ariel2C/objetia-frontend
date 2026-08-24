@@ -831,7 +831,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
         {/* BARRA SECUNDARIA DE ACCIONES (Control de Rangos) */}
         {activeConsoleTab === 'roles' && (
-          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-row justify-start items-center gap-2.5 bg-[#1f1f1f]">
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-row justify-between items-center gap-2.5 bg-[#1f1f1f]">
             {modoVistaRango === 'lista' ? (
               <button
                 onClick={() => abrirFormularioRango('crear')}
@@ -840,13 +840,33 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 Nuevo Rango
               </button>
             ) : (
-              <button
-                onClick={() => setModoVistaRango('lista')}
-                className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer flex items-center gap-1 whitespace-nowrap font-sans"
-              >
-                <ChevronLeft className="h-3.5 w-3.5 flex-shrink-0" />
-                <span>Volver al listado de rangos</span>
-              </button>
+              <div className="flex items-center justify-between w-full gap-2">
+                <button
+                  type="button"
+                  onClick={() => setModoVistaRango('lista')}
+                  className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer flex items-center gap-1 whitespace-nowrap font-sans"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span>Volver al listado de rangos</span>
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setModoVistaRango('lista')}
+                    className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer whitespace-nowrap font-sans"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    form="rango-form-element"
+                    className="px-3 sm:px-4 h-[28px] sm:h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#454d63] transition cursor-pointer whitespace-nowrap font-sans shadow-xs"
+                  >
+                    {rangoForm.dbId ? 'Guardar Cambios' : 'Crear Rango'}
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         )}
@@ -1154,7 +1174,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 /* VISTA PÁGINA DE FORMULARIO DE CREACIÓN / EDICIÓN (SIN MODAL) */
                 <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-6 space-y-5 font-sans">
 
-                  <form onSubmit={guardarRangoForm} className="space-y-4 text-xs font-sans">
+                  <form id="rango-form-element" onSubmit={guardarRangoForm} className="space-y-4 text-xs font-sans">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[#8c8c8c] mb-1 font-medium">Nombre Visible del Rango</label>
@@ -1245,23 +1265,6 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                           );
                         })}
                       </div>
-                    </div>
-
-                    {/* BOTONES DE ACCIÓN FORMULARIO */}
-                    <div className="flex items-center justify-end gap-2 pt-4 border-t border-[#262626]">
-                      <button
-                        type="button"
-                        onClick={() => setModoVistaRango('lista')}
-                        className="px-4 h-[34px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
-                      >
-                        Cancelar
-                      </button>
-                      <button
-                        type="submit"
-                        className="px-5 h-[34px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[8px] text-xs font-medium transition cursor-pointer font-sans shadow-xs"
-                      >
-                        {rangoForm.dbId ? 'Guardar Cambios' : 'Crear Rango'}
-                      </button>
                     </div>
                   </form>
                 </div>
