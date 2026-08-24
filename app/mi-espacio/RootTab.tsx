@@ -155,14 +155,12 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     if (esRoot && token) {
       cargarDatos();
     }
-  }, [token, esRoot, activeConsoleTab, roleFilter]);
+  }, [token, esRoot, activeConsoleTab]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setSearchUser(val);
-    if (val.trim() !== '') {
-      setRoleFilter('');
-    }
+    setRoleFilter('');
   };
 
   const rolesDisponiblesEnTabla = useMemo(() => {
@@ -206,11 +204,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     setCargando(true);
     try {
       if (activeConsoleTab === 'users' || activeConsoleTab === 'keys') {
-        let url = `${getApiUrl()}/root/users?limit=100`;
-        if (searchUser) url += `&search=${encodeURIComponent(searchUser)}`;
-        if (roleFilter) url += `&role=${roleFilter}`;
-
-        const res = await fetch(url, {
+        const res = await fetch(`${getApiUrl()}/root/users?limit=200`, {
           headers: { "Authorization": `Bearer ${token}` }
         });
         const data = await res.json();
