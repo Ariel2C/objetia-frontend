@@ -699,26 +699,26 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           {/* TAB 3: LOGS DE AUDITORÍA */}
           {/* ============================================================================== */}
           {activeConsoleTab === 'logs' && (
-            <div className="bg-[#18181c] border border-[#26262e] rounded-2xl overflow-hidden p-4 space-y-3">
+            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden p-4 space-y-3">
               <div className="space-y-2">
                 {logsList.map((l) => (
-                  <div key={l.id} className="p-3 bg-[#1c1c22] border border-[#2b2b34] rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs font-mono">
-                    <div className="space-y-0.5">
+                  <div key={l.id} className="p-3 bg-[#191919] border border-[#262626] rounded-[10px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 font-sans">
+                    <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
-                          l.action === 'LOGIN' ? 'bg-blue-500/20 text-blue-300' :
-                          l.action === 'CHANGE_ROLE' ? 'bg-amber-500/20 text-amber-300' :
-                          'bg-purple-500/20 text-purple-300'
+                        <span className={`px-2 py-0.5 rounded-[6px] text-[11px] font-medium uppercase ${
+                          l.action === 'LOGIN' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
+                          l.action === 'CHANGE_ROLE' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' :
+                          'bg-purple-500/20 text-purple-300 border border-purple-500/30'
                         }`}>
                           {l.action}
                         </span>
-                        <span className="text-gray-200 font-bold">{l.user_email || `User #${l.user_id}`}</span>
+                        <span className="text-[#d4d4d4] font-medium text-xs">{l.user_email || `User #${l.user_id}`}</span>
                       </div>
-                      <p className="text-gray-400 font-sans text-xs">{l.details}</p>
+                      <p className="text-[#8c8c8c] font-sans text-xs">{l.details}</p>
                     </div>
-                    <div className="text-[10px] text-gray-500 text-right">
+                    <div className="text-xs text-[#8c8c8c] font-sans text-left sm:text-right space-y-0.5">
                       <p>{new Date(l.created_at).toLocaleString()}</p>
-                      <p>{l.ip_address}</p>
+                      {l.ip_address && <p>{l.ip_address}</p>}
                     </div>
                   </div>
                 ))}
