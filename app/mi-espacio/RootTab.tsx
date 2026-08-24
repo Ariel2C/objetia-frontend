@@ -556,58 +556,61 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           {activeConsoleTab === 'users' && (
             <div className="space-y-4">
               
-              {/* VISTA MÓVIL DE TARJETAS OSCURAS (Como en la Segunda Imagen) */}
+              {/* VISTA MÓVIL DE TARJETAS OSCURAS (Estilo Google AI Studio) */}
               <div className="block lg:hidden space-y-3">
                 {usuariosFiltrados.map((u) => (
-                  <div key={u.id} className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
+                  <div key={u.id} className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 space-y-3 font-sans">
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
                         {u.avatar_url ? (
-                          <img src={u.avatar_url} alt="" className="h-8 w-8 rounded-full border border-[#87a9ff]/40 object-cover" />
+                          <img src={u.avatar_url} alt="" className="h-8 w-8 rounded-full border border-[#87a9ff]/40 object-cover flex-shrink-0" />
                         ) : (
-                          <div className="h-8 w-8 rounded-full bg-[#2a2a2a] text-[#87a9ff] font-medium flex items-center justify-center text-[12px]">
+                          <div className="h-8 w-8 rounded-full bg-[#2a2a2a] text-[#87a9ff] font-medium flex items-center justify-center text-[12px] flex-shrink-0">
                             {u.full_name?.charAt(0).toUpperCase() || 'U'}
                           </div>
                         )}
-                        <div>
-                          <p className="text-[14px] font-medium text-[#87a9ff]">{u.full_name}</p>
-                          <p className="text-[12px] text-[#8c8c8c]">{u.email}</p>
+                        <div className="min-w-0">
+                          <p className="text-[14px] font-medium text-[#87a9ff] truncate">{u.full_name}</p>
+                          <p className="text-xs text-[#8c8c8c] font-sans truncate">{u.email}</p>
                         </div>
                       </div>
 
-                      <span className={`px-2 py-0.5 rounded-[6px] text-[11px] font-medium uppercase ${
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium uppercase flex-shrink-0 ${
                         u.role === 'root' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
                         u.role === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' :
-                        'bg-[#2a2a2a] text-[#d4d4d4]'
+                        'bg-[#2a2a2a] text-[#8c8c8c] border border-[#333333]'
                       }`}>
                         {u.role}
                       </span>
                     </div>
 
-                    <div className="text-[13px] text-[#8c8c8c] space-y-1 pt-2 border-t border-[#262626]">
-                      <div className="flex justify-between">
-                        <span>Creado:</span>
-                        <span className="text-[#d4d4d4]">{new Date(u.created_at).toLocaleDateString()}</span>
+                    <div className="text-xs text-[#8c8c8c] font-sans space-y-1 pt-2 border-t border-[#262626]">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[#666666]">Creado:</span>
+                        <span className="text-[#d4d4d4] font-sans">{new Date(u.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2">
-                      <CustomSelect
-                        value={u.role}
-                        disabled={u.id === usuario?.id}
-                        options={[
-                          { value: 'client', label: 'CLIENT', sublabel: 'Usuario comprador' },
-                          { value: 'financial', label: 'FINANCIAL', sublabel: 'Administrador financiero' },
-                          { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
-                          { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
-                        ]}
-                        onChange={(val) => cambiarRol(u.id, val)}
-                      />
+                    <div className="flex items-center justify-between pt-2 border-t border-[#262626] gap-2">
+                      <div className="flex-1 min-w-0">
+                        <CustomSelect
+                          value={u.role}
+                          disabled={u.id === usuario?.id}
+                          options={[
+                            { value: 'client', label: 'CLIENT', sublabel: 'Usuario comprador' },
+                            { value: 'financial', label: 'FINANCIAL', sublabel: 'Administrador financiero' },
+                            { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
+                            { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
+                          ]}
+                          onChange={(val) => cambiarRol(u.id, val)}
+                        />
+                      </div>
 
                       {u.id !== usuario?.id && (
                         <button
                           onClick={() => eliminarUsuario(u.id, u.email)}
-                          className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-[12px] transition"
+                          className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-[10px] border border-red-500/30 transition flex-shrink-0 cursor-pointer"
+                          title="Eliminar usuario"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
