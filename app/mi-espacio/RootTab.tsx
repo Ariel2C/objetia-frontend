@@ -816,22 +816,15 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           </div>
         </header>
 
-        {/* BARRA SECUNDARIA DE ACCIONES & NUEVO RANGO (Control de Rangos) */}
-        {activeConsoleTab === 'roles' && (
-          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-row justify-between items-center gap-2.5 bg-[#1f1f1f]">
-            <span className="text-[12px] sm:text-[13px] font-medium text-[#8c8c8c]">
-              Administración de Rangos y Permisos
-            </span>
-
-            {modoVistaRango === 'lista' && (
-              <button
-                onClick={() => abrirFormularioRango('crear')}
-                className="px-3 h-[30px] bg-[#393f51] border border-[#454d63] text-white rounded-[10px] text-xs font-medium hover:bg-[#454d63] transition cursor-pointer flex items-center gap-1 whitespace-nowrap shadow-xs font-sans"
-              >
-                <Sliders className="h-3.5 w-3.5 flex-shrink-0" />
-                <span>+ Nuevo Rango</span>
-              </button>
-            )}
+        {/* BARRA SECUNDARIA DE ACCIONES (Control de Rangos) */}
+        {activeConsoleTab === 'roles' && modoVistaRango === 'lista' && (
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-row justify-start items-center gap-2.5 bg-[#1f1f1f]">
+            <button
+              onClick={() => abrirFormularioRango('crear')}
+              className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer whitespace-nowrap font-sans"
+            >
+              Nuevo Rango
+            </button>
           </div>
         )}
 
