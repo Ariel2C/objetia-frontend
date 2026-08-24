@@ -724,63 +724,55 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   <p className="text-xs text-[#8c8c8c] text-center py-6 font-sans">No se encontraron usuarios registrados.</p>
                 ) : (
                   usuariosPaginados.map((u) => (
-                    <div key={u.id} className="p-3.5 bg-[#191919] border border-[#262626] rounded-[10px] space-y-2.5 font-sans">
-                      
-                      {/* FILA 1: Nombre, Email y Badge de Rol */}
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2.5 min-w-0">
+                    <div key={u.id} className="p-3 bg-[#191919] border border-[#262626] rounded-[10px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 font-sans">
+                      <div className="space-y-1 min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
                           {u.avatar_url ? (
-                            <img src={u.avatar_url} alt="" className="h-8 w-8 rounded-full border border-[#87a9ff]/40 object-cover flex-shrink-0" />
+                            <img src={u.avatar_url} alt="" className="h-6 w-6 rounded-full border border-[#87a9ff]/40 object-cover flex-shrink-0" />
                           ) : (
-                            <div className="h-8 w-8 rounded-full bg-[#2a2a2a] text-[#87a9ff] font-medium flex items-center justify-center text-[12px] flex-shrink-0 font-sans">
+                            <div className="h-6 w-6 rounded-full bg-[#2a2a2a] text-[#87a9ff] font-medium flex items-center justify-center text-[11px] flex-shrink-0 font-sans">
                               {u.full_name?.charAt(0).toUpperCase() || 'U'}
                             </div>
                           )}
-                          <div className="min-w-0 flex items-center gap-2 flex-wrap">
-                            <p className="text-[14px] font-medium text-[#87a9ff] truncate">{u.full_name}</p>
-                            <span className="text-xs text-[#8c8c8c] font-sans truncate">({u.email})</span>
-                          </div>
+                          <p className="text-[14px] font-medium text-[#87a9ff] truncate">{u.full_name}</p>
+                          <span className="text-xs text-[#8c8c8c] font-sans truncate">({u.email})</span>
+                          <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium uppercase flex-shrink-0 ${
+                            u.role === 'root' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
+                            u.role === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' :
+                            'bg-[#2a2a2a] text-[#8c8c8c] border border-[#333333]'
+                          }`}>
+                            {u.role}
+                          </span>
                         </div>
 
-                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase flex-shrink-0 ${
-                          u.role === 'root' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
-                          u.role === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' :
-                          'bg-[#2a2a2a] text-[#8c8c8c] border border-[#333333]'
-                        }`}>
-                          {u.role}
-                        </span>
+                        <div className="flex items-center gap-1.5 text-xs text-[#8c8c8c] font-sans">
+                          <span className="text-[#666666]">Creado:</span>
+                          <span suppressHydrationWarning className="text-[#8c8c8c] font-sans">{new Date(u.created_at).toLocaleDateString()}</span>
+                        </div>
                       </div>
 
-                      {/* FILA 2: Fecha Creación & Cambiar Rango / Eliminar */}
-                      <div className="pt-2 border-t border-[#262626] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 text-xs text-[#8c8c8c]">
-                        <div className="flex items-center gap-1.5 font-sans">
-                          <span>Creado:</span>
-                          <span suppressHydrationWarning className="text-[#d4d4d4] font-sans">{new Date(u.created_at).toLocaleDateString()}</span>
-                        </div>
+                      <div className="flex items-center gap-2 flex-shrink-0 flex-wrap sm:flex-nowrap">
+                        <span className="text-xs text-[#8c8c8c] font-sans whitespace-nowrap">Cambiar rango:</span>
+                        <CustomSelect
+                          value={u.role}
+                          disabled={u.id === usuario?.id}
+                          options={[
+                            { value: 'client', label: 'CLIENT', sublabel: 'Usuario comprador' },
+                            { value: 'financial', label: 'FINANCIAL', sublabel: 'Administrador financiero' },
+                            { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
+                            { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
+                          ]}
+                          onChange={(val) => cambiarRol(u.id, val)}
+                        />
 
-                        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                          <span className="text-xs text-[#8c8c8c] font-sans whitespace-nowrap">Cambiar rango:</span>
-                          <CustomSelect
-                            value={u.role}
-                            disabled={u.id === usuario?.id}
-                            options={[
-                              { value: 'client', label: 'CLIENT', sublabel: 'Usuario comprador' },
-                              { value: 'financial', label: 'FINANCIAL', sublabel: 'Administrador financiero' },
-                              { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
-                              { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
-                            ]}
-                            onChange={(val) => cambiarRol(u.id, val)}
-                          />
-
-                          {u.id !== usuario?.id && (
-                            <button
-                              onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
-                              className="px-3 h-[28px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[10px] text-xs font-medium transition cursor-pointer flex-shrink-0 whitespace-nowrap shadow-xs font-sans"
-                            >
-                              Eliminar
-                            </button>
-                          )}
-                        </div>
+                        {u.id !== usuario?.id && (
+                          <button
+                            onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
+                            className="px-3 h-[28px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[8px] text-xs font-medium transition cursor-pointer flex-shrink-0 whitespace-nowrap shadow-xs font-sans"
+                          >
+                            Eliminar
+                          </button>
+                        )}
                       </div>
 
                     </div>
