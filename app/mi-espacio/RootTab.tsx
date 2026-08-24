@@ -979,22 +979,18 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           {/* ============================================================================== */}
           {activeConsoleTab === 'roles' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden p-4 space-y-3 font-sans">
-              <div className="space-y-2.5">
+              <div className="space-y-2">
                 {rangosList.map((r) => (
                   <div key={r.id} className="p-3.5 bg-[#191919] border border-[#262626] rounded-[10px] space-y-2.5 font-sans">
                     
-                    {/* FILA 1: Icono, Nombre de Rango, Badge y Nivel + Acciones */}
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                      <div className="flex items-center gap-2.5 flex-wrap min-w-0">
-                        <Sliders className="h-4.5 w-4.5 text-[#87a9ff] flex-shrink-0" />
-                        <p className="text-[14px] font-bold text-[#87a9ff]">{r.name}</p>
-                        <span className="text-xs text-[#8c8c8c]">({r.label})</span>
-                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase ${r.badgeColor}`}>
-                          Nivel {r.level}
-                        </span>
+                    {/* SUBFILA 1: Nombre del Rango, Etiqueta y Acciones */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                        <p className="text-[14px] font-bold text-[#87a9ff] truncate">{r.name}</p>
+                        <span className="text-xs text-[#8c8c8c] font-sans truncate">({r.label})</span>
                       </div>
 
-                      <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         <button
                           onClick={() => {
                             setFormRangoName(r.name);
@@ -1019,13 +1015,13 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                       </div>
                     </div>
 
-                    {/* FILA 2: Descripción y Permisos */}
+                    {/* SUBFILA 2: Descripción y Permisos */}
                     <div className="pt-2 border-t border-[#262626] space-y-1.5 text-xs text-[#8c8c8c]">
-                      <p className="text-[#d4d4d4]">{r.description}</p>
-                      <div className="flex items-center gap-1.5 flex-wrap pt-1">
-                        <span className="text-[#666666] font-medium">Permisos asignados:</span>
+                      <p className="text-[#d4d4d4] font-sans">{r.description}</p>
+                      <div className="flex items-center gap-1.5 flex-wrap pt-0.5 font-sans">
+                        <span className="text-[#666666] font-medium font-sans">Permisos:</span>
                         {r.permissions.map((p, idx) => (
-                          <span key={idx} className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#d4d4d4] border border-[#333333] text-[11px]">
+                          <span key={idx} className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#d4d4d4] border border-[#333333] text-[11px] font-sans">
                             {p}
                           </span>
                         ))}
