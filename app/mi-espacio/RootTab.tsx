@@ -765,16 +765,14 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                           onChange={(val) => cambiarRol(u.id, val)}
                         />
 
-                        {u.id !== usuario?.id ? (
-                          <button
-                            onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
-                            className="px-3 h-[28px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[8px] text-xs font-medium transition cursor-pointer flex-shrink-0 whitespace-nowrap shadow-xs font-sans"
-                          >
-                            Eliminar
-                          </button>
-                        ) : (
-                          <div className="w-[72px] flex-shrink-0 hidden sm:block" />
-                        )}
+                        <button
+                          disabled={u.id === usuario?.id}
+                          onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
+                          className="px-3 h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#252525] disabled:hover:text-[#d4d4d4] rounded-[8px] text-xs font-medium transition cursor-pointer flex-shrink-0 whitespace-nowrap shadow-xs font-sans"
+                          title={u.id === usuario?.id ? "No puedes eliminar tu propia cuenta" : "Eliminar usuario"}
+                        >
+                          Eliminar
+                        </button>
                       </div>
 
                     </div>
