@@ -144,6 +144,8 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   const [usersList, setUsersList] = useState<UserData[]>([]);
   const [searchUser, setSearchUser] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('');
+  const [usersPage, setUsersPage] = useState(1);
+  const USERS_PER_PAGE = 10;
 
   const [sessionsList, setSessionsList] = useState<SessionData[]>([]);
   const [sessionFilter, setSessionFilter] = useState<'todas' | 'activas' | 'revocadas'>('todas');
@@ -169,6 +171,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     const val = e.target.value;
     setSearchUser(val);
     setRoleFilter('');
+    setUsersPage(1);
   };
 
   const rolesDisponiblesEnTabla = useMemo(() => {
@@ -201,6 +204,12 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     }
     return true;
   });
+
+  const totalUserPages = Math.max(1, Math.ceil(usuariosFiltrados.length / USERS_PER_PAGE));
+  const usuariosPaginados = useMemo(() => {
+    const start = (usersPage - 1) * USERS_PER_PAGE;
+    return usuariosFiltrados.slice(start, start + USERS_PER_PAGE);
+  }, [usuariosFiltrados, usersPage, USERS_PER_PAGE]);
 
   const sesionesFiltradas = sessionsList.filter(s => {
     if (sessionFilter === 'activas' && !s.is_active) return false;
@@ -569,7 +578,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 return (
                   <button
                     key={f.id}
-                    onClick={() => setRoleFilter(f.id)}
+                    onClick={() => {
+                      setRoleFilter(f.id);
+                      setUsersPage(1);
+                    }}
                     className={`px-2.5 sm:px-3 h-[25px] sm:h-[28px] rounded-full text-[11px] sm:text-[13px] font-medium transition cursor-pointer whitespace-nowrap ${
                       isSelected
                         ? 'bg-[#323232] text-[#ffffff] border border-[#555555]'
@@ -706,45 +718,48 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           {/* TAB 1: CONTROL DE USUARIOS */}
           {/* ============================================================================== */}
           {activeConsoleTab === 'users' && (
-            <div className="space-y-4">
-              
-              {/* VISTA MÓVIL DE TARJETAS OSCURAS (Estilo Google AI Studio) */}
-              <div className="block lg:hidden space-y-3">
-                {usuariosFiltrados.map((u) => (
-                  <div key={u.id} className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 space-y-3 font-sans">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        {u.avatar_url ? (
-                          <img src={u.avatar_url} alt="" className="h-8 w-8 rounded-full border border-[#87a9ff]/40 object-cover flex-shrink-0" />
-                        ) : (
-                          <div className="h-8 w-8 rounded-full bg-[#2a2a2a] text-[#87a9ff] font-medium flex items-center justify-center text-[12px] flex-shrink-0">
-                            {u.full_name?.charAt(0).toUpperCase() || 'U'}
+            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-visible p-4 space-y-3">
+              <div className="space-y-2">
+                {usuariosPaginados.length === 0 ? (
+                  <p className="text-xs text-[#8c8c8c] text-center py-6 font-sans">No se encontraron usuarios registrados.</p>
+                ) : (
+                  usuariosPaginados.map((u) => (
+                    <div key={u.id} className="p-3.5 bg-[#191919] border border-[#262626] rounded-[10px] space-y-2.5 font-sans">
+                      
+                      {/* FILA 1: Nombre, Email y Badge de Rol */}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          {u.avatar_url ? (
+                            <img src={u.avatar_url} alt="" className="h-8 w-8 rounded-full border border-[#87a9ff]/40 object-cover flex-shrink-0" />
+                          ) : (
+                            <div className="h-8 w-8 rounded-full bg-[#2a2a2a] text-[#87a9ff] font-medium flex items-center justify-center text-[12px] flex-shrink-0 font-sans">
+                              {u.full_name?.charAt(0).toUpperCase() || 'U'}
+                            </div>
+                          )}
+                          <div className="min-w-0 flex items-center gap-2 flex-wrap">
+                            <p className="text-[14px] font-medium text-[#87a9ff] truncate">{u.full_name}</p>
+                            <span className="text-xs text-[#8c8c8c] font-sans truncate">({u.email})</span>
                           </div>
-                        )}
-                        <div className="min-w-0">
-                          <p className="text-[14px] font-medium text-[#87a9ff] truncate">{u.full_name}</p>
-                          <p className="text-xs text-[#8c8c8c] font-sans truncate">{u.email}</p>
                         </div>
+
+                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase flex-shrink-0 ${
+                          u.role === 'root' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
+                          u.role === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' :
+                          'bg-[#2a2a2a] text-[#8c8c8c] border border-[#333333]'
+                        }`}>
+                          {u.role}
+                        </span>
                       </div>
 
-                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium uppercase flex-shrink-0 ${
-                        u.role === 'root' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
-                        u.role === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' :
-                        'bg-[#2a2a2a] text-[#8c8c8c] border border-[#333333]'
-                      }`}>
-                        {u.role}
-                      </span>
-                    </div>
+                      {/* FILA 2: Fecha Creación & Cambiar Rango / Eliminar */}
+                      <div className="pt-2 border-t border-[#262626] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 text-xs text-[#8c8c8c]">
+                        <div className="flex items-center gap-1.5 font-sans">
+                          <span>Creado:</span>
+                          <span suppressHydrationWarning className="text-[#d4d4d4] font-sans">{new Date(u.created_at).toLocaleDateString()}</span>
+                        </div>
 
-                    <div className="flex items-center gap-1.5 text-xs text-[#8c8c8c] font-sans pt-2 border-t border-[#262626]">
-                      <span className="text-[#8c8c8c] font-sans">Creado:</span>
-                      <span suppressHydrationWarning className="text-[#d4d4d4] font-sans">{new Date(u.created_at).toLocaleDateString()}</span>
-                    </div>
-
-                    <div className="pt-2 border-t border-[#262626] flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 flex-1 min-w-0">
-                        <span className="text-xs text-[#8c8c8c] font-sans whitespace-nowrap">Cambiar rango:</span>
-                        <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                          <span className="text-xs text-[#8c8c8c] font-sans whitespace-nowrap">Cambiar rango:</span>
                           <CustomSelect
                             value={u.role}
                             disabled={u.id === usuario?.id}
@@ -756,88 +771,50 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                             ]}
                             onChange={(val) => cambiarRol(u.id, val)}
                           />
+
+                          {u.id !== usuario?.id && (
+                            <button
+                              onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
+                              className="px-3 h-[28px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[10px] text-xs font-medium transition cursor-pointer flex-shrink-0 whitespace-nowrap shadow-xs font-sans"
+                            >
+                              Eliminar
+                            </button>
+                          )}
                         </div>
                       </div>
 
-                      {u.id !== usuario?.id && (
-                        <button
-                          onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
-                          className="px-3 h-[28px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[10px] text-[11px] sm:text-xs font-medium transition cursor-pointer flex-shrink-0 whitespace-nowrap shadow-xs"
-                        >
-                          Eliminar
-                        </button>
-                      )}
                     </div>
+                  ))
+                )}
+              </div>
+
+              {/* CONTROLES DE PAGINACIÓN */}
+              {totalUserPages > 1 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-3 border-t border-[#262626] text-xs text-[#8c8c8c] font-sans">
+                  <span>
+                    Mostrando {usuariosPaginados.length} de {usuariosFiltrados.length} usuarios (Página {usersPage} de {totalUserPages})
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      disabled={usersPage <= 1}
+                      onClick={() => setUsersPage(p => Math.max(1, p - 1))}
+                      className="px-3 h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[8px] hover:bg-[#323232] disabled:opacity-40 disabled:hover:bg-[#252525] transition cursor-pointer font-sans"
+                    >
+                      Anterior
+                    </button>
+                    <span className="text-[#d4d4d4] font-medium font-sans">
+                      {usersPage} / {totalUserPages}
+                    </span>
+                    <button
+                      disabled={usersPage >= totalUserPages}
+                      onClick={() => setUsersPage(p => Math.min(totalUserPages, p + 1))}
+                      className="px-3 h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[8px] hover:bg-[#323232] disabled:opacity-40 disabled:hover:bg-[#252525] transition cursor-pointer font-sans"
+                    >
+                      Siguiente
+                    </button>
                   </div>
-                ))}
-              </div>
-
-              {/* VISTA ESCRITORIO CON TABLA OSCURA (DevTools CSS Mat-Table) */}
-              <div className="hidden lg:block bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-visible">
-                <table className="w-full text-left text-[13px] leading-[20px] text-[#d4d4d4] font-sans">
-                  <thead>
-                    <tr className="bg-[#1f1f1f] border-b border-[#262626] text-[#8c8c8c] font-medium text-[13px] leading-[21px] font-sans">
-                      <th className="px-4 py-3 font-medium text-left">Usuario</th>
-                      <th className="px-4 py-3 font-medium text-left">Email</th>
-                      <th className="px-4 py-3 font-medium text-left">Rol / Jerarquía</th>
-                      <th className="px-4 py-3 font-medium text-left">Fecha Creación</th>
-                      <th className="px-4 py-3 font-medium text-left">Rango & Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-[#262626]">
-                    {usuariosFiltrados.map((u) => (
-                      <tr key={u.id} className="hover:bg-[#252525] transition-colors">
-                        <td className="px-4 py-3 font-medium text-[#d4d4d4] flex items-center gap-2 font-sans">
-                          {u.avatar_url ? (
-                            <img src={u.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover border border-[#87a9ff]/40" />
-                          ) : (
-                            <div className="h-7 w-7 rounded-full bg-[#2a2a2a] text-[#87a9ff] font-medium flex items-center justify-center text-[12px]">
-                              {u.full_name?.charAt(0).toUpperCase() || 'U'}
-                            </div>
-                          )}
-                          <span className="text-[#87a9ff] font-medium hover:underline cursor-pointer text-[13px] font-sans">{u.full_name}</span>
-                        </td>
-                        <td className="px-4 py-3 text-[#d4d4d4] font-sans text-xs">{u.email}</td>
-                        <td className="px-4 py-3 font-sans">
-                          <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase ${
-                            u.role === 'root' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
-                            u.role === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' :
-                            'bg-[#2a2a2a] text-[#d4d4d4] border border-[#333333]'
-                          }`}>
-                            {u.role}
-                          </span>
-                        </td>
-                        <td suppressHydrationWarning className="px-4 py-3 text-[#8c8c8c] font-sans text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
-                        <td className="px-4 py-3 text-left font-sans">
-                          <div className="inline-flex items-center gap-2">
-                            <CustomSelect
-                              value={u.role}
-                              disabled={u.id === usuario?.id}
-                              options={[
-                                { value: 'client', label: 'CLIENT', sublabel: 'Usuario comprador' },
-                                { value: 'financial', label: 'FINANCIAL', sublabel: 'Administrador financiero' },
-                                { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
-                                { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
-                              ]}
-                              onChange={(val) => cambiarRol(u.id, val)}
-                            />
-
-                            {u.id !== usuario?.id && (
-                              <button
-                                onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
-                                className="px-3 h-[28px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[10px] text-xs font-medium transition cursor-pointer whitespace-nowrap shadow-xs"
-                              >
-                                Eliminar
-                              </button>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-
+                </div>
+              )}
             </div>
           )}
 
