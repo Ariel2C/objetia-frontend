@@ -550,11 +550,11 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   placeholder="Filtrar usuarios..."
                   style={{ 
                     color: '#ffffff', 
-                    WebkitTextFillColor: '#ffffff',
+                    WebkitTextFillColor: searchUser ? '#ffffff' : undefined,
                     backgroundColor: '#191919', 
                     caretColor: '#ffffff' 
                   }}
-                  className="w-full pl-8 pr-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[12px] !text-white text-[13px] placeholder-[#8c8c8c] focus:outline-none focus:border-[#87a9ff] transition font-sans caret-white"
+                  className="w-full pl-8 pr-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[12px] text-white text-[13px] placeholder:text-[#8c8c8c] placeholder:opacity-100 focus:outline-none focus:border-[#87a9ff] transition font-sans caret-white"
                 />
               </div>
             </div>
