@@ -456,32 +456,30 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
         {/* BARRA SECUNDARIA DE FILTROS & PILLS (Google AI Studio Theme) */}
         <div className="px-4 sm:px-6 py-3 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 bg-[#1f1f1f]">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[14px] font-medium text-[#8c8c8c]">Agrupar por:</span>
-            <button 
-              onClick={() => setRoleFilter('')}
-              className={`px-3 h-[28px] rounded-full text-[13px] font-medium transition ${
-                roleFilter === '' ? 'bg-[#2a2a2a] text-[#ffffff] border border-[#87a9ff]/40' : 'bg-[#191919] text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-              }`}
-            >
-              • Todos
-            </button>
-            <button 
-              onClick={() => setRoleFilter('root')}
-              className={`px-3 h-[28px] rounded-full text-[13px] font-medium transition ${
-                roleFilter === 'root' ? 'bg-[#2a2a2a] text-[#ffffff] border border-amber-500/40' : 'bg-[#191919] text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-              }`}
-            >
-              Root
-            </button>
-            <button 
-              onClick={() => setRoleFilter('admin')}
-              className={`px-3 h-[28px] rounded-full text-[13px] font-medium transition ${
-                roleFilter === 'admin' ? 'bg-[#2a2a2a] text-[#ffffff] border border-purple-500/40' : 'bg-[#191919] text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-              }`}
-            >
-              Admins
-            </button>
+            {[
+              { id: '', label: 'Todos' },
+              { id: 'client', label: 'Clientes' },
+              { id: 'financial', label: 'Financial' },
+              { id: 'admin', label: 'Admins' },
+              { id: 'root', label: 'Root' },
+            ].map((f) => {
+              const isSelected = roleFilter === f.id;
+              return (
+                <button
+                  key={f.id}
+                  onClick={() => setRoleFilter(f.id)}
+                  className={`px-3 h-[28px] rounded-full text-[13px] font-medium transition cursor-pointer ${
+                    isSelected
+                      ? 'bg-[#323232] text-[#ffffff] border border-[#555555]'
+                      : 'bg-[#191919] text-[#8c8c8c] border border-transparent hover:bg-[#252525] hover:text-[#d4d4d4]'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              );
+            })}
           </div>
 
           {/* BUSCADOR OSCURO CON DROPDOWN */}
