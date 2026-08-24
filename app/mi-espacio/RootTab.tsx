@@ -147,6 +147,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
   const [sessionsList, setSessionsList] = useState<SessionData[]>([]);
   const [sessionFilter, setSessionFilter] = useState<'todas' | 'activas' | 'revocadas'>('todas');
+  const [searchSessionEmail, setSearchSessionEmail] = useState('');
   const [logsList, setLogsList] = useState<LogData[]>([]);
   const [searchLogEmail, setSearchLogEmail] = useState('');
   const [logEventFilter, setLogEventFilter] = useState('');
@@ -199,8 +200,15 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   });
 
   const sesionesFiltradas = sessionsList.filter(s => {
-    if (sessionFilter === 'activas') return s.is_active;
-    if (sessionFilter === 'revocadas') return !s.is_active;
+    if (sessionFilter === 'activas' && !s.is_active) return false;
+    if (sessionFilter === 'revocadas' && s.is_active) return false;
+    if (searchSessionEmail) {
+      const q = searchSessionEmail.toLowerCase();
+      const emailMatch = s.user_email?.toLowerCase().includes(q);
+      const nameMatch = s.user_name?.toLowerCase().includes(q);
+      const ipMatch = s.ip_address?.toLowerCase().includes(q);
+      if (!emailMatch && !nameMatch && !ipMatch) return false;
+    }
     return true;
   });
 
@@ -589,7 +597,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
         {/* BARRA SECUNDARIA DE FILTROS & PILLS (Monitor de Sesiones) */}
         {activeConsoleTab === 'sessions' && (
-          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex items-center justify-between gap-2.5 bg-[#1f1f1f]">
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 bg-[#1f1f1f]">
             <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
               <span className="text-[12px] sm:text-[13px] font-medium text-[#8c8c8c] whitespace-nowrap mr-0.5">Estado:</span>
               {[
@@ -612,6 +620,26 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   </button>
                 );
               })}
+            </div>
+
+            {/* BUSCADOR DE SESIONES POR EMAIL */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#8c8c8c]" />
+                <input
+                  type="text"
+                  value={searchSessionEmail}
+                  onChange={(e) => setSearchSessionEmail(e.target.value)}
+                  placeholder="Buscar por email..."
+                  style={{ 
+                    color: '#ffffff', 
+                    WebkitTextFillColor: searchSessionEmail ? '#ffffff' : undefined,
+                    backgroundColor: '#191919', 
+                    caretColor: '#ffffff' 
+                  }}
+                  className="w-full pl-8 pr-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[12px] text-white text-[13px] placeholder:text-[#8c8c8c] placeholder:opacity-100 focus:outline-none focus:border-[#87a9ff] transition font-sans caret-white"
+                />
+              </div>
             </div>
           </div>
         )}
@@ -802,42 +830,46 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           {/* TAB 2: MONITOR DE SESIONES */}
           {/* ============================================================================== */}
           {activeConsoleTab === 'sessions' && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {sesionesFiltradas.map((s) => (
-                  <div key={s.id} className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 space-y-3 font-sans">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-medium text-[#87a9ff] text-[14px]">{s.user_name}</p>
-                        <p className="text-xs text-[#8c8c8c] font-sans">{s.user_email}</p>
+            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden p-4 space-y-3">
+              <div className="space-y-2">
+                {sesionesFiltradas.length === 0 ? (
+                  <p className="text-xs text-[#8c8c8c] text-center py-6 font-sans">No se encontraron sesiones registradas.</p>
+                ) : (
+                  sesionesFiltradas.map((s) => (
+                    <div key={s.id} className="p-3 bg-[#191919] border border-[#262626] rounded-[10px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 font-sans">
+                      <div className="space-y-1 min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-medium text-[#87a9ff] text-[14px]">{s.user_name}</p>
+                          <span className="text-xs text-[#8c8c8c] font-sans">({s.user_email})</span>
+                          {s.is_active ? (
+                            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                              ACTIVA
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#2a2a2a] text-[#8c8c8c] border border-[#333333]">
+                              REVOCADA
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#8c8c8c] font-sans">
+                          <p><span className="text-[#666666]">IP:</span> {s.ip_address || "127.0.0.1"}</p>
+                          <p className="truncate max-w-xs sm:max-w-md" title={s.user_agent}><span className="text-[#666666]">Device:</span> {s.user_agent || "Web Browser"}</p>
+                          <p suppressHydrationWarning><span className="text-[#666666]">Inicio:</span> {new Date(s.created_at).toLocaleString()}</p>
+                        </div>
                       </div>
-                      {s.is_active ? (
-                        <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-                          ACTIVA
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#2a2a2a] text-[#8c8c8c] border border-[#333333]">
-                          REVOCADA
-                        </span>
+
+                      {s.is_active && (
+                        <button
+                          onClick={() => revocarSesion(s.id)}
+                          className="px-3 h-[28px] bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-[8px] text-xs font-medium border border-red-500/30 transition cursor-pointer flex-shrink-0 whitespace-nowrap"
+                        >
+                          Revocar Sesión
+                        </button>
                       )}
                     </div>
-
-                    <div className="space-y-1 text-xs text-[#8c8c8c] border-t border-[#262626] pt-2 font-sans">
-                      <p><span className="text-[#666666]">IP:</span> {s.ip_address || "127.0.0.1"}</p>
-                      <p className="truncate" title={s.user_agent}><span className="text-[#666666]">Device:</span> {s.user_agent || "Web Browser"}</p>
-                      <p><span className="text-[#666666]">Inicio:</span> {new Date(s.created_at).toLocaleString()}</p>
-                    </div>
-
-                    {s.is_active && (
-                      <button
-                        onClick={() => revocarSesion(s.id)}
-                        className="w-full py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-[10px] text-xs font-medium border border-red-500/30 transition cursor-pointer mt-2"
-                      >
-                        Revocar Sesión
-                      </button>
-                    )}
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
             </div>
           )}
