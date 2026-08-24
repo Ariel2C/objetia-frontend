@@ -105,7 +105,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {/* Tipografías premium de diseño para la identidad corporativa de Objetia */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cormorant+Garamond:wght@600;700&family=Inter:wght@400;600;800&family=Montserrat:wght@500;700;900&family=Outfit:wght@400;600;800;900&family=Playfair+Display:ital,wght@0,700;1,700&family=Plus+Jakarta+Sans:wght@400;600;800&family=Poppins:wght@500;700;900&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800&family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Cormorant+Garamond:wght@600;700&family=Google+Sans+Text:wght@400;500;600;700&family=Google+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@500;700;900&family=Outfit:wght@400;600;800;900&family=Playfair+Display:ital,wght@0,700;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Poppins:wght@500;700;900&family=Space+Grotesk:wght@600;700&family=Syne:wght@700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet" />
       </head>
       <body
         style={{

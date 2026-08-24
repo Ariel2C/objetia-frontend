@@ -282,7 +282,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   );
 
   return (
-    <div className="min-h-[85vh] bg-[#121214] text-[#e3e3e8] rounded-3xl overflow-hidden flex flex-col lg:flex-row border border-[#222228] shadow-2xl relative">
+    <div 
+      style={{ fontFamily: "'Google Sans Text', 'Google Sans', 'Plus Jakarta Sans', 'Inter', Roboto, sans-serif" }}
+      className="min-h-[85vh] bg-[#121214] text-[#e3e3e8] rounded-3xl overflow-hidden flex flex-col lg:flex-row border border-[#222228] shadow-2xl relative"
+    >
       
       {/* 1. SIDEBAR ESCRITORIO (Google AI Studio Theme) */}
       <aside className="hidden lg:block w-64 bg-[#18181c] border-r border-[#26262e] flex-shrink-0 min-h-[750px]">
