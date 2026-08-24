@@ -474,20 +474,31 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
         const data = await res.json();
         if (res.ok) setUsersList(data.users || []);
       } else if (activeConsoleTab === 'roles') {
-        const res = await fetch(`${getApiUrl()}/root/roles`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        const data = await res.json();
-        if (res.ok && data.roles) {
-          const rolesMapeados = data.roles.map((r: any) => ({
+        const [resRoles, resPerms] = await Promise.all([
+          fetch(`${getApiUrl()}/root/roles`, { headers: { "Authorization": `Bearer ${token}` } }),
+          fetch(`${getApiUrl()}/root/permissions`, { headers: { "Authorization": `Bearer ${token}` } })
+        ]);
+        const dataRoles = await resRoles.json();
+        const dataPerms = await resPerms.json();
+
+        if (resPerms.ok && dataPerms.permissions) {
+          setAllPermissions(dataPerms.permissions);
+        }
+
+        if (resRoles.ok && dataRoles.roles) {
+          const rolesMapeados = dataRoles.roles.map((r: any) => ({
             id: r.code,
             dbId: r.id,
+            code: r.code,
             name: r.name,
             label: r.label,
             description: r.description || '',
             level: r.level,
             badgeColor: r.badge_color,
-            permissions: r.permissions ? r.permissions.split(',').map((p: string) => p.trim()) : []
+            permission_ids: r.permission_ids || [],
+            permissions: Array.isArray(r.permissions)
+              ? r.permissions
+              : (r.permissions ? String(r.permissions).split(',').map((p: string) => p.trim()) : [])
           }));
           setRangosList(rolesMapeados);
         }
