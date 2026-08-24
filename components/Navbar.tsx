@@ -467,16 +467,6 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                           )}
                         </div>
 
-                        {(usuario.role === 'root' || usuario.role === 'ROOT') && (
-                          <Link 
-                            href="/root/dashboard" 
-                            onClick={() => setMenuAbierto(false)}
-                            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-black text-amber-900 bg-amber-50 hover:bg-amber-100 transition border border-amber-200/60"
-                          >
-                            <Shield className="h-4 w-4 text-amber-600" /> Panel Root / Auditoría
-                          </Link>
-                        )}
-
                         <Link 
                           href="/mi-espacio" 
                           onClick={() => setMenuAbierto(false)}
