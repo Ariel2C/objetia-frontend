@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../../components/AuthContext';
 import { useToast } from '../../components/ToastContext';
 import { getApiUrl } from '../../lib/config';
@@ -156,6 +156,34 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
       cargarDatos();
     }
   }, [token, esRoot, activeConsoleTab, roleFilter]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSearchUser(val);
+    if (val.trim() !== '') {
+      setRoleFilter('');
+    }
+  };
+
+  const rolesDisponiblesEnTabla = useMemo(() => {
+    const usuariosSegunBusqueda = usersList.filter(u => {
+      if (!searchUser) return true;
+      const q = searchUser.toLowerCase();
+      return u.full_name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q);
+    });
+
+    const rolesPresentes = new Set(usuariosSegunBusqueda.map(u => u.role?.toLowerCase()).filter(Boolean));
+    
+    const todosLosFiltros = [
+      { id: '', label: 'Todos' },
+      { id: 'client', label: 'Clientes' },
+      { id: 'financial', label: 'Financial' },
+      { id: 'admin', label: 'Admins' },
+      { id: 'root', label: 'Root' },
+    ];
+
+    return todosLosFiltros.filter(f => f.id === '' || rolesPresentes.has(f.id));
+  }, [usersList, searchUser]);
 
   const usuariosFiltrados = usersList.filter(u => {
     if (roleFilter && u.role?.toLowerCase() !== roleFilter.toLowerCase()) return false;
@@ -493,13 +521,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 bg-[#1f1f1f]">
             <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
               <span className="text-[12px] sm:text-[13px] font-medium text-[#8c8c8c] whitespace-nowrap mr-0.5">Agrupar por:</span>
-              {[
-                { id: '', label: 'Todos' },
-                { id: 'client', label: 'Clientes' },
-                { id: 'financial', label: 'Financial' },
-                { id: 'admin', label: 'Admins' },
-                { id: 'root', label: 'Root' },
-              ].map((f) => {
+              {rolesDisponiblesEnTabla.map((f) => {
                 const isSelected = roleFilter === f.id;
                 return (
                   <button
@@ -524,10 +546,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 <input
                   type="text"
                   value={searchUser}
-                  onChange={(e) => setSearchUser(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && cargarDatos()}
+                  onChange={handleSearchChange}
                   placeholder="Filtrar usuarios..."
-                  className="w-full pl-8 pr-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[12px] text-[13px] text-white placeholder-[#8c8c8c] focus:outline-none focus:border-[#87a9ff] transition font-sans"
+                  style={{ color: '#ffffff', backgroundColor: '#191919' }}
+                  className="w-full pl-8 pr-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[12px] text-[13px] text-white placeholder-[#8c8c8c] focus:outline-none focus:border-[#87a9ff] transition font-sans caret-white"
                 />
               </div>
             </div>
