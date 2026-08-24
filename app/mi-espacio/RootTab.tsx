@@ -285,7 +285,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
       toast.error("Ingresa el nombre del rango.");
       return;
     }
-    const codeClean = rangoForm.dbId ? rangoForm.code : (rangoForm.code || rangoForm.name).toLowerCase().trim().replace(/\s+/g, '_');
+    const codeClean = rangoForm.dbId ? rangoForm.code : rangoForm.name.toLowerCase().trim().replace(/\s+/g, '_');
 
     try {
       if (!rangoForm.dbId) {
@@ -1146,26 +1146,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   <form onSubmit={guardarRangoForm} className="space-y-4 text-xs font-sans">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[#8c8c8c] mb-1 font-medium">Código Interno (ID)</label>
-                        <input
-                          type="text"
-                          required
-                          disabled={!!rangoForm.dbId && ['root', 'admin', 'cliente'].includes(rangoForm.code.toLowerCase())}
-                          value={rangoForm.code}
-                          onChange={(e) => setRangoForm(f => ({ ...f, code: e.target.value }))}
-                          placeholder="Ej: moderador"
-                          style={{ 
-                            color: '#ffffff', 
-                            WebkitTextFillColor: '#ffffff',
-                            backgroundColor: '#191919', 
-                            caretColor: '#ffffff' 
-                          }}
-                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] disabled:opacity-50 font-sans caret-white"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[#8c8c8c] mb-1 font-medium">Nombre Visible (Ej: ADMINISTRADOR)</label>
+                        <label className="block text-[#8c8c8c] mb-1 font-medium">Nombre Visible del Rango</label>
                         <input
                           type="text"
                           required
@@ -1183,30 +1164,12 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                       </div>
 
                       <div>
-                        <label className="block text-[#8c8c8c] mb-1 font-medium">Etiqueta / Título</label>
+                        <label className="block text-[#8c8c8c] mb-1 font-medium">Etiqueta / Título Descriptivo</label>
                         <input
                           type="text"
                           value={rangoForm.label}
                           onChange={(e) => setRangoForm(f => ({ ...f, label: e.target.value }))}
                           placeholder="Ej: Administrador General del Sistema"
-                          style={{ 
-                            color: '#ffffff', 
-                            WebkitTextFillColor: '#ffffff',
-                            backgroundColor: '#191919', 
-                            caretColor: '#ffffff' 
-                          }}
-                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-[#8c8c8c] mb-1 font-medium">Nivel Jerárquico (1 - 100)</label>
-                        <input
-                          type="number"
-                          min={1}
-                          max={100}
-                          value={rangoForm.level}
-                          onChange={(e) => setRangoForm(f => ({ ...f, level: Number(e.target.value) }))}
                           style={{ 
                             color: '#ffffff', 
                             WebkitTextFillColor: '#ffffff',
