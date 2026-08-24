@@ -141,7 +141,18 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     if (esRoot && token) {
       cargarDatos();
     }
-  }, [token, esRoot, activeConsoleTab]);
+  }, [token, esRoot, activeConsoleTab, roleFilter]);
+
+  const usuariosFiltrados = usersList.filter(u => {
+    if (roleFilter && u.role?.toLowerCase() !== roleFilter.toLowerCase()) return false;
+    if (searchUser) {
+      const q = searchUser.toLowerCase();
+      const nameMatch = u.full_name?.toLowerCase().includes(q);
+      const emailMatch = u.email?.toLowerCase().includes(q);
+      if (!nameMatch && !emailMatch) return false;
+    }
+    return true;
+  });
 
   const cargarDatos = async () => {
     setCargando(true);
@@ -502,7 +513,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
               
               {/* VISTA MÓVIL DE TARJETAS OSCURAS (Como en la Segunda Imagen) */}
               <div className="block lg:hidden space-y-3">
-                {usersList.map((u) => (
+                {usuariosFiltrados.map((u) => (
                   <div key={u.id} className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -574,7 +585,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#262626]">
-                    {usersList.map((u) => (
+                    {usuariosFiltrados.map((u) => (
                       <tr key={u.id} className="hover:bg-[#252525] transition-colors">
                         <td className="px-4 py-3 font-medium text-[#d4d4d4] flex items-center gap-2">
                           {u.avatar_url ? (
