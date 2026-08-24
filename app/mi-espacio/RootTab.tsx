@@ -147,53 +147,81 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   const [usersPage, setUsersPage] = useState(1);
   const USERS_PER_PAGE = 10;
 
-  // Estados Control de Rangos
-  const [rangosList, setRangosList] = useState<{
+  interface RoleItem {
     id: string;
+    dbId?: number;
+    code: string;
     name: string;
     label: string;
     description: string;
     level: number;
     badgeColor: string;
+    permission_ids?: number[];
     permissions: string[];
-  }[]>([
+  }
+
+  interface PermissionItem {
+    id: number;
+    code: string;
+    name: string;
+    category: string;
+    description?: string;
+  }
+
+  // Estados Control de Rangos y Permisos
+  const [modoVistaRango, setModoVistaRango] = useState<'lista' | 'formulario'>('lista');
+  const [allPermissions, setAllPermissions] = useState<PermissionItem[]>([]);
+  const [rangosList, setRangosList] = useState<RoleItem[]>([
     {
       id: 'root',
+      code: 'root',
       name: 'ROOT',
       label: 'SuperAdmin Programador',
       description: 'Acceso total sin restricciones al sistema, base de datos, sesiones, logs y variables de entorno.',
       level: 100,
       badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
-      permissions: ['Acceso Total', 'Gestión de Rangos', 'Control de Usuarios', 'Revocar Sesiones', 'Logs de Auditoría', 'Acción Root']
+      permissions: ['Acceso Total Root', 'Control de Rangos', 'Control de Usuarios']
     },
     {
       id: 'admin',
+      code: 'admin',
       name: 'ADMIN',
       label: 'Administrador CMS',
       description: 'Administración de contenido, moderación de productos, catálogos, banners y branding.',
       level: 50,
       badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
-      permissions: ['Moderación de Productos', 'Gestión de Banners', 'Branding & CMS', 'Publicaciones']
+      permissions: ['Moderación de Productos', 'Gestión de Banners', 'Branding & Apariencia']
     },
     {
       id: 'cliente',
+      code: 'cliente',
       name: 'CLIENTE',
       label: 'Usuario Comprador / Vendedor',
       description: 'Perfil estándar de usuario para comprar, publicar productos C2C y gestionar billetera.',
       level: 10,
       badgeColor: 'bg-[#2a2a2a] text-[#8c8c8c] border-[#333333]',
-      permissions: ['Comprar Productos', 'Publicar Venta C2C', 'Mi Billetera', 'Mi Perfil']
+      permissions: ['Comprar Productos', 'Publicar Venta C2C', 'Mi Billetera']
     }
   ]);
 
-  const [modalRango, setModalRango] = useState<{ modo: 'crear' | 'editar'; rango?: any } | null>(null);
-  const [modalEliminarRango, setModalEliminarRango] = useState<any | null>(null);
+  const [modalEliminarRango, setModalEliminarRango] = useState<RoleItem | null>(null);
 
-  const [formRangoName, setFormRangoName] = useState('');
-  const [formRangoLabel, setFormRangoLabel] = useState('');
-  const [formRangoLevel, setFormRangoLevel] = useState<number>(20);
-  const [formRangoDesc, setFormRangoDesc] = useState('');
-  const [formRangoPerms, setFormRangoPerms] = useState('');
+  const [rangoForm, setRangoForm] = useState<{
+    dbId?: number;
+    code: string;
+    name: string;
+    label: string;
+    description: string;
+    level: number;
+    selectedPermissionIds: number[];
+  }>({
+    code: '',
+    name: '',
+    label: '',
+    description: '',
+    level: 10,
+    selectedPermissionIds: []
+  });
 
   const [sessionsList, setSessionsList] = useState<SessionData[]>([]);
   const [sessionFilter, setSessionFilter] = useState<'todas' | 'activas' | 'revocadas'>('todas');
@@ -207,7 +235,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   const [logPage, setLogPage] = useState(1);
   const LOGS_PER_PAGE = 10;
 
-  const esRoot = usuario && (usuario.role?.toLowerCase() === 'root' || usuario.role === 'ROOT');
+  const esRoot = Boolean(usuario && (usuario.role?.toLowerCase() === 'root' || usuario.role === 'ROOT'));
 
   useEffect(() => {
     if (esRoot && token) {
@@ -215,15 +243,53 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     }
   }, [token, esRoot, activeConsoleTab]);
 
-  const guardarRango = async (e: React.FormEvent) => {
+  const abrirFormularioRango = (modo: 'crear' | 'editar', rango?: RoleItem) => {
+    if (modo === 'editar' && rango) {
+      setRangoForm({
+        dbId: rango.dbId,
+        code: rango.code || rango.id,
+        name: rango.name,
+        label: rango.label || rango.name,
+        description: rango.description || '',
+        level: rango.level || 10,
+        selectedPermissionIds: rango.permission_ids || []
+      });
+    } else {
+      setRangoForm({
+        code: '',
+        name: '',
+        label: '',
+        description: '',
+        level: 10,
+        selectedPermissionIds: []
+      });
+    }
+    setModoVistaRango('formulario');
+  };
+
+  const togglePermissionId = (permId: number) => {
+    setRangoForm(prev => {
+      const exists = prev.selectedPermissionIds.includes(permId);
+      return {
+        ...prev,
+        selectedPermissionIds: exists
+          ? prev.selectedPermissionIds.filter(id => id !== permId)
+          : [...prev.selectedPermissionIds, permId]
+      };
+    });
+  };
+
+  const guardarRangoForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formRangoName.trim()) {
+    if (!rangoForm.name.trim()) {
       toast.error("Ingresa el nombre del rango.");
       return;
     }
+    const codeClean = rangoForm.dbId ? rangoForm.code : (rangoForm.code || rangoForm.name).toLowerCase().trim().replace(/\s+/g, '_');
 
     try {
-      if (modalRango?.modo === 'crear') {
+      if (!rangoForm.dbId) {
+        // Crear nuevo rango
         const res = await fetch(`${getApiUrl()}/root/roles`, {
           method: 'POST',
           headers: {
@@ -231,33 +297,56 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({
-            code: formRangoName.toLowerCase().trim().replace(/\s+/g, '_'),
-            name: formRangoName.toUpperCase().trim(),
-            label: formRangoLabel.trim() || formRangoName.trim(),
-            description: formRangoDesc.trim(),
-            level: Number(formRangoLevel) || 20,
+            code: codeClean,
+            name: rangoForm.name.toUpperCase().trim(),
+            label: rangoForm.label.trim() || rangoForm.name.trim(),
+            description: rangoForm.description.trim(),
+            level: Number(rangoForm.level) || 10,
             badge_color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
-            permissions: formRangoPerms || 'Acceso General'
+            permission_ids: rangoForm.selectedPermissionIds
           })
         });
         const data = await res.json();
         if (res.ok) {
-          toast.success(`Rango ${formRangoName.toUpperCase()} guardado en la base de datos.`);
+          toast.success(`Rango ${rangoForm.name.toUpperCase()} guardado exitosamente.`);
+          setModoVistaRango('lista');
           cargarDatos();
         } else {
           toast.error(data.detail || "Error al guardar el rango.");
         }
       } else {
-        toast.success(`Rango ${formRangoName.toUpperCase()} actualizado.`);
+        // Editar rango existente
+        const res = await fetch(`${getApiUrl()}/root/roles/${rangoForm.dbId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            code: rangoForm.code,
+            name: rangoForm.name.toUpperCase().trim(),
+            label: rangoForm.label.trim() || rangoForm.name.trim(),
+            description: rangoForm.description.trim(),
+            level: Number(rangoForm.level) || 10,
+            badge_color: 'bg-[#2a2a2a] text-[#8c8c8c] border-[#333333]',
+            permission_ids: rangoForm.selectedPermissionIds
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          toast.success(`Rango '${rangoForm.name.toUpperCase()}' actualizado.`);
+          setModoVistaRango('lista');
+          cargarDatos();
+        } else {
+          toast.error(data.detail || "Error al actualizar el rango.");
+        }
       }
     } catch {
       toast.error("No pudimos conectar con el servidor.");
-    } finally {
-      setModalRango(null);
     }
   };
 
-  const eliminarRango = async (rango: any) => {
+  const eliminarRango = async (rango: RoleItem) => {
     try {
       if (rango?.dbId) {
         const res = await fetch(`${getApiUrl()}/root/roles/${rango.dbId}`, {
@@ -266,7 +355,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
         });
         const data = await res.json();
         if (!res.ok) {
-          toast.error(data.detail || "Error al eliminar rango.");
+          toast.error(data.detail || "No se puede eliminar el rango.");
           return;
         }
       }
@@ -603,10 +692,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
         <div className="bg-[#252525] border border-[#333333] p-2 rounded-[12px] flex items-center justify-between">
           <div className="flex items-center gap-2 overflow-hidden">
             <div className="h-6 w-6 rounded-full bg-gradient-to-tr from-amber-500 to-red-500 text-white font-bold text-[10px] flex items-center justify-center flex-shrink-0">
-              {usuario.full_name?.charAt(0).toUpperCase() || 'R'}
+              {usuario?.full_name?.charAt(0).toUpperCase() || 'R'}
             </div>
             <span className="text-[12px] font-medium text-[#d4d4d4] truncate">
-              {usuario.email}
+              {usuario?.email || 'root@objetia.com'}
             </span>
           </div>
           <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-[#3a3a3a] text-[#87a9ff] border border-[#87a9ff]/30 flex-shrink-0">
@@ -697,23 +786,6 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
               </button>
             )}
 
-            {activeConsoleTab === 'roles' && (
-              <button
-                onClick={() => {
-                  setFormRangoName('');
-                  setFormRangoLabel('');
-                  setFormRangoLevel(20);
-                  setFormRangoDesc('');
-                  setFormRangoPerms('');
-                  setModalRango({ modo: 'crear' });
-                }}
-                className="px-2.5 sm:px-3.5 h-[28px] sm:h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#454d63] transition cursor-pointer flex items-center gap-1 whitespace-nowrap"
-              >
-                <Sliders className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
-                <span className="whitespace-nowrap">Nuevo Rango</span>
-              </button>
-            )}
-
             <button
               onClick={cargarDatos}
               disabled={cargando}
@@ -732,6 +804,25 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             </button>
           </div>
         </header>
+
+        {/* BARRA SECUNDARIA DE ACCIONES & NUEVO RANGO (Control de Rangos) */}
+        {activeConsoleTab === 'roles' && (
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-row justify-between items-center gap-2.5 bg-[#1f1f1f]">
+            <span className="text-[12px] sm:text-[13px] font-medium text-[#8c8c8c]">
+              Administración de Rangos y Permisos
+            </span>
+
+            {modoVistaRango === 'lista' && (
+              <button
+                onClick={() => abrirFormularioRango('crear')}
+                className="px-3 h-[30px] bg-[#393f51] border border-[#454d63] text-white rounded-[10px] text-xs font-medium hover:bg-[#454d63] transition cursor-pointer flex items-center gap-1 whitespace-nowrap shadow-xs font-sans"
+              >
+                <Sliders className="h-3.5 w-3.5 flex-shrink-0" />
+                <span>+ Nuevo Rango</span>
+              </button>
+            )}
+          </div>
+        )}
 
         {/* BARRA SECUNDARIA DE FILTROS & PILLS (Solo en Control de Usuarios) */}
         {activeConsoleTab === 'users' && (
@@ -978,59 +1069,193 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           {/* TAB: CONTROL DE RANGOS */}
           {/* ============================================================================== */}
           {activeConsoleTab === 'roles' && (
-            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden p-4 space-y-3 font-sans">
-              <div className="space-y-2">
-                {rangosList.map((r) => (
-                  <div key={r.id} className="p-3.5 bg-[#191919] border border-[#262626] rounded-[10px] space-y-2.5 font-sans">
-                    
-                    {/* SUBFILA 1: Nombre del Rango, Etiqueta y Acciones */}
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0 flex-wrap">
-                        <p className="text-[14px] font-bold text-[#87a9ff] truncate">{r.name}</p>
-                        <span className="text-xs text-[#8c8c8c] font-sans truncate">({r.label})</span>
-                      </div>
+            <div>
+              {modoVistaRango === 'lista' ? (
+                /* VISTA LISTA DE TARJETAS DE RANGOS */
+                <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden p-4 space-y-3 font-sans">
+                  <div className="space-y-2">
+                    {rangosList.map((r) => (
+                      <div key={r.id} className="p-3.5 bg-[#191919] border border-[#262626] rounded-[10px] space-y-2.5 font-sans">
+                        
+                        {/* SUBFILA 1: Nombre del Rango, Etiqueta y Acciones */}
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0 flex-wrap">
+                            <p className="text-[14px] font-bold text-[#87a9ff] truncate">{r.name}</p>
+                            <span className="text-xs text-[#8c8c8c] font-sans truncate">({r.label})</span>
+                          </div>
 
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <button
-                          onClick={() => {
-                            setFormRangoName(r.name);
-                            setFormRangoLabel(r.label);
-                            setFormRangoLevel(r.level);
-                            setFormRangoDesc(r.description);
-                            setFormRangoPerms(r.permissions.join(', '));
-                            setModalRango({ modo: 'editar', rango: r });
-                          }}
-                          className="px-3 h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          disabled={r.id === 'root' || r.id === 'admin' || r.id === 'cliente'}
-                          onClick={() => setModalEliminarRango(r)}
-                          className="w-[72px] h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#252525] disabled:hover:text-[#d4d4d4] rounded-[8px] text-xs font-medium transition cursor-pointer flex items-center justify-center font-sans"
-                          title={r.id === 'root' || r.id === 'admin' || r.id === 'cliente' ? "Rango del sistema no eliminable" : "Eliminar rango"}
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <button
+                              onClick={() => abrirFormularioRango('editar', r)}
+                              className="px-3 h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
+                            >
+                              Editar
+                            </button>
+                            <button
+                              disabled={['root', 'admin', 'cliente', 'client'].includes(r.code?.toLowerCase() || r.id?.toLowerCase())}
+                              onClick={() => setModalEliminarRango(r)}
+                              className="w-[72px] h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#252525] disabled:hover:text-[#d4d4d4] rounded-[8px] text-xs font-medium transition cursor-pointer flex items-center justify-center font-sans"
+                              title={['root', 'admin', 'cliente', 'client'].includes(r.code?.toLowerCase() || r.id?.toLowerCase()) ? "Rango del sistema no eliminable" : "Eliminar rango"}
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </div>
 
-                    {/* SUBFILA 2: Descripción y Permisos */}
-                    <div className="pt-2 border-t border-[#262626] space-y-1.5 text-xs text-[#8c8c8c]">
-                      <p className="text-[#d4d4d4] font-sans">{r.description}</p>
-                      <div className="flex items-center gap-1.5 flex-wrap pt-0.5 font-sans">
-                        <span className="text-[#666666] font-medium font-sans">Permisos:</span>
-                        {r.permissions.map((p, idx) => (
-                          <span key={idx} className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#d4d4d4] border border-[#333333] text-[11px] font-sans">
-                            {p}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+                        {/* SUBFILA 2: Descripción y Permisos */}
+                        <div className="pt-2 border-t border-[#262626] space-y-1.5 text-xs text-[#8c8c8c]">
+                          <p className="text-[#d4d4d4] font-sans">{r.description}</p>
+                          <div className="flex items-center gap-1.5 flex-wrap pt-0.5 font-sans">
+                            <span className="text-[#666666] font-medium font-sans">Permisos:</span>
+                            {r.permissions.map((p, idx) => (
+                              <span key={idx} className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#d4d4d4] border border-[#333333] text-[11px] font-sans">
+                                {p}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
 
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
+                </div>
+              ) : (
+                /* VISTA PÁGINA DE FORMULARIO DE CREACIÓN / EDICIÓN (SIN MODAL) */
+                <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-6 space-y-5 font-sans">
+                  {/* ENCABEZADO FORMULARIO */}
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#262626]">
+                    <button
+                      type="button"
+                      onClick={() => setModoVistaRango('lista')}
+                      className="px-3 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:text-white hover:bg-[#323232] rounded-[8px] text-xs font-medium transition cursor-pointer flex items-center gap-1.5 font-sans"
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                      <span>Volver al Listado de Rangos</span>
+                    </button>
+                    <h2 className="text-base font-bold text-white">
+                      {rangoForm.dbId ? `Editar Rango: ${rangoForm.name}` : 'Crear Nuevo Rango'}
+                    </h2>
+                  </div>
+
+                  <form onSubmit={guardarRangoForm} className="space-y-4 text-xs font-sans">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[#8c8c8c] mb-1 font-medium">Código Interno (ID)</label>
+                        <input
+                          type="text"
+                          required
+                          disabled={!!rangoForm.dbId && ['root', 'admin', 'cliente'].includes(rangoForm.code.toLowerCase())}
+                          value={rangoForm.code}
+                          onChange={(e) => setRangoForm(f => ({ ...f, code: e.target.value }))}
+                          placeholder="Ej: moderador"
+                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff] disabled:opacity-50"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[#8c8c8c] mb-1 font-medium">Nombre Visible (Ej: ADMINISTRADOR)</label>
+                        <input
+                          type="text"
+                          required
+                          value={rangoForm.name}
+                          onChange={(e) => setRangoForm(f => ({ ...f, name: e.target.value }))}
+                          placeholder="Ej: ADMINISTRADOR GENERAL"
+                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[#8c8c8c] mb-1 font-medium">Etiqueta / Título</label>
+                        <input
+                          type="text"
+                          value={rangoForm.label}
+                          onChange={(e) => setRangoForm(f => ({ ...f, label: e.target.value }))}
+                          placeholder="Ej: Administrador General del Sistema"
+                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[#8c8c8c] mb-1 font-medium">Nivel Jerárquico (1 - 100)</label>
+                        <input
+                          type="number"
+                          min={1}
+                          max={100}
+                          value={rangoForm.level}
+                          onChange={(e) => setRangoForm(f => ({ ...f, level: Number(e.target.value) }))}
+                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[#8c8c8c] mb-1 font-medium">Descripción Funcional</label>
+                      <textarea
+                        rows={2}
+                        value={rangoForm.description}
+                        onChange={(e) => setRangoForm(f => ({ ...f, description: e.target.value }))}
+                        placeholder="Descripción de tareas y ámbito de este rango..."
+                        className="w-full p-2.5 bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                      />
+                    </div>
+
+                    {/* SECCIÓN DE PERMISOS ASIGNADOS CON CHECKBOXES */}
+                    <div className="pt-3 border-t border-[#262626] space-y-3">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
+                        <h3 className="text-xs font-bold text-[#87a9ff] uppercase tracking-wider">Permisos Asignados al Rango</h3>
+                        <span className="text-xs text-[#8c8c8c]">
+                          {rangoForm.selectedPermissionIds.length} de {allPermissions.length} permisos activos
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {allPermissions.map((perm) => {
+                          const isChecked = rangoForm.selectedPermissionIds.includes(perm.id);
+                          return (
+                            <div
+                              key={perm.id}
+                              onClick={() => togglePermissionId(perm.id)}
+                              className={`p-3 rounded-[10px] border transition cursor-pointer flex items-start gap-2.5 font-sans ${
+                                isChecked
+                                  ? 'bg-[#87a9ff]/10 border-[#87a9ff]/50 text-white'
+                                  : 'bg-[#191919] border-[#262626] text-[#8c8c8c] hover:border-[#444444]'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={() => {}}
+                                className="mt-0.5 h-4 w-4 rounded accent-[#87a9ff] cursor-pointer"
+                              />
+                              <div className="min-w-0">
+                                <p className={`text-xs font-medium ${isChecked ? 'text-white' : 'text-[#d4d4d4]'}`}>{perm.name}</p>
+                                <p className="text-[11px] text-[#8c8c8c] truncate">{perm.description || perm.category}</p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* BOTONES DE ACCIÓN FORMULARIO */}
+                    <div className="flex items-center justify-end gap-2 pt-4 border-t border-[#262626]">
+                      <button
+                        type="button"
+                        onClick={() => setModoVistaRango('lista')}
+                        className="px-4 h-[34px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-5 h-[34px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[8px] text-xs font-medium transition cursor-pointer font-sans shadow-xs"
+                      >
+                        {rangoForm.dbId ? 'Guardar Cambios' : 'Crear Rango'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
             </div>
           )}
 
@@ -1238,97 +1463,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
         </div>
       )}
 
-      {/* MODAL CREAR / EDITAR RANGO */}
-      {modalRango && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-fade-in font-sans">
-          <div className="bg-[#1f1f1f] border border-[#333333] rounded-[16px] max-w-md w-full p-5 space-y-4 shadow-2xl text-left animate-scale-up">
-            <div className="flex items-center justify-between pb-2 border-b border-[#262626]">
-              <h3 className="text-base font-bold text-white flex items-center gap-2">
-                <Sliders className="h-4.5 w-4.5 text-[#87a9ff]" />
-                <span>{modalRango.modo === 'crear' ? 'Crear Nuevo Rango' : 'Editar Rango'}</span>
-              </h3>
-              <button onClick={() => setModalRango(null)} className="text-[#8c8c8c] hover:text-white transition cursor-pointer">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
 
-            <form onSubmit={guardarRango} className="space-y-3 text-xs">
-              <div>
-                <label className="block text-[#8c8c8c] mb-1 font-medium">Nombre del Rango (identificador)</label>
-                <input
-                  type="text"
-                  required
-                  value={formRangoName}
-                  onChange={(e) => setFormRangoName(e.target.value)}
-                  placeholder="Ej: MODERADOR"
-                  className="w-full px-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[#8c8c8c] mb-1 font-medium">Etiqueta Descriptiva</label>
-                <input
-                  type="text"
-                  value={formRangoLabel}
-                  onChange={(e) => setFormRangoLabel(e.target.value)}
-                  placeholder="Ej: Moderador de Contenido"
-                  className="w-full px-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[#8c8c8c] mb-1 font-medium">Nivel de Jerarquía (1 - 100)</label>
-                <input
-                  type="number"
-                  min={1}
-                  max={100}
-                  value={formRangoLevel}
-                  onChange={(e) => setFormRangoLevel(Number(e.target.value))}
-                  className="w-full px-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[#8c8c8c] mb-1 font-medium">Descripción</label>
-                <textarea
-                  rows={2}
-                  value={formRangoDesc}
-                  onChange={(e) => setFormRangoDesc(e.target.value)}
-                  placeholder="Descripción de tareas y ámbito de este rango..."
-                  className="w-full p-2 bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[#8c8c8c] mb-1 font-medium">Permisos (separados por coma)</label>
-                <input
-                  type="text"
-                  value={formRangoPerms}
-                  onChange={(e) => setFormRangoPerms(e.target.value)}
-                  placeholder="Ej: Moderación, Catálogo, Banners"
-                  className="w-full px-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#262626]">
-                <button
-                  type="button"
-                  onClick={() => setModalRango(null)}
-                  className="px-3.5 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] rounded-[8px] font-medium transition cursor-pointer"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[8px] font-medium hover:bg-[#454d63] transition cursor-pointer"
-                >
-                  {modalRango.modo === 'crear' ? 'Crear Rango' : 'Guardar Cambios'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* MODAL CONFIRMAR ELIMINAR RANGO */}
       {modalEliminarRango && (
