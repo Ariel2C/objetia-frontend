@@ -465,37 +465,37 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           </div>
         </header>
 
-        {/* BARRA SECUNDARIA DE FILTROS & PILLS (Google AI Studio Theme) */}
-        <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 bg-[#1f1f1f]">
-          <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
-            <span className="text-[12px] sm:text-[13px] font-medium text-[#8c8c8c] whitespace-nowrap mr-0.5">Agrupar por:</span>
-            {[
-              { id: '', label: 'Todos' },
-              { id: 'client', label: 'Clientes' },
-              { id: 'financial', label: 'Financial' },
-              { id: 'admin', label: 'Admins' },
-              { id: 'root', label: 'Root' },
-            ].map((f) => {
-              const isSelected = roleFilter === f.id;
-              return (
-                <button
-                  key={f.id}
-                  onClick={() => setRoleFilter(f.id)}
-                  className={`px-2.5 sm:px-3 h-[25px] sm:h-[28px] rounded-full text-[11px] sm:text-[13px] font-medium transition cursor-pointer whitespace-nowrap ${
-                    isSelected
-                      ? 'bg-[#323232] text-[#ffffff] border border-[#555555]'
-                      : 'bg-[#191919] text-[#8c8c8c] border border-transparent hover:bg-[#252525] hover:text-[#d4d4d4]'
-                  }`}
-                >
-                  {f.label}
-                </button>
-              );
-            })}
-          </div>
+        {/* BARRA SECUNDARIA DE FILTROS & PILLS (Solo en Control de Usuarios) */}
+        {activeConsoleTab === 'users' && (
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 bg-[#1f1f1f]">
+            <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
+              <span className="text-[12px] sm:text-[13px] font-medium text-[#8c8c8c] whitespace-nowrap mr-0.5">Agrupar por:</span>
+              {[
+                { id: '', label: 'Todos' },
+                { id: 'client', label: 'Clientes' },
+                { id: 'financial', label: 'Financial' },
+                { id: 'admin', label: 'Admins' },
+                { id: 'root', label: 'Root' },
+              ].map((f) => {
+                const isSelected = roleFilter === f.id;
+                return (
+                  <button
+                    key={f.id}
+                    onClick={() => setRoleFilter(f.id)}
+                    className={`px-2.5 sm:px-3 h-[25px] sm:h-[28px] rounded-full text-[11px] sm:text-[13px] font-medium transition cursor-pointer whitespace-nowrap ${
+                      isSelected
+                        ? 'bg-[#323232] text-[#ffffff] border border-[#555555]'
+                        : 'bg-[#191919] text-[#8c8c8c] border border-transparent hover:bg-[#252525] hover:text-[#d4d4d4]'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                );
+              })}
+            </div>
 
-          {/* BUSCADOR OSCURO CON DROPDOWN */}
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            {activeConsoleTab === 'users' && (
+            {/* BUSCADOR OSCURO CON DROPDOWN */}
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#8c8c8c]" />
                 <input
@@ -507,9 +507,9 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   className="w-full pl-8 pr-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[12px] text-[13px] text-[#d4d4d4] focus:outline-none focus:border-[#87a9ff] transition"
                 />
               </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* ÁREA DE CONTENIDO DINÁMICO */}
         <div className="p-4 sm:p-6 flex-1 overflow-y-auto bg-[#191919]">
