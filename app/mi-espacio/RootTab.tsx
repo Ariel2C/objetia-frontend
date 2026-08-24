@@ -787,7 +787,11 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
             <h1 className="text-[15px] sm:text-[20px] font-semibold text-[#d4d4d4] tracking-tight truncate">
               {activeConsoleTab === 'users' && "Control de Usuarios"}
-              {activeConsoleTab === 'roles' && "Control de Rangos"}
+              {activeConsoleTab === 'roles' && (
+                modoVistaRango === 'formulario'
+                  ? (rangoForm.dbId ? `Editar Rango: ${rangoForm.name}` : "Crear Nuevo Rango")
+                  : "Control de Rangos"
+              )}
               {activeConsoleTab === 'sessions' && "Monitor de Sesiones"}
               {activeConsoleTab === 'logs' && "Logs de Auditoría"}
               {activeConsoleTab === 'keys' && "Claves de API"}
@@ -841,7 +845,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer flex items-center gap-1 whitespace-nowrap font-sans"
               >
                 <ChevronLeft className="h-3.5 w-3.5 flex-shrink-0" />
-                <span>Volver</span>
+                <span>Volver al listado de rangos</span>
               </button>
             )}
           </div>
@@ -1149,12 +1153,6 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
               ) : (
                 /* VISTA PÁGINA DE FORMULARIO DE CREACIÓN / EDICIÓN (SIN MODAL) */
                 <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-6 space-y-5 font-sans">
-                  {/* ENCABEZADO FORMULARIO */}
-                  <div className="pb-3 border-b border-[#262626]">
-                    <h2 className="text-base font-bold text-white">
-                      {rangoForm.dbId ? `Editar Rango: ${rangoForm.name}` : 'Crear Nuevo Rango'}
-                    </h2>
-                  </div>
 
                   <form onSubmit={guardarRangoForm} className="space-y-4 text-xs font-sans">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
