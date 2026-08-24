@@ -135,7 +135,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   const { usuario, token } = useAuth();
   const toast = useToast();
 
-  const [activeConsoleTab, setActiveConsoleTab] = useState<'users' | 'sessions' | 'logs' | 'keys'>('users');
+  const [activeConsoleTab, setActiveConsoleTab] = useState<'users' | 'roles' | 'sessions' | 'logs' | 'keys'>('users');
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   const [sidebarOculto, setSidebarOculto] = useState(false);
   const [cargando, setCargando] = useState(true);
@@ -146,6 +146,54 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   const [roleFilter, setRoleFilter] = useState<string>('');
   const [usersPage, setUsersPage] = useState(1);
   const USERS_PER_PAGE = 10;
+
+  // Estados Control de Rangos
+  const [rangosList, setRangosList] = useState<{
+    id: string;
+    name: string;
+    label: string;
+    description: string;
+    level: number;
+    badgeColor: string;
+    permissions: string[];
+  }[]>([
+    {
+      id: 'root',
+      name: 'ROOT',
+      label: 'SuperAdmin Programador',
+      description: 'Acceso total sin restricciones al sistema, base de datos, sesiones, logs y variables de entorno.',
+      level: 100,
+      badgeColor: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+      permissions: ['Acceso Total', 'Gestión de Rangos', 'Control de Usuarios', 'Revocar Sesiones', 'Logs de Auditoría', 'Acción Root']
+    },
+    {
+      id: 'admin',
+      name: 'ADMIN',
+      label: 'Administrador CMS',
+      description: 'Administración de contenido, moderación de productos, catálogos, banners y branding.',
+      level: 50,
+      badgeColor: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
+      permissions: ['Moderación de Productos', 'Gestión de Banners', 'Branding & CMS', 'Publicaciones']
+    },
+    {
+      id: 'cliente',
+      name: 'CLIENTE',
+      label: 'Usuario Comprador / Vendedor',
+      description: 'Perfil estándar de usuario para comprar, publicar productos C2C y gestionar billetera.',
+      level: 10,
+      badgeColor: 'bg-[#2a2a2a] text-[#8c8c8c] border-[#333333]',
+      permissions: ['Comprar Productos', 'Publicar Venta C2C', 'Mi Billetera', 'Mi Perfil']
+    }
+  ]);
+
+  const [modalRango, setModalRango] = useState<{ modo: 'crear' | 'editar'; rango?: any } | null>(null);
+  const [modalEliminarRango, setModalEliminarRango] = useState<any | null>(null);
+
+  const [formRangoName, setFormRangoName] = useState('');
+  const [formRangoLabel, setFormRangoLabel] = useState('');
+  const [formRangoLevel, setFormRangoLevel] = useState<number>(20);
+  const [formRangoDesc, setFormRangoDesc] = useState('');
+  const [formRangoPerms, setFormRangoPerms] = useState('');
 
   const [sessionsList, setSessionsList] = useState<SessionData[]>([]);
   const [sessionFilter, setSessionFilter] = useState<'todas' | 'activas' | 'revocadas'>('todas');
@@ -167,6 +215,38 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     }
   }, [token, esRoot, activeConsoleTab]);
 
+  const guardarRango = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formRangoName.trim()) {
+      toast.error("Ingresa el nombre del rango.");
+      return;
+    }
+    const nuevoItem = {
+      id: modalRango?.modo === 'editar' ? modalRango.rango!.id : formRangoName.toLowerCase().trim().replace(/\s+/g, '_'),
+      name: formRangoName.toUpperCase().trim(),
+      label: formRangoLabel.trim() || formRangoName.trim(),
+      description: formRangoDesc.trim() || 'Rango personalizado del sistema.',
+      level: Number(formRangoLevel) || 20,
+      badgeColor: modalRango?.modo === 'editar' ? modalRango.rango!.badgeColor : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+      permissions: formRangoPerms ? formRangoPerms.split(',').map(p => p.trim()).filter(Boolean) : ['Acceso General']
+    };
+
+    if (modalRango?.modo === 'editar') {
+      setRangosList(prev => prev.map(r => r.id === modalRango.rango!.id ? nuevoItem : r));
+      toast.success(`Rango ${nuevoItem.name} actualizado correctamente.`);
+    } else {
+      setRangosList(prev => [...prev, nuevoItem]);
+      toast.success(`Rango ${nuevoItem.name} creado exitosamente.`);
+    }
+    setModalRango(null);
+  };
+
+  const eliminarRango = (id: string) => {
+    setRangosList(prev => prev.filter(r => r.id !== id));
+    toast.success("Rango eliminado del sistema.");
+    setModalEliminarRango(null);
+  };
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     setSearchUser(val);
@@ -181,12 +261,14 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
       return u.full_name?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q);
     });
 
-    const rolesPresentes = new Set(usuariosSegunBusqueda.map(u => u.role?.toLowerCase()).filter(Boolean));
+    const rolesPresentes = new Set(usuariosSegunBusqueda.map(u => {
+      const r = u.role?.toLowerCase();
+      return (r === 'client' || r === 'cliente') ? 'cliente' : r;
+    }).filter(Boolean));
     
     const todosLosFiltros = [
       { id: '', label: 'Todos' },
-      { id: 'client', label: 'Clientes' },
-      { id: 'financial', label: 'Financial' },
+      { id: 'cliente', label: 'Clientes' },
       { id: 'admin', label: 'Admins' },
       { id: 'root', label: 'Root' },
     ];
@@ -195,7 +277,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   }, [usersList, searchUser]);
 
   const usuariosFiltrados = usersList.filter(u => {
-    if (roleFilter && u.role?.toLowerCase() !== roleFilter.toLowerCase()) return false;
+    if (roleFilter) {
+      const uRole = (u.role?.toLowerCase() === 'client' || u.role?.toLowerCase() === 'cliente') ? 'cliente' : u.role?.toLowerCase();
+      if (uRole !== roleFilter.toLowerCase()) return false;
+    }
     if (searchUser) {
       const q = searchUser.toLowerCase();
       const nameMatch = u.full_name?.toLowerCase().includes(q);
@@ -402,6 +487,18 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             <Users className="h-4 w-4 text-current flex-shrink-0" />
             <span>Control de Usuarios</span>
           </button>
+
+          <button
+            onClick={() => { setActiveConsoleTab('roles'); setMenuMovilAbierto(false); }}
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
+              activeConsoleTab === 'roles' 
+                ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+            }`}
+          >
+            <Sliders className="h-4 w-4 text-current flex-shrink-0" />
+            <span>Control de Rangos</span>
+          </button>
         </div>
 
         {/* NAVEGACIÓN - GRUPO 2: OBSERVAR */}
@@ -531,6 +628,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
             <h1 className="text-[15px] sm:text-[20px] font-semibold text-[#d4d4d4] tracking-tight truncate">
               {activeConsoleTab === 'users' && "Control de Usuarios"}
+              {activeConsoleTab === 'roles' && "Control de Rangos"}
               {activeConsoleTab === 'sessions' && "Monitor de Sesiones"}
               {activeConsoleTab === 'logs' && "Logs de Auditoría"}
               {activeConsoleTab === 'keys' && "Claves de API"}
@@ -546,6 +644,23 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
               >
                 <ChevronLeft className="h-3.5 w-3.5 flex-shrink-0" />
                 <span className="whitespace-nowrap">Volver a Mi Espacio</span>
+              </button>
+            )}
+
+            {activeConsoleTab === 'roles' && (
+              <button
+                onClick={() => {
+                  setFormRangoName('');
+                  setFormRangoLabel('');
+                  setFormRangoLevel(20);
+                  setFormRangoDesc('');
+                  setFormRangoPerms('');
+                  setModalRango({ modo: 'crear' });
+                }}
+                className="px-2.5 sm:px-3.5 h-[28px] sm:h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#454d63] transition cursor-pointer flex items-center gap-1 whitespace-nowrap"
+              >
+                <Sliders className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                <span className="whitespace-nowrap">Nuevo Rango</span>
               </button>
             )}
 
@@ -754,11 +869,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                       <div className="flex items-center gap-2 flex-shrink-0 flex-wrap sm:flex-nowrap">
                         <span className="text-xs text-[#8c8c8c] font-sans whitespace-nowrap">Cambiar rango:</span>
                         <CustomSelect
-                          value={u.role}
+                          value={u.role === 'client' ? 'cliente' : u.role}
                           disabled={u.id === usuario?.id}
                           options={[
-                            { value: 'client', label: 'CLIENT', sublabel: 'Usuario comprador' },
-                            { value: 'financial', label: 'FINANCIAL', sublabel: 'Administrador financiero' },
+                            { value: 'cliente', label: 'CLIENTE', sublabel: 'Usuario comprador' },
                             { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
                             { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
                           ]}
@@ -807,6 +921,70 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* ============================================================================== */}
+          {/* TAB: CONTROL DE RANGOS */}
+          {/* ============================================================================== */}
+          {activeConsoleTab === 'roles' && (
+            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden p-4 space-y-3 font-sans">
+              <div className="space-y-2.5">
+                {rangosList.map((r) => (
+                  <div key={r.id} className="p-3.5 bg-[#191919] border border-[#262626] rounded-[10px] space-y-2.5 font-sans">
+                    
+                    {/* FILA 1: Icono, Nombre de Rango, Badge y Nivel + Acciones */}
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                      <div className="flex items-center gap-2.5 flex-wrap min-w-0">
+                        <Sliders className="h-4.5 w-4.5 text-[#87a9ff] flex-shrink-0" />
+                        <p className="text-[14px] font-bold text-[#87a9ff]">{r.name}</p>
+                        <span className="text-xs text-[#8c8c8c]">({r.label})</span>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase ${r.badgeColor}`}>
+                          Nivel {r.level}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
+                        <button
+                          onClick={() => {
+                            setFormRangoName(r.name);
+                            setFormRangoLabel(r.label);
+                            setFormRangoLevel(r.level);
+                            setFormRangoDesc(r.description);
+                            setFormRangoPerms(r.permissions.join(', '));
+                            setModalRango({ modo: 'editar', rango: r });
+                          }}
+                          className="px-3 h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
+                        >
+                          Editar
+                        </button>
+                        <button
+                          disabled={r.id === 'root' || r.id === 'admin' || r.id === 'cliente'}
+                          onClick={() => setModalEliminarRango(r)}
+                          className="w-[72px] h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#252525] disabled:hover:text-[#d4d4d4] rounded-[8px] text-xs font-medium transition cursor-pointer flex items-center justify-center font-sans"
+                          title={r.id === 'root' || r.id === 'admin' || r.id === 'cliente' ? "Rango del sistema no eliminable" : "Eliminar rango"}
+                        >
+                          Eliminar
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* FILA 2: Descripción y Permisos */}
+                    <div className="pt-2 border-t border-[#262626] space-y-1.5 text-xs text-[#8c8c8c]">
+                      <p className="text-[#d4d4d4]">{r.description}</p>
+                      <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                        <span className="text-[#666666] font-medium">Permisos asignados:</span>
+                        {r.permissions.map((p, idx) => (
+                          <span key={idx} className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#d4d4d4] border border-[#333333] text-[11px]">
+                            {p}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -1008,6 +1186,134 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 className="px-4 h-[32px] bg-[#393f51] border border-[#454d63] text-white hover:bg-red-600 hover:border-red-500 rounded-[10px] text-xs font-medium transition cursor-pointer shadow-xs"
               >
                 Aceptar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL CREAR / EDITAR RANGO */}
+      {modalRango && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-fade-in font-sans">
+          <div className="bg-[#1f1f1f] border border-[#333333] rounded-[16px] max-w-md w-full p-5 space-y-4 shadow-2xl text-left animate-scale-up">
+            <div className="flex items-center justify-between pb-2 border-b border-[#262626]">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Sliders className="h-4.5 w-4.5 text-[#87a9ff]" />
+                <span>{modalRango.modo === 'crear' ? 'Crear Nuevo Rango' : 'Editar Rango'}</span>
+              </h3>
+              <button onClick={() => setModalRango(null)} className="text-[#8c8c8c] hover:text-white transition cursor-pointer">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={guardarRango} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Nombre del Rango (identificador)</label>
+                <input
+                  type="text"
+                  required
+                  value={formRangoName}
+                  onChange={(e) => setFormRangoName(e.target.value)}
+                  placeholder="Ej: MODERADOR"
+                  className="w-full px-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Etiqueta Descriptiva</label>
+                <input
+                  type="text"
+                  value={formRangoLabel}
+                  onChange={(e) => setFormRangoLabel(e.target.value)}
+                  placeholder="Ej: Moderador de Contenido"
+                  className="w-full px-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Nivel de Jerarquía (1 - 100)</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={100}
+                  value={formRangoLevel}
+                  onChange={(e) => setFormRangoLevel(Number(e.target.value))}
+                  className="w-full px-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Descripción</label>
+                <textarea
+                  rows={2}
+                  value={formRangoDesc}
+                  onChange={(e) => setFormRangoDesc(e.target.value)}
+                  placeholder="Descripción de tareas y ámbito de este rango..."
+                  className="w-full p-2 bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Permisos (separados por coma)</label>
+                <input
+                  type="text"
+                  value={formRangoPerms}
+                  onChange={(e) => setFormRangoPerms(e.target.value)}
+                  placeholder="Ej: Moderación, Catálogo, Banners"
+                  className="w-full px-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#262626]">
+                <button
+                  type="button"
+                  onClick={() => setModalRango(null)}
+                  className="px-3.5 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] rounded-[8px] font-medium transition cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[8px] font-medium hover:bg-[#454d63] transition cursor-pointer"
+                >
+                  {modalRango.modo === 'crear' ? 'Crear Rango' : 'Guardar Cambios'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL CONFIRMAR ELIMINAR RANGO */}
+      {modalEliminarRango && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-fade-in font-sans">
+          <div className="bg-[#1f1f1f] border border-[#333333] rounded-[16px] max-w-sm w-full p-5 space-y-4 shadow-2xl text-left animate-scale-up">
+            <div className="flex items-center justify-between pb-2 border-b border-[#262626]">
+              <h3 className="text-base font-bold text-white flex items-center gap-2">
+                <Trash2 className="h-4.5 w-4.5 text-red-400" />
+                <span>Eliminar Rango</span>
+              </h3>
+              <button onClick={() => setModalEliminarRango(null)} className="text-[#8c8c8c] hover:text-white transition cursor-pointer">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-[#d4d4d4] leading-relaxed">
+              ¿Estás seguro de que deseas eliminar el rango <span className="font-bold text-white">{modalEliminarRango.name}</span>? Esta acción no se puede deshacer.
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#262626]">
+              <button
+                onClick={() => setModalEliminarRango(null)}
+                className="px-3.5 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => eliminarRango(modalEliminarRango.id)}
+                className="px-4 h-[32px] bg-red-600/20 border border-red-500/40 text-red-300 hover:bg-red-600/30 rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
+              >
+                Confirmar Eliminación
               </button>
             </div>
           </div>
