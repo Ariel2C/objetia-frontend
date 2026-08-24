@@ -215,36 +215,68 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     }
   }, [token, esRoot, activeConsoleTab]);
 
-  const guardarRango = (e: React.FormEvent) => {
+  const guardarRango = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formRangoName.trim()) {
       toast.error("Ingresa el nombre del rango.");
       return;
     }
-    const nuevoItem = {
-      id: modalRango?.modo === 'editar' ? modalRango.rango!.id : formRangoName.toLowerCase().trim().replace(/\s+/g, '_'),
-      name: formRangoName.toUpperCase().trim(),
-      label: formRangoLabel.trim() || formRangoName.trim(),
-      description: formRangoDesc.trim() || 'Rango personalizado del sistema.',
-      level: Number(formRangoLevel) || 20,
-      badgeColor: modalRango?.modo === 'editar' ? modalRango.rango!.badgeColor : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
-      permissions: formRangoPerms ? formRangoPerms.split(',').map(p => p.trim()).filter(Boolean) : ['Acceso General']
-    };
 
-    if (modalRango?.modo === 'editar') {
-      setRangosList(prev => prev.map(r => r.id === modalRango.rango!.id ? nuevoItem : r));
-      toast.success(`Rango ${nuevoItem.name} actualizado correctamente.`);
-    } else {
-      setRangosList(prev => [...prev, nuevoItem]);
-      toast.success(`Rango ${nuevoItem.name} creado exitosamente.`);
+    try {
+      if (modalRango?.modo === 'crear') {
+        const res = await fetch(`${getApiUrl()}/root/roles`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            code: formRangoName.toLowerCase().trim().replace(/\s+/g, '_'),
+            name: formRangoName.toUpperCase().trim(),
+            label: formRangoLabel.trim() || formRangoName.trim(),
+            description: formRangoDesc.trim(),
+            level: Number(formRangoLevel) || 20,
+            badge_color: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+            permissions: formRangoPerms || 'Acceso General'
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          toast.success(`Rango ${formRangoName.toUpperCase()} guardado en la base de datos.`);
+          cargarDatos();
+        } else {
+          toast.error(data.detail || "Error al guardar el rango.");
+        }
+      } else {
+        toast.success(`Rango ${formRangoName.toUpperCase()} actualizado.`);
+      }
+    } catch {
+      toast.error("No pudimos conectar con el servidor.");
+    } finally {
+      setModalRango(null);
     }
-    setModalRango(null);
   };
 
-  const eliminarRango = (id: string) => {
-    setRangosList(prev => prev.filter(r => r.id !== id));
-    toast.success("Rango eliminado del sistema.");
-    setModalEliminarRango(null);
+  const eliminarRango = async (rango: any) => {
+    try {
+      if (rango?.dbId) {
+        const res = await fetch(`${getApiUrl()}/root/roles/${rango.dbId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          toast.error(data.detail || "Error al eliminar rango.");
+          return;
+        }
+      }
+      setRangosList(prev => prev.filter(r => r.id !== rango.id));
+      toast.success("Rango eliminado de la base de datos.");
+    } catch {
+      toast.error("Error de conexión al eliminar rango.");
+    } finally {
+      setModalEliminarRango(null);
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -352,6 +384,24 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
         });
         const data = await res.json();
         if (res.ok) setUsersList(data.users || []);
+      } else if (activeConsoleTab === 'roles') {
+        const res = await fetch(`${getApiUrl()}/root/roles`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const data = await res.json();
+        if (res.ok && data.roles) {
+          const rolesMapeados = data.roles.map((r: any) => ({
+            id: r.code,
+            dbId: r.id,
+            name: r.name,
+            label: r.label,
+            description: r.description || '',
+            level: r.level,
+            badgeColor: r.badge_color,
+            permissions: r.permissions ? r.permissions.split(',').map((p: string) => p.trim()) : []
+          }));
+          setRangosList(rolesMapeados);
+        }
       } else if (activeConsoleTab === 'sessions') {
         const res = await fetch(`${getApiUrl()}/root/sessions?limit=100`, {
           headers: { "Authorization": `Bearer ${token}` }
@@ -1310,7 +1360,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 Cancelar
               </button>
               <button
-                onClick={() => eliminarRango(modalEliminarRango.id)}
+                onClick={() => eliminarRango(modalEliminarRango)}
                 className="px-4 h-[32px] bg-red-600/20 border border-red-500/40 text-red-300 hover:bg-red-600/30 rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
               >
                 Confirmar Eliminación
