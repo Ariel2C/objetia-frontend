@@ -148,6 +148,9 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   const [sessionsList, setSessionsList] = useState<SessionData[]>([]);
   const [sessionFilter, setSessionFilter] = useState<'todas' | 'activas' | 'revocadas'>('todas');
   const [searchSessionEmail, setSearchSessionEmail] = useState('');
+  const [sessionPage, setSessionPage] = useState(1);
+  const SESSIONS_PER_PAGE = 10;
+
   const [logsList, setLogsList] = useState<LogData[]>([]);
   const [searchLogEmail, setSearchLogEmail] = useState('');
   const [logEventFilter, setLogEventFilter] = useState('');
@@ -211,6 +214,12 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     }
     return true;
   });
+
+  const totalSessionPages = Math.max(1, Math.ceil(sesionesFiltradas.length / SESSIONS_PER_PAGE));
+  const sesionesPaginadas = useMemo(() => {
+    const start = (sessionPage - 1) * SESSIONS_PER_PAGE;
+    return sesionesFiltradas.slice(start, start + SESSIONS_PER_PAGE);
+  }, [sesionesFiltradas, sessionPage, SESSIONS_PER_PAGE]);
 
   const eventosDisponiblesEnLogs = useMemo(() => {
     const acciones = new Set(logsList.map(l => l.action).filter(Boolean));
@@ -609,7 +618,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 return (
                   <button
                     key={f.id}
-                    onClick={() => setSessionFilter(f.id as any)}
+                    onClick={() => {
+                      setSessionFilter(f.id as any);
+                      setSessionPage(1);
+                    }}
                     className={`px-2.5 sm:px-3 h-[25px] sm:h-[28px] rounded-full text-[11px] sm:text-[13px] font-medium transition cursor-pointer whitespace-nowrap ${
                       isSelected
                         ? 'bg-[#323232] text-[#ffffff] border border-[#555555]'
@@ -629,7 +641,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 <input
                   type="text"
                   value={searchSessionEmail}
-                  onChange={(e) => setSearchSessionEmail(e.target.value)}
+                  onChange={(e) => {
+                    setSearchSessionEmail(e.target.value);
+                    setSessionPage(1);
+                  }}
                   placeholder="Buscar por email..."
                   style={{ 
                     color: '#ffffff', 
@@ -832,10 +847,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           {activeConsoleTab === 'sessions' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden p-4 space-y-3">
               <div className="space-y-2">
-                {sesionesFiltradas.length === 0 ? (
+                {sesionesPaginadas.length === 0 ? (
                   <p className="text-xs text-[#8c8c8c] text-center py-6 font-sans">No se encontraron sesiones registradas.</p>
                 ) : (
-                  sesionesFiltradas.map((s) => (
+                  sesionesPaginadas.map((s) => (
                     <div key={s.id} className="p-3 bg-[#191919] border border-[#262626] rounded-[10px] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 font-sans">
                       <div className="space-y-1 min-w-0 flex-1">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -871,6 +886,34 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   ))
                 )}
               </div>
+
+              {/* CONTROLES DE PAGINACIÓN */}
+              {totalSessionPages > 1 && (
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-3 border-t border-[#262626] text-xs text-[#8c8c8c] font-sans">
+                  <span>
+                    Mostrando {sesionesPaginadas.length} de {sesionesFiltradas.length} sesiones (Página {sessionPage} de {totalSessionPages})
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <button
+                      disabled={sessionPage <= 1}
+                      onClick={() => setSessionPage(p => Math.max(1, p - 1))}
+                      className="px-3 h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[8px] hover:bg-[#323232] disabled:opacity-40 disabled:hover:bg-[#252525] transition cursor-pointer font-sans"
+                    >
+                      Anterior
+                    </button>
+                    <span className="text-[#d4d4d4] font-medium font-sans">
+                      {sessionPage} / {totalSessionPages}
+                    </span>
+                    <button
+                      disabled={sessionPage >= totalSessionPages}
+                      onClick={() => setSessionPage(p => Math.min(totalSessionPages, p + 1))}
+                      className="px-3 h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[8px] hover:bg-[#323232] disabled:opacity-40 disabled:hover:bg-[#252525] transition cursor-pointer font-sans"
+                    >
+                      Siguiente
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
