@@ -91,7 +91,7 @@ function CustomSelect({
         type="button"
         disabled={disabled}
         onClick={toggleOpen}
-        className="h-[30px] px-2.5 bg-[#1f1f1f] hover:bg-[#252525] border border-[#333333] rounded-[8px] text-[13px] leading-[18px] font-medium text-white flex items-center justify-between gap-2 focus:outline-none transition cursor-pointer disabled:opacity-40"
+        className="h-[30px] w-[115px] px-2.5 bg-[#1f1f1f] hover:bg-[#252525] border border-[#333333] rounded-[8px] text-[13px] leading-[18px] font-medium text-white flex items-center justify-between gap-2 focus:outline-none transition cursor-pointer disabled:opacity-40"
       >
         <span className="truncate">{selectedOption?.label || value}</span>
         {open ? <ChevronUp className="h-3.5 w-3.5 text-[#8c8c8c]" /> : <ChevronDown className="h-3.5 w-3.5 text-[#8c8c8c]" />}
@@ -768,7 +768,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                         <button
                           disabled={u.id === usuario?.id}
                           onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
-                          className="px-3 h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#252525] disabled:hover:text-[#d4d4d4] rounded-[8px] text-xs font-medium transition cursor-pointer flex-shrink-0 whitespace-nowrap shadow-xs font-sans"
+                          className="w-[72px] h-[28px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-[#252525] disabled:hover:text-[#d4d4d4] rounded-[8px] text-xs font-medium transition cursor-pointer flex-shrink-0 whitespace-nowrap shadow-xs font-sans flex items-center justify-center"
                           title={u.id === usuario?.id ? "No puedes eliminar tu propia cuenta" : "Eliminar usuario"}
                         >
                           Eliminar
