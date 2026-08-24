@@ -658,33 +658,33 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {sessionsList.map((s) => (
-                  <div key={s.id} className="bg-[#1c1c22] border border-[#2b2b34] rounded-2xl p-4 space-y-3 shadow-md">
+                  <div key={s.id} className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 space-y-3 font-sans">
                     <div className="flex justify-between items-start">
                       <div>
-                        <p className="font-extrabold text-blue-400 text-sm">{s.user_name}</p>
-                        <p className="text-[11px] text-gray-400 font-mono">{s.user_email}</p>
+                        <p className="font-medium text-[#87a9ff] text-[14px]">{s.user_name}</p>
+                        <p className="text-xs text-[#8c8c8c] font-sans">{s.user_email}</p>
                       </div>
                       {s.is_active ? (
-                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                        <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
                           ACTIVA
                         </span>
                       ) : (
-                        <span className="px-2 py-0.5 rounded-full text-[9px] font-black bg-gray-800 text-gray-400">
+                        <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-[#2a2a2a] text-[#8c8c8c] border border-[#333333]">
                           REVOCADA
                         </span>
                       )}
                     </div>
 
-                    <div className="space-y-1 text-xs text-gray-400 border-t border-[#26262e] pt-2 font-mono">
-                      <p><span className="text-gray-500">IP:</span> {s.ip_address || "127.0.0.1"}</p>
-                      <p className="truncate" title={s.user_agent}><span className="text-gray-500">Device:</span> {s.user_agent || "Web Browser"}</p>
-                      <p><span className="text-gray-500">Inicio:</span> {new Date(s.created_at).toLocaleString()}</p>
+                    <div className="space-y-1 text-xs text-[#8c8c8c] border-t border-[#262626] pt-2 font-sans">
+                      <p><span className="text-[#666666]">IP:</span> {s.ip_address || "127.0.0.1"}</p>
+                      <p className="truncate" title={s.user_agent}><span className="text-[#666666]">Device:</span> {s.user_agent || "Web Browser"}</p>
+                      <p><span className="text-[#666666]">Inicio:</span> {new Date(s.created_at).toLocaleString()}</p>
                     </div>
 
                     {s.is_active && (
                       <button
                         onClick={() => revocarSesion(s.id)}
-                        className="w-full py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-xl text-xs font-bold border border-red-500/30 transition cursor-pointer mt-2"
+                        className="w-full py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-[10px] text-xs font-medium border border-red-500/30 transition cursor-pointer mt-2"
                       >
                         Revocar Sesión
                       </button>
