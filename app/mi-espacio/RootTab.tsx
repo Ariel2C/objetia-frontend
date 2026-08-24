@@ -374,9 +374,14 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     >
       
       {/* 1. SIDEBAR ESCRITORIO (Google AI Studio Theme) */}
-      <aside className={`hidden lg:block bg-[#191919] border-r border-[#262626] flex-shrink-0 min-h-screen transition-all duration-300 ease-in-out overflow-hidden ${
-        sidebarOculto ? 'w-0 opacity-0 border-r-0' : 'w-64 opacity-100'
-      }`}>
+      <aside 
+        style={{
+          width: sidebarOculto ? '0px' : '256px',
+          opacity: sidebarOculto ? 0 : 1,
+          transition: 'width 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms cubic-bezier(0.4, 0, 0.2, 1)'
+        }}
+        className="hidden lg:block bg-[#191919] border-r border-[#262626] flex-shrink-0 min-h-screen overflow-hidden"
+      >
         <div className="w-64 h-full">
           {renderSidebarContent()}
         </div>
@@ -401,15 +406,15 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
       <main className="flex-1 flex flex-col min-w-0 bg-[#191919] text-[14px] leading-[20px] font-normal">
         
         {/* BARRA SUPERIOR DE ENCABEZADO */}
-        <header className="p-3 sm:px-6 sm:py-4 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 bg-[#191919]">
-          <div className="flex items-center gap-2.5 w-full sm:w-auto min-w-0">
+        <header className="p-3 sm:px-6 sm:py-4 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 sm:gap-4 bg-[#191919]">
+          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto min-w-0">
             {/* BOTÓN MENÚ HAMBURGUESA EN MÓVIL (Estilo Segunda Imagen) */}
             <button
               onClick={() => setMenuMovilAbierto(true)}
-              className="lg:hidden p-2 rounded-[12px] bg-[#252525] text-[#d4d4d4] hover:text-white transition cursor-pointer flex-shrink-0"
+              className="lg:hidden p-1.5 sm:p-2 rounded-[10px] sm:rounded-[12px] bg-[#252525] text-[#d4d4d4] hover:text-white transition cursor-pointer flex-shrink-0"
               title="Abrir menú de navegación"
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
             </button>
 
             {/* BOTÓN MOSTRAR SIDEBAR EN ESCRITORIO CUANDO ESTÁ OCULTO */}
@@ -421,7 +426,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
               <PanelLeftOpen className="h-5 w-5 text-current" />
             </button>
 
-            <h1 className="text-[16px] sm:text-[20px] font-semibold text-[#d4d4d4] tracking-tight truncate">
+            <h1 className="text-[15px] sm:text-[20px] font-semibold text-[#d4d4d4] tracking-tight truncate">
               {activeConsoleTab === 'users' && "Control de Usuarios"}
               {activeConsoleTab === 'sessions' && "Monitor de Sesiones"}
               {activeConsoleTab === 'logs' && "Logs de Auditoría"}
@@ -429,14 +434,14 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             </h1>
           </div>
 
-          {/* ACCIONES CABECERA */}
-          <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 scrollbar-none flex-nowrap justify-start sm:justify-end">
+          {/* ACCIONES CABECERA (Reducidos en móvil sin scroll horizontal) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap justify-start sm:justify-end">
             {onVolverAMiEspacio && (
               <button
                 onClick={onVolverAMiEspacio}
-                className="px-3 h-[32px] bg-[#252525] border border-[#87a9ff]/40 text-[#87a9ff] hover:text-white hover:bg-[#87a9ff]/20 rounded-[12px] text-[13px] font-medium transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap flex-shrink-0 shadow-xs"
+                className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#87a9ff]/40 text-[#87a9ff] hover:text-white hover:bg-[#87a9ff]/20 rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium transition flex items-center gap-1 cursor-pointer whitespace-nowrap shadow-xs"
               >
-                <ChevronLeft className="h-4 w-4 flex-shrink-0" />
+                <ChevronLeft className="h-3.5 w-3.5 flex-shrink-0" />
                 <span className="whitespace-nowrap">Volver a Mi Espacio</span>
               </button>
             )}
@@ -444,26 +449,26 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             <button
               onClick={cargarDatos}
               disabled={cargando}
-              className="px-3 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[12px] text-[13px] font-medium hover:bg-[#323232] hover:text-white transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap flex-shrink-0"
+              className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition flex items-center gap-1 cursor-pointer whitespace-nowrap"
             >
-              <RefreshCw className={`h-3.5 w-3.5 flex-shrink-0 ${cargando ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0 ${cargando ? 'animate-spin' : ''}`} />
               <span className="whitespace-nowrap">Actualizar</span>
             </button>
 
             <button
               onClick={() => toast.info("Consola en sincronía directa con PostgreSQL en AWS.", "Estado del Sistema")}
-              className="px-3.5 h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[12px] text-[13px] font-medium hover:bg-[#454d63] transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap flex-shrink-0"
+              className="px-2.5 sm:px-3.5 h-[28px] sm:h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#454d63] transition cursor-pointer flex items-center gap-1 whitespace-nowrap"
             >
-              <Key className="h-3.5 w-3.5 flex-shrink-0" />
+              <Key className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
               <span className="whitespace-nowrap">Acción Root</span>
             </button>
           </div>
         </header>
 
         {/* BARRA SECUNDARIA DE FILTROS & PILLS (Google AI Studio Theme) */}
-        <div className="px-3 sm:px-6 py-2.5 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 bg-[#1f1f1f]">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none flex-nowrap">
-            <span className="text-[13px] font-medium text-[#8c8c8c] whitespace-nowrap mr-1 flex-shrink-0">Agrupar por:</span>
+        <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 bg-[#1f1f1f]">
+          <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
+            <span className="text-[12px] sm:text-[13px] font-medium text-[#8c8c8c] whitespace-nowrap mr-0.5">Agrupar por:</span>
             {[
               { id: '', label: 'Todos' },
               { id: 'client', label: 'Clientes' },
@@ -476,7 +481,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 <button
                   key={f.id}
                   onClick={() => setRoleFilter(f.id)}
-                  className={`px-3 h-[28px] rounded-full text-[13px] font-medium transition cursor-pointer whitespace-nowrap flex-shrink-0 ${
+                  className={`px-2.5 sm:px-3 h-[25px] sm:h-[28px] rounded-full text-[11px] sm:text-[13px] font-medium transition cursor-pointer whitespace-nowrap ${
                     isSelected
                       ? 'bg-[#323232] text-[#ffffff] border border-[#555555]'
                       : 'bg-[#191919] text-[#8c8c8c] border border-transparent hover:bg-[#252525] hover:text-[#d4d4d4]'
