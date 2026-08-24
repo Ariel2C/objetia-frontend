@@ -6,7 +6,7 @@ import { getApiUrl } from '../../lib/config';
 import { 
   Menu, X, Key, Users, Activity, FileText, Search, Trash2, 
   RefreshCw, ShieldAlert, CheckCircle2, XCircle, Crown, Shield, 
-  Sliders, Database, Terminal, ChevronDown, ChevronLeft, Bell, Settings, Copy, 
+  Sliders, Database, Terminal, ChevronDown, ChevronUp, ChevronLeft, Bell, Settings, Copy, 
   ExternalLink, Layers, ArrowUpRight, Lock, Eye
 } from 'lucide-react';
 
@@ -41,6 +41,78 @@ interface LogData {
   details?: string;
   ip_address?: string;
   created_at: string;
+}
+
+interface OptionItem {
+  value: string;
+  label: string;
+  sublabel?: string;
+}
+
+function CustomSelect({
+  value,
+  options,
+  onChange,
+  disabled
+}: {
+  value: string;
+  options: OptionItem[];
+  onChange: (val: string) => void;
+  disabled?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedOption = options.find(o => o.value.toLowerCase() === value.toLowerCase()) || options[0];
+
+  return (
+    <div ref={ref} className="relative inline-block text-left">
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => setOpen(!open)}
+        className="h-[36px] px-3 bg-[#1f1f1f] hover:bg-[#252525] border border-[#333333] rounded-[12px] text-[14px] leading-[21px] font-medium text-white flex items-center justify-between gap-2.5 focus:outline-none transition cursor-pointer disabled:opacity-40"
+      >
+        <span className="truncate">{selectedOption?.label || value}</span>
+        {open ? <ChevronUp className="h-4 w-4 text-[#8c8c8c]" /> : <ChevronDown className="h-4 w-4 text-[#8c8c8c]" />}
+      </button>
+
+      {open && (
+        <div className="absolute right-0 mt-1.5 w-64 bg-[#1f1f1f] border border-[#262626] rounded-[12px] shadow-2xl z-50 p-1 space-y-1 animate-scale-in">
+          {options.map((opt) => {
+            const isSelected = opt.value.toLowerCase() === value.toLowerCase();
+            return (
+              <div
+                key={opt.value}
+                onClick={() => {
+                  onChange(opt.value);
+                  setOpen(false);
+                }}
+                className={`p-2.5 rounded-[8px] cursor-pointer transition flex flex-col justify-center ${
+                  isSelected ? 'bg-[#323232] text-white' : 'hover:bg-[#2a2a2a] text-[#d4d4d4]'
+                }`}
+              >
+                <span className="text-[14px] leading-[21px] font-medium text-white">{opt.label}</span>
+                {opt.sublabel && (
+                  <span className="text-[12px] leading-[16px] text-[#8c8c8c] font-normal">{opt.sublabel}</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
 }
 
 interface RootTabProps {
@@ -464,22 +536,22 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                     </div>
 
                     <div className="flex items-center justify-between pt-2">
-                      <select
+                      <CustomSelect
                         value={u.role}
                         disabled={u.id === usuario?.id}
-                        onChange={(e) => cambiarRol(u.id, e.target.value)}
-                        className="bg-[#252525] border border-[#333333] text-[13px] font-medium text-[#d4d4d4] rounded-[8px] px-2 py-1 focus:outline-none cursor-pointer"
-                      >
-                        <option value="client">CLIENT</option>
-                        <option value="financial">FINANCIAL</option>
-                        <option value="admin">ADMIN</option>
-                        <option value="root">ROOT</option>
-                      </select>
+                        options={[
+                          { value: 'client', label: 'CLIENT', sublabel: 'Usuario comprador' },
+                          { value: 'financial', label: 'FINANCIAL', sublabel: 'Administrador financiero' },
+                          { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
+                          { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
+                        ]}
+                        onChange={(val) => cambiarRol(u.id, val)}
+                      />
 
                       {u.id !== usuario?.id && (
                         <button
                           onClick={() => eliminarUsuario(u.id, u.email)}
-                          className="p-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-[8px] transition"
+                          className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-[12px] transition"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -526,27 +598,29 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                         </td>
                         <td className="px-4 py-3 text-[#8c8c8c] font-mono text-[13px]">{new Date(u.created_at).toLocaleDateString()}</td>
                         <td className="px-4 py-3 text-right space-x-2">
-                          <select
-                            value={u.role}
-                            disabled={u.id === usuario?.id}
-                            onChange={(e) => cambiarRol(u.id, e.target.value)}
-                            className="px-2.5 py-1 bg-[#252525] border border-[#333333] rounded-[8px] text-[13px] font-medium text-[#d4d4d4] focus:outline-none cursor-pointer disabled:opacity-40"
-                          >
-                            <option value="client">CLIENT</option>
-                            <option value="financial">FINANCIAL</option>
-                            <option value="admin">ADMIN</option>
-                            <option value="root">ROOT</option>
-                          </select>
+                          <div className="inline-flex items-center gap-2">
+                            <CustomSelect
+                              value={u.role}
+                              disabled={u.id === usuario?.id}
+                              options={[
+                                { value: 'client', label: 'CLIENT', sublabel: 'Usuario comprador' },
+                                { value: 'financial', label: 'FINANCIAL', sublabel: 'Administrador financiero' },
+                                { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
+                                { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
+                              ]}
+                              onChange={(val) => cambiarRol(u.id, val)}
+                            />
 
-                          {u.id !== usuario?.id && (
-                            <button
-                              onClick={() => eliminarUsuario(u.id, u.email)}
-                              className="p-1.5 text-red-400 hover:bg-red-500/20 rounded-[8px] transition"
-                              title="Eliminar usuario"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          )}
+                            {u.id !== usuario?.id && (
+                              <button
+                                onClick={() => eliminarUsuario(u.id, u.email)}
+                                className="p-2 text-red-400 hover:bg-red-500/20 rounded-[12px] transition"
+                                title="Eliminar usuario"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     ))}
