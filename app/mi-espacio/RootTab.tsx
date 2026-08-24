@@ -1130,11 +1130,15 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                           <p className="text-[#d4d4d4] font-sans">{r.description}</p>
                           <div className="flex items-center gap-1.5 flex-wrap pt-0.5 font-sans">
                             <span className="text-[#666666] font-medium font-sans">Permisos:</span>
-                            {r.permissions.map((p, idx) => (
-                              <span key={idx} className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#d4d4d4] border border-[#333333] text-[11px] font-sans">
-                                {p}
-                              </span>
-                            ))}
+                            {(Array.isArray(r.permissions) ? r.permissions : [r.permissions])
+                              .flatMap(p => String(p || '').split(','))
+                              .map(p => p.trim())
+                              .filter(Boolean)
+                              .map((permText, idx) => (
+                                <span key={idx} className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#d4d4d4] border border-[#333333] text-[11px] font-sans whitespace-nowrap">
+                                  {permText}
+                                </span>
+                              ))}
                           </div>
                         </div>
 
