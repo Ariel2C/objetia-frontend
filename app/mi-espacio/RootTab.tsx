@@ -637,7 +637,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
               </div>
 
               {/* VISTA ESCRITORIO CON TABLA OSCURA (DevTools CSS Mat-Table) */}
-              <div className="hidden lg:block bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-visible pb-16 min-h-[220px]">
+              <div className="hidden lg:block bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-visible">
                 <table className="w-full text-left text-[13px] leading-[20px] text-[#d4d4d4] font-sans">
                   <thead>
                     <tr className="bg-[#1f1f1f] border-b border-[#262626] text-[#8c8c8c] font-medium text-[13px] leading-[21px] font-sans">
