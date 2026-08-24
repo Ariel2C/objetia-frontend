@@ -214,8 +214,12 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     }
   };
 
-  const eliminarUsuario = async (userId: number, userEmail: string) => {
-    if (!confirm(`¿Eliminar definitivamente la cuenta ${userEmail}?`)) return;
+  const [modalEliminarUser, setModalEliminarUser] = useState<{ id: number; email: string } | null>(null);
+
+  const confirmarEliminarUsuario = async () => {
+    if (!modalEliminarUser) return;
+    const { id: userId, email: userEmail } = modalEliminarUser;
+    setModalEliminarUser(null);
     try {
       const res = await fetch(`${getApiUrl()}/root/users/${userId}`, {
         method: 'DELETE',
@@ -584,37 +588,35 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                       </span>
                     </div>
 
-                    <div className="text-xs text-[#8c8c8c] font-sans space-y-1 pt-2 border-t border-[#262626]">
-                      <div className="flex justify-between items-center">
-                        <span className="text-[#666666]">Creado:</span>
-                        <span className="text-[#d4d4d4] font-sans">{new Date(u.created_at).toLocaleDateString()}</span>
-                      </div>
+                    <div className="flex items-center gap-1.5 text-xs text-[#8c8c8c] font-sans pt-2 border-t border-[#262626]">
+                      <span className="text-[#666666]">Creado:</span>
+                      <span className="text-[#d4d4d4] font-sans">{new Date(u.created_at).toLocaleDateString()}</span>
                     </div>
 
-                    <div className="flex items-center justify-between pt-2 border-t border-[#262626] gap-2">
-                      <div className="flex-1 min-w-0">
-                        <CustomSelect
-                          value={u.role}
-                          disabled={u.id === usuario?.id}
-                          options={[
-                            { value: 'client', label: 'CLIENT', sublabel: 'Usuario comprador' },
-                            { value: 'financial', label: 'FINANCIAL', sublabel: 'Administrador financiero' },
-                            { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
-                            { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
-                          ]}
-                          onChange={(val) => cambiarRol(u.id, val)}
-                        />
+                    <div className="pt-2 border-t border-[#262626] space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="text-xs text-[#8c8c8c] font-medium whitespace-nowrap">Rango & Acciones:</span>
+                        {u.id !== usuario?.id && (
+                          <button
+                            onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
+                            className="px-3 h-[28px] bg-[#393f51] border border-[#454d63] text-white hover:bg-[#454d63] rounded-[10px] text-[11px] sm:text-xs font-medium transition cursor-pointer flex-shrink-0 whitespace-nowrap shadow-xs"
+                          >
+                            Eliminar
+                          </button>
+                        )}
                       </div>
 
-                      {u.id !== usuario?.id && (
-                        <button
-                          onClick={() => eliminarUsuario(u.id, u.email)}
-                          className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 rounded-[10px] border border-red-500/30 transition flex-shrink-0 cursor-pointer"
-                          title="Eliminar usuario"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      )}
+                      <CustomSelect
+                        value={u.role}
+                        disabled={u.id === usuario?.id}
+                        options={[
+                          { value: 'client', label: 'CLIENT', sublabel: 'Usuario comprador' },
+                          { value: 'financial', label: 'FINANCIAL', sublabel: 'Administrador financiero' },
+                          { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
+                          { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
+                        ]}
+                        onChange={(val) => cambiarRol(u.id, val)}
+                      />
                     </div>
                   </div>
                 ))}
@@ -672,7 +674,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
                             {u.id !== usuario?.id && (
                               <button
-                                onClick={() => eliminarUsuario(u.id, u.email)}
+                                onClick={() => setModalEliminarUser({ id: u.id, email: u.email })}
                                 className="p-1.5 text-red-400 hover:bg-red-500/20 rounded-[8px] transition"
                                 title="Eliminar usuario"
                               >
@@ -795,6 +797,40 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
         </div>
       </main>
+
+      {/* MODAL DE CONFIRMACIÓN DE ELIMINACIÓN */}
+      {modalEliminarUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs animate-fade-in">
+          <div className="bg-[#1f1f1f] border border-[#262626] rounded-[16px] p-5 sm:p-6 max-w-md w-full shadow-2xl space-y-4 animate-scale-up">
+            <div className="flex items-center gap-3 text-red-400">
+              <div className="p-2 bg-red-500/10 rounded-full border border-red-500/30 flex-shrink-0">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <h3 className="text-[16px] sm:text-[18px] font-semibold text-white">¿Eliminar Usuario?</h3>
+            </div>
+
+            <p className="text-xs sm:text-sm text-[#d4d4d4] font-sans leading-relaxed">
+              ¿Estás seguro de que deseas eliminar permanentemente la cuenta de{' '}
+              <strong className="text-white font-semibold">{modalEliminarUser.email}</strong>? Esta acción no se puede deshacer.
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-3 border-t border-[#262626]">
+              <button
+                onClick={() => setModalEliminarUser(null)}
+                className="px-3.5 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:text-white hover:bg-[#323232] rounded-[10px] text-xs font-medium transition cursor-pointer"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmarEliminarUsuario}
+                className="px-4 h-[32px] bg-[#393f51] border border-[#454d63] text-white hover:bg-red-600 hover:border-red-500 rounded-[10px] text-xs font-medium transition cursor-pointer shadow-xs"
+              >
+                Aceptar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
