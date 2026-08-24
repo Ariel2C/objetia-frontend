@@ -61,6 +61,7 @@ function CustomSelect({
   disabled?: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [dropUp, setDropUp] = useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -73,6 +74,15 @@ function CustomSelect({
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const toggleOpen = () => {
+    if (!open && ref.current) {
+      const rect = ref.current.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - rect.bottom;
+      setDropUp(spaceBelow < 220);
+    }
+    setOpen(!open);
+  };
+
   const selectedOption = options.find(o => o.value.toLowerCase() === value.toLowerCase()) || options[0];
 
   return (
@@ -80,7 +90,7 @@ function CustomSelect({
       <button
         type="button"
         disabled={disabled}
-        onClick={() => setOpen(!open)}
+        onClick={toggleOpen}
         className="h-[30px] px-2.5 bg-[#1f1f1f] hover:bg-[#252525] border border-[#333333] rounded-[8px] text-[13px] leading-[18px] font-medium text-white flex items-center justify-between gap-2 focus:outline-none transition cursor-pointer disabled:opacity-40"
       >
         <span className="truncate">{selectedOption?.label || value}</span>
@@ -88,7 +98,9 @@ function CustomSelect({
       </button>
 
       {open && (
-        <div className="absolute left-0 mt-1 w-56 bg-[#1f1f1f] border border-[#262626] rounded-[10px] shadow-2xl z-50 p-1 space-y-0.5 animate-scale-in">
+        <div className={`absolute left-0 w-56 bg-[#1f1f1f] border border-[#262626] rounded-[10px] shadow-2xl z-[100] p-1 space-y-0.5 animate-scale-in ${
+          dropUp ? 'bottom-full mb-1' : 'top-full mt-1'
+        }`}>
           {options.map((opt) => {
             const isSelected = opt.value.toLowerCase() === value.toLowerCase();
             return (
@@ -515,7 +527,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   onChange={(e) => setSearchUser(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && cargarDatos()}
                   placeholder="Filtrar usuarios..."
-                  className="w-full pl-8 pr-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[12px] text-[13px] text-[#d4d4d4] focus:outline-none focus:border-[#87a9ff] transition"
+                  className="w-full pl-8 pr-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[12px] text-[13px] text-white placeholder-[#8c8c8c] focus:outline-none focus:border-[#87a9ff] transition font-sans"
                 />
               </div>
             </div>
@@ -625,7 +637,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
               </div>
 
               {/* VISTA ESCRITORIO CON TABLA OSCURA (DevTools CSS Mat-Table) */}
-              <div className="hidden lg:block bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden">
+              <div className="hidden lg:block bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-visible pb-16 min-h-[220px]">
                 <table className="w-full text-left text-[13px] leading-[20px] text-[#d4d4d4] font-sans">
                   <thead>
                     <tr className="bg-[#1f1f1f] border-b border-[#262626] text-[#8c8c8c] font-medium text-[13px] leading-[21px] font-sans">
