@@ -168,112 +168,120 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
   // Renderizador del Sidebar / Drawer de Navegación Lateral (Google AI Studio Theme)
   const renderSidebarContent = () => (
-    <div className="flex flex-col h-full justify-between text-xs select-none">
+    <div className="flex flex-col h-full justify-between text-[14px] leading-[21px] font-medium select-none bg-[#191919] p-4 space-y-6">
       <div className="space-y-6">
         {/* BRANDING CABECERA SIDEBAR */}
-        <div className="flex items-center justify-between px-4 pt-4 pb-2">
+        <div className="flex items-center justify-between pb-2">
           <div className="flex items-center gap-2 cursor-pointer group">
-            <span className="font-extrabold text-sm tracking-tight text-white group-hover:text-blue-400 transition">
+            <span className="font-semibold text-[15px] tracking-tight text-white group-hover:text-blue-400 transition">
               Objetia AI Studio
             </span>
-            <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+            <ChevronDown className="h-4 w-4 text-[#8c8c8c]" />
           </div>
           {/* Botón cerrar en móvil */}
           <button 
             onClick={() => setMenuMovilAbierto(false)} 
-            className="lg:hidden text-gray-400 hover:text-white p-1 rounded-lg"
+            className="lg:hidden text-[#8c8c8c] hover:text-white p-1 rounded-lg"
           >
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* NAVEGACIÓN - GRUPO 1: PROYECTO & USUARIOS */}
-        <div className="space-y-1 px-2">
-          <p className="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
-            Proyecto
+        <div className="space-y-1">
+          <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5">
+            PROYECTO
           </p>
           <button
             onClick={() => { setActiveConsoleTab('users'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition text-left ${
-              activeConsoleTab === 'users' ? 'bg-[#2b2b34] text-white shadow-xs' : 'text-gray-400 hover:bg-[#222228] hover:text-gray-200'
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
+              activeConsoleTab === 'users' 
+                ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
             }`}
           >
-            <Users className="h-4 w-4 text-blue-400" />
+            <Users className="h-4 w-4 text-current flex-shrink-0" />
             <span>Control de Usuarios</span>
           </button>
 
           <button
             onClick={() => { setActiveConsoleTab('keys'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition text-left ${
-              activeConsoleTab === 'keys' ? 'bg-[#2b2b34] text-white shadow-xs' : 'text-gray-400 hover:bg-[#222228] hover:text-gray-200'
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
+              activeConsoleTab === 'keys' 
+                ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
             }`}
           >
-            <Key className="h-4 w-4 text-amber-400" />
-            <span>Claves de API & Status</span>
+            <Key className="h-4 w-4 text-current flex-shrink-0" />
+            <span>Claves de API</span>
           </button>
         </div>
 
         {/* NAVEGACIÓN - GRUPO 2: USO & FACTURACIÓN */}
-        <div className="space-y-1 px-2">
-          <p className="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
-            Uso y Monitoreo
+        <div className="space-y-1">
+          <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5">
+            USO Y FACTURACIÓN
           </p>
           <button
             onClick={() => { setActiveConsoleTab('sessions'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition text-left ${
-              activeConsoleTab === 'sessions' ? 'bg-[#2b2b34] text-white shadow-xs' : 'text-gray-400 hover:bg-[#222228] hover:text-gray-200'
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
+              activeConsoleTab === 'sessions' 
+                ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
             }`}
           >
-            <Activity className="h-4 w-4 text-emerald-400" />
+            <Activity className="h-4 w-4 text-current flex-shrink-0" />
             <span>Monitor de Sesiones</span>
           </button>
         </div>
 
         {/* NAVEGACIÓN - GRUPO 3: OBSERVAR */}
-        <div className="space-y-1 px-2">
-          <p className="px-3 text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
-            Observar
+        <div className="space-y-1">
+          <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5">
+            OBSERVAR
           </p>
           <button
             onClick={() => { setActiveConsoleTab('logs'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl font-bold transition text-left ${
-              activeConsoleTab === 'logs' ? 'bg-[#2b2b34] text-white shadow-xs' : 'text-gray-400 hover:bg-[#222228] hover:text-gray-200'
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
+              activeConsoleTab === 'logs' 
+                ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
             }`}
           >
-            <Database className="h-4 w-4 text-purple-400" />
-            <span>Logs de Auditoría</span>
+            <Database className="h-4 w-4 text-current flex-shrink-0" />
+            <span>Registros y Auditoría</span>
           </button>
         </div>
       </div>
 
       {/* FOOTER SIDEBAR - BARRA DE ÍCONOS Y PILL DE USUARIO ROOT */}
-      <div className="p-3 border-t border-[#26262e] space-y-3">
-        <div className="flex items-center justify-around text-gray-400">
-          <button title="Notificaciones" className="p-1.5 hover:text-white rounded-lg hover:bg-[#26262e] transition">
-            <Bell className="h-4 w-4" />
+      <div className="pt-3 border-t border-[#262626] space-y-3">
+        <div className="flex items-center justify-around text-[#8c8c8c]">
+          <button title="Notificaciones" className="p-1.5 hover:text-white rounded-lg hover:bg-[#2a2a2a] transition">
+            <Bell className="h-4 w-4 text-current" />
           </button>
-          <button title="Configuración" className="p-1.5 hover:text-white rounded-lg hover:bg-[#26262e] transition">
-            <Settings className="h-4 w-4" />
+          <button title="Configuración" className="p-1.5 hover:text-white rounded-lg hover:bg-[#2a2a2a] transition">
+            <Settings className="h-4 w-4 text-current" />
           </button>
-          <button title="Buscar" className="p-1.5 hover:text-white rounded-lg hover:bg-[#26262e] transition">
-            <Search className="h-4 w-4" />
+          <button title="Buscar" className="p-1.5 hover:text-white rounded-lg hover:bg-[#2a2a2a] transition">
+            <Search className="h-4 w-4 text-current" />
           </button>
-          <button title="Credenciales" className="p-1.5 hover:text-white rounded-lg hover:bg-[#26262e] transition">
-            <Key className="h-4 w-4" />
+          <button title="Credenciales" className="p-1.5 hover:text-white rounded-lg hover:bg-[#2a2a2a] transition">
+            <Key className="h-4 w-4 text-current" />
           </button>
         </div>
 
         {/* PILL PERFIL USUARIO GOOGLE AI STUDIO */}
-        <div className="bg-[#1c1c22] border border-[#2a2a34] p-2 rounded-xl flex items-center justify-between">
+        <div className="bg-[#252525] border border-[#333333] p-2 rounded-[12px] flex items-center justify-between">
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className="h-6 w-6 rounded-full bg-gradient-to-tr from-amber-500 to-red-500 text-white font-black text-[10px] flex items-center justify-center flex-shrink-0">
+            <div className="h-6 w-6 rounded-full bg-gradient-to-tr from-amber-500 to-red-500 text-white font-bold text-[10px] flex items-center justify-center flex-shrink-0">
               {usuario.full_name?.charAt(0).toUpperCase() || 'R'}
             </div>
-            <span className="text-[11px] font-semibold text-gray-200 truncate">
+            <span className="text-[12px] font-medium text-[#d4d4d4] truncate">
               {usuario.email}
             </span>
           </div>
-          <span className="px-1.5 py-0.5 text-[9px] font-black uppercase rounded bg-[#2b2b34] text-blue-400 border border-blue-500/30 flex-shrink-0">
+          <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-[#3a3a3a] text-[#87a9ff] border border-[#87a9ff]/30 flex-shrink-0">
             PRO
           </span>
         </div>
@@ -283,12 +291,12 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
   return (
     <div 
-      style={{ fontFamily: "'Google Sans Text', 'Google Sans', 'Plus Jakarta Sans', 'Inter', Roboto, sans-serif" }}
-      className="min-h-[85vh] bg-[#121214] text-[#e3e3e8] rounded-3xl overflow-hidden flex flex-col lg:flex-row border border-[#222228] shadow-2xl relative"
+      style={{ fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif" }}
+      className="min-h-screen bg-[#191919] text-[#d4d4d4] flex flex-col lg:flex-row border-none relative overflow-x-hidden"
     >
       
       {/* 1. SIDEBAR ESCRITORIO (Google AI Studio Theme) */}
-      <aside className="hidden lg:block w-64 bg-[#18181c] border-r border-[#26262e] flex-shrink-0 min-h-[750px]">
+      <aside className="hidden lg:block w-64 bg-[#191919] border-r border-[#262626] flex-shrink-0 min-h-screen">
         {renderSidebarContent()}
       </aside>
 
