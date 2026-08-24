@@ -829,9 +829,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             ) : (
               <button
                 onClick={() => setModoVistaRango('lista')}
-                className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer whitespace-nowrap font-sans"
+                className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer flex items-center gap-1 whitespace-nowrap font-sans"
               >
-                Volver al listado de rangos
+                <ChevronLeft className="h-3.5 w-3.5 flex-shrink-0" />
+                <span>Volver</span>
               </button>
             )}
           </div>
@@ -1153,7 +1154,13 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                           value={rangoForm.code}
                           onChange={(e) => setRangoForm(f => ({ ...f, code: e.target.value }))}
                           placeholder="Ej: moderador"
-                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff] disabled:opacity-50"
+                          style={{ 
+                            color: '#ffffff', 
+                            WebkitTextFillColor: '#ffffff',
+                            backgroundColor: '#191919', 
+                            caretColor: '#ffffff' 
+                          }}
+                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] disabled:opacity-50 font-sans caret-white"
                         />
                       </div>
 
@@ -1165,7 +1172,13 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                           value={rangoForm.name}
                           onChange={(e) => setRangoForm(f => ({ ...f, name: e.target.value }))}
                           placeholder="Ej: ADMINISTRADOR GENERAL"
-                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                          style={{ 
+                            color: '#ffffff', 
+                            WebkitTextFillColor: '#ffffff',
+                            backgroundColor: '#191919', 
+                            caretColor: '#ffffff' 
+                          }}
+                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
                         />
                       </div>
 
@@ -1176,7 +1189,13 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                           value={rangoForm.label}
                           onChange={(e) => setRangoForm(f => ({ ...f, label: e.target.value }))}
                           placeholder="Ej: Administrador General del Sistema"
-                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                          style={{ 
+                            color: '#ffffff', 
+                            WebkitTextFillColor: '#ffffff',
+                            backgroundColor: '#191919', 
+                            caretColor: '#ffffff' 
+                          }}
+                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
                         />
                       </div>
 
@@ -1188,7 +1207,13 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                           max={100}
                           value={rangoForm.level}
                           onChange={(e) => setRangoForm(f => ({ ...f, level: Number(e.target.value) }))}
-                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                          style={{ 
+                            color: '#ffffff', 
+                            WebkitTextFillColor: '#ffffff',
+                            backgroundColor: '#191919', 
+                            caretColor: '#ffffff' 
+                          }}
+                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
                         />
                       </div>
                     </div>
@@ -1200,7 +1225,13 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                         value={rangoForm.description}
                         onChange={(e) => setRangoForm(f => ({ ...f, description: e.target.value }))}
                         placeholder="Descripción de tareas y ámbito de este rango..."
-                        className="w-full p-2.5 bg-[#191919] border border-[#262626] rounded-[8px] text-white focus:outline-none focus:border-[#87a9ff]"
+                        style={{ 
+                          color: '#ffffff', 
+                          WebkitTextFillColor: '#ffffff',
+                          backgroundColor: '#191919', 
+                          caretColor: '#ffffff' 
+                        }}
+                        className="w-full p-2.5 bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
                       />
                     </div>
 
