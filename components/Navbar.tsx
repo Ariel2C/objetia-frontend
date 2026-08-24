@@ -46,6 +46,11 @@ export default function Navbar({ logoUrl }: NavbarProps) {
   const [brandFontFamilyState, setBrandFontFamilyState] = useState("Outfit");
   const [navBgColorState, setNavBgColorState] = useState("#FFFFFF");
   const [navbarSearch, setNavbarSearch] = useState('');
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const checkBgColor = () => {
@@ -351,7 +356,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               Vender
             </button>
 
-            {!cargando && (
+            {mounted && !cargando && (
               usuario ? (
                 /* ==================================================================== */
                 /* USUARIO LOGUEADO / ONLINE: APARICIÓN DE TODOS LOS ÍCONOS DE ACCIÓN */

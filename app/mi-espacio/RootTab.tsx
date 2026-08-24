@@ -590,7 +590,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
                     <div className="flex items-center gap-1.5 text-xs text-[#8c8c8c] font-sans pt-2 border-t border-[#262626]">
                       <span className="text-[#8c8c8c] font-sans">Creado:</span>
-                      <span className="text-[#d4d4d4] font-sans">{new Date(u.created_at).toLocaleDateString()}</span>
+                      <span suppressHydrationWarning className="text-[#d4d4d4] font-sans">{new Date(u.created_at).toLocaleDateString()}</span>
                     </div>
 
                     <div className="pt-2 border-t border-[#262626] flex flex-wrap sm:flex-nowrap items-center justify-between gap-2">
