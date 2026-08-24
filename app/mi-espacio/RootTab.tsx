@@ -267,10 +267,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             {/* Botón Ocultar en Escritorio */}
             <button 
               onClick={() => setSidebarOculto(true)} 
-              className="hidden lg:flex p-1.5 text-[#8c8c8c] hover:text-white hover:bg-[#252525] rounded-[8px] transition cursor-pointer"
+              className="hidden lg:flex p-2 text-[#8c8c8c] hover:text-white hover:bg-[#252525] rounded-[10px] transition cursor-pointer"
               title="Ocultar menú lateral"
             >
-              <PanelLeftClose className="h-4 w-4" />
+              <PanelLeftClose className="h-5 w-5" />
             </button>
 
             {/* Botón cerrar en móvil */}
@@ -374,8 +374,12 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     >
       
       {/* 1. SIDEBAR ESCRITORIO (Google AI Studio Theme) */}
-      <aside className={`hidden ${sidebarOculto ? 'lg:hidden' : 'lg:block'} w-64 bg-[#191919] border-r border-[#262626] flex-shrink-0 min-h-screen transition-all`}>
-        {renderSidebarContent()}
+      <aside className={`hidden lg:block bg-[#191919] border-r border-[#262626] flex-shrink-0 min-h-screen transition-all duration-300 ease-in-out overflow-hidden ${
+        sidebarOculto ? 'w-0 opacity-0 border-r-0' : 'w-64 opacity-100'
+      }`}>
+        <div className="w-64 h-full">
+          {renderSidebarContent()}
+        </div>
       </aside>
 
       {/* 2. DRAWER MÓVIL DESLIZABLE DESDE LA IZQUIERDA (Estilo Tercera Imagen) */}
