@@ -401,12 +401,12 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
       <main className="flex-1 flex flex-col min-w-0 bg-[#191919] text-[14px] leading-[20px] font-normal">
         
         {/* BARRA SUPERIOR DE ENCABEZADO */}
-        <header className="p-4 sm:px-6 sm:py-4 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-[#191919]">
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+        <header className="p-3 sm:px-6 sm:py-4 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 bg-[#191919]">
+          <div className="flex items-center gap-2.5 w-full sm:w-auto min-w-0">
             {/* BOTÓN MENÚ HAMBURGUESA EN MÓVIL (Estilo Segunda Imagen) */}
             <button
               onClick={() => setMenuMovilAbierto(true)}
-              className="lg:hidden p-2 rounded-[12px] bg-[#252525] text-[#d4d4d4] hover:text-white transition cursor-pointer"
+              className="lg:hidden p-2 rounded-[12px] bg-[#252525] text-[#d4d4d4] hover:text-white transition cursor-pointer flex-shrink-0"
               title="Abrir menú de navegación"
             >
               <Menu className="h-5 w-5" />
@@ -415,57 +415,55 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             {/* BOTÓN MOSTRAR SIDEBAR EN ESCRITORIO CUANDO ESTÁ OCULTO */}
             <button
               onClick={() => setSidebarOculto(false)}
-              className={`hidden ${sidebarOculto ? 'lg:flex' : 'lg:hidden'} p-2 rounded-[12px] bg-[#252525] text-[#d4d4d4] hover:text-white hover:bg-[#323232] transition cursor-pointer`}
+              className={`hidden ${sidebarOculto ? 'lg:flex' : 'lg:hidden'} p-2 rounded-[12px] bg-[#252525] text-[#d4d4d4] hover:text-white hover:bg-[#323232] transition cursor-pointer flex-shrink-0`}
               title="Mostrar menú lateral"
             >
               <PanelLeftOpen className="h-5 w-5 text-current" />
             </button>
 
-            <div>
-              <h1 className="text-[18px] sm:text-[20px] font-semibold text-[#d4d4d4] tracking-tight flex items-center gap-2">
-                {activeConsoleTab === 'users' && "Control de Usuarios"}
-                {activeConsoleTab === 'sessions' && "Monitor de Sesiones"}
-                {activeConsoleTab === 'logs' && "Logs de Auditoría"}
-                {activeConsoleTab === 'keys' && "Claves de API"}
-              </h1>
-            </div>
+            <h1 className="text-[16px] sm:text-[20px] font-semibold text-[#d4d4d4] tracking-tight truncate">
+              {activeConsoleTab === 'users' && "Control de Usuarios"}
+              {activeConsoleTab === 'sessions' && "Monitor de Sesiones"}
+              {activeConsoleTab === 'logs' && "Logs de Auditoría"}
+              {activeConsoleTab === 'keys' && "Claves de API"}
+            </h1>
           </div>
 
           {/* ACCIONES CABECERA */}
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+          <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0 scrollbar-none flex-nowrap justify-start sm:justify-end">
             {onVolverAMiEspacio && (
               <button
                 onClick={onVolverAMiEspacio}
-                className="px-3 h-[32px] bg-[#252525] border border-[#87a9ff]/40 text-[#87a9ff] hover:text-white hover:bg-[#87a9ff]/20 rounded-[12px] text-[14px] font-medium transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                className="px-3 h-[32px] bg-[#252525] border border-[#87a9ff]/40 text-[#87a9ff] hover:text-white hover:bg-[#87a9ff]/20 rounded-[12px] text-[13px] font-medium transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap flex-shrink-0 shadow-xs"
               >
-                <ChevronLeft className="h-4 w-4" />
-                <span>Volver a Mi Espacio</span>
+                <ChevronLeft className="h-4 w-4 flex-shrink-0" />
+                <span className="whitespace-nowrap">Volver a Mi Espacio</span>
               </button>
             )}
 
             <button
               onClick={cargarDatos}
               disabled={cargando}
-              className="px-3 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[12px] text-[14px] font-medium hover:bg-[#323232] hover:text-white transition flex items-center gap-1.5 cursor-pointer"
+              className="px-3 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[12px] text-[13px] font-medium hover:bg-[#323232] hover:text-white transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap flex-shrink-0"
             >
-              <RefreshCw className={`h-3.5 w-3.5 ${cargando ? 'animate-spin' : ''}`} />
-              <span>Actualizar</span>
+              <RefreshCw className={`h-3.5 w-3.5 flex-shrink-0 ${cargando ? 'animate-spin' : ''}`} />
+              <span className="whitespace-nowrap">Actualizar</span>
             </button>
 
             <button
               onClick={() => toast.info("Consola en sincronía directa con PostgreSQL en AWS.", "Estado del Sistema")}
-              className="px-3.5 h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[12px] text-[14px] font-medium hover:bg-[#454d63] transition cursor-pointer flex items-center gap-1.5"
+              className="px-3.5 h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[12px] text-[13px] font-medium hover:bg-[#454d63] transition cursor-pointer flex items-center gap-1.5 whitespace-nowrap flex-shrink-0"
             >
-              <Key className="h-3.5 w-3.5" />
-              <span>Acción Root</span>
+              <Key className="h-3.5 w-3.5 flex-shrink-0" />
+              <span className="whitespace-nowrap">Acción Root</span>
             </button>
           </div>
         </header>
 
         {/* BARRA SECUNDARIA DE FILTROS & PILLS (Google AI Studio Theme) */}
-        <div className="px-4 sm:px-6 py-3 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 bg-[#1f1f1f]">
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[14px] font-medium text-[#8c8c8c]">Agrupar por:</span>
+        <div className="px-3 sm:px-6 py-2.5 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 bg-[#1f1f1f]">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none flex-nowrap">
+            <span className="text-[13px] font-medium text-[#8c8c8c] whitespace-nowrap mr-1 flex-shrink-0">Agrupar por:</span>
             {[
               { id: '', label: 'Todos' },
               { id: 'client', label: 'Clientes' },
@@ -478,7 +476,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 <button
                   key={f.id}
                   onClick={() => setRoleFilter(f.id)}
-                  className={`px-3 h-[28px] rounded-full text-[13px] font-medium transition cursor-pointer ${
+                  className={`px-3 h-[28px] rounded-full text-[13px] font-medium transition cursor-pointer whitespace-nowrap flex-shrink-0 ${
                     isSelected
                       ? 'bg-[#323232] text-[#ffffff] border border-[#555555]'
                       : 'bg-[#191919] text-[#8c8c8c] border border-transparent hover:bg-[#252525] hover:text-[#d4d4d4]'
@@ -491,9 +489,9 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           </div>
 
           {/* BUSCADOR OSCURO CON DROPDOWN */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             {activeConsoleTab === 'users' && (
-              <div className="relative flex-1 sm:w-64">
+              <div className="relative w-full sm:w-64">
                 <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-[#8c8c8c]" />
                 <input
                   type="text"
@@ -501,7 +499,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   onChange={(e) => setSearchUser(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && cargarDatos()}
                   placeholder="Filtrar usuarios..."
-                  className="w-full pl-8 pr-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[12px] text-[14px] text-[#d4d4d4] focus:outline-none focus:border-[#87a9ff] transition"
+                  className="w-full pl-8 pr-3 h-[32px] bg-[#191919] border border-[#262626] rounded-[12px] text-[13px] text-[#d4d4d4] focus:outline-none focus:border-[#87a9ff] transition"
                 />
               </div>
             )}
