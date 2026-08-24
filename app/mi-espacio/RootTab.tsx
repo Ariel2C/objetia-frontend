@@ -257,7 +257,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
         <div className="flex items-center justify-between pb-2">
           <div className="flex items-center gap-2 cursor-pointer group">
             <span className="font-semibold text-[15px] tracking-tight text-white group-hover:text-blue-400 transition">
-              Objetia AI Studio
+              Objetia
             </span>
             <ChevronDown className="h-4 w-4 text-[#8c8c8c]" />
           </div>
@@ -270,10 +270,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           </button>
         </div>
 
-        {/* NAVEGACIÓN - GRUPO 1: PROYECTO & USUARIOS */}
+        {/* NAVEGACIÓN - GRUPO 1: SISTEMA */}
         <div className="space-y-1">
           <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5">
-            PROYECTO
+            SISTEMA
           </p>
           <button
             onClick={() => { setActiveConsoleTab('users'); setMenuMovilAbierto(false); }}
@@ -286,24 +286,12 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             <Users className="h-4 w-4 text-current flex-shrink-0" />
             <span>Control de Usuarios</span>
           </button>
-
-          <button
-            onClick={() => { setActiveConsoleTab('keys'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
-              activeConsoleTab === 'keys' 
-                ? 'bg-[#2a2a2a] text-[#ffffff]' 
-                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-            }`}
-          >
-            <Key className="h-4 w-4 text-current flex-shrink-0" />
-            <span>Claves de API</span>
-          </button>
         </div>
 
-        {/* NAVEGACIÓN - GRUPO 2: USO & FACTURACIÓN */}
+        {/* NAVEGACIÓN - GRUPO 2: OBSERVAR */}
         <div className="space-y-1">
           <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5">
-            USO Y FACTURACIÓN
+            OBSERVAR
           </p>
           <button
             onClick={() => { setActiveConsoleTab('sessions'); setMenuMovilAbierto(false); }}
@@ -316,13 +304,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             <Activity className="h-4 w-4 text-current flex-shrink-0" />
             <span>Monitor de Sesiones</span>
           </button>
-        </div>
 
-        {/* NAVEGACIÓN - GRUPO 3: OBSERVAR */}
-        <div className="space-y-1">
-          <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5">
-            OBSERVAR
-          </p>
           <button
             onClick={() => { setActiveConsoleTab('logs'); setMenuMovilAbierto(false); }}
             className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
