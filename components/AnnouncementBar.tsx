@@ -1,27 +1,17 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { X, Zap } from 'lucide-react';
 
 export default function AnnouncementBar() {
   const pathname = usePathname();
-  const [isRootTab, setIsRootTab] = useState(false);
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab');
+
+  const isRootTab = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && tab === 'root');
   const [visible, setVisible] = useState(false);
   const [mensajeState, setMensajeState] = useState("");
   const [finISOState, setFinISOState] = useState<string | null>(null);
-
-  useEffect(() => {
-    const checkRoot = () => {
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        const isRoot = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && params.get('tab') === 'root');
-        setIsRootTab(isRoot);
-      }
-    };
-    checkRoot();
-    const interval = setInterval(checkRoot, 300);
-    return () => clearInterval(interval);
-  }, [pathname]);
 
   const syncCampaignData = (campana: any) => {
     if (campana && campana.activa && campana.mostrarBarraAnuncios !== false) {

@@ -1,4 +1,4 @@
-// app/layout.tsx
+import React, { Suspense } from 'react';
 import './globals.css';
 import { Inter } from 'next/font/google';
 import Navbar from '../components/Navbar';
@@ -127,13 +127,17 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <AuthProvider>
           <FavoritesProvider>
             <ToastProvider>
-              <AnnouncementBar />
-              <Navbar logoUrl={brandingDB.logo_url} />
+              <Suspense fallback={null}>
+                <AnnouncementBar />
+                <Navbar logoUrl={brandingDB.logo_url} />
+              </Suspense>
               <PromoModal />
               {/* Visor de errores solo para desarrollo: no exponer detalles internos en producción */}
               {process.env.NODE_ENV === 'development' && <ErrorVisualizer />}
               <main className="pb-20 md:pb-0">{children}</main>
-              <Footer />
+              <Suspense fallback={null}>
+                <Footer />
+              </Suspense>
             </ToastProvider>
           </FavoritesProvider>
         </AuthProvider>

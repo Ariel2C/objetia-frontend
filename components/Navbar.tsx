@@ -2,7 +2,7 @@
 "use client";
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { 
   ShoppingCart, 
   MessageSquare, 
@@ -27,24 +27,14 @@ export default function Navbar({ logoUrl }: NavbarProps) {
   const { usuario, logout, token, cargando } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab');
 
-  const [isRootTab, setIsRootTab] = useState(false);
+  const isRootTab = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && tab === 'root');
+
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [notifAbierto, setNotifAbierto] = useState(false);
   const [descubrirAbierto, setDescubrirAbierto] = useState(false);
-
-  useEffect(() => {
-    const checkRoot = () => {
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        const isRoot = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && params.get('tab') === 'root');
-        setIsRootTab(isRoot);
-      }
-    };
-    checkRoot();
-    const interval = setInterval(checkRoot, 300);
-    return () => clearInterval(interval);
-  }, [pathname]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
   const [favoritosCount, setFavoritosCount] = useState(0);

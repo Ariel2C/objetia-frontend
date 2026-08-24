@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { 
   ShieldCheck, 
@@ -18,20 +18,10 @@ import {
 
 export default function Footer() {
   const pathname = usePathname();
-  const [isRootTab, setIsRootTab] = useState(false);
+  const searchParams = useSearchParams();
+  const tab = searchParams.get('tab');
 
-  useEffect(() => {
-    const checkRoot = () => {
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        const isRoot = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && params.get('tab') === 'root');
-        setIsRootTab(isRoot);
-      }
-    };
-    checkRoot();
-    const interval = setInterval(checkRoot, 300);
-    return () => clearInterval(interval);
-  }, [pathname]);
+  const isRootTab = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && tab === 'root');
 
   if (isRootTab) return null;
   return (
