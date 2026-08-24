@@ -817,14 +817,23 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
         </header>
 
         {/* BARRA SECUNDARIA DE ACCIONES (Control de Rangos) */}
-        {activeConsoleTab === 'roles' && modoVistaRango === 'lista' && (
+        {activeConsoleTab === 'roles' && (
           <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-row justify-start items-center gap-2.5 bg-[#1f1f1f]">
-            <button
-              onClick={() => abrirFormularioRango('crear')}
-              className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer whitespace-nowrap font-sans"
-            >
-              Nuevo Rango
-            </button>
+            {modoVistaRango === 'lista' ? (
+              <button
+                onClick={() => abrirFormularioRango('crear')}
+                className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer whitespace-nowrap font-sans"
+              >
+                Nuevo Rango
+              </button>
+            ) : (
+              <button
+                onClick={() => setModoVistaRango('lista')}
+                className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer whitespace-nowrap font-sans"
+              >
+                Volver al listado de rangos
+              </button>
+            )}
           </div>
         )}
 
@@ -1127,15 +1136,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 /* VISTA PÁGINA DE FORMULARIO DE CREACIÓN / EDICIÓN (SIN MODAL) */
                 <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-6 space-y-5 font-sans">
                   {/* ENCABEZADO FORMULARIO */}
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-3 border-b border-[#262626]">
-                    <button
-                      type="button"
-                      onClick={() => setModoVistaRango('lista')}
-                      className="px-3 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:text-white hover:bg-[#323232] rounded-[8px] text-xs font-medium transition cursor-pointer flex items-center gap-1.5 font-sans"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                      <span>Volver al Listado de Rangos</span>
-                    </button>
+                  <div className="pb-3 border-b border-[#262626]">
                     <h2 className="text-base font-bold text-white">
                       {rangoForm.dbId ? `Editar Rango: ${rangoForm.name}` : 'Crear Nuevo Rango'}
                     </h2>
