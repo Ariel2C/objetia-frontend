@@ -563,32 +563,32 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
               {/* VISTA ESCRITORIO CON TABLA OSCURA (DevTools CSS Mat-Table) */}
               <div className="hidden lg:block bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden">
-                <table className="w-full text-left text-[13px] leading-[18px] text-[#d4d4d4]">
+                <table className="w-full text-left text-[14px] leading-[20px] text-[#d4d4d4]">
                   <thead>
-                    <tr className="bg-[#1f1f1f] border-b border-[#262626] text-[#8c8c8c] font-medium text-[13px] leading-[18px]">
-                      <th className="px-4 py-2.5 font-medium text-left">Usuario</th>
-                      <th className="px-4 py-2.5 font-medium text-left">Email</th>
-                      <th className="px-4 py-2.5 font-medium text-left">Rol / Jerarquía</th>
-                      <th className="px-4 py-2.5 font-medium text-left">Fecha Creación</th>
-                      <th className="px-4 py-2.5 font-medium text-left">Rango & Acciones</th>
+                    <tr className="bg-[#1f1f1f] border-b border-[#262626] text-[#8c8c8c] font-medium text-[14px] leading-[21px]">
+                      <th className="px-4 py-3 font-medium text-left">Usuario</th>
+                      <th className="px-4 py-3 font-medium text-left">Email</th>
+                      <th className="px-4 py-3 font-medium text-left">Rol / Jerarquía</th>
+                      <th className="px-4 py-3 font-medium text-left">Fecha Creación</th>
+                      <th className="px-4 py-3 font-medium text-left">Rango & Acciones</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#262626]">
                     {usersList.map((u) => (
                       <tr key={u.id} className="hover:bg-[#252525] transition-colors">
-                        <td className="px-4 py-2.5 font-medium text-[#d4d4d4] flex items-center gap-2">
+                        <td className="px-4 py-3 font-medium text-[#d4d4d4] flex items-center gap-2">
                           {u.avatar_url ? (
-                            <img src={u.avatar_url} alt="" className="h-6 w-6 rounded-full object-cover border border-[#87a9ff]/40" />
+                            <img src={u.avatar_url} alt="" className="h-7 w-7 rounded-full object-cover border border-[#87a9ff]/40" />
                           ) : (
-                            <div className="h-6 w-6 rounded-full bg-[#2a2a2a] text-[#87a9ff] font-medium flex items-center justify-center text-[11px]">
+                            <div className="h-7 w-7 rounded-full bg-[#2a2a2a] text-[#87a9ff] font-medium flex items-center justify-center text-[12px]">
                               {u.full_name?.charAt(0).toUpperCase() || 'U'}
                             </div>
                           )}
-                          <span className="text-[#87a9ff] font-medium hover:underline cursor-pointer text-[13px]">{u.full_name}</span>
+                          <span className="text-[#87a9ff] font-medium hover:underline cursor-pointer text-[14px]">{u.full_name}</span>
                         </td>
-                        <td className="px-4 py-2.5 text-[#d4d4d4] font-mono text-[12px]">{u.email}</td>
-                        <td className="px-4 py-2.5">
-                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium uppercase ${
+                        <td className="px-4 py-3 text-[#d4d4d4] font-mono text-[13px]">{u.email}</td>
+                        <td className="px-4 py-3">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-medium uppercase ${
                             u.role === 'root' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' :
                             u.role === 'admin' ? 'bg-purple-500/20 text-purple-300 border border-purple-500/40' :
                             'bg-[#2a2a2a] text-[#d4d4d4] border border-[#333333]'
@@ -596,8 +596,8 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                             {u.role}
                           </span>
                         </td>
-                        <td className="px-4 py-2.5 text-[#8c8c8c] font-mono text-[12px]">{new Date(u.created_at).toLocaleDateString()}</td>
-                        <td className="px-4 py-2.5 text-left">
+                        <td className="px-4 py-3 text-[#8c8c8c] font-mono text-[13px]">{new Date(u.created_at).toLocaleDateString()}</td>
+                        <td className="px-4 py-3 text-left">
                           <div className="inline-flex items-center gap-2">
                             <CustomSelect
                               value={u.role}
@@ -617,7 +617,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                                 className="p-1.5 text-red-400 hover:bg-red-500/20 rounded-[8px] transition"
                                 title="Eliminar usuario"
                               >
-                                <Trash2 className="h-3.5 w-3.5" />
+                                <Trash2 className="h-4 w-4" />
                               </button>
                             )}
                           </div>
