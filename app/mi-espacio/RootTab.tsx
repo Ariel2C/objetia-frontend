@@ -6,7 +6,7 @@ import { getApiUrl } from '../../lib/config';
 import { 
   Menu, X, Key, Users, Activity, FileText, Search, Trash2, 
   RefreshCw, ShieldAlert, CheckCircle2, XCircle, Crown, Shield, 
-  Sliders, Database, Terminal, ChevronDown, Bell, Settings, Copy, 
+  Sliders, Database, Terminal, ChevronDown, ChevronLeft, Bell, Settings, Copy, 
   ExternalLink, Layers, ArrowUpRight, Lock, Eye
 } from 'lucide-react';
 
@@ -43,7 +43,11 @@ interface LogData {
   created_at: string;
 }
 
-export default function RootTab() {
+interface RootTabProps {
+  onVolverAMiEspacio?: () => void;
+}
+
+export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   const { usuario, token } = useAuth();
   const toast = useToast();
 
@@ -327,6 +331,16 @@ export default function RootTab() {
 
           {/* ACCIONES CABECERA */}
           <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+            {onVolverAMiEspacio && (
+              <button
+                onClick={onVolverAMiEspacio}
+                className="px-3 py-2 bg-[#22222a] border border-blue-500/40 text-blue-400 hover:text-white hover:bg-blue-600/20 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                <span>Volver a Mi Espacio</span>
+              </button>
+            )}
+
             <button
               onClick={cargarDatos}
               disabled={cargando}
