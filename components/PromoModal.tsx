@@ -1,27 +1,32 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { X, Gift, Sparkles, ArrowRight, Tag } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
 export default function PromoModal() {
   const [abierto, setAbierto] = useState(false);
   const { usuario } = useAuth();
+  const pathname = usePathname();
 
   useEffect(() => {
-    // Si el usuario ya inició sesión, no mostrar
-    if (usuario) return;
+    // El cartel de bienvenida SOLO debe aparecer en la página de inicio (Home '/')
+    if (pathname !== '/' || usuario) {
+      setAbierto(false);
+      return;
+    }
     const timer = setTimeout(() => {
       setAbierto(true);
     }, 1200);
     return () => clearTimeout(timer);
-  }, [usuario]);
+  }, [usuario, pathname]);
 
   const cerrarModal = () => {
     setAbierto(false);
   };
 
-  if (!abierto || usuario) return null;
+  if (!abierto || usuario || pathname !== '/') return null;
 
   return (
     <div 
