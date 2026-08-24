@@ -12,13 +12,16 @@ import {
   ShoppingBag,
   TrendingUp,
   Package,
-  LayoutGrid
+  LayoutGrid,
+  Terminal,
+  Crown
 } from 'lucide-react';
 
 interface SidebarProps {
   tabActual: string;
   setTabActual: (tab: string) => void;
   esAdmin: boolean;
+  esRoot?: boolean;
   logout: () => void;
 }
 
@@ -27,13 +30,21 @@ interface TabItem {
   label: string;
   icon: React.ElementType;
   soloAdmin?: boolean;
+  soloRoot?: boolean;
 }
 
-const GRUPOS: { titulo: string; soloAdmin?: boolean; items: TabItem[] }[] = [
+const GRUPOS: { titulo: string; soloAdmin?: boolean; soloRoot?: boolean; items: TabItem[] }[] = [
   {
     titulo: "Navegación",
     items: [
       { id: "menu", label: "Menú de Tarjetas", icon: LayoutGrid },
+    ],
+  },
+  {
+    titulo: "Programador Root",
+    soloRoot: true,
+    items: [
+      { id: "root", label: "Panel Programador", icon: Terminal },
     ],
   },
   {
@@ -58,8 +69,12 @@ const GRUPOS: { titulo: string; soloAdmin?: boolean; items: TabItem[] }[] = [
   },
 ];
 
-export default function Sidebar({ tabActual, setTabActual, esAdmin, logout }: SidebarProps) {
-  const gruposVisibles = GRUPOS.filter(g => !g.soloAdmin || esAdmin);
+export default function Sidebar({ tabActual, setTabActual, esAdmin, esRoot, logout }: SidebarProps) {
+  const gruposVisibles = GRUPOS.filter(g => {
+    if (g.soloRoot) return esRoot;
+    if (g.soloAdmin) return esAdmin;
+    return true;
+  });
   const todosLosItems = gruposVisibles.flatMap(g => g.items);
 
   const cambiarTab = (id: string) => {

@@ -15,7 +15,9 @@ import {
   MessageSquare,
   Heart,
   Calendar,
-  ShieldAlert
+  ShieldAlert,
+  Terminal,
+  Crown
 } from 'lucide-react';
 
 interface CardItem {
@@ -31,11 +33,12 @@ interface MenuCardsProps {
   tabActual: string;
   setTabActual: (tab: string) => void;
   esAdmin: boolean;
+  esRoot?: boolean;
   onSelectCard?: (tabId: string) => void;
   logout?: () => void;
 }
 
-export default function MenuCards({ tabActual, setTabActual, esAdmin, onSelectCard }: MenuCardsProps) {
+export default function MenuCards({ tabActual, setTabActual, esAdmin, esRoot, onSelectCard }: MenuCardsProps) {
   const router = useRouter();
 
   // Tarjetas para Administradores
@@ -43,6 +46,12 @@ export default function MenuCards({ tabActual, setTabActual, esAdmin, onSelectCa
     {
       titulo: "Administración",
       items: [
+        ...(esRoot ? [{
+          id: "root",
+          label: "Panel Programador",
+          icon: Terminal,
+          iconColor: "text-amber-500 font-extrabold"
+        }] : []),
         {
           id: "dashboard",
           label: "Panel de control",

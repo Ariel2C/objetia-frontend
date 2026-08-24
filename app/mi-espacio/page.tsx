@@ -19,10 +19,11 @@ import SalesTab from './SalesTab';
 import PublicationsTab from './PublicationsTab';
 import CampaignsTab from './CampaignsTab';
 import ModerationTab from './ModerationTab';
+import RootTab from './RootTab';
 
 const TABS_VALIDOS = new Set([
   "menu", "dashboard", "appearance", "campanas", "secciones", "banners",
-  "billetera", "perfil", "purchases", "sales", "publications", "moderation"
+  "billetera", "perfil", "purchases", "sales", "publications", "moderation", "root"
 ]);
 
 export default function MiEspacioPage() {
@@ -647,7 +648,8 @@ function MiEspacioContent() {
     );
   }
 
-  const esAdmin = usuario && (usuario.role?.toLowerCase() === "admin" || usuario.email?.toLowerCase() === "admin@vamaar.com");
+  const esAdmin = usuario && (usuario.role?.toLowerCase() === "admin" || usuario.email?.toLowerCase() === "admin@vamaar.com" || usuario.role?.toLowerCase() === "root");
+  const esRoot = usuario && (usuario.role?.toLowerCase() === "root" || usuario.role === "ROOT");
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-10 animate-fade-in font-sans text-gray-800 antialiased">
@@ -688,6 +690,7 @@ function MiEspacioContent() {
               tabActual={tabActual} 
               setTabActual={setTabActual} 
               esAdmin={esAdmin} 
+              esRoot={esRoot}
               logout={logout}
             />
           </div>
@@ -849,6 +852,11 @@ function MiEspacioContent() {
           <ModerationTab 
             token={token || ""}
           />
+        )}
+
+        {/* TAB: PANEL DE PROGRAMADOR ROOT (TEMA GOOGLE AI STUDIO) */}
+        {tabActual === "root" && (
+          <RootTab />
         )}
 
       </main>
