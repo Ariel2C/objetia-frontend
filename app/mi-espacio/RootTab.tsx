@@ -523,6 +523,10 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   };
 
   const cambiarRol = async (userId: number, nuevoRol: string) => {
+    if (usuario && usuario.id === userId) {
+      toast.warning("No podés modificar el rango de tu propia cuenta ROOT activa.");
+      return;
+    }
     try {
       const res = await fetch(`${getApiUrl()}/root/users/${userId}/role`, {
         method: 'PATCH',
@@ -532,9 +536,14 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
         },
         body: JSON.stringify({ role: nuevoRol })
       });
+      if (res.status === 401) {
+        toast.warning("Tu sesión de administrador ha expirado. Inicia sesión nuevamente.");
+        window.dispatchEvent(new Event("vamaar:unauthorized"));
+        return;
+      }
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Error al modificar rol.");
-      toast.success(data.message, "¡Rol actualizado!");
+      toast.success(data.mensaje || data.message || "¡Rol actualizado!", "Éxito");
       cargarDatos();
     } catch (err: any) {
       toast.error(err.message || "Error al cambiar rol.");
