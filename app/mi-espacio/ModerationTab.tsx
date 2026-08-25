@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { getApiUrl } from "../../lib/config";
 import { useToast } from "../../components/ToastContext";
+import { useAuth } from "../../components/AuthContext";
 import FormattedPrice from "../../components/FormattedPrice";
 
 interface ModerationItem {
@@ -26,10 +27,13 @@ interface ModerationItem {
 }
 
 interface ModerationTabProps {
-  token: string;
+  token?: string;
 }
 
 export default function ModerationTab({ token }: ModerationTabProps) {
+  const { token: contextToken } = useAuth();
+  const activeToken = token || contextToken || (typeof window !== "undefined" ? localStorage.getItem("token") : "") || "";
+
   const [productos, setProductos] = useState<ModerationItem[]>([]);
   const [cargando, setCargando] = useState(true);
   const [procesandoId, setProcesandoId] = useState<number | null>(null);
@@ -38,11 +42,12 @@ export default function ModerationTab({ token }: ModerationTabProps) {
   const toast = useToast();
 
   const cargarProductos = async () => {
+    if (!activeToken) return;
     setCargando(true);
     try {
       const res = await fetch(`${getApiUrl()}/products/admin/moderation/`, {
         headers: {
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${activeToken}`
         }
       });
       if (!res.ok) throw new Error("Error al obtener productos de moderación");
@@ -57,17 +62,18 @@ export default function ModerationTab({ token }: ModerationTabProps) {
   };
 
   useEffect(() => {
-    if (token) cargarProductos();
-  }, [token]);
+    if (activeToken) cargarProductos();
+  }, [activeToken]);
 
   const handleAccion = async (id: number, action: "approve" | "reject") => {
+    if (!activeToken) return;
     setProcesandoId(id);
     try {
       const res = await fetch(`${getApiUrl()}/products/admin/moderation/${id}/action`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`
+          Authorization: `Bearer ${activeToken}`
         },
         body: JSON.stringify({ action })
       });
