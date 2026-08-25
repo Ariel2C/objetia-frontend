@@ -69,12 +69,28 @@ const GRUPOS: { titulo: string; soloAdmin?: boolean; soloRoot?: boolean; items: 
   },
 ];
 
+import { useAuth } from '../../components/AuthContext';
+
 export default function Sidebar({ tabActual, setTabActual, esAdmin, esRoot, logout }: SidebarProps) {
+  const { tienePermiso } = useAuth();
+
   const gruposVisibles = GRUPOS.filter(g => {
-    if (g.soloRoot) return esRoot;
-    if (g.soloAdmin) return esAdmin;
+    if (g.soloRoot) return esRoot || tienePermiso('manage_roles') || tienePermiso('full_access');
+    if (g.soloAdmin) return esAdmin || tienePermiso('full_access');
     return true;
-  });
+  }).map(g => ({
+    ...g,
+    items: g.items.filter(item => {
+      if (item.id === 'root') return esRoot || tienePermiso('manage_roles') || tienePermiso('manage_users');
+      if (item.id === 'dashboard') return esAdmin || tienePermiso('full_access') || tienePermiso('manage_roles');
+      if (item.id === 'appearance' || item.id === 'secciones') return esAdmin || tienePermiso('manage_branding') || tienePermiso('full_access');
+      if (item.id === 'banners') return esAdmin || tienePermiso('manage_banners') || tienePermiso('full_access');
+      if (item.id === 'billetera') return tienePermiso('wallet_access') || tienePermiso('full_access') || true;
+      if (item.id === 'publications' || item.id === 'sales') return tienePermiso('sell_products') || tienePermiso('full_access') || true;
+      if (item.id === 'purchases') return tienePermiso('buy_products') || tienePermiso('full_access') || true;
+      return true;
+    })
+  }));
   const todosLosItems = gruposVisibles.flatMap(g => g.items);
 
   const cambiarTab = (id: string) => {

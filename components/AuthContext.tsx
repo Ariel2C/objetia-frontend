@@ -8,6 +8,7 @@ interface Usuario {
   full_name: string;
   avatar_url?: string;
   role: string;
+  permissions?: string[];
 }
 
 interface AuthContextType {
@@ -16,6 +17,7 @@ interface AuthContextType {
   login: (token: string, datosUsuario: Usuario) => void;
   logout: () => void;
   cargando: boolean;
+  tienePermiso: (codigoPermiso: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -134,6 +136,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("vamaar_user", JSON.stringify(datosUsuario));
   };
 
+  const tienePermiso = (codigoPermiso: string): boolean => {
+    if (!usuario) return false;
+    const userRoleClean = usuario.role?.toLowerCase() || '';
+    if (userRoleClean === 'root') return true;
+
+    const perms = usuario.permissions || [];
+    if (perms.includes('full_access')) return true;
+    return perms.includes(codigoPermiso.toLowerCase());
+  };
+
   const logout = () => {
     setToken(null);
     setUsuario(null);
@@ -143,7 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ usuario, token, login, logout, cargando }}>
+    <AuthContext.Provider value={{ usuario, token, login, logout, cargando, tienePermiso }}>
       {children}
     </AuthContext.Provider>
   );

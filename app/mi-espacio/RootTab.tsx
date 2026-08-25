@@ -135,7 +135,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   const { usuario, token } = useAuth();
   const toast = useToast();
 
-  const [activeConsoleTab, setActiveConsoleTab] = useState<'users' | 'roles' | 'sessions' | 'logs' | 'keys'>('users');
+  const [activeConsoleTab, setActiveConsoleTab] = useState<'users' | 'roles' | 'permissions' | 'sessions' | 'logs' | 'keys'>('users');
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   const [sidebarOculto, setSidebarOculto] = useState(false);
   const [cargando, setCargando] = useState(true);
@@ -222,6 +222,120 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     level: 10,
     selectedPermissionIds: []
   });
+
+  const [modoVistaPermiso, setModoVistaPermiso] = useState<'lista' | 'formulario'>('lista');
+  const [modalEliminarPermiso, setModalEliminarPermiso] = useState<PermissionItem | null>(null);
+  const [permisoForm, setPermisoForm] = useState<{
+    dbId?: number;
+    code: string;
+    name: string;
+    category: string;
+    description: string;
+  }>({
+    code: '',
+    name: '',
+    category: 'Sistema',
+    description: ''
+  });
+
+  const abrirFormularioPermiso = (modo: 'crear' | 'editar', permiso?: PermissionItem) => {
+    if (modo === 'editar' && permiso) {
+      setPermisoForm({
+        dbId: permiso.id,
+        code: permiso.code,
+        name: permiso.name,
+        category: permiso.category || 'Sistema',
+        description: permiso.description || ''
+      });
+    } else {
+      setPermisoForm({
+        code: '',
+        name: '',
+        category: 'Sistema',
+        description: ''
+      });
+    }
+    setModoVistaPermiso('formulario');
+  };
+
+  const guardarPermisoForm = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!permisoForm.name.trim()) {
+      toast.error("Ingresa el nombre del permiso.");
+      return;
+    }
+    const codeClean = permisoForm.dbId ? permisoForm.code : permisoForm.name.toLowerCase().trim().replace(/\s+/g, '_');
+
+    try {
+      if (!permisoForm.dbId) {
+        // Crear nuevo permiso
+        const res = await fetch(`${getApiUrl()}/root/permissions`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            code: codeClean,
+            name: permisoForm.name.trim(),
+            category: permisoForm.category.trim() || 'Sistema',
+            description: permisoForm.description.trim()
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          toast.success(`Permiso '${permisoForm.name}' creado exitosamente.`);
+          setModoVistaPermiso('lista');
+          cargarDatos();
+        } else {
+          toast.error(data.detail || "Error al crear el permiso.");
+        }
+      } else {
+        // Editar permiso existente
+        const res = await fetch(`${getApiUrl()}/root/permissions/${permisoForm.dbId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            code: permisoForm.code,
+            name: permisoForm.name.trim(),
+            category: permisoForm.category.trim() || 'Sistema',
+            description: permisoForm.description.trim()
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          toast.success(`Permiso '${permisoForm.name}' actualizado.`);
+          setModoVistaPermiso('lista');
+          cargarDatos();
+        } else {
+          toast.error(data.detail || "Error al actualizar el permiso.");
+        }
+      }
+    } catch {
+      toast.error("No pudimos conectar con el servidor.");
+    }
+  };
+
+  const confirmarEliminarPermiso = async () => {
+    if (!modalEliminarPermiso) return;
+    const { id: permId, name: permName } = modalEliminarPermiso;
+    setModalEliminarPermiso(null);
+    try {
+      const res = await fetch(`${getApiUrl()}/root/permissions/${permId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Error al eliminar permiso.");
+      toast.success(data.mensaje || `Permiso '${permName}' eliminado.`, "Éxito");
+      cargarDatos();
+    } catch (err: any) {
+      toast.error(err.message || "Error al eliminar el permiso.");
+    }
+  };
 
   const [sessionsList, setSessionsList] = useState<SessionData[]>([]);
   const [sessionFilter, setSessionFilter] = useState<'todas' | 'activas' | 'revocadas'>('todas');
@@ -812,6 +926,11 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   ? (rangoForm.dbId ? `Editar Rango: ${rangoForm.name}` : "Crear Nuevo Rango")
                   : "Control de Rangos"
               )}
+              {activeConsoleTab === 'permissions' && (
+                modoVistaPermiso === 'formulario'
+                  ? (permisoForm.dbId ? `Editar Permiso: ${permisoForm.name}` : "Crear Nuevo Permiso")
+                  : "Control de Permisos"
+              )}
               {activeConsoleTab === 'sessions' && "Monitor de Sesiones"}
               {activeConsoleTab === 'logs' && "Logs de Auditoría"}
               {activeConsoleTab === 'keys' && "Claves de API"}
@@ -884,6 +1003,48 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                     className="px-3 sm:px-4 h-[28px] sm:h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#454d63] transition cursor-pointer whitespace-nowrap font-sans shadow-xs"
                   >
                     {rangoForm.dbId ? 'Guardar Cambios' : 'Crear Rango'}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* BARRA SECUNDARIA DE ACCIONES (Control de Permisos) */}
+        {activeConsoleTab === 'permissions' && (
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-row justify-between items-center gap-2.5 bg-[#1f1f1f]">
+            {modoVistaPermiso === 'lista' ? (
+              <button
+                onClick={() => abrirFormularioPermiso('crear')}
+                className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer whitespace-nowrap font-sans"
+              >
+                Nuevo Permiso
+              </button>
+            ) : (
+              <div className="flex items-center justify-between w-full gap-2">
+                <button
+                  type="button"
+                  onClick={() => setModoVistaPermiso('lista')}
+                  className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer flex items-center gap-1 whitespace-nowrap font-sans"
+                >
+                  <ChevronLeft className="h-3.5 w-3.5 flex-shrink-0" />
+                  <span>Volver al listado de permisos</span>
+                </button>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setModoVistaPermiso('lista')}
+                    className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer whitespace-nowrap font-sans"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    form="permiso-form-element"
+                    className="px-3 sm:px-4 h-[28px] sm:h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#454d63] transition cursor-pointer whitespace-nowrap font-sans shadow-xs"
+                  >
+                    {permisoForm.dbId ? 'Guardar Cambios' : 'Crear Permiso'}
                   </button>
                 </div>
               </div>
@@ -1297,6 +1458,102 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           )}
 
           {/* ============================================================================== */}
+          {/* TAB 1.3: CONTROL DE PERMISOS */}
+          {/* ============================================================================== */}
+          {activeConsoleTab === 'permissions' && (
+            <div className="space-y-4">
+              {modoVistaPermiso === 'lista' ? (
+                <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-5 space-y-4 font-sans">
+                  <div className="flex items-center justify-between border-b border-[#262626] pb-3">
+                    <h2 className="text-sm font-bold text-[#87a9ff] uppercase tracking-wider">Catálogo de Permisos Registrados ({allPermissions.length})</h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {allPermissions.map((perm) => {
+                      const esBase = ["full_access", "manage_roles", "manage_users", "view_audit_logs", "manage_sessions"].includes(perm.code.toLowerCase());
+                      return (
+                        <div key={perm.id} className="p-3.5 bg-[#191919] border border-[#262626] rounded-[10px] space-y-2 font-sans flex flex-col justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#87a9ff] border border-[#333333] text-[10px] font-medium uppercase tracking-wider">
+                                {perm.category || "Sistema"}
+                              </span>
+                              <span className="text-[10px] text-[#666666] font-mono">{perm.code}</span>
+                            </div>
+                            <h3 className="text-xs font-bold text-white pt-1">{perm.name}</h3>
+                            <p className="text-[11px] text-[#8c8c8c] leading-tight">{perm.description || "Sin descripción asignada."}</p>
+                          </div>
+
+                          <div className="pt-2 border-t border-[#262626] flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => abrirFormularioPermiso('editar', perm)}
+                              className="px-2.5 h-[26px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white rounded-[6px] text-[11px] font-medium transition cursor-pointer font-sans"
+                            >
+                              Editar
+                            </button>
+                            <button
+                              disabled={esBase}
+                              onClick={() => setModalEliminarPermiso(perm)}
+                              className="px-2.5 h-[26px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed rounded-[6px] text-[11px] font-medium transition cursor-pointer font-sans"
+                              title={esBase ? "Permiso base del sistema no eliminable" : "Eliminar permiso"}
+                            >
+                              Eliminar
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                /* FORMULARIO CREAR / EDITAR PERMISO */
+                <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-6 space-y-5 font-sans">
+                  <form id="permiso-form-element" onSubmit={guardarPermisoForm} className="space-y-4 text-xs font-sans">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-[#8c8c8c] mb-1 font-medium">Nombre del Permiso</label>
+                        <input
+                          type="text"
+                          required
+                          value={permisoForm.name}
+                          onChange={(e) => setPermisoForm(f => ({ ...f, name: e.target.value }))}
+                          placeholder="Ej: Gestionar Envíos"
+                          style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
+                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[#8c8c8c] mb-1 font-medium">Categoría (Ej: CMS, Sistema, Operaciones)</label>
+                        <input
+                          type="text"
+                          value={permisoForm.category}
+                          onChange={(e) => setPermisoForm(f => ({ ...f, category: e.target.value }))}
+                          placeholder="Ej: Operaciones"
+                          style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
+                          className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[#8c8c8c] mb-1 font-medium">Descripción Explicativa</label>
+                      <textarea
+                        rows={3}
+                        value={permisoForm.description}
+                        onChange={(e) => setPermisoForm(f => ({ ...f, description: e.target.value }))}
+                        placeholder="Explicación detallada de la función que habilita este permiso..."
+                        style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
+                        className="w-full p-2.5 bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
+                      />
+                    </div>
+                  </form>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ============================================================================== */}
           {/* TAB 2: MONITOR DE SESIONES */}
           {/* ============================================================================== */}
           {activeConsoleTab === 'sessions' && (
@@ -1529,6 +1786,42 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
               </button>
               <button
                 onClick={() => eliminarRango(modalEliminarRango)}
+                className="px-4 h-[32px] bg-red-600/20 border border-red-500/40 text-red-300 hover:bg-red-600/30 rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
+              >
+                Confirmar Eliminación
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL ELIMINAR PERMISO */}
+      {modalEliminarPermiso && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs font-sans">
+          <div className="bg-[#1f1f1f] border border-[#262626] rounded-[16px] p-6 max-w-sm w-full space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#262626] pb-3">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <ShieldAlert className="h-4.5 w-4.5 text-red-400" />
+                <span>Confirmar Eliminación de Permiso</span>
+              </h3>
+              <button onClick={() => setModalEliminarPermiso(null)} className="text-[#8c8c8c] hover:text-white transition cursor-pointer">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <p className="text-xs text-[#d4d4d4] leading-relaxed">
+              ¿Estás seguro de que deseas eliminar el permiso <span className="font-bold text-white">{modalEliminarPermiso.name}</span>? Se desvinculará automáticamente de todos los rangos activos.
+            </p>
+
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#262626]">
+              <button
+                onClick={() => setModalEliminarPermiso(null)}
+                className="px-3.5 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={confirmarEliminarPermiso}
                 className="px-4 h-[32px] bg-red-600/20 border border-red-500/40 text-red-300 hover:bg-red-600/30 rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
               >
                 Confirmar Eliminación

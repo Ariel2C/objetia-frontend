@@ -38,56 +38,61 @@ interface MenuCardsProps {
   logout?: () => void;
 }
 
+import { useAuth } from '../../components/AuthContext';
+
 export default function MenuCards({ tabActual, setTabActual, esAdmin, esRoot, onSelectCard }: MenuCardsProps) {
   const router = useRouter();
+  const { tienePermiso } = useAuth();
+
+  const tieneAccesoAdmin = esAdmin || tienePermiso('manage_roles') || tienePermiso('manage_products') || tienePermiso('manage_banners') || tienePermiso('full_access');
 
   // Tarjetas para Administradores
   const adminCards: { titulo: string; items: CardItem[] }[] = [
     {
       titulo: "Administración",
       items: [
-        ...(esRoot ? [{
+        ...((esRoot || tienePermiso('manage_roles') || tienePermiso('manage_users')) ? [{
           id: "root",
           label: "Panel Programador",
           icon: Terminal,
           iconColor: "text-amber-500 font-extrabold"
         }] : []),
-        {
+        ...(esAdmin || tienePermiso('full_access') ? [{
           id: "dashboard",
           label: "Panel de control",
           icon: LayoutDashboard,
           iconColor: "text-purple-700"
-        },
-        {
+        }] : []),
+        ...(esAdmin || tienePermiso('manage_branding') || tienePermiso('full_access') ? [{
           id: "appearance",
           label: "Apariencia web",
           icon: Palette,
           iconColor: "text-purple-700"
-        },
-        {
+        }] : []),
+        ...(esAdmin || tienePermiso('manage_branding') || tienePermiso('full_access') ? [{
           id: "campanas",
           label: "Campañas y Eventos",
           icon: Calendar,
           iconColor: "text-purple-700"
-        },
-        {
+        }] : []),
+        ...(esAdmin || tienePermiso('manage_branding') || tienePermiso('full_access') ? [{
           id: "secciones",
           label: "Personalización",
           icon: Sliders,
           iconColor: "text-purple-700"
-        },
-        {
+        }] : []),
+        ...(esAdmin || tienePermiso('manage_products') || tienePermiso('full_access') ? [{
           id: "moderation",
           label: "Productos en revisión",
           icon: ShieldAlert,
           iconColor: "text-amber-600"
-        },
-        {
+        }] : []),
+        ...(esAdmin || tienePermiso('manage_banners') || tienePermiso('full_access') ? [{
           id: "banners",
           label: "Banners inicio",
           icon: ImageIcon,
           iconColor: "text-purple-700"
-        },
+        }] : []),
       ]
     },
     {
@@ -198,7 +203,7 @@ export default function MenuCards({ tabActual, setTabActual, esAdmin, esRoot, on
     }
   ];
 
-  const grupos = esAdmin ? adminCards : clientCards;
+  const grupos = (esAdmin || tieneAccesoAdmin) ? adminCards : clientCards;
 
   const handleClick = (item: CardItem) => {
     if (item.isExternalLink && item.href) {
