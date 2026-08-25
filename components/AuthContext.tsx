@@ -141,9 +141,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const userRoleClean = usuario.role?.toLowerCase() || '';
     if (userRoleClean === 'root') return true;
 
-    const perms = usuario.permissions || [];
+    const perms = (usuario.permissions || []).map(p => p.toLowerCase());
     if (perms.includes('full_access')) return true;
-    return perms.includes(codigoPermiso.toLowerCase());
+
+    const target = codigoPermiso.toLowerCase();
+    if (perms.includes(target)) return true;
+
+    // Herencia de grupo Mi Espacio
+    if (['billetera', 'publications', 'purchases', 'sales', 'perfil', 'wallet_access', 'sell_products', 'buy_products'].includes(target)) {
+      if (perms.includes('mi_espacio') || perms.includes('cuenta') || perms.includes('operaciones')) return true;
+    }
+    // Herencia de grupo CMS
+    if (['appearance', 'campanas', 'secciones', 'banners', 'manage_branding', 'manage_banners'].includes(target)) {
+      if (perms.includes('cms') || perms.includes('gestion_de_contenido')) return true;
+    }
+    // Herencia de grupo Administrador
+    if (['dashboard', 'moderation', 'manage_products'].includes(target)) {
+      if (perms.includes('admin_section') || perms.includes('admin')) return true;
+    }
+    // Herencia de grupo Programador
+    if (['users', 'roles', 'permissions', 'sections', 'sessions', 'logs', 'manage_users', 'manage_roles', 'manage_permissions', 'manage_sections', 'manage_sessions', 'view_audit_logs'].includes(target)) {
+      if (perms.includes('system') || perms.includes('programador')) return true;
+    }
+
+    return false;
   };
 
   const logout = () => {
