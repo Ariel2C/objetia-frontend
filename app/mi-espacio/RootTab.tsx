@@ -322,6 +322,15 @@ export default function RootTab({
   const [sidebarOculto, setSidebarOculto] = useState(false);
   const [cargando, setCargando] = useState(true);
 
+  // Bloquear el scroll del body principal mientras la Consola de Administración está abierta
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, []);
+
   interface SectionNode {
     id: number;
     code: string;
