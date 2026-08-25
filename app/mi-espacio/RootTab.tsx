@@ -346,11 +346,7 @@ export default function RootTab({
 
   const [sectionsTree, setSectionsTree] = useState<SectionNode[]>([]);
   const [flatSections, setFlatSections] = useState<{ id: number; code: string; name: string; category: string; parent_code?: string; path?: string }[]>([]);
-  const [expandedSectionCodes, setExpandedSectionCodes] = useState<Record<string, boolean>>({
-    admin_section: true,
-    cms: true,
-    system: true
-  });
+  const [expandedSectionCodes, setExpandedSectionCodes] = useState<Record<string, boolean>>({});
 
   const [modalSeccion, setModalSeccion] = useState<{
     id?: number;
@@ -437,7 +433,7 @@ export default function RootTab({
 
   // Renderizador del Árbol en Control de Secciones (Estilo Explorador con Líneas Guía de Jerarquía)
   const renderSectionNode = (node: SectionNode, depth = 0) => {
-    const isExpanded = expandedSectionCodes[node.code] ?? true;
+    const isExpanded = expandedSectionCodes[node.code] ?? false;
     const hasChildren = node.children && node.children.length > 0;
     const isRootGroup = !node.parent_code;
 
@@ -559,7 +555,7 @@ export default function RootTab({
     const hasChildren = node.children && node.children.length > 0;
     const fullyChecked = hasChildren ? isParentSectionFullyChecked(node) : isChecked;
     const partiallyChecked = hasChildren ? isParentSectionPartiallyChecked(node) : false;
-    const isExpanded = expandedSectionCodes[node.code] ?? true;
+    const isExpanded = expandedSectionCodes[node.code] ?? false;
     const isRootGroup = !node.parent_code;
 
     return (
