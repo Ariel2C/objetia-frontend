@@ -41,7 +41,7 @@ export default function MiEspacioPage() {
 }
 
 function MiEspacioContent() {
-  const { usuario, token, logout, cargando } = useAuth();
+  const { usuario, token, logout, cargando, tienePermiso } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const tabDesdeUrl = searchParams.get("tab");
@@ -814,7 +814,7 @@ function MiEspacioContent() {
         )}
 
         {/* TAB: BILLETERA (CLIENTE COMÚN) */}
-        {tabActual === "billetera" && (
+        {tabActual === "billetera" && (esRoot || tienePermiso('full_access') || tienePermiso('billetera')) && (
           <WalletTab 
             cargandoBalance={cargandoBalance}
             balance={balance}
@@ -829,21 +829,21 @@ function MiEspacioContent() {
         )}
 
         {/* TAB: MIS COMPRAS */}
-        {tabActual === "purchases" && (
+        {tabActual === "purchases" && (esRoot || tienePermiso('full_access') || tienePermiso('purchases')) && (
           <PurchasesTab 
             token={token}
           />
         )}
 
         {/* TAB: MIS VENTAS */}
-        {tabActual === "sales" && (
+        {tabActual === "sales" && (esRoot || tienePermiso('full_access') || tienePermiso('sales')) && (
           <SalesTab 
             token={token}
           />
         )}
 
         {/* TAB: MIS PUBLICACIONES */}
-        {tabActual === "publications" && (
+        {tabActual === "publications" && (esRoot || tienePermiso('full_access') || tienePermiso('publications')) && (
           <PublicationsTab 
             token={token}
           />

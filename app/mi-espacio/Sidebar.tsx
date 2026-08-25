@@ -74,26 +74,25 @@ import { useAuth } from '../../components/AuthContext';
 export default function Sidebar({ tabActual, setTabActual, esAdmin, esRoot, logout }: SidebarProps) {
   const { tienePermiso } = useAuth();
 
-  const gruposVisibles = GRUPOS.filter(g => {
-    if (g.soloRoot) return esRoot || tienePermiso('manage_roles') || tienePermiso('full_access') || tienePermiso('system');
-    if (g.soloAdmin) return esAdmin || tienePermiso('full_access') || tienePermiso('admin_section') || tienePermiso('cms');
-    return true;
-  }).map(g => ({
+  const tieneAccesoItem = (id: string) => {
+    if (esRoot || tienePermiso('full_access')) return true;
+    if (id === 'root') return tienePermiso('system') || tienePermiso('users') || tienePermiso('roles') || tienePermiso('permissions') || tienePermiso('sections') || tienePermiso('sessions') || tienePermiso('logs');
+    if (id === 'dashboard') return tienePermiso('dashboard') || tienePermiso('admin_section');
+    if (id === 'appearance') return tienePermiso('appearance') || tienePermiso('cms');
+    if (id === 'secciones') return tienePermiso('secciones') || tienePermiso('cms');
+    if (id === 'banners') return tienePermiso('banners') || tienePermiso('cms');
+    if (id === 'billetera') return tienePermiso('billetera');
+    if (id === 'publications') return tienePermiso('publications');
+    if (id === 'purchases') return tienePermiso('purchases');
+    if (id === 'sales') return tienePermiso('sales');
+    if (id === 'perfil') return tienePermiso('perfil') || true;
+    return tienePermiso(id);
+  };
+
+  const gruposVisibles = GRUPOS.map(g => ({
     ...g,
-    items: g.items.filter(item => {
-      if (item.id === 'root') return esRoot || tienePermiso('manage_roles') || tienePermiso('manage_users') || tienePermiso('system');
-      if (item.id === 'dashboard') return esAdmin || tienePermiso('full_access') || tienePermiso('manage_roles') || tienePermiso('dashboard') || tienePermiso('admin_section');
-      if (item.id === 'appearance') return esAdmin || tienePermiso('manage_branding') || tienePermiso('full_access') || tienePermiso('appearance') || tienePermiso('cms');
-      if (item.id === 'secciones') return esAdmin || tienePermiso('manage_branding') || tienePermiso('full_access') || tienePermiso('secciones') || tienePermiso('cms');
-      if (item.id === 'banners') return esAdmin || tienePermiso('manage_banners') || tienePermiso('full_access') || tienePermiso('banners') || tienePermiso('cms');
-      if (item.id === 'billetera') return tienePermiso('wallet_access') || tienePermiso('billetera') || tienePermiso('mi_espacio') || tienePermiso('full_access') || esRoot;
-      if (item.id === 'publications') return tienePermiso('sell_products') || tienePermiso('publications') || tienePermiso('mi_espacio') || tienePermiso('full_access') || esRoot;
-      if (item.id === 'purchases') return tienePermiso('buy_products') || tienePermiso('purchases') || tienePermiso('mi_espacio') || tienePermiso('full_access') || esRoot;
-      if (item.id === 'sales') return tienePermiso('sell_products') || tienePermiso('sales') || tienePermiso('mi_espacio') || tienePermiso('full_access') || esRoot;
-      if (item.id === 'perfil') return tienePermiso('perfil') || tienePermiso('mi_espacio') || tienePermiso('full_access') || true;
-      return tienePermiso(item.id) || tienePermiso('full_access') || esRoot;
-    })
-  }));
+    items: g.items.filter(item => tieneAccesoItem(item.id))
+  })).filter(g => g.items.length > 0);
   const todosLosItems = gruposVisibles.flatMap(g => g.items);
 
   const cambiarTab = (id: string) => {

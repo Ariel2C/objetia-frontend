@@ -188,11 +188,14 @@ export default function MenuCards({ tabActual, setTabActual, esAdmin, esRoot, on
   ];
 
   const itemPermitido = (id: string) => {
-    if (id === 'billetera') return tienePermiso('wallet_access') || tienePermiso('billetera') || tienePermiso('mi_espacio') || tienePermiso('full_access') || esRoot;
-    if (id === 'publications' || id === 'sales' || id === 'vender') return tienePermiso('sell_products') || tienePermiso('publications') || tienePermiso('sales') || tienePermiso('mi_espacio') || tienePermiso('full_access') || esRoot;
-    if (id === 'purchases') return tienePermiso('buy_products') || tienePermiso('purchases') || tienePermiso('mi_espacio') || tienePermiso('full_access') || esRoot;
-    if (id === 'perfil') return tienePermiso('perfil') || tienePermiso('mi_espacio') || tienePermiso('full_access') || true;
-    return tienePermiso(id) || tienePermiso('mi_espacio') || tienePermiso('full_access') || esRoot;
+    if (esRoot || tienePermiso('full_access')) return true;
+    if (id === 'billetera') return tienePermiso('billetera');
+    if (id === 'publications') return tienePermiso('publications');
+    if (id === 'purchases') return tienePermiso('purchases');
+    if (id === 'sales') return tienePermiso('sales');
+    if (id === 'vender') return tienePermiso('publications') || tienePermiso('sales');
+    if (id === 'perfil') return tienePermiso('perfil') || true;
+    return tienePermiso(id);
   };
 
   const gruposRaw = clientCards;
