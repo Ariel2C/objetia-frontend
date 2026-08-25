@@ -792,6 +792,18 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             <Sliders className="h-4 w-4 text-current flex-shrink-0" />
             <span>Control de Rangos</span>
           </button>
+
+          <button
+            onClick={() => { setActiveConsoleTab('permissions'); setMenuMovilAbierto(false); }}
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
+              activeConsoleTab === 'permissions' 
+                ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+            }`}
+          >
+            <Key className="h-4 w-4 text-current flex-shrink-0" />
+            <span>Control de Permisos</span>
+          </button>
         </div>
 
         {/* NAVEGACIÓN - GRUPO 2: OBSERVAR */}
