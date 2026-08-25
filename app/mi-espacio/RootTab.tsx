@@ -245,6 +245,26 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
   const abrirFormularioRango = (modo: 'crear' | 'editar', rango?: RoleItem) => {
     if (modo === 'editar' && rango) {
+      let activeIds: number[] = rango.permission_ids ? [...rango.permission_ids] : [];
+
+      if (activeIds.length === 0 && rango.permissions && rango.permissions.length > 0 && allPermissions.length > 0) {
+        const pNamesClean = (Array.isArray(rango.permissions) ? rango.permissions : [rango.permissions])
+          .flatMap(p => String(p || '').split(','))
+          .map(p => p.trim().toLowerCase())
+          .filter(Boolean);
+
+        activeIds = allPermissions
+          .filter(perm =>
+            pNamesClean.some(name =>
+              name === perm.name.toLowerCase() ||
+              name === perm.code.toLowerCase() ||
+              perm.name.toLowerCase().includes(name) ||
+              name.includes(perm.name.toLowerCase())
+            )
+          )
+          .map(perm => perm.id);
+      }
+
       setRangoForm({
         dbId: rango.dbId,
         code: rango.code || rango.id,
@@ -252,7 +272,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
         label: rango.label || rango.name,
         description: rango.description || '',
         level: rango.level || 10,
-        selectedPermissionIds: rango.permission_ids || []
+        selectedPermissionIds: activeIds
       });
     } else {
       setRangoForm({
