@@ -2528,37 +2528,46 @@ export default function RootTab({
                             </span>
                           </div>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
                             {grupo.items.map((perm) => {
                               const esBase = ["full_access", "manage_roles", "manage_users", "view_audit_logs", "manage_sessions"].includes(perm.code.toLowerCase());
                               return (
-                                <div key={perm.id} className="p-3.5 bg-[#191919] border border-[#262626] rounded-[10px] space-y-2 font-sans flex flex-col justify-between hover:border-[#383838] transition-colors">
-                                  <div className="space-y-1">
-                                    <div className="flex items-center justify-between gap-2">
-                                      <span className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#87a9ff] border border-[#333333] text-[10px] font-medium uppercase tracking-wider">
-                                        {grupo.label}
-                                      </span>
-                                      <span className="text-[10px] text-[#666666] font-mono">{perm.code}</span>
+                                <div key={perm.id} className="p-2.5 bg-[#191919] border border-[#262626] rounded-[8px] space-y-1 font-sans flex flex-col justify-between hover:border-[#383838] transition-colors">
+                                  <div className="flex items-center justify-between gap-2">
+                                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                                      <Key className="h-3.5 w-3.5 text-[#87a9ff] flex-shrink-0" />
+                                      <h3 className="text-xs font-semibold text-white truncate" title={perm.name}>
+                                        {perm.name}
+                                      </h3>
                                     </div>
-                                    <h3 className="text-xs font-bold text-white pt-1">{perm.name}</h3>
-                                    <p className="text-[11px] text-[#8c8c8c] leading-tight">{perm.description || "Sin descripción asignada."}</p>
+
+                                    {/* Botones de acción en la misma fila solo con iconos */}
+                                    <div className="flex items-center gap-1 flex-shrink-0">
+                                      <button
+                                        type="button"
+                                        onClick={() => abrirFormularioPermiso('editar', perm)}
+                                        className="w-6 h-6 flex items-center justify-center bg-[#252528] hover:bg-[#323236] text-[#d4d4d4] hover:text-[#87a9ff] border border-[#333338] rounded-[5px] transition cursor-pointer"
+                                        title="Editar permiso"
+                                      >
+                                        <Edit3 className="h-3 w-3" />
+                                      </button>
+                                      <button
+                                        type="button"
+                                        disabled={esBase}
+                                        onClick={() => setModalEliminarPermiso(perm)}
+                                        className="w-6 h-6 flex items-center justify-center bg-[#252528] hover:bg-red-500/20 text-[#8c8c8c] hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed border border-[#333338] rounded-[5px] transition cursor-pointer"
+                                        title={esBase ? "Permiso base no eliminable" : "Eliminar permiso"}
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </button>
+                                    </div>
                                   </div>
 
-                                  <div className="pt-2 border-t border-[#262626] flex items-center justify-end gap-2">
-                                    <button
-                                      onClick={() => abrirFormularioPermiso('editar', perm)}
-                                      className="px-2.5 h-[26px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white rounded-[6px] text-[11px] font-medium transition cursor-pointer font-sans"
-                                    >
-                                      Editar
-                                    </button>
-                                    <button
-                                      disabled={esBase}
-                                      onClick={() => setModalEliminarPermiso(perm)}
-                                      className="px-2.5 h-[26px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed rounded-[6px] text-[11px] font-medium transition cursor-pointer font-sans"
-                                      title={esBase ? "Permiso base del sistema no eliminable" : "Eliminar permiso"}
-                                    >
-                                      Eliminar
-                                    </button>
+                                  <div className="flex items-center justify-between gap-2 text-[10px]">
+                                    <p className="text-[#8c8c8c] truncate flex-1" title={perm.description || ""}>
+                                      {perm.description || "Sin descripción asignada."}
+                                    </p>
+                                    <span className="text-[#666666] font-mono flex-shrink-0">[{perm.code}]</span>
                                   </div>
                                 </div>
                               );
