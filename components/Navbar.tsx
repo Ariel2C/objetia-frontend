@@ -31,7 +31,13 @@ export default function Navbar({ logoUrl }: NavbarProps) {
   const searchParams = useSearchParams();
   const tab = searchParams.get('tab');
 
-  const isRootTab = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && tab === 'root');
+  const ADMIN_TABS = new Set([
+    'root', 'admin', 'dashboard', 'moderation', 'appearance', 'campanas', 
+    'secciones', 'banners', 'users', 'roles', 'permissions', 'sections', 
+    'sessions', 'logs'
+  ]);
+
+  const isRootTab = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && tab && ADMIN_TABS.has(tab));
 
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [notifAbierto, setNotifAbierto] = useState(false);
