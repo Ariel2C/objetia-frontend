@@ -796,15 +796,33 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
       return (r === 'client' || r === 'cliente') ? 'cliente' : r;
     }).filter(Boolean));
     
-    const todosLosFiltros = [
+    const baseFiltros = [
       { id: '', label: 'Todos' },
-      { id: 'cliente', label: 'Clientes' },
-      { id: 'admin', label: 'Admins' },
-      { id: 'root', label: 'Root' },
+      ...rangosList.map(r => ({ id: r.code.toLowerCase(), label: r.name }))
     ];
 
-    return todosLosFiltros.filter(f => f.id === '' || rolesPresentes.has(f.id));
-  }, [usersList, searchUser]);
+    const unicos = new Map();
+    baseFiltros.forEach(item => {
+      if (!unicos.has(item.id)) unicos.set(item.id, item);
+    });
+
+    return Array.from(unicos.values()).filter(f => f.id === '' || rolesPresentes.has(f.id));
+  }, [usersList, searchUser, rangosList]);
+
+  const roleSelectOptions = useMemo(() => {
+    if (rangosList && rangosList.length > 0) {
+      return rangosList.map(r => ({
+        value: r.code,
+        label: r.name,
+        sublabel: r.label || r.description
+      }));
+    }
+    return [
+      { value: 'cliente', label: 'CLIENTE', sublabel: 'Usuario comprador' },
+      { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
+      { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
+    ];
+  }, [rangosList]);
 
   const usuariosFiltrados = usersList.filter(u => {
     if (roleFilter) {
@@ -877,11 +895,30 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     setCargando(true);
     try {
       if (activeConsoleTab === 'users' || activeConsoleTab === 'keys') {
-        const res = await fetch(`${getApiUrl()}/root/users?limit=200`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        const data = await res.json();
-        if (res.ok) setUsersList(data.users || []);
+        const [resUsers, resRoles] = await Promise.all([
+          fetch(`${getApiUrl()}/root/users?limit=200`, { headers: { "Authorization": `Bearer ${token}` } }),
+          fetch(`${getApiUrl()}/root/roles`, { headers: { "Authorization": `Bearer ${token}` } })
+        ]);
+        const dataUsers = await resUsers.json();
+        const dataRoles = await resRoles.json();
+        if (resUsers.ok) setUsersList(dataUsers.users || []);
+        if (resRoles.ok && dataRoles.roles) {
+          const rolesMapeados = dataRoles.roles.map((r: any) => ({
+            id: r.code,
+            dbId: r.id,
+            code: r.code,
+            name: r.name,
+            label: r.label,
+            description: r.description || '',
+            level: r.level,
+            badgeColor: r.badge_color,
+            permission_ids: r.permission_ids || [],
+            permissions: Array.isArray(r.permissions)
+              ? r.permissions
+              : (r.permissions ? String(r.permissions).split(',').map((p: string) => p.trim()) : [])
+          }));
+          setRangosList(rolesMapeados);
+        }
       } else if (activeConsoleTab === 'roles' || activeConsoleTab === 'permissions') {
         const [resRoles, resPerms, resSecs] = await Promise.all([
           fetch(`${getApiUrl()}/root/roles`, { headers: { "Authorization": `Bearer ${token}` } }),
@@ -1587,11 +1624,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                         <CustomSelect
                           value={u.role === 'client' ? 'cliente' : u.role}
                           disabled={u.id === usuario?.id}
-                          options={[
-                            { value: 'cliente', label: 'CLIENTE', sublabel: 'Usuario comprador' },
-                            { value: 'admin', label: 'ADMIN', sublabel: 'Administrador CMS' },
-                            { value: 'root', label: 'ROOT', sublabel: 'SuperAdmin Programador' }
-                          ]}
+                          options={roleSelectOptions}
                           onChange={(val) => cambiarRol(u.id, val)}
                         />
 
