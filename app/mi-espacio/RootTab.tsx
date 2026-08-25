@@ -137,7 +137,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   const toast = useToast();
 
   const [activeConsoleTab, setActiveConsoleTab] = useState<'users' | 'roles' | 'permissions' | 'sections' | 'sessions' | 'logs' | 'keys'>('users');
-  const [seguridadMenuAbierto, setSeguridadMenuAbierto] = useState(true);
+  const [seguridadMenuAbierto, setSeguridadMenuAbierto] = useState(false);
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   const [sidebarOculto, setSidebarOculto] = useState(false);
   const [cargando, setCargando] = useState(true);
@@ -157,11 +157,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
   const [sectionsTree, setSectionsTree] = useState<SectionNode[]>([]);
   const [flatSections, setFlatSections] = useState<{ id: number; code: string; name: string; category: string }[]>([]);
-  const [expandedSectionCodes, setExpandedSectionCodes] = useState<Record<string, boolean>>({
-    'system': true,
-    'cms': true,
-    'operations': true
-  });
+  const [expandedSectionCodes, setExpandedSectionCodes] = useState<Record<string, boolean>>({});
 
   const [modalSeccion, setModalSeccion] = useState<{
     id?: number;
@@ -294,7 +290,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   };
 
   const renderSectionNode = (node: SectionNode, depth = 0) => {
-    const isExpanded = expandedSectionCodes[node.code] ?? true;
+    const isExpanded = expandedSectionCodes[node.code] ?? false;
     const hasChildren = node.children && node.children.length > 0;
     const hasActions = node.actions && node.actions.length > 0;
 
