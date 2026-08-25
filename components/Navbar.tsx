@@ -37,7 +37,31 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     'sessions', 'logs'
   ]);
 
-  const isRootTab = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && tab && ADMIN_TABS.has(tab));
+  const esUsuarioAdmin = Boolean(
+    usuario && (
+      usuario.role?.toLowerCase() === 'admin' ||
+      usuario.role?.toLowerCase() === 'administrador' ||
+      usuario.role?.toLowerCase() === 'root' ||
+      usuario.email?.toLowerCase() === 'admin@vamaar.com' ||
+      tienePermiso('full_access') ||
+      tienePermiso('admin_section') ||
+      tienePermiso('dashboard') ||
+      tienePermiso('appearance') ||
+      tienePermiso('campanas') ||
+      tienePermiso('secciones') ||
+      tienePermiso('banners') ||
+      tienePermiso('moderation') ||
+      tienePermiso('system') ||
+      tienePermiso('users') ||
+      tienePermiso('roles') ||
+      tienePermiso('permissions') ||
+      tienePermiso('sections') ||
+      tienePermiso('sessions') ||
+      tienePermiso('logs')
+    )
+  );
+
+  const isRootTab = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && tab && ADMIN_TABS.has(tab) && esUsuarioAdmin);
 
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [notifAbierto, setNotifAbierto] = useState(false);
@@ -477,12 +501,12 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         <div className="px-3 py-2 border-b border-gray-50">
                           <p className="text-xs font-bold text-gray-900 truncate">{usuario.full_name}</p>
                           <p className="text-[10px] text-gray-400 truncate">{usuario.email}</p>
-                          {usuario.role === 'ADMIN' && (
+                          {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'administrador') && (
                             <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-purple-100 text-purple-700">
                               Administrador
                             </span>
                           )}
-                          {(usuario.role === 'root' || usuario.role === 'ROOT') && (
+                          {(usuario.role?.toLowerCase() === 'root') && (
                             <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-amber-100 text-amber-800">
                               Programador Root
                             </span>
@@ -497,7 +521,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                           <User className="h-4 w-4 text-purple-600" /> Mi Espacio
                         </Link>
 
-                        {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'root' || tienePermiso('full_access') || tienePermiso('manage_roles')) && (
+                        {esUsuarioAdmin && (
                           <Link 
                             href="/mi-espacio?tab=dashboard" 
                             onClick={() => setMenuAbierto(false)}

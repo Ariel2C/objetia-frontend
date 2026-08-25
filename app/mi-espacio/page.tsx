@@ -650,8 +650,42 @@ function MiEspacioContent() {
     );
   }
 
-  const esAdmin = usuario && (usuario.role?.toLowerCase() === "admin" || usuario.email?.toLowerCase() === "admin@vamaar.com" || usuario.role?.toLowerCase() === "root");
-  const esRoot = usuario && (usuario.role?.toLowerCase() === "root" || usuario.role === "ROOT");
+  const esAdmin = Boolean(
+    usuario && (
+      usuario.role?.toLowerCase() === "admin" ||
+      usuario.role?.toLowerCase() === "administrador" ||
+      usuario.role?.toLowerCase() === "root" ||
+      usuario.email?.toLowerCase() === "admin@vamaar.com" ||
+      tienePermiso('full_access') ||
+      tienePermiso('admin_section') ||
+      tienePermiso('dashboard') ||
+      tienePermiso('appearance') ||
+      tienePermiso('campanas') ||
+      tienePermiso('secciones') ||
+      tienePermiso('banners') ||
+      tienePermiso('moderation') ||
+      tienePermiso('system') ||
+      tienePermiso('users') ||
+      tienePermiso('roles') ||
+      tienePermiso('permissions') ||
+      tienePermiso('sections') ||
+      tienePermiso('sessions') ||
+      tienePermiso('logs')
+    )
+  );
+  const esRoot = Boolean(
+    usuario && (
+      usuario.role?.toLowerCase() === "root" ||
+      tienePermiso('full_access') ||
+      tienePermiso('system') ||
+      tienePermiso('users') ||
+      tienePermiso('roles') ||
+      tienePermiso('permissions') ||
+      tienePermiso('sections') ||
+      tienePermiso('sessions') ||
+      tienePermiso('logs')
+    )
+  );
 
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-10 animate-fade-in font-sans text-gray-800 antialiased">
