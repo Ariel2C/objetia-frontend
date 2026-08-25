@@ -2,9 +2,13 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ShieldAlert, CheckCircle2, XCircle, AlertTriangle, Loader2, RefreshCw, User, Mail, Search } from "lucide-react";
+import { 
+  ShieldAlert, CheckCircle2, XCircle, AlertTriangle, Loader2, RefreshCw, 
+  User, Mail, Search, Sparkles, Filter, Eye, ShieldCheck, ArrowUpRight, Clock
+} from "lucide-react";
 import { getApiUrl } from "../../lib/config";
 import { useToast } from "../../components/ToastContext";
+import FormattedPrice from "../../components/FormattedPrice";
 
 interface ModerationItem {
   id: number;
@@ -99,124 +103,209 @@ export default function ModerationTab({ token }: ModerationTabProps) {
 
   const conteoRechazados = productos.filter(p => p.moderation_status === "rejected").length;
   const conteoPendientes = productos.filter(p => p.moderation_status === "pending").length;
+  const conteoAprobados = productos.filter(p => p.moderation_status === "approved").length;
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* CABECERA */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-        <div>
-          <div className="flex items-center gap-2">
-            <ShieldAlert className="h-6 w-6 text-amber-500" />
-            <h2 className="text-lg font-bold text-gray-900">Moderación y Revisión de Productos</h2>
+    <div className="space-y-6 animate-fade-in font-sans text-[#d4d4d4]">
+      {/* 1. CABECERA & CONTROLES ESTILO GOOGLE AI STUDIO */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-[#262626]">
+        <div className="flex items-center gap-2">
+          {/* Badge de Proyecto */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#252525] border border-[#333333] text-xs font-medium text-[#d4d4d4]">
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+            <span className="text-[#8c8c8c]">Motor</span>
+            <span className="text-white font-semibold">Moderación IA Automática</span>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Revisá los artículos rechazados o bajo la lupa de la Inteligencia Artificial por contacto externo o imágenes inapropiadas.
-          </p>
+
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#252525] border border-[#333333] text-xs text-[#8c8c8c]">
+            <Clock className="h-3.5 w-3.5 text-[#87a9ff]" />
+            <span>Escaneo en vivo</span>
+          </div>
         </div>
+
+        {/* Botón Actualizar Estilo IDE */}
         <button
           onClick={cargarProductos}
           disabled={cargando}
-          className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition"
+          className="flex items-center gap-2 px-3.5 py-1.5 bg-[#252525] hover:bg-[#2f2f2f] text-white text-xs font-medium rounded-lg border border-[#333333] transition cursor-pointer disabled:opacity-50"
         >
-          <RefreshCw className={`h-3.5 w-3.5 ${cargando ? "animate-spin" : ""}`} />
-          Actualizar
+          <RefreshCw className={`h-3.5 w-3.5 text-[#87a9ff] ${cargando ? "animate-spin" : ""}`} />
+          <span>Actualizar Cola</span>
         </button>
       </div>
 
-      {/* FILTROS Y BÚSQUEDA */}
-      <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3">
-        <div className="flex flex-wrap gap-2">
+      {/* 2. MINI TARJETAS KPI DE MODERACIÓN (Google AI Studio Style) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {/* KPI 1: Rechazados */}
+        <div 
+          onClick={() => setFiltroEstado("rejected")}
+          className={`bg-[#1f1f1f] border rounded-[16px] p-4 flex flex-col justify-between cursor-pointer transition-all ${
+            filtroEstado === "rejected" ? "border-red-500/50 shadow-[0_0_15px_rgba(239,68,68,0.15)]" : "border-[#2b2b2b] hover:border-[#3d3d3d]"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[12px] font-medium text-[#9aa0a6]">Rechazados por IA</span>
+            <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-red-500/10 text-red-400 border border-red-500/20">
+              Alerta
+            </span>
+          </div>
+          <div className="text-[28px] font-bold text-white tracking-tight mt-2 tabular-nums">
+            {conteoRechazados}
+          </div>
+          <p className="text-[11px] text-[#8c8c8c] mt-1">Violaciones de contacto o imágenes</p>
+        </div>
+
+        {/* KPI 2: Pendientes */}
+        <div 
+          onClick={() => setFiltroEstado("pending")}
+          className={`bg-[#1f1f1f] border rounded-[16px] p-4 flex flex-col justify-between cursor-pointer transition-all ${
+            filtroEstado === "pending" ? "border-amber-500/50 shadow-[0_0_15px_rgba(245,158,11,0.15)]" : "border-[#2b2b2b] hover:border-[#3d3d3d]"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[12px] font-medium text-[#9aa0a6]">En Cola de Revisión</span>
+            <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+              En proceso
+            </span>
+          </div>
+          <div className="text-[28px] font-bold text-white tracking-tight mt-2 tabular-nums">
+            {conteoPendientes}
+          </div>
+          <p className="text-[11px] text-[#8c8c8c] mt-1">Escaneando OCR y contenido</p>
+        </div>
+
+        {/* KPI 3: Aprobados / Total */}
+        <div 
+          onClick={() => setFiltroEstado("todos")}
+          className={`bg-[#1f1f1f] border rounded-[16px] p-4 flex flex-col justify-between cursor-pointer transition-all ${
+            filtroEstado === "todos" ? "border-[#87a9ff]/50 shadow-[0_0_15px_rgba(135,169,255,0.15)]" : "border-[#2b2b2b] hover:border-[#3d3d3d]"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="text-[12px] font-medium text-[#9aa0a6]">Total de Publicaciones</span>
+            <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase rounded bg-[#2a2a2a] text-[#87a9ff] border border-[#383838]">
+              Registros
+            </span>
+          </div>
+          <div className="text-[28px] font-bold text-white tracking-tight mt-2 tabular-nums">
+            {productos.length}
+          </div>
+          <p className="text-[11px] text-[#8c8c8c] mt-1">{conteoAprobados} publicaciones aprobadas</p>
+        </div>
+      </div>
+
+      {/* 3. FILTROS Y BARRA DE BÚSQUEDA */}
+      <div className="flex flex-col md:flex-row justify-between items-stretch md:items-center gap-3 bg-[#1f1f1f] border border-[#2b2b2b] p-2.5 rounded-[14px]">
+        {/* Pills de Filtrado */}
+        <div className="flex flex-wrap gap-1.5">
           <button
             onClick={() => setFiltroEstado("rejected")}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
               filtroEstado === "rejected"
-                ? "bg-red-500 text-white shadow-xs"
-                : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                ? "bg-[#2f2020] text-red-300 border border-red-500/40"
+                : "bg-[#18181a] text-[#8c8c8c] border border-transparent hover:bg-[#252525] hover:text-white"
             }`}
           >
-            <AlertTriangle className="h-3.5 w-3.5" />
-            Rechazados por IA ({conteoRechazados})
+            <AlertTriangle className="h-3.5 w-3.5 text-red-400" />
+            Rechazados ({conteoRechazados})
           </button>
 
           <button
             onClick={() => setFiltroEstado("pending")}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
               filtroEstado === "pending"
-                ? "bg-amber-500 text-white shadow-xs"
-                : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                ? "bg-[#2d2515] text-amber-300 border border-amber-500/40"
+                : "bg-[#18181a] text-[#8c8c8c] border border-transparent hover:bg-[#252525] hover:text-white"
             }`}
           >
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+            <Clock className="h-3.5 w-3.5 text-amber-400" />
             Pendientes ({conteoPendientes})
           </button>
 
           <button
+            onClick={() => setFiltroEstado("approved")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer flex items-center gap-1.5 ${
+              filtroEstado === "approved"
+                ? "bg-[#182820] text-emerald-300 border border-emerald-500/40"
+                : "bg-[#18181a] text-[#8c8c8c] border border-transparent hover:bg-[#252525] hover:text-white"
+            }`}
+          >
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+            Aprobados ({conteoAprobados})
+          </button>
+
+          <button
             onClick={() => setFiltroEstado("todos")}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer ${
               filtroEstado === "todos"
-                ? "bg-gray-900 text-white shadow-xs"
-                : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"
+                ? "bg-[#252525] text-white border border-[#444444]"
+                : "bg-[#18181a] text-[#8c8c8c] border border-transparent hover:bg-[#252525] hover:text-white"
             }`}
           >
             Todos ({productos.length})
           </button>
         </div>
 
+        {/* Input Buscador Oscuro */}
         <div className="relative min-w-[240px]">
-          <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <Search className="h-3.5 w-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-[#8c8c8c]" />
           <input
             type="text"
             placeholder="Buscar por vendedor, título..."
             value={busqueda}
             onChange={e => setBusqueda(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500/20"
+            style={{ color: '#ffffff', backgroundColor: '#18181a', caretColor: '#ffffff' }}
+            className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#18181a] text-white border border-[#333333] rounded-lg placeholder:text-[#666666] focus:outline-none focus:border-[#87a9ff] transition font-sans"
           />
         </div>
       </div>
 
-      {/* LISTADO DE PRODUCTOS */}
+      {/* 4. LISTADO DE PRODUCTOS EN MODERACIÓN */}
       {cargando ? (
-        <div className="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm">
-          <Loader2 className="h-8 w-8 animate-spin text-purple-600 mb-2" />
-          <p className="text-xs text-gray-400 font-medium">Cargando productos de moderación...</p>
+        <div className="flex flex-col items-center justify-center py-20 bg-[#1f1f1f] rounded-[16px] border border-[#2b2b2b] gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-[#87a9ff]" />
+          <p className="text-xs text-[#8c8c8c]">Cargando cola de moderación...</p>
         </div>
       ) : productosFiltrados.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-2xl border border-gray-100 shadow-sm space-y-2">
-          <CheckCircle2 className="h-10 w-10 text-emerald-500 mx-auto" />
-          <p className="text-sm font-bold text-gray-800">¡Todo impecable!</p>
-          <p className="text-xs text-gray-400">No hay publicaciones con el filtro seleccionado.</p>
+        <div className="text-center py-20 bg-[#1f1f1f] rounded-[16px] border border-[#2b2b2b] space-y-3">
+          <CheckCircle2 className="h-10 w-10 text-emerald-400 mx-auto" />
+          <p className="text-sm font-bold text-white">¡Cola de revisión despejada!</p>
+          <p className="text-xs text-[#8c8c8c]">No hay publicaciones que coincidan con los filtros actuales.</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {productosFiltrados.map(p => (
             <div
               key={p.id}
-              className="bg-white rounded-2xl border border-gray-100 p-4 sm:p-5 shadow-xs hover:shadow-md transition space-y-4"
+              className="bg-[#1f1f1f] border border-[#2b2b2b] rounded-[16px] p-5 space-y-4 hover:border-[#3d3d3d] transition-all"
             >
               <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-                <div className="flex items-center gap-4">
+                {/* Info Producto */}
+                <div className="flex items-center gap-4 min-w-0">
                   {p.image_url ? (
                     <img
                       src={p.image_url}
                       alt={p.title}
-                      className="h-16 w-16 sm:h-20 sm:w-20 object-cover rounded-xl border border-gray-100 flex-shrink-0"
+                      className="h-16 w-16 sm:h-20 sm:w-20 object-cover rounded-xl border border-[#2b2b2b] bg-[#121214] flex-shrink-0"
                     />
                   ) : (
-                    <div className="h-16 w-16 sm:h-20 sm:w-20 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 text-xs font-bold flex-shrink-0">
+                    <div className="h-16 w-16 sm:h-20 sm:w-20 bg-[#18181a] border border-[#2b2b2b] rounded-xl flex items-center justify-center text-[#8c8c8c] text-xs font-semibold flex-shrink-0">
                       Sin foto
                     </div>
                   )}
 
-                  <div>
+                  <div className="min-w-0 space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <h3 className="text-sm font-bold text-gray-900">{p.title}</h3>
+                      <h3 className="text-sm font-semibold text-white truncate max-w-[280px] sm:max-w-md">
+                        {p.title}
+                      </h3>
                       <span
-                        className={`px-2 py-0.5 text-[10px] font-extrabold uppercase rounded-full ${
+                        className={`px-2 py-0.5 text-[9px] font-bold uppercase rounded-[6px] border ${
                           p.moderation_status === "rejected"
-                            ? "bg-red-100 text-red-700 border border-red-200"
+                            ? "bg-red-500/10 text-red-400 border-red-500/20"
                             : p.moderation_status === "pending"
-                            ? "bg-amber-100 text-amber-700 border border-amber-200"
-                            : "bg-emerald-100 text-emerald-700 border border-emerald-200"
+                            ? "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                            : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                         }`}
                       >
                         {p.moderation_status === "rejected"
@@ -227,28 +316,29 @@ export default function ModerationTab({ token }: ModerationTabProps) {
                       </span>
                     </div>
 
-                    <p className="text-xs font-extrabold text-purple-700 mt-1">
-                      $ {p.price.toLocaleString("es-AR")} <span className="text-[11px] text-gray-400 font-normal">| {p.category}</span>
+                    <p className="text-xs font-bold text-emerald-400 flex items-center gap-2">
+                      <FormattedPrice price={p.price} />
+                      <span className="text-[11px] text-[#8c8c8c] font-normal">· {p.category}</span>
                     </p>
 
-                    <div className="flex items-center gap-4 text-[11px] text-gray-500 mt-2 flex-wrap">
-                      <span className="flex items-center gap-1 font-medium">
-                        <User className="h-3.5 w-3.5 text-gray-400" /> {p.seller_name}
+                    <div className="flex items-center gap-4 text-[11px] text-[#8c8c8c] pt-0.5 flex-wrap">
+                      <span className="flex items-center gap-1">
+                        <User className="h-3.5 w-3.5 text-[#666666]" /> {p.seller_name}
                       </span>
                       <span className="flex items-center gap-1">
-                        <Mail className="h-3.5 w-3.5 text-gray-400" /> {p.seller_email}
+                        <Mail className="h-3.5 w-3.5 text-[#666666]" /> {p.seller_email}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {/* ACCIONES DEL ADMIN */}
-                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                {/* ACCIONES DEL ADMINISTRADOR */}
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-end flex-shrink-0">
                   {p.moderation_status !== "approved" && (
                     <button
                       onClick={() => handleAccion(p.id, "approve")}
                       disabled={procesandoId === p.id}
-                      className="flex-1 sm:flex-none px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="flex-1 sm:flex-none px-4 py-2 bg-emerald-500/15 hover:bg-emerald-500 text-emerald-300 hover:text-[#121214] border border-emerald-500/30 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                     >
                       {procesandoId === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <CheckCircle2 className="h-3.5 w-3.5" />}
                       Aprobar
@@ -259,7 +349,7 @@ export default function ModerationTab({ token }: ModerationTabProps) {
                     <button
                       onClick={() => handleAccion(p.id, "reject")}
                       disabled={procesandoId === p.id}
-                      className="flex-1 sm:flex-none px-4 py-2 bg-red-500 hover:bg-red-600 text-white text-xs font-bold rounded-xl transition shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                      className="flex-1 sm:flex-none px-4 py-2 bg-red-500/15 hover:bg-red-500 text-red-300 hover:text-white border border-red-500/30 text-xs font-bold rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
                     >
                       {procesandoId === p.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
                       Rechazar
@@ -270,23 +360,23 @@ export default function ModerationTab({ token }: ModerationTabProps) {
 
               {/* DETALLE DE MODERACIÓN / DETECCIÓN DE IA */}
               {p.ai_moderation_notes ? (
-                <div className="bg-amber-50/80 border border-amber-200/80 p-3 rounded-xl flex items-start gap-2.5 text-xs text-amber-900">
-                  <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-extrabold block text-amber-950 text-[11px] uppercase tracking-wider">
-                      Detalle de Moderación de IA:
+                <div className="bg-[#241e15] border border-amber-500/30 p-3.5 rounded-xl flex items-start gap-2.5 text-xs text-amber-200">
+                  <AlertTriangle className="h-4 w-4 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <span className="font-bold block text-amber-300 text-[10px] uppercase tracking-wider">
+                      Detección Inteligente de IA:
                     </span>
-                    <p className="mt-0.5 text-[11px] leading-relaxed font-medium">{p.ai_moderation_notes}</p>
+                    <p className="text-[11px] leading-relaxed text-[#fef3c7]">{p.ai_moderation_notes}</p>
                   </div>
                 </div>
               ) : (
-                <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-start gap-2.5 text-xs text-slate-800">
-                  <Loader2 className="h-4 w-4 text-slate-500 flex-shrink-0 mt-0.5 animate-spin" />
+                <div className="bg-[#18181a] border border-[#2b2b2b] p-3 rounded-xl flex items-start gap-2.5 text-xs text-[#8c8c8c]">
+                  <Loader2 className="h-3.5 w-3.5 text-[#87a9ff] flex-shrink-0 mt-0.5 animate-spin" />
                   <div>
-                    <span className="font-extrabold block text-slate-900 text-[11px] uppercase tracking-wider">
-                      Estado de Moderación:
+                    <span className="font-semibold block text-white text-[10px] uppercase tracking-wider">
+                      Estado de Análisis:
                     </span>
-                    <p className="mt-0.5 text-[11px] leading-relaxed font-medium">Publicación en cola de análisis por IA (escaneando imágenes y OCR anti-evasión).</p>
+                    <p className="text-[11px] text-[#8c8c8c]">Publicación en proceso de verificación automática por los filtros de seguridad.</p>
                   </div>
                 </div>
               )}
