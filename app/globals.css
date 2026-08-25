@@ -129,3 +129,36 @@ input, select, textarea {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================================================== */
+/* REGLA GLOBAL ESTRICTA: TEXTO Y VISIBILIDAD EN INPUTS, SELECTS Y DROPDOWNS     */
+/* ============================================================================== */
+/* Garantiza que todo textbox, combobox o textarea en temas oscuros tenga texto blanco forzado */
+input.text-white,
+select.text-white,
+textarea.text-white,
+[class*="bg-[#1"] input,
+[class*="bg-[#1"] select,
+[class*="bg-[#1"] textarea,
+[class*="bg-[#2"] input,
+[class*="bg-[#2"] select,
+[class*="bg-[#2"] textarea {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  caret-color: #ffffff !important;
+}
+
+/* Forzar que las opciones de los dropdowns/combobox (select option) siempre tengan fondo oscuro y texto blanco */
+select option {
+  background-color: #1e1e1e !important;
+  color: #ffffff !important;
+}
+
+/* Asegurar placeholders nítidos y legibles en campos oscuros */
+input.text-white::placeholder,
+textarea.text-white::placeholder,
+[class*="bg-[#1"] input::placeholder,
+[class*="bg-[#2"] input::placeholder {
+  color: #8c8c8c !important;
+  opacity: 1 !important;
+}
