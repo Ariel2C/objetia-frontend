@@ -105,6 +105,22 @@ input, select, textarea {
   box-shadow: var(--shadow-card);
 }
 
+/* Dark Custom Scrollbar para Consola de Administración y Sidebar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #191919;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #333333;
+  border-radius: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}
+
 /* Respeto por usuarios con movimiento reducido */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

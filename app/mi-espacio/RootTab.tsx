@@ -1230,36 +1230,38 @@ export default function RootTab({
 
   // Renderizador del Sidebar / Drawer de Navegación Lateral (Google AI Studio Theme)
   const renderSidebarContent = () => (
-    <div className="flex flex-col h-full justify-between text-[14px] leading-[21px] font-medium select-none bg-[#191919] p-4 space-y-6">
-      <div className="space-y-6">
-        {/* BRANDING CABECERA SIDEBAR */}
-        <div className="flex items-center justify-between pb-2">
-          <div className="flex items-center gap-2 cursor-pointer group">
-            <span className="font-semibold text-[15px] tracking-tight text-white group-hover:text-blue-400 transition">
-              Objetia
-            </span>
-            <ChevronDown className="h-4 w-4 text-[#8c8c8c]" />
-          </div>
-
-          <div className="flex items-center gap-1">
-            {/* Botón Ocultar en Escritorio */}
-            <button 
-              onClick={() => setSidebarOculto(true)} 
-              className="hidden lg:flex p-2 text-[#8c8c8c] hover:text-white hover:bg-[#252525] rounded-[10px] transition cursor-pointer"
-              title="Ocultar menú lateral"
-            >
-              <PanelLeftClose className="h-5 w-5" />
-            </button>
-
-            {/* Botón cerrar en móvil */}
-            <button 
-              onClick={() => setMenuMovilAbierto(false)} 
-              className="lg:hidden text-[#8c8c8c] hover:text-white p-1 rounded-lg"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
+    <div className="flex flex-col h-full justify-between text-[14px] leading-[21px] font-medium select-none bg-[#191919] p-4 overflow-hidden">
+      {/* BRANDING CABECERA SIDEBAR */}
+      <div className="flex items-center justify-between pb-2 flex-shrink-0">
+        <div className="flex items-center gap-2 cursor-pointer group">
+          <span className="font-semibold text-[15px] tracking-tight text-white group-hover:text-blue-400 transition">
+            Objetia
+          </span>
+          <ChevronDown className="h-4 w-4 text-[#8c8c8c]" />
         </div>
+
+        <div className="flex items-center gap-1">
+          {/* Botón Ocultar en Escritorio */}
+          <button 
+            onClick={() => setSidebarOculto(true)} 
+            className="hidden lg:flex p-2 text-[#8c8c8c] hover:text-white hover:bg-[#252525] rounded-[10px] transition cursor-pointer"
+            title="Ocultar menú lateral"
+          >
+            <PanelLeftClose className="h-5 w-5" />
+          </button>
+
+          {/* Botón cerrar en móvil */}
+          <button 
+            onClick={() => setMenuMovilAbierto(false)} 
+            className="lg:hidden text-[#8c8c8c] hover:text-white p-1 rounded-lg"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+
+      {/* ÁREA DE ÍTEMS DE NAVEGACIÓN DESPLAZABLE */}
+      <div className="flex-1 overflow-y-auto space-y-6 custom-scrollbar pr-1 my-2">
 
         {/* NAVEGACIÓN - GRUPO 1: SECCIÓN ADMINISTRADOR */}
         <div className="space-y-1 font-sans">
@@ -1476,7 +1478,7 @@ export default function RootTab({
   return (
     <div 
       style={{ fontFamily: "Inter, -apple-system, BlinkMacSystemFont, sans-serif" }}
-      className="min-h-screen bg-[#191919] text-[#d4d4d4] flex flex-col lg:flex-row border-none relative overflow-x-hidden"
+      className="h-full w-full bg-[#191919] text-[#d4d4d4] flex flex-col lg:flex-row border-none relative overflow-hidden"
     >
       
       {/* 1. SIDEBAR ESCRITORIO (Google AI Studio Theme) */}
@@ -1486,9 +1488,9 @@ export default function RootTab({
           opacity: sidebarOculto ? 0 : 1,
           transition: 'width 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms cubic-bezier(0.4, 0, 0.2, 1)'
         }}
-        className="hidden lg:block bg-[#191919] border-r border-[#262626] flex-shrink-0 min-h-screen overflow-hidden"
+        className="hidden lg:block bg-[#191919] border-r border-[#262626] flex-shrink-0 h-full overflow-hidden"
       >
-        <div className="w-64 h-full">
+        <div className="w-64 h-full flex flex-col">
           {renderSidebarContent()}
         </div>
       </aside>
@@ -1509,10 +1511,10 @@ export default function RootTab({
       )}
 
       {/* 3. CONTENIDO PRINCIPAL WORKSPACE */}
-      <main className="flex-1 flex flex-col min-w-0 bg-[#191919] text-[14px] leading-[20px] font-normal">
+      <main className="flex-1 flex flex-col min-w-0 h-full bg-[#191919] text-[14px] leading-[20px] font-normal overflow-hidden">
         
         {/* BARRA SUPERIOR DE ENCABEZADO */}
-        <header className="p-3 sm:px-6 sm:py-4 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 sm:gap-4 bg-[#191919]">
+        <header className="p-3 sm:px-6 sm:py-4 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 sm:gap-4 bg-[#191919] flex-shrink-0">
           <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto min-w-0">
             {/* BOTÓN MENÚ HAMBURGUESA EN MÓVIL (Estilo Segunda Imagen) */}
             <button
@@ -1674,7 +1676,7 @@ export default function RootTab({
 
         {/* BARRA SECUNDARIA DE ACCIONES (Control de Secciones y Acciones) */}
         {activeConsoleTab === 'sections' && (
-          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-row justify-between items-center gap-2.5 bg-[#1f1f1f]">
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-row justify-between items-center gap-2.5 bg-[#1f1f1f] flex-shrink-0">
             <button
               onClick={() => setModalSeccion({ code: '', name: '', category: 'General', description: '', parent_code: '' })}
               className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer flex items-center gap-1 font-sans"
@@ -1688,7 +1690,7 @@ export default function RootTab({
 
         {/* BARRA SECUNDARIA DE FILTROS & PILLS (Solo en Control de Usuarios) */}
         {activeConsoleTab === 'users' && (
-          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 bg-[#1f1f1f]">
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 bg-[#1f1f1f] flex-shrink-0">
             <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
               <span className="text-[12px] sm:text-[13px] font-medium text-[#8c8c8c] whitespace-nowrap mr-0.5">Agrupar por:</span>
               {rolesDisponiblesEnTabla.map((f) => {
@@ -1736,7 +1738,7 @@ export default function RootTab({
 
         {/* BARRA SECUNDARIA DE FILTROS & PILLS (Monitor de Sesiones) */}
         {activeConsoleTab === 'sessions' && (
-          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 bg-[#1f1f1f]">
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 bg-[#1f1f1f] flex-shrink-0">
             <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap">
               <span className="text-[12px] sm:text-[13px] font-medium text-[#8c8c8c] whitespace-nowrap mr-0.5">Estado:</span>
               {[
@@ -1791,7 +1793,7 @@ export default function RootTab({
 
         {/* BARRA SECUNDARIA DE FILTROS & BUSCADOR (Logs de Auditoría) */}
         {activeConsoleTab === 'logs' && (
-          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 bg-[#1f1f1f]">
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-2.5 bg-[#1f1f1f] flex-shrink-0">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-[12px] sm:text-[13px] font-medium text-[#8c8c8c] whitespace-nowrap">Agrupar por:</span>
               <CustomSelect
@@ -1829,8 +1831,8 @@ export default function RootTab({
           </div>
         )}
 
-        {/* ÁREA DE CONTENIDO DINÁMICO */}
-        <div className="p-4 sm:p-6 flex-1 overflow-y-auto bg-[#191919]">
+        {/* ÁREA DE CONTENIDO DINÁMICO CON SCROLLBAR FUNCIONAL */}
+        <div className="p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto bg-[#191919] custom-scrollbar">
 
           {/* ============================================================================== */}
           {/* SECCIÓN ADMINISTRADOR / CMS TABS */}
