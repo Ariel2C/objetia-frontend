@@ -1304,7 +1304,8 @@ export default function RootTab({
         const data = await res.json();
         if (res.ok) setLogsList(data.logs || []);
       }
-    } catch {
+    } catch (err: any) {
+      console.error("Error al conectar con la consola Root:", err);
       toast.error("No pudimos conectar con la consola Root.");
     } finally {
       setCargando(false);
