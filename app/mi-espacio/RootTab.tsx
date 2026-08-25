@@ -1465,6 +1465,20 @@ export default function RootTab({
     return false;
   };
 
+  // Redirigir automáticamente si la pestaña activa no está autorizada para este usuario
+  useEffect(() => {
+    if (!cargando && !tienePermisoTab(activeConsoleTab)) {
+      const tabsDisponibles: ConsoleTabType[] = [
+        'dashboard', 'moderation', 'appearance', 'campanas', 'secciones', 
+        'banners', 'users', 'roles', 'permissions', 'sections', 'sessions', 'logs'
+      ];
+      const primerTabPermitido = tabsDisponibles.find(t => tienePermisoTab(t));
+      if (primerTabPermitido) {
+        setActiveConsoleTab(primerTabPermitido);
+      }
+    }
+  }, [cargando, activeConsoleTab, rangosList, allPermissions, usuario]);
+
   const [modalEliminarUser, setModalEliminarUser] = useState<{ id: number; email: string } | null>(null);
 
   const confirmarEliminarUsuario = async () => {
@@ -1554,180 +1568,212 @@ export default function RootTab({
       <div className="flex-1 overflow-y-auto space-y-6 custom-scrollbar pr-1 my-2">
 
         {/* NAVEGACIÓN - GRUPO 1: SECCIÓN ADMINISTRADOR */}
-        <div className="space-y-1 font-sans">
-          <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5 font-sans">
-            SECCIÓN ADMINISTRADOR
-          </p>
-          <button
-            onClick={() => { setActiveConsoleTab('dashboard'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
-              activeConsoleTab === 'dashboard' 
-                ? 'bg-[#2a2a2a] text-[#ffffff]' 
-                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-            }`}
-          >
-            <LayoutDashboard className="h-4 w-4 text-current flex-shrink-0" />
-            <span>Panel de Control</span>
-          </button>
-          <button
-            onClick={() => { setActiveConsoleTab('moderation'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
-              activeConsoleTab === 'moderation' 
-                ? 'bg-[#2a2a2a] text-[#ffffff]' 
-                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-            }`}
-          >
-            <ShieldAlert className="h-4 w-4 text-amber-500 flex-shrink-0" />
-            <span>Productos en Revisión</span>
-          </button>
-        </div>
-
-        {/* NAVEGACIÓN - GRUPO 2: GESTIÓN DE CONTENIDO */}
-        <div className="space-y-1 font-sans">
-          <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5 font-sans">
-            GESTIÓN DE CONTENIDO
-          </p>
-          <button
-            onClick={() => { setActiveConsoleTab('appearance'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
-              activeConsoleTab === 'appearance' 
-                ? 'bg-[#2a2a2a] text-[#ffffff]' 
-                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-            }`}
-          >
-            <Palette className="h-4 w-4 text-current flex-shrink-0" />
-            <span>Apariencia Web</span>
-          </button>
-          <button
-            onClick={() => { setActiveConsoleTab('campanas'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
-              activeConsoleTab === 'campanas' 
-                ? 'bg-[#2a2a2a] text-[#ffffff]' 
-                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-            }`}
-          >
-            <Calendar className="h-4 w-4 text-current flex-shrink-0" />
-            <span>Campañas y Eventos</span>
-          </button>
-          <button
-            onClick={() => { setActiveConsoleTab('secciones'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
-              activeConsoleTab === 'secciones' 
-                ? 'bg-[#2a2a2a] text-[#ffffff]' 
-                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-            }`}
-          >
-            <Sliders className="h-4 w-4 text-current flex-shrink-0" />
-            <span>Personalización</span>
-          </button>
-          <button
-            onClick={() => { setActiveConsoleTab('banners'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
-              activeConsoleTab === 'banners' 
-                ? 'bg-[#2a2a2a] text-[#ffffff]' 
-                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-            }`}
-          >
-            <ImageIcon className="h-4 w-4 text-current flex-shrink-0" />
-            <span>Banners de Inicio</span>
-          </button>
-        </div>
-
-        {/* NAVEGACIÓN - GRUPO 3: PROGRAMADOR */}
-        <div className="space-y-1 font-sans">
-          <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5 font-sans">
-            PROGRAMADOR
-          </p>
-          <button
-            onClick={() => { setActiveConsoleTab('users'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
-              activeConsoleTab === 'users' 
-                ? 'bg-[#2a2a2a] text-[#ffffff]' 
-                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-            }`}
-          >
-            <Users className="h-4 w-4 text-current flex-shrink-0" />
-            <span>Control de Usuarios</span>
-          </button>
-
-          {/* ACORDEÓN / ÁRBOL DE SEGURIDAD Y ACCESOS */}
-          <div className="pt-1 font-sans">
-            <button
-              onClick={() => setSeguridadMenuAbierto(!seguridadMenuAbierto)}
-              className="w-full flex items-center justify-between px-3 h-[36px] rounded-[12px] text-[14px] font-medium text-[#d4d4d4] hover:bg-[#252525] transition-colors cursor-pointer font-sans"
-            >
-              <div className="flex items-center gap-2.5">
-                <ShieldCheck className="h-4 w-4 text-[#87a9ff] flex-shrink-0" />
-                <span>Seguridad y Accesos</span>
-              </div>
-              {seguridadMenuAbierto ? <ChevronDown className="h-3.5 w-3.5 text-[#8c8c8c]" /> : <ChevronRight className="h-3.5 w-3.5 text-[#8c8c8c]" />}
-            </button>
-
-            {seguridadMenuAbierto && (
-              <div className="pl-3.5 mt-1 space-y-1 border-l border-[#262626] ml-4 font-sans">
-                <button
-                  onClick={() => { setActiveConsoleTab('roles'); setMenuMovilAbierto(false); }}
-                  className={`w-full flex items-center gap-2 px-2.5 h-[32px] rounded-[8px] text-[13px] font-medium transition-colors text-left cursor-pointer font-sans ${
-                    activeConsoleTab === 'roles' 
-                      ? 'bg-[#2a2a2a] text-[#87a9ff]' 
-                      : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-                  }`}
-                >
-                  <Sliders className="h-3.5 w-3.5 text-current flex-shrink-0" />
-                  <span>Control de Rangos</span>
-                </button>
-
-                <button
-                  onClick={() => { setActiveConsoleTab('permissions'); setMenuMovilAbierto(false); }}
-                  className={`w-full flex items-center gap-2 px-2.5 h-[32px] rounded-[8px] text-[13px] font-medium transition-colors text-left cursor-pointer font-sans ${
-                    activeConsoleTab === 'permissions' 
-                      ? 'bg-[#2a2a2a] text-[#87a9ff]' 
-                      : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-                  }`}
-                >
-                  <Key className="h-3.5 w-3.5 text-current flex-shrink-0" />
-                  <span>Control de Permisos</span>
-                </button>
-
-                <button
-                  onClick={() => { setActiveConsoleTab('sections'); setMenuMovilAbierto(false); }}
-                  className={`w-full flex items-center gap-2 px-2.5 h-[32px] rounded-[8px] text-[13px] font-medium transition-colors text-left cursor-pointer font-sans ${
-                    activeConsoleTab === 'sections' 
-                      ? 'bg-[#2a2a2a] text-[#87a9ff]' 
-                      : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-                  }`}
-                >
-                  <FolderTree className="h-3.5 w-3.5 text-current flex-shrink-0" />
-                  <span>Secciones y Acciones</span>
-                </button>
-              </div>
+        {(tienePermisoTab('dashboard') || tienePermisoTab('moderation')) && (
+          <div className="space-y-1 font-sans">
+            <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5 font-sans">
+              SECCIÓN ADMINISTRADOR
+            </p>
+            {tienePermisoTab('dashboard') && (
+              <button
+                onClick={() => { setActiveConsoleTab('dashboard'); setMenuMovilAbierto(false); }}
+                className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                  activeConsoleTab === 'dashboard' 
+                    ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                    : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                }`}
+              >
+                <LayoutDashboard className="h-4 w-4 text-current flex-shrink-0" />
+                <span>Panel de Control</span>
+              </button>
+            )}
+            {tienePermisoTab('moderation') && (
+              <button
+                onClick={() => { setActiveConsoleTab('moderation'); setMenuMovilAbierto(false); }}
+                className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                  activeConsoleTab === 'moderation' 
+                    ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                    : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                }`}
+              >
+                <ShieldAlert className="h-4 w-4 text-amber-500 flex-shrink-0" />
+                <span>Productos en Revisión</span>
+              </button>
             )}
           </div>
+        )}
 
-          <button
-            onClick={() => { setActiveConsoleTab('sessions'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
-              activeConsoleTab === 'sessions' 
-                ? 'bg-[#2a2a2a] text-[#ffffff]' 
-                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-            }`}
-          >
-            <Activity className="h-4 w-4 text-current flex-shrink-0" />
-            <span>Monitor de Sesiones</span>
-          </button>
+        {/* NAVEGACIÓN - GRUPO 2: GESTIÓN DE CONTENIDO */}
+        {(tienePermisoTab('appearance') || tienePermisoTab('campanas') || tienePermisoTab('secciones') || tienePermisoTab('banners')) && (
+          <div className="space-y-1 font-sans">
+            <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5 font-sans">
+              GESTIÓN DE CONTENIDO
+            </p>
+            {tienePermisoTab('appearance') && (
+              <button
+                onClick={() => { setActiveConsoleTab('appearance'); setMenuMovilAbierto(false); }}
+                className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                  activeConsoleTab === 'appearance' 
+                    ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                    : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                }`}
+              >
+                <Palette className="h-4 w-4 text-current flex-shrink-0" />
+                <span>Apariencia Web</span>
+              </button>
+            )}
+            {tienePermisoTab('campanas') && (
+              <button
+                onClick={() => { setActiveConsoleTab('campanas'); setMenuMovilAbierto(false); }}
+                className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                  activeConsoleTab === 'campanas' 
+                    ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                    : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                }`}
+              >
+                <Calendar className="h-4 w-4 text-current flex-shrink-0" />
+                <span>Campañas y Eventos</span>
+              </button>
+            )}
+            {tienePermisoTab('secciones') && (
+              <button
+                onClick={() => { setActiveConsoleTab('secciones'); setMenuMovilAbierto(false); }}
+                className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                  activeConsoleTab === 'secciones' 
+                    ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                    : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                }`}
+              >
+                <Sliders className="h-4 w-4 text-current flex-shrink-0" />
+                <span>Personalización</span>
+              </button>
+            )}
+            {tienePermisoTab('banners') && (
+              <button
+                onClick={() => { setActiveConsoleTab('banners'); setMenuMovilAbierto(false); }}
+                className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                  activeConsoleTab === 'banners' 
+                    ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                    : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                }`}
+              >
+                <ImageIcon className="h-4 w-4 text-current flex-shrink-0" />
+                <span>Banners de Inicio</span>
+              </button>
+            )}
+          </div>
+        )}
 
-          <button
-            onClick={() => { setActiveConsoleTab('logs'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
-              activeConsoleTab === 'logs' 
-                ? 'bg-[#2a2a2a] text-[#ffffff]' 
-                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-            }`}
-          >
-            <Database className="h-4 w-4 text-current flex-shrink-0" />
-            <span>Registros y Auditoría</span>
-          </button>
-        </div>
+        {/* NAVEGACIÓN - GRUPO 3: PROGRAMADOR */}
+        {(tienePermisoTab('users') || tienePermisoTab('roles') || tienePermisoTab('permissions') || tienePermisoTab('sections') || tienePermisoTab('sessions') || tienePermisoTab('logs')) && (
+          <div className="space-y-1 font-sans">
+            <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5 font-sans">
+              PROGRAMADOR
+            </p>
+            {tienePermisoTab('users') && (
+              <button
+                onClick={() => { setActiveConsoleTab('users'); setMenuMovilAbierto(false); }}
+                className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                  activeConsoleTab === 'users' 
+                    ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                    : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                }`}
+              >
+                <Users className="h-4 w-4 text-current flex-shrink-0" />
+                <span>Control de Usuarios</span>
+              </button>
+            )}
+
+            {/* ACORDEÓN / ÁRBOL DE SEGURIDAD Y ACCESOS */}
+            {(tienePermisoTab('roles') || tienePermisoTab('permissions') || tienePermisoTab('sections')) && (
+              <div className="pt-1 font-sans">
+                <button
+                  onClick={() => setSeguridadMenuAbierto(!seguridadMenuAbierto)}
+                  className="w-full flex items-center justify-between px-3 h-[36px] rounded-[12px] text-[14px] font-medium text-[#d4d4d4] hover:bg-[#252525] transition-colors cursor-pointer font-sans"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <ShieldCheck className="h-4 w-4 text-[#87a9ff] flex-shrink-0" />
+                    <span>Seguridad y Accesos</span>
+                  </div>
+                  {seguridadMenuAbierto ? <ChevronDown className="h-3.5 w-3.5 text-[#8c8c8c]" /> : <ChevronRight className="h-3.5 w-3.5 text-[#8c8c8c]" />}
+                </button>
+
+                {seguridadMenuAbierto && (
+                  <div className="pl-3.5 mt-1 space-y-1 border-l border-[#262626] ml-4 font-sans">
+                    {tienePermisoTab('roles') && (
+                      <button
+                        onClick={() => { setActiveConsoleTab('roles'); setMenuMovilAbierto(false); }}
+                        className={`w-full flex items-center gap-2 px-2.5 h-[32px] rounded-[8px] text-[13px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                          activeConsoleTab === 'roles' 
+                            ? 'bg-[#2a2a2a] text-[#87a9ff]' 
+                            : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                        }`}
+                      >
+                        <Sliders className="h-3.5 w-3.5 text-current flex-shrink-0" />
+                        <span>Control de Rangos</span>
+                      </button>
+                    )}
+
+                    {tienePermisoTab('permissions') && (
+                      <button
+                        onClick={() => { setActiveConsoleTab('permissions'); setMenuMovilAbierto(false); }}
+                        className={`w-full flex items-center gap-2 px-2.5 h-[32px] rounded-[8px] text-[13px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                          activeConsoleTab === 'permissions' 
+                            ? 'bg-[#2a2a2a] text-[#87a9ff]' 
+                            : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                        }`}
+                      >
+                        <Key className="h-3.5 w-3.5 text-current flex-shrink-0" />
+                        <span>Control de Permisos</span>
+                      </button>
+                    )}
+
+                    {tienePermisoTab('sections') && (
+                      <button
+                        onClick={() => { setActiveConsoleTab('sections'); setMenuMovilAbierto(false); }}
+                        className={`w-full flex items-center gap-2 px-2.5 h-[32px] rounded-[8px] text-[13px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                          activeConsoleTab === 'sections' 
+                            ? 'bg-[#2a2a2a] text-[#87a9ff]' 
+                            : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                        }`}
+                      >
+                        <FolderTree className="h-3.5 w-3.5 text-current flex-shrink-0" />
+                        <span>Secciones y Acciones</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {tienePermisoTab('sessions') && (
+              <button
+                onClick={() => { setActiveConsoleTab('sessions'); setMenuMovilAbierto(false); }}
+                className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
+                  activeConsoleTab === 'sessions' 
+                    ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                    : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                }`}
+              >
+                <Activity className="h-4 w-4 text-current flex-shrink-0" />
+                <span>Monitor de Sesiones</span>
+              </button>
+            )}
+
+            {tienePermisoTab('logs') && (
+              <button
+                onClick={() => { setActiveConsoleTab('logs'); setMenuMovilAbierto(false); }}
+                className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
+                  activeConsoleTab === 'logs' 
+                    ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                    : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                }`}
+              >
+                <Database className="h-4 w-4 text-current flex-shrink-0" />
+                <span>Registros y Auditoría</span>
+              </button>
+            )}
+          </div>
+        )}
       </div>
 
       {/* FOOTER SIDEBAR - BARRA DE ÍCONOS Y PILL DE USUARIO ROOT */}
