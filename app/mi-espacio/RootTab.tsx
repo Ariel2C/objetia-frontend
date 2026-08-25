@@ -166,11 +166,13 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     name: string;
     category: string;
     description?: string;
+    target_section?: string;
   }
 
   // Estados Control de Rangos y Permisos
   const [modoVistaRango, setModoVistaRango] = useState<'lista' | 'formulario'>('lista');
   const [allPermissions, setAllPermissions] = useState<PermissionItem[]>([]);
+  const [appSections, setAppSections] = useState<{ code: string; name: string; category: string; description?: string }[]>([]);
   const [rangosList, setRangosList] = useState<RoleItem[]>([
     {
       id: 'root',
@@ -231,11 +233,13 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     name: string;
     category: string;
     description: string;
+    target_section: string;
   }>({
     code: '',
     name: '',
     category: 'Sistema',
-    description: ''
+    description: '',
+    target_section: ''
   });
 
   const abrirFormularioPermiso = (modo: 'crear' | 'editar', permiso?: PermissionItem) => {
@@ -245,14 +249,16 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
         code: permiso.code,
         name: permiso.name,
         category: permiso.category || 'Sistema',
-        description: permiso.description || ''
+        description: permiso.description || '',
+        target_section: permiso.target_section || ''
       });
     } else {
       setPermisoForm({
         code: '',
         name: '',
         category: 'Sistema',
-        description: ''
+        description: '',
+        target_section: ''
       });
     }
     setModoVistaPermiso('formulario');
@@ -279,7 +285,8 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             code: codeClean,
             name: permisoForm.name.trim(),
             category: permisoForm.category.trim() || 'Sistema',
-            description: permisoForm.description.trim()
+            description: permisoForm.description.trim(),
+            target_section: permisoForm.target_section || null
           })
         });
         const data = await res.json();
@@ -302,7 +309,8 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             code: permisoForm.code,
             name: permisoForm.name.trim(),
             category: permisoForm.category.trim() || 'Sistema',
-            description: permisoForm.description.trim()
+            description: permisoForm.description.trim(),
+            target_section: permisoForm.target_section || null
           })
         });
         const data = await res.json();
@@ -607,16 +615,22 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
         });
         const data = await res.json();
         if (res.ok) setUsersList(data.users || []);
-      } else if (activeConsoleTab === 'roles') {
-        const [resRoles, resPerms] = await Promise.all([
+      } else if (activeConsoleTab === 'roles' || activeConsoleTab === 'permissions') {
+        const [resRoles, resPerms, resSecs] = await Promise.all([
           fetch(`${getApiUrl()}/root/roles`, { headers: { "Authorization": `Bearer ${token}` } }),
-          fetch(`${getApiUrl()}/root/permissions`, { headers: { "Authorization": `Bearer ${token}` } })
+          fetch(`${getApiUrl()}/root/permissions`, { headers: { "Authorization": `Bearer ${token}` } }),
+          fetch(`${getApiUrl()}/root/app-sections`, { headers: { "Authorization": `Bearer ${token}` } })
         ]);
         const dataRoles = await resRoles.json();
         const dataPerms = await resPerms.json();
+        const dataSecs = await resSecs.json();
 
         if (resPerms.ok && dataPerms.permissions) {
           setAllPermissions(dataPerms.permissions);
+        }
+
+        if (resSecs.ok && dataSecs.sections) {
+          setAppSections(dataSecs.sections);
         }
 
         if (resRoles.ok && dataRoles.roles) {
@@ -1529,7 +1543,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                           required
                           value={permisoForm.name}
                           onChange={(e) => setPermisoForm(f => ({ ...f, name: e.target.value }))}
-                          placeholder="Ej: Gestionar Envíos"
+                          placeholder="Ej: Gestionar Banners"
                           style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
                           className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
                         />
@@ -1541,7 +1555,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                           type="text"
                           value={permisoForm.category}
                           onChange={(e) => setPermisoForm(f => ({ ...f, category: e.target.value }))}
-                          placeholder="Ej: Operaciones"
+                          placeholder="Ej: CMS"
                           style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
                           className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
                         />
@@ -1549,9 +1563,26 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                     </div>
 
                     <div>
+                      <label className="block text-[#8c8c8c] mb-1 font-medium">Sección Protegida de la App (Vínculo Dinámico)</label>
+                      <select
+                        value={permisoForm.target_section}
+                        onChange={(e) => setPermisoForm(f => ({ ...f, target_section: e.target.value }))}
+                        style={{ color: '#ffffff', backgroundColor: '#191919' }}
+                        className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans cursor-pointer"
+                      >
+                        <option value="">-- Sin Sección Específica (Acceso General) --</option>
+                        {appSections.map((sec) => (
+                          <option key={sec.code} value={sec.code} className="bg-[#191919] text-white">
+                            {sec.name} ({sec.category}) - [{sec.code}]
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
                       <label className="block text-[#8c8c8c] mb-1 font-medium">Descripción Explicativa</label>
                       <textarea
-                        rows={3}
+                        rows={2}
                         value={permisoForm.description}
                         onChange={(e) => setPermisoForm(f => ({ ...f, description: e.target.value }))}
                         placeholder="Explicación detallada de la función que habilita este permiso..."
