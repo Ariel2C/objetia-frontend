@@ -335,33 +335,31 @@ export default function RootTab({
     id: number;
     code: string;
     name: string;
+    path?: string;
     category: string;
     description?: string;
     parent_code?: string;
     icon_name?: string;
     is_active: boolean;
-    actions: { id: number; code: string; name: string; description?: string; is_active: boolean }[];
     children: SectionNode[];
   }
 
   const [sectionsTree, setSectionsTree] = useState<SectionNode[]>([]);
-  const [flatSections, setFlatSections] = useState<{ id: number; code: string; name: string; category: string }[]>([]);
-  const [expandedSectionCodes, setExpandedSectionCodes] = useState<Record<string, boolean>>({});
+  const [flatSections, setFlatSections] = useState<{ id: number; code: string; name: string; category: string; parent_code?: string; path?: string }[]>([]);
+  const [expandedSectionCodes, setExpandedSectionCodes] = useState<Record<string, boolean>>({
+    admin_section: true,
+    cms: true,
+    system: true
+  });
 
   const [modalSeccion, setModalSeccion] = useState<{
     id?: number;
     code: string;
     name: string;
+    path: string;
     category: string;
     description: string;
     parent_code: string;
-  } | null>(null);
-
-  const [modalAccion, setModalAccion] = useState<{
-    section_code: string;
-    code: string;
-    name: string;
-    description: string;
   } | null>(null);
 
   const toggleExpandSection = (code: string) => {
@@ -381,6 +379,7 @@ export default function RootTab({
           body: JSON.stringify({
             code: codeClean,
             name: modalSeccion.name.trim(),
+            path: modalSeccion.path.trim() || null,
             category: modalSeccion.category.trim() || 'General',
             description: modalSeccion.description.trim(),
             parent_code: modalSeccion.parent_code || null
@@ -388,11 +387,11 @@ export default function RootTab({
         });
         const data = await res.json();
         if (res.ok) {
-          toast.success(`Sección '${modalSeccion.name}' creada exitosamente.`);
+          toast.success(`Página '${modalSeccion.name}' creada exitosamente.`);
           setModalSeccion(null);
           cargarDatos();
         } else {
-          toast.error(data.detail || "Error al crear la sección.");
+          toast.error(data.detail || "Error al crear la página.");
         }
       } else {
         const res = await fetch(`${getApiUrl()}/root/sections/${modalSeccion.id}`, {
@@ -401,6 +400,7 @@ export default function RootTab({
           body: JSON.stringify({
             code: modalSeccion.code,
             name: modalSeccion.name.trim(),
+            path: modalSeccion.path.trim() || null,
             category: modalSeccion.category.trim() || 'General',
             description: modalSeccion.description.trim(),
             parent_code: modalSeccion.parent_code || null
@@ -408,11 +408,11 @@ export default function RootTab({
         });
         const data = await res.json();
         if (res.ok) {
-          toast.success(`Sección '${modalSeccion.name}' actualizada.`);
+          toast.success(`Página '${modalSeccion.name}' actualizada.`);
           setModalSeccion(null);
           cargarDatos();
         } else {
-          toast.error(data.detail || "Error al actualizar la sección.");
+          toast.error(data.detail || "Error al actualizar la página.");
         }
       }
     } catch {
@@ -427,159 +427,121 @@ export default function RootTab({
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Error al eliminar sección.");
-      toast.success(data.mensaje || `Sección '${name}' eliminada.`);
+      if (!res.ok) throw new Error(data.detail || "Error al eliminar página.");
+      toast.success(data.mensaje || `Página '${name}' eliminada.`);
       cargarDatos();
     } catch (err: any) {
-      toast.error(err.message || "Error al eliminar sección.");
-    }
-  };
-
-  const guardarAccion = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!modalAccion || !modalAccion.name.trim()) return;
-    const codeClean = modalAccion.name.toLowerCase().trim().replace(/\s+/g, '_');
-
-    try {
-      const res = await fetch(`${getApiUrl()}/root/sections/${modalAccion.section_code}/actions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({
-          code: codeClean,
-          name: modalAccion.name.trim(),
-          description: modalAccion.description.trim()
-        })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        toast.success(`Acción '${modalAccion.name}' creada exitosamente.`);
-        setModalAccion(null);
-        cargarDatos();
-      } else {
-        toast.error(data.detail || "Error al crear acción.");
-      }
-    } catch {
-      toast.error("No se pudo conectar con el servidor.");
-    }
-  };
-
-  const eliminarAccion = async (id: number, name: string) => {
-    try {
-      const res = await fetch(`${getApiUrl()}/root/actions/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.detail || "Error al eliminar acción.");
-      toast.success(data.mensaje || `Acción '${name}' eliminada.`);
-      cargarDatos();
-    } catch (err: any) {
-      toast.error(err.message || "Error al eliminar acción.");
+      toast.error(err.message || "Error al eliminar página.");
     }
   };
 
   const renderSectionNode = (node: SectionNode, depth = 0) => {
-    const isExpanded = expandedSectionCodes[node.code] ?? false;
+    const isExpanded = expandedSectionCodes[node.code] ?? true;
     const hasChildren = node.children && node.children.length > 0;
-    const hasActions = node.actions && node.actions.length > 0;
+    const isRootGroup = !node.parent_code;
 
     return (
-      <div key={node.code} className="font-sans text-xs select-none">
-        {/* FILA DE SECCIÓN (CARPETA EN ÁRBOL ESTILO EXPLORADOR VS CODE) */}
+      <div key={node.code} className="font-sans text-xs select-none space-y-1">
+        {/* FILA DE SECCIÓN PRINCIPAL O PÁGINA */}
         <div 
-          style={{ paddingLeft: `${depth * 18 + 8}px` }}
-          className="group py-1.5 pr-2 hover:bg-[#252525] rounded-[6px] flex items-center justify-between gap-2 transition-colors cursor-pointer"
+          style={{ paddingLeft: `${depth * 20 + 8}px` }}
+          className={`group py-2 pr-3 rounded-[8px] flex items-center justify-between gap-2 transition-colors ${
+            isRootGroup 
+              ? 'bg-[#191919] border border-[#2b2b2b] hover:border-[#383838]' 
+              : 'bg-[#161618] hover:bg-[#202022] border border-[#222224]'
+          }`}
         >
           <div 
-            onClick={() => toggleExpandSection(node.code)}
-            className="flex items-center gap-2 min-w-0 flex-1 py-0.5"
+            onClick={() => isRootGroup && toggleExpandSection(node.code)}
+            className={`flex items-center gap-2.5 min-w-0 flex-1 ${isRootGroup ? 'cursor-pointer' : ''}`}
           >
-            <span className="text-[#8c8c8c] hover:text-white transition flex-shrink-0">
-              {isExpanded ? <ChevronDown className="h-4 w-4 text-[#cccccc]" /> : <ChevronRight className="h-4 w-4 text-[#8c8c8c]" />}
-            </span>
-
-            {isExpanded ? (
-              <FolderOpen className="h-4 w-4 text-[#cccccc] fill-[#cccccc]/20 flex-shrink-0" />
+            {isRootGroup ? (
+              <button 
+                type="button"
+                onClick={(e) => { e.stopPropagation(); toggleExpandSection(node.code); }}
+                className="text-[#8c8c8c] hover:text-white transition flex-shrink-0 cursor-pointer p-0.5"
+              >
+                {isExpanded ? <ChevronDown className="h-4 w-4 text-[#87a9ff]" /> : <ChevronRight className="h-4 w-4 text-[#8c8c8c]" />}
+              </button>
             ) : (
-              <Folder className="h-4 w-4 text-[#8c8c8c] flex-shrink-0" />
+              <span className="w-3.5 flex-shrink-0" />
             )}
 
-            <span className="text-[13px] text-[#cccccc] group-hover:text-white font-sans font-medium truncate">
+            {isRootGroup ? (
+              <Folder className={`h-4 w-4 flex-shrink-0 ${isExpanded ? 'text-[#87a9ff]' : 'text-[#8c8c8c]'}`} />
+            ) : (
+              <FileText className="h-4 w-4 text-[#87a9ff] flex-shrink-0" />
+            )}
+
+            <span className={`text-[13px] font-sans font-medium truncate ${isRootGroup ? 'text-white font-semibold' : 'text-[#d4d4d4]'}`}>
               {node.name}
             </span>
+
+            {/* Badge de Ruta de la Página */}
+            {node.path && (
+              <span className="text-[11px] px-2 py-0.5 rounded-[4px] bg-[#252525] text-[#87a9ff] border border-[#383838] font-mono">
+                {node.path}
+              </span>
+            )}
+
             <span className="text-[10px] text-[#666666] font-mono">[{node.code}]</span>
           </div>
 
-          {/* ACCIONES DE EDICIÓN Y CREACIÓN EN HOVER */}
-          <div className="flex items-center gap-1 flex-shrink-0 opacity-80 group-hover:opacity-100 transition">
-            <button
-              type="button"
-              onClick={() => setModalAccion({ section_code: node.code, code: '', name: '', description: '' })}
-              className="p-1 text-[#8c8c8c] hover:text-[#87a9ff] hover:bg-[#333333] rounded transition cursor-pointer flex items-center gap-1 font-sans text-[11px]"
-              title="Agregar Acción a esta sección"
-            >
-              <Zap className="h-3.5 w-3.5 text-amber-400" />
-              <span className="hidden sm:inline">+ Acción</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setModalSeccion({
-                id: node.id,
-                code: node.code,
-                name: node.name,
-                category: node.category,
-                description: node.description || '',
-                parent_code: node.parent_code || ''
-              })}
-              className="p-1 text-[#8c8c8c] hover:text-white hover:bg-[#333333] rounded transition cursor-pointer font-sans text-[11px]"
-              title="Editar sección"
-            >
-              Editar
-            </button>
-
-            <button
-              type="button"
-              onClick={() => eliminarSeccion(node.id, node.name)}
-              className="p-1 text-[#8c8c8c] hover:text-red-400 hover:bg-[#333333] rounded transition cursor-pointer font-sans text-[11px]"
-              title="Eliminar sección"
-            >
-              Eliminar
-            </button>
-          </div>
-        </div>
-
-        {/* NODOS HIJOS Y ACCIONES ESPECÍFICAS (CUANDO ESTÁ EXPANDIDO) */}
-        {isExpanded && (
-          <div className="space-y-0.5">
-            {/* SECCIONES HIJAS */}
-            {hasChildren && node.children.map((child) => renderSectionNode(child, depth + 1))}
-
-            {/* ACCIONES DENTRO DE LA SECCIÓN (ARCHIVOS HOJAS DEL ÁRBOL) */}
-            {hasActions && node.actions.map((act) => (
-              <div 
-                key={act.id} 
-                style={{ paddingLeft: `${(depth + 1) * 18 + 26}px` }}
-                className="group py-1 pr-2 hover:bg-[#252525] rounded-[6px] flex items-center justify-between gap-2 transition-colors"
+          {/* ACCIONES A LA DERECHA */}
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            {isRootGroup ? (
+              <button
+                type="button"
+                onClick={() => setModalSeccion({
+                  code: '',
+                  name: '',
+                  path: '',
+                  category: node.name,
+                  description: '',
+                  parent_code: node.code
+                })}
+                className="px-2.5 py-1 bg-[#252525] hover:bg-[#303030] text-[#87a9ff] border border-[#383838] rounded-[6px] transition cursor-pointer flex items-center gap-1 font-sans text-[11px]"
+                title={`Agregar nueva página a ${node.name}`}
               >
-                <div className="flex items-center gap-2 min-w-0 flex-1">
-                  <FileText className="h-3.5 w-3.5 text-[#87a9ff] flex-shrink-0" />
-                  <span className="text-[12px] text-[#a0a0a0] group-hover:text-white font-sans truncate">
-                    {act.name}
-                  </span>
-                  <span className="text-[9px] text-[#666666] font-mono">[{act.code}]</span>
-                </div>
+                <Plus className="h-3 w-3" />
+                <span>+ Agregar Página</span>
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setModalSeccion({
+                    id: node.id,
+                    code: node.code,
+                    name: node.name,
+                    path: node.path || `/${node.code}`,
+                    category: node.category,
+                    description: node.description || '',
+                    parent_code: node.parent_code || ''
+                  })}
+                  className="px-2.5 py-1 bg-[#252525] hover:bg-[#333333] text-[#d4d4d4] hover:text-white border border-[#333333] rounded-[6px] transition cursor-pointer font-sans text-[11px]"
+                  title="Editar nombre y ruta de la página"
+                >
+                  Editar
+                </button>
 
                 <button
                   type="button"
-                  onClick={() => eliminarAccion(act.id, act.name)}
-                  className="p-1 text-[#666666] hover:text-red-400 hover:bg-[#333333] rounded transition cursor-pointer"
-                  title="Eliminar acción"
+                  onClick={() => eliminarSeccion(node.id, node.name)}
+                  className="px-2.5 py-1 bg-[#252525] hover:bg-red-500/20 text-[#8c8c8c] hover:text-red-400 border border-[#333333] rounded-[6px] transition cursor-pointer font-sans text-[11px]"
+                  title="Eliminar página"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  Eliminar
                 </button>
-              </div>
-            ))}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* PÁGINAS HIJAS */}
+        {isRootGroup && isExpanded && hasChildren && (
+          <div className="space-y-1 pl-2">
+            {node.children.map((child) => renderSectionNode(child, depth + 1))}
           </div>
         )}
       </div>
@@ -661,6 +623,12 @@ export default function RootTab({
           >
             {node.name}
           </span>
+
+          {node.path && (
+            <span className="text-[10px] px-1.5 py-0.5 rounded-[4px] bg-[#252525] text-[#87a9ff] border border-[#383838] font-mono ml-1">
+              {node.path}
+            </span>
+          )}
         </div>
 
         {/* Nodos Hijos (Desplegable) */}
@@ -1907,7 +1875,7 @@ export default function RootTab({
         {activeConsoleTab === 'sections' && (
           <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-row justify-between items-center gap-2.5 bg-[#1f1f1f] flex-shrink-0">
             <button
-              onClick={() => setModalSeccion({ code: '', name: '', category: 'General', description: '', parent_code: '' })}
+              onClick={() => setModalSeccion({ code: '', name: '', path: '', category: 'General', description: '', parent_code: '' })}
               className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer flex items-center gap-1 font-sans"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -2894,14 +2862,14 @@ export default function RootTab({
         </div>
       )}
 
-      {/* MODAL CREAR / EDITAR SECCIÓN */}
+      {/* MODAL CREAR / EDITAR PÁGINA O SECCIÓN */}
       {modalSeccion && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs font-sans">
           <div className="bg-[#1f1f1f] border border-[#262626] rounded-[16px] p-6 max-w-md w-full space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#262626] pb-3">
               <h3 className="text-sm font-bold text-white flex items-center gap-2">
                 <FolderTree className="h-4.5 w-4.5 text-[#87a9ff]" />
-                <span>{modalSeccion.id ? 'Editar Sección' : 'Nueva Sección en Árbol'}</span>
+                <span>{modalSeccion.id ? 'Editar Página' : 'Nueva Página en el Sistema'}</span>
               </h3>
               <button onClick={() => setModalSeccion(null)} className="text-[#8c8c8c] hover:text-white transition cursor-pointer">
                 <X className="h-5 w-5" />
@@ -2910,62 +2878,47 @@ export default function RootTab({
 
             <form onSubmit={guardarSeccion} className="space-y-3 text-xs">
               <div>
-                <label className="block text-[#8c8c8c] mb-1 font-medium">Nombre de la Sección</label>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Nombre de la Página</label>
                 <input
                   type="text"
                   required
                   value={modalSeccion.name}
                   onChange={(e) => setModalSeccion(s => s ? ({ ...s, name: e.target.value }) : null)}
-                  placeholder="Ej: Mis Ventas"
+                  placeholder="Ej: Panel de Control"
                   style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
                   className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
                 />
               </div>
 
               <div>
-                <label className="block text-[#8c8c8c] mb-1 font-medium">Sección Padre (Jerarquía en Árbol)</label>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Dirección / Ruta URL de Acceso</label>
+                <input
+                  type="text"
+                  value={modalSeccion.path}
+                  onChange={(e) => setModalSeccion(s => s ? ({ ...s, path: e.target.value }) : null)}
+                  placeholder="Ej: /dashboard o /appearance"
+                  style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
+                  className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Sección Contenedora (Grupo del Menú)</label>
                 <select
                   value={modalSeccion.parent_code}
                   onChange={(e) => setModalSeccion(s => s ? ({ ...s, parent_code: e.target.value }) : null)}
                   style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
                   className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans cursor-pointer"
                 >
-                  <option value="">-- Nodo Raíz Principal (Sin Padre) --</option>
+                  <option value="">-- Sección Principal Independiente --</option>
                   {flatSections
-                    .filter(s => !modalSeccion.id || s.id !== modalSeccion.id)
+                    .filter(s => !s.parent_code && (!modalSeccion.id || s.id !== modalSeccion.id))
                     .map((s) => (
                       <option key={s.code} value={s.code} className="bg-[#191919] text-white">
-                        {s.name} ({s.category}) - [{s.code}]
+                        {s.name} [{s.code}]
                       </option>
                     ))}
                 </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-[#8c8c8c] mb-1 font-medium">Categoría</label>
-                  <input
-                    type="text"
-                    value={modalSeccion.category}
-                    onChange={(e) => setModalSeccion(s => s ? ({ ...s, category: e.target.value }) : null)}
-                    placeholder="Ej: Operaciones"
-                    style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
-                    className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-[#8c8c8c] mb-1 font-medium">Código Interno</label>
-                  <input
-                    type="text"
-                    disabled={Boolean(modalSeccion.id)}
-                    value={modalSeccion.code || (modalSeccion.name ? modalSeccion.name.toLowerCase().replace(/\s+/g, '_') : '')}
-                    onChange={(e) => setModalSeccion(s => s ? ({ ...s, code: e.target.value }) : null)}
-                    placeholder="Auto-generado..."
-                    style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
-                    className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white disabled:opacity-50"
-                  />
-                </div>
               </div>
 
               <div>
@@ -2974,7 +2927,7 @@ export default function RootTab({
                   rows={2}
                   value={modalSeccion.description}
                   onChange={(e) => setModalSeccion(s => s ? ({ ...s, description: e.target.value }) : null)}
-                  placeholder="Finalidad de esta sección..."
+                  placeholder="Finalidad y alcance de esta página..."
                   style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
                   className="w-full p-2.5 bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
                 />
@@ -2992,67 +2945,7 @@ export default function RootTab({
                   type="submit"
                   className="px-4 h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[8px] text-xs font-medium hover:bg-[#454d63] transition cursor-pointer font-sans"
                 >
-                  {modalSeccion.id ? 'Guardar Cambios' : 'Crear Sección'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL CREAR ACCIÓN */}
-      {modalAccion && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs font-sans">
-          <div className="bg-[#1f1f1f] border border-[#262626] rounded-[16px] p-6 max-w-sm w-full space-y-4 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-[#262626] pb-3">
-              <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                <Zap className="h-4.5 w-4.5 text-amber-400" />
-                <span>Nueva Acción ({modalAccion.section_code})</span>
-              </h3>
-              <button onClick={() => setModalAccion(null)} className="text-[#8c8c8c] hover:text-white transition cursor-pointer">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <form onSubmit={guardarAccion} className="space-y-3 text-xs">
-              <div>
-                <label className="block text-[#8c8c8c] mb-1 font-medium">Nombre de la Acción (Ej: Vender Artículos)</label>
-                <input
-                  type="text"
-                  required
-                  value={modalAccion.name}
-                  onChange={(e) => setModalAccion(a => a ? ({ ...a, name: e.target.value }) : null)}
-                  placeholder="Ej: Publicar y Vender C2C"
-                  style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
-                  className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
-                />
-              </div>
-
-              <div>
-                <label className="block text-[#8c8c8c] mb-1 font-medium">Descripción</label>
-                <textarea
-                  rows={2}
-                  value={modalAccion.description}
-                  onChange={(e) => setModalAccion(a => a ? ({ ...a, description: e.target.value }) : null)}
-                  placeholder="Permite al usuario vender artículos..."
-                  style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
-                  className="w-full p-2.5 bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
-                />
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#262626]">
-                <button
-                  type="button"
-                  onClick={() => setModalAccion(null)}
-                  className="px-3.5 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
-                >
-                  Cancelar
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 h-[32px] bg-amber-600/30 border border-amber-500/50 text-amber-300 rounded-[8px] text-xs font-medium hover:bg-amber-600/40 transition cursor-pointer font-sans"
-                >
-                  Crear Acción
+                  {modalSeccion.id ? 'Guardar Cambios' : 'Crear Página'}
                 </button>
               </div>
             </form>
