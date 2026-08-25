@@ -1887,12 +1887,17 @@ export default function RootTab({
         {activeConsoleTab === 'permissions' && (
           <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-row justify-between items-center gap-2.5 bg-[#1f1f1f]">
             {modoVistaPermiso === 'lista' ? (
-              <button
-                onClick={() => abrirFormularioPermiso('crear')}
-                className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer whitespace-nowrap font-sans"
-              >
-                Nuevo Permiso
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => abrirFormularioPermiso('crear')}
+                  className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer whitespace-nowrap font-sans"
+                >
+                  Nuevo Permiso
+                </button>
+                <span className="text-xs text-[#8c8c8c] font-sans">
+                  Permisos registrados ({allPermissions.length})
+                </span>
+              </div>
             ) : (
               <div className="flex items-center justify-between w-full gap-2">
                 <button
@@ -2454,9 +2459,9 @@ export default function RootTab({
                           return (
                             <div key={grupo.key} className="space-y-2.5 bg-[#18181a] border border-[#262626] rounded-[10px] p-3">
                               <div className="flex items-center gap-2 pb-1.5 border-b border-[#262626]">
-                                <span className="text-xs font-bold text-white uppercase tracking-wider">{grupo.label}</span>
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#252525] text-[#8c8c8c] border border-[#333333]">
-                                  {grupo.items.length}
+                                <span className="text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider">{grupo.label}</span>
+                                <span className="text-[10px] text-[#666668] font-mono">
+                                  ({grupo.items.length})
                                 </span>
                               </div>
 
@@ -2508,19 +2513,15 @@ export default function RootTab({
           {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'permissions' && (
             <div className="space-y-4">
               {modoVistaPermiso === 'lista' ? (
-                <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-5 space-y-6 font-sans">
-                  <div className="flex items-center justify-between border-b border-[#262626] pb-3">
-                    <h2 className="text-sm font-bold text-[#87a9ff] uppercase tracking-wider">Catálogo de Permisos Registrados ({allPermissions.length})</h2>
-                  </div>
-
-                  <div className="space-y-6">
+                <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-5 space-y-5 font-sans">
+                  <div className="space-y-5">
                     {permisosAgrupadosPorSeccion.map((grupo) => {
                       return (
-                        <div key={grupo.key} className="space-y-2.5">
-                          <div className="flex items-center gap-2 pb-1.5 border-b border-[#2b2b2e]">
-                            <h3 className="text-xs font-bold text-white uppercase tracking-wider">{grupo.label}</h3>
-                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#252528] text-[#87a9ff] border border-[#38383c] font-medium">
-                              {grupo.items.length} permiso(s)
+                        <div key={grupo.key} className="space-y-2">
+                          <div className="flex items-center gap-2 pb-1 border-b border-[#262629]">
+                            <h3 className="text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider">{grupo.label}</h3>
+                            <span className="text-[10px] text-[#666668] font-mono">
+                              ({grupo.items.length})
                             </span>
                           </div>
 
