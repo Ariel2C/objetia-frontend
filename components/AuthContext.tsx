@@ -134,6 +134,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUsuario(datosUsuario);
     localStorage.setItem("vamaar_token", nuevoToken);
     localStorage.setItem("vamaar_user", JSON.stringify(datosUsuario));
+
+    // Refrescar permisos actualizados inmediatamente en segundo plano
+    fetch(`${getApiUrl()}/auth/me`, {
+      headers: {
+        'Authorization': `Bearer ${nuevoToken}`
+      }
+    })
+    .then(res => {
+      if (res.ok) return res.json();
+      throw new Error(`Status ${res.status}`);
+    })
+    .then(fullData => {
+      setUsuario(fullData);
+      localStorage.setItem("vamaar_user", JSON.stringify(fullData));
+    })
+    .catch(() => {});
   };
 
   const tienePermiso = (codigoPermiso: string): boolean => {
