@@ -203,7 +203,18 @@ export default function MenuCards({ tabActual, setTabActual, esAdmin, esRoot, on
     }
   ];
 
-  const grupos = (esAdmin || tieneAccesoAdmin) ? adminCards : clientCards;
+  const itemPermitido = (id: string) => {
+    if (id === 'billetera') return tienePermiso('wallet_access') || tienePermiso('full_access') || esRoot;
+    if (id === 'publications' || id === 'sales' || id === 'vender') return tienePermiso('sell_products') || tienePermiso('full_access') || esRoot;
+    if (id === 'purchases') return tienePermiso('buy_products') || tienePermiso('full_access') || esRoot;
+    return true;
+  };
+
+  const gruposRaw = (esAdmin || tieneAccesoAdmin) ? adminCards : clientCards;
+  const grupos = gruposRaw.map(g => ({
+    ...g,
+    items: g.items.filter(item => itemPermitido(item.id))
+  })).filter(g => g.items.length > 0);
 
   const handleClick = (item: CardItem) => {
     if (item.isExternalLink && item.href) {

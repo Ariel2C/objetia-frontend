@@ -24,7 +24,7 @@ interface NavbarProps {
 }
 
 export default function Navbar({ logoUrl }: NavbarProps) {
-  const { usuario, logout, token, cargando } = useAuth();
+  const { usuario, logout, token, cargando, tienePermiso } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -347,14 +347,16 @@ export default function Navbar({ logoUrl }: NavbarProps) {
           {/* SECCIÓN USUARIO Y ACCIONES DE CABECERA */}
           <div className="flex items-center space-x-4 sm:space-x-5">
             
-            {/* BOTÓN VENDER (SIEMPRE VISIBLE) */}
-            <button 
-              onClick={handleBotonVender}
-              className="inline-flex items-center justify-center text-white text-xs font-extrabold px-4 py-2 rounded-xl transition shadow-xs hover:opacity-90 cursor-pointer"
-              style={{ backgroundColor: 'var(--color-primary, #2C3E50)' }}
-            >
-              Vender
-            </button>
+            {/* BOTÓN VENDER (VISIBLE SOLO SI TIENE PERMISO DE VENTA O NO ESTÁ LOGUEADO) */}
+            {(!usuario || tienePermiso('sell_products') || tienePermiso('full_access') || usuario?.role === 'root') && (
+              <button 
+                onClick={handleBotonVender}
+                className="inline-flex items-center justify-center text-white text-xs font-extrabold px-4 py-2 rounded-xl transition shadow-xs hover:opacity-90 cursor-pointer"
+                style={{ backgroundColor: 'var(--color-primary, #2C3E50)' }}
+              >
+                Vender
+              </button>
+            )}
 
             {mounted && !cargando && (
               usuario ? (

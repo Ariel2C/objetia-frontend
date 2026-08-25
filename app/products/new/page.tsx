@@ -36,7 +36,7 @@ interface SecondaryPhotoState {
 const MAX_IA_SCANS_PER_SESSION = 3;
 
 export default function NewProductPage() {
-  const { usuario, token, cargando } = useAuth();
+  const { usuario, token, cargando, tienePermiso } = useAuth();
   const router = useRouter();
   const toast = useToast();
 
@@ -83,12 +83,17 @@ export default function NewProductPage() {
   const [errorSubmit, setErrorSubmit] = useState<string | null>(null);
   const [publicando, setPublicando] = useState(false);
 
-  // Escudo de autenticación
+  // Escudo de autenticación y permisos
   useEffect(() => {
-    if (!cargando && !usuario) {
-      router.push("/auth");
+    if (!cargando) {
+      if (!usuario) {
+        router.push("/auth");
+      } else if (!tienePermiso('sell_products') && !tienePermiso('full_access') && usuario.role?.toLowerCase() !== 'root') {
+        toast.error("No tienes permiso para publicar o vender productos.");
+        router.push("/mi-espacio");
+      }
     }
-  }, [usuario, cargando, router]);
+  }, [usuario, cargando, router, tienePermiso, toast]);
 
   if (cargando || !usuario) {
     return (
