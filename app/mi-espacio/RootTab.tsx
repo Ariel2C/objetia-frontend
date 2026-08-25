@@ -435,51 +435,56 @@ export default function RootTab({
     }
   };
 
+  // Renderizador del Árbol en Control de Secciones (Estilo Explorador con Líneas Guía de Jerarquía)
   const renderSectionNode = (node: SectionNode, depth = 0) => {
     const isExpanded = expandedSectionCodes[node.code] ?? true;
     const hasChildren = node.children && node.children.length > 0;
     const isRootGroup = !node.parent_code;
 
     return (
-      <div key={node.code} className="font-sans text-xs select-none space-y-1">
-        {/* FILA DE SECCIÓN PRINCIPAL O PÁGINA */}
+      <div key={node.code} className="font-sans text-xs select-none relative">
+        {/* FILA PRINCIPAL DEL NODO */}
         <div 
-          style={{ paddingLeft: `${depth * 20 + 8}px` }}
-          className={`group py-2 pr-3 rounded-[8px] flex items-center justify-between gap-2 transition-colors ${
+          className={`group py-1.5 px-2.5 rounded-[6px] flex items-center justify-between gap-2 transition-all relative ${
             isRootGroup 
-              ? 'bg-[#191919] border border-[#2b2b2b] hover:border-[#383838]' 
-              : 'bg-[#161618] hover:bg-[#202022] border border-[#222224]'
+              ? 'bg-[#1e1e1e] border border-[#2d2d30] hover:border-[#3e3e42] hover:bg-[#252528]' 
+              : 'bg-[#18181a] hover:bg-[#222226] border border-[#26262a] before:content-[\'\'] before:absolute before:-left-[18px] before:top-1/2 before:w-[15px] before:border-t before:border-dashed before:border-[#444448]'
           }`}
         >
           <div 
             onClick={() => isRootGroup && toggleExpandSection(node.code)}
-            className={`flex items-center gap-2.5 min-w-0 flex-1 ${isRootGroup ? 'cursor-pointer' : ''}`}
+            className={`flex items-center gap-2 min-w-0 flex-1 ${isRootGroup ? 'cursor-pointer' : ''}`}
           >
+            {/* Flecha de colapso o espaciador */}
             {isRootGroup ? (
               <button 
                 type="button"
                 onClick={(e) => { e.stopPropagation(); toggleExpandSection(node.code); }}
-                className="text-[#8c8c8c] hover:text-white transition flex-shrink-0 cursor-pointer p-0.5"
+                className="w-4 h-4 flex items-center justify-center text-[#8c8c8c] hover:text-white transition cursor-pointer flex-shrink-0"
               >
-                {isExpanded ? <ChevronDown className="h-4 w-4 text-[#87a9ff]" /> : <ChevronRight className="h-4 w-4 text-[#8c8c8c]" />}
+                <span className={`text-[10px] transform transition-transform duration-150 ${isExpanded ? 'rotate-90 text-[#87a9ff]' : 'rotate-0 text-[#8c8c8c]'}`}>
+                  ▶
+                </span>
               </button>
             ) : (
-              <span className="w-3.5 flex-shrink-0" />
+              <span className="w-1.5 flex-shrink-0" />
             )}
 
+            {/* Icono de Carpeta / Archivo */}
             {isRootGroup ? (
-              <Folder className={`h-4 w-4 flex-shrink-0 ${isExpanded ? 'text-[#87a9ff]' : 'text-[#8c8c8c]'}`} />
+              <Folder className={`h-4 w-4 flex-shrink-0 ${isExpanded ? 'text-[#87a9ff] fill-[#87a9ff]/20' : 'text-[#8c8c8c]'}`} />
             ) : (
               <FileText className="h-4 w-4 text-[#87a9ff] flex-shrink-0" />
             )}
 
-            <span className={`text-[13px] font-sans font-medium truncate ${isRootGroup ? 'text-white font-semibold' : 'text-[#d4d4d4]'}`}>
+            {/* Nombre del nodo */}
+            <span className={`text-[13px] font-sans font-medium truncate ${isRootGroup ? 'text-white font-semibold' : 'text-[#e0e0e0] group-hover:text-white'}`}>
               {node.name}
             </span>
 
             {/* Badge de Ruta de la Página */}
             {node.path && (
-              <span className="text-[11px] px-2 py-0.5 rounded-[4px] bg-[#252525] text-[#87a9ff] border border-[#383838] font-mono">
+              <span className="text-[11px] px-2 py-0.5 rounded-[4px] bg-[#141416] text-[#87a9ff] border border-[#2f3542] font-mono">
                 {node.path}
               </span>
             )}
@@ -500,7 +505,7 @@ export default function RootTab({
                   description: '',
                   parent_code: node.code
                 })}
-                className="px-2.5 py-1 bg-[#252525] hover:bg-[#303030] text-[#87a9ff] border border-[#383838] rounded-[6px] transition cursor-pointer flex items-center gap-1 font-sans text-[11px]"
+                className="px-2.5 py-1 bg-[#28282b] hover:bg-[#343438] text-[#87a9ff] border border-[#3c3c40] rounded-[6px] transition cursor-pointer flex items-center gap-1 font-sans text-[11px]"
                 title={`Agregar nueva página a ${node.name}`}
               >
                 <Plus className="h-3 w-3" />
@@ -519,7 +524,7 @@ export default function RootTab({
                     description: node.description || '',
                     parent_code: node.parent_code || ''
                   })}
-                  className="px-2.5 py-1 bg-[#252525] hover:bg-[#333333] text-[#d4d4d4] hover:text-white border border-[#333333] rounded-[6px] transition cursor-pointer font-sans text-[11px]"
+                  className="px-2 py-0.5 bg-[#252528] hover:bg-[#323236] text-[#d4d4d4] hover:text-white border border-[#333338] rounded-[5px] transition cursor-pointer font-sans text-[11px]"
                   title="Editar nombre y ruta de la página"
                 >
                   Editar
@@ -528,7 +533,7 @@ export default function RootTab({
                 <button
                   type="button"
                   onClick={() => eliminarSeccion(node.id, node.name)}
-                  className="px-2.5 py-1 bg-[#252525] hover:bg-red-500/20 text-[#8c8c8c] hover:text-red-400 border border-[#333333] rounded-[6px] transition cursor-pointer font-sans text-[11px]"
+                  className="px-2 py-0.5 bg-[#252528] hover:bg-red-500/20 text-[#8c8c8c] hover:text-red-400 border border-[#333338] rounded-[5px] transition cursor-pointer font-sans text-[11px]"
                   title="Eliminar página"
                 >
                   Eliminar
@@ -538,9 +543,9 @@ export default function RootTab({
           </div>
         </div>
 
-        {/* PÁGINAS HIJAS */}
+        {/* PÁGINAS HIJAS CON LÍNEAS GUÍA DE ÁRBOL */}
         {isRootGroup && isExpanded && hasChildren && (
-          <div className="space-y-1 pl-2">
+          <div className="relative ml-[17px] pl-[18px] border-l border-dashed border-[#444448] space-y-1.5 my-1.5">
             {node.children.map((child) => renderSectionNode(child, depth + 1))}
           </div>
         )}
@@ -548,19 +553,21 @@ export default function RootTab({
     );
   };
 
-  // Renderizador del Árbol de Secciones y Páginas con Checkboxes para la Selección de Permisos (Estilo Google AI Studio Tree View)
+  // Renderizador del Árbol de Secciones y Páginas con Checkboxes y Líneas Guía para Permisos (Estilo Google AI Studio)
   const renderPermissionTreeNode = (node: SectionNode, depth = 0, parentNode?: SectionNode) => {
     const isChecked = isSectionChecked(node.code);
     const hasChildren = node.children && node.children.length > 0;
     const fullyChecked = hasChildren ? isParentSectionFullyChecked(node) : isChecked;
     const partiallyChecked = hasChildren ? isParentSectionPartiallyChecked(node) : false;
     const isExpanded = expandedSectionCodes[node.code] ?? true;
+    const isRootGroup = !node.parent_code;
 
     return (
-      <div key={node.code} className="font-sans select-none space-y-0.5">
+      <div key={node.code} className="font-sans select-none relative">
         <div 
-          style={{ paddingLeft: `${depth * 20 + 4}px` }}
-          className="flex items-center gap-2 py-1 px-1.5 rounded-[6px] hover:bg-[#252525] group transition-colors cursor-pointer"
+          className={`flex items-center gap-2 py-1.5 px-2 rounded-[6px] hover:bg-[#252528] group transition-colors cursor-pointer relative ${
+            !isRootGroup ? 'before:content-[\'\'] before:absolute before:-left-[18px] before:top-1/2 before:w-[15px] before:border-t before:border-dashed before:border-[#444448]' : ''
+          }`}
           onClick={() => {
             if (hasChildren) {
               toggleSectionInPermission(node);
@@ -579,7 +586,7 @@ export default function RootTab({
               }} 
               className="w-4 h-4 flex items-center justify-center text-[#8c8c8c] hover:text-white transition-colors cursor-pointer flex-shrink-0"
             >
-              <span className={`text-[9px] transform transition-transform ${isExpanded ? 'rotate-90 text-[#d4d4d4]' : 'rotate-0 text-[#8c8c8c]'}`}>
+              <span className={`text-[9px] transform transition-transform duration-150 ${isExpanded ? 'rotate-90 text-[#87a9ff]' : 'rotate-0 text-[#8c8c8c]'}`}>
                 ▶
               </span>
             </button>
@@ -611,9 +618,16 @@ export default function RootTab({
             )}
           </div>
 
+          {/* Icono de Carpeta o Archivo */}
+          {hasChildren ? (
+            <Folder className={`h-4 w-4 flex-shrink-0 ${isExpanded ? 'text-[#87a9ff] fill-[#87a9ff]/20' : 'text-[#8c8c8c]'}`} />
+          ) : (
+            <FileText className="h-3.5 w-3.5 text-[#87a9ff] flex-shrink-0" />
+          )}
+
           {/* Etiqueta / Nombre de la Sección o Página */}
           <span 
-            className={`text-[13px] font-normal leading-none pl-0.5 transition-colors ${
+            className={`text-[13px] leading-none transition-colors ${
               fullyChecked 
                 ? 'text-white font-medium' 
                 : partiallyChecked 
@@ -625,15 +639,15 @@ export default function RootTab({
           </span>
 
           {node.path && (
-            <span className="text-[10px] px-1.5 py-0.5 rounded-[4px] bg-[#252525] text-[#87a9ff] border border-[#383838] font-mono ml-1">
+            <span className="text-[10px] px-1.5 py-0.5 rounded-[4px] bg-[#141416] text-[#87a9ff] border border-[#2f3542] font-mono ml-1">
               {node.path}
             </span>
           )}
         </div>
 
-        {/* Nodos Hijos (Desplegable) */}
+        {/* Nodos Hijos con Líneas Guía de Jerarquía */}
         {hasChildren && isExpanded && (
-          <div className="space-y-0.5">
+          <div className="relative ml-[17px] pl-[18px] border-l border-dashed border-[#444448] space-y-0.5 my-0.5">
             {node.children.map((child) => renderPermissionTreeNode(child, depth + 1, node))}
           </div>
         )}
