@@ -2451,43 +2451,41 @@ export default function RootTab({
 
                       <div className="space-y-4">
                         {permisosAgrupadosPorSeccion.map((grupo) => {
-                          const IconoGrupo = grupo.icon;
                           return (
                             <div key={grupo.key} className="space-y-2.5 bg-[#18181a] border border-[#262626] rounded-[10px] p-3">
                               <div className="flex items-center gap-2 pb-1.5 border-b border-[#262626]">
-                                <IconoGrupo className="h-3.5 w-3.5 text-[#87a9ff]" />
                                 <span className="text-xs font-bold text-white uppercase tracking-wider">{grupo.label}</span>
                                 <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#252525] text-[#8c8c8c] border border-[#333333]">
                                   {grupo.items.length}
                                 </span>
                               </div>
 
-                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                                 {grupo.items.map((perm) => {
                                   const isChecked = rangoForm.selectedPermissionIds.includes(perm.id);
                                   return (
                                     <div
                                       key={perm.id}
                                       onClick={() => togglePermissionId(perm.id)}
-                                      className={`p-2.5 rounded-[8px] border transition cursor-pointer flex items-center gap-2.5 font-sans select-none ${
+                                      className={`p-2 rounded-[7px] border transition cursor-pointer flex items-center gap-2 font-sans select-none ${
                                         isChecked
                                           ? 'bg-[#87a9ff]/10 border-[#87a9ff]/50 text-white shadow-xs'
                                           : 'bg-[#141416] border-[#262626] text-[#8c8c8c] hover:bg-[#1f1f22] hover:border-[#383838]'
                                       }`}
                                     >
                                       <div
-                                        className={`w-4 h-4 rounded-[4px] border flex items-center justify-center flex-shrink-0 transition-all ${
+                                        className={`w-3.5 h-3.5 rounded-[3px] border flex items-center justify-center flex-shrink-0 transition-all ${
                                           isChecked
                                             ? 'bg-[#87a9ff] border-[#87a9ff] text-[#121212] shadow-xs'
                                             : 'bg-[#252525] border-[#383838] hover:border-[#555555]'
                                         }`}
                                       >
-                                        {isChecked && <Check className="w-3 h-3 text-[#121212] stroke-[3]" />}
+                                        {isChecked && <Check className="w-2.5 h-2.5 text-[#121212] stroke-[3]" />}
                                       </div>
 
                                       <div className="min-w-0">
-                                        <p className={`text-xs font-medium ${isChecked ? 'text-white' : 'text-[#d4d4d4]'}`}>{perm.name}</p>
-                                        <p className="text-[10px] text-[#8c8c8c] truncate">{perm.description || perm.category}</p>
+                                        <p className={`text-[11px] font-medium truncate ${isChecked ? 'text-white' : 'text-[#d4d4d4]'}`}>{perm.name}</p>
+                                        <p className="text-[9px] text-[#8c8c8c] truncate">{perm.description || perm.category}</p>
                                       </div>
                                     </div>
                                   );
@@ -2517,57 +2515,52 @@ export default function RootTab({
 
                   <div className="space-y-6">
                     {permisosAgrupadosPorSeccion.map((grupo) => {
-                      const IconoGrupo = grupo.icon;
                       return (
-                        <div key={grupo.key} className="space-y-3">
-                          <div className="flex items-center gap-2 pb-2 border-b border-[#2b2b2e]">
-                            <IconoGrupo className="h-4 w-4 text-[#87a9ff]" />
+                        <div key={grupo.key} className="space-y-2.5">
+                          <div className="flex items-center gap-2 pb-1.5 border-b border-[#2b2b2e]">
                             <h3 className="text-xs font-bold text-white uppercase tracking-wider">{grupo.label}</h3>
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#252528] text-[#87a9ff] border border-[#38383c] font-medium">
                               {grupo.items.length} permiso(s)
                             </span>
                           </div>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
                             {grupo.items.map((perm) => {
                               const esBase = ["full_access", "manage_roles", "manage_users", "view_audit_logs", "manage_sessions"].includes(perm.code.toLowerCase());
                               return (
                                 <div key={perm.id} className="p-2.5 bg-[#191919] border border-[#262626] rounded-[8px] space-y-1 font-sans flex flex-col justify-between hover:border-[#383838] transition-colors">
-                                  <div className="flex items-center justify-between gap-2">
-                                    <div className="flex items-center gap-1.5 min-w-0 flex-1">
-                                      <Key className="h-3.5 w-3.5 text-[#87a9ff] flex-shrink-0" />
-                                      <h3 className="text-xs font-semibold text-white truncate" title={perm.name}>
-                                        {perm.name}
-                                      </h3>
-                                    </div>
+                                  <div className="flex items-center justify-between gap-1.5">
+                                    <h3 className="text-xs font-semibold text-white truncate flex-1 min-w-0" title={perm.name}>
+                                      {perm.name}
+                                    </h3>
 
                                     {/* Botones de acción en la misma fila solo con iconos */}
                                     <div className="flex items-center gap-1 flex-shrink-0">
                                       <button
                                         type="button"
                                         onClick={() => abrirFormularioPermiso('editar', perm)}
-                                        className="w-6 h-6 flex items-center justify-center bg-[#252528] hover:bg-[#323236] text-[#d4d4d4] hover:text-[#87a9ff] border border-[#333338] rounded-[5px] transition cursor-pointer"
+                                        className="w-5 h-5 flex items-center justify-center bg-[#252528] hover:bg-[#323236] text-[#d4d4d4] hover:text-[#87a9ff] border border-[#333338] rounded-[4px] transition cursor-pointer"
                                         title="Editar permiso"
                                       >
-                                        <Edit3 className="h-3 w-3" />
+                                        <Edit3 className="h-2.5 w-2.5" />
                                       </button>
                                       <button
                                         type="button"
                                         disabled={esBase}
                                         onClick={() => setModalEliminarPermiso(perm)}
-                                        className="w-6 h-6 flex items-center justify-center bg-[#252528] hover:bg-red-500/20 text-[#8c8c8c] hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed border border-[#333338] rounded-[5px] transition cursor-pointer"
+                                        className="w-5 h-5 flex items-center justify-center bg-[#252528] hover:bg-red-500/20 text-[#8c8c8c] hover:text-red-400 disabled:opacity-30 disabled:cursor-not-allowed border border-[#333338] rounded-[4px] transition cursor-pointer"
                                         title={esBase ? "Permiso base no eliminable" : "Eliminar permiso"}
                                       >
-                                        <Trash2 className="h-3 w-3" />
+                                        <Trash2 className="h-2.5 w-2.5" />
                                       </button>
                                     </div>
                                   </div>
 
-                                  <div className="flex items-center justify-between gap-2 text-[10px]">
+                                  <div className="flex items-center justify-between gap-1 text-[10px]">
                                     <p className="text-[#8c8c8c] truncate flex-1" title={perm.description || ""}>
-                                      {perm.description || "Sin descripción asignada."}
+                                      {perm.description || "Sin descripción"}
                                     </p>
-                                    <span className="text-[#666666] font-mono flex-shrink-0">[{perm.code}]</span>
+                                    <span className="text-[#666666] font-mono text-[9px] flex-shrink-0">[{perm.code}]</span>
                                   </div>
                                 </div>
                               );
