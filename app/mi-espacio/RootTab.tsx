@@ -586,7 +586,7 @@ export default function RootTab({
     );
   };
 
-  // Renderizador del Árbol de Secciones y Páginas con Checkboxes para la Selección de Permisos
+  // Renderizador del Árbol de Secciones y Páginas con Checkboxes para la Selección de Permisos (Estilo Google AI Studio Tree View)
   const renderPermissionTreeNode = (node: SectionNode, depth = 0, parentNode?: SectionNode) => {
     const isChecked = isSectionChecked(node.code);
     const hasChildren = node.children && node.children.length > 0;
@@ -595,87 +595,77 @@ export default function RootTab({
     const isExpanded = expandedSectionCodes[node.code] ?? true;
 
     return (
-      <div key={node.code} className="space-y-1 font-sans">
+      <div key={node.code} className="font-sans select-none space-y-0.5">
         <div 
-          style={{ paddingLeft: `${depth * 20 + 8}px` }}
-          className={`py-2 pr-3 rounded-[10px] flex items-center justify-between gap-2 transition cursor-pointer select-none ${
-            fullyChecked 
-              ? 'bg-[#87a9ff]/15 border border-[#87a9ff]/40 text-white' 
-              : partiallyChecked 
-                ? 'bg-[#252525] border border-[#87a9ff]/30 text-[#e0e0e0]'
-                : 'bg-[#18181a] hover:bg-[#222222] border border-[#2b2b2b] text-[#8c8c8c]'
-          }`}
+          style={{ paddingLeft: `${depth * 20 + 4}px` }}
+          className="flex items-center gap-2 py-1 px-1.5 rounded-[6px] hover:bg-[#252525] group transition-colors cursor-pointer"
+          onClick={() => {
+            if (hasChildren) {
+              toggleSectionInPermission(node);
+            } else {
+              toggleSingleSectionCode(node.code, parentNode);
+            }
+          }}
         >
-          <div className="flex items-center gap-2.5 min-w-0 flex-1">
-            {/* Checkbox interactivo */}
-            <div 
-              onClick={(e) => {
-                e.stopPropagation();
-                if (hasChildren) {
-                  toggleSectionInPermission(node);
-                } else {
-                  toggleSingleSectionCode(node.code, parentNode);
-                }
-              }}
-              className={`w-4 h-4 rounded-[4px] border flex items-center justify-center flex-shrink-0 transition cursor-pointer ${
-                fullyChecked
-                  ? 'bg-[#87a9ff] border-[#87a9ff] text-[#121212]'
-                  : partiallyChecked
-                    ? 'bg-[#87a9ff]/40 border-[#87a9ff] text-white'
-                    : 'bg-[#252525] border-[#444444] hover:border-[#87a9ff]'
-              }`}
+          {/* Triángulo / Flecha de Colapso / Expansión (a la izquierda del checkbox) */}
+          {hasChildren ? (
+            <button 
+              type="button"
+              onClick={(e) => { 
+                e.stopPropagation(); 
+                toggleExpandSection(node.code); 
+              }} 
+              className="w-4 h-4 flex items-center justify-center text-[#8c8c8c] hover:text-white transition-colors cursor-pointer flex-shrink-0"
             >
-              {fullyChecked && <Check className="w-3 h-3 text-[#121212] stroke-[3]" />}
-              {partiallyChecked && !fullyChecked && <div className="w-2 h-0.5 bg-white rounded-full" />}
-            </div>
+              <span className={`text-[9px] transform transition-transform ${isExpanded ? 'rotate-90 text-[#d4d4d4]' : 'rotate-0 text-[#8c8c8c]'}`}>
+                ▶
+              </span>
+            </button>
+          ) : (
+            <span className="w-4 flex-shrink-0" />
+          )}
 
-            {/* Toggle desplegable para carpetas */}
-            {hasChildren ? (
-              <button 
-                type="button"
-                onClick={(e) => { e.stopPropagation(); toggleExpandSection(node.code); }} 
-                className="text-[#8c8c8c] hover:text-white p-0.5 cursor-pointer"
-              >
-                {isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
-              </button>
-            ) : (
-              <span className="w-3.5" />
+          {/* Checkbox con estados: Desmarcado, Marcado (check), e Indeterminado (cuadrado relleno en el centro) */}
+          <div 
+            onClick={(e) => {
+              e.stopPropagation();
+              if (hasChildren) {
+                toggleSectionInPermission(node);
+              } else {
+                toggleSingleSectionCode(node.code, parentNode);
+              }
+            }}
+            className={`w-4 h-4 rounded-[3px] border flex items-center justify-center flex-shrink-0 transition cursor-pointer ${
+              fullyChecked
+                ? 'bg-[#87a9ff] border-[#87a9ff] text-[#121212]'
+                : partiallyChecked
+                  ? 'bg-[#191919] border-[#87a9ff]'
+                  : 'bg-[#191919] border-[#555555] group-hover:border-[#87a9ff]'
+            }`}
+          >
+            {fullyChecked && <Check className="w-3 h-3 text-[#121212] stroke-[3]" />}
+            {partiallyChecked && !fullyChecked && (
+              <div className="w-2.5 h-2.5 bg-[#87a9ff] rounded-[1.5px]" />
             )}
-
-            {/* Icono de carpeta o archivo */}
-            {hasChildren ? (
-              isExpanded ? (
-                <FolderOpen className="h-4 w-4 text-[#87a9ff] flex-shrink-0" />
-              ) : (
-                <Folder className="h-4 w-4 text-[#8c8c8c] flex-shrink-0" />
-              )
-            ) : (
-              <FileText className="h-3.5 w-3.5 text-[#87a9ff] flex-shrink-0" />
-            )}
-
-            {/* Nombre y código */}
-            <span 
-              onClick={() => {
-                if (hasChildren) toggleSectionInPermission(node);
-                else toggleSingleSectionCode(node.code, parentNode);
-              }}
-              className={`text-xs font-medium truncate ${
-                fullyChecked ? 'text-white font-semibold' : 'text-[#d4d4d4]'
-              }`}
-            >
-              {node.name}
-            </span>
-            <span className="text-[10px] text-[#666666] font-mono">[{node.code}]</span>
           </div>
 
-          <span className="text-[10px] px-2 py-0.5 rounded bg-[#252525] text-[#8c8c8c] border border-[#333333]">
-            {node.category}
+          {/* Etiqueta / Nombre de la Sección o Página */}
+          <span 
+            className={`text-[13px] font-normal leading-none pl-0.5 transition-colors ${
+              fullyChecked 
+                ? 'text-white font-medium' 
+                : partiallyChecked 
+                  ? 'text-[#e0e0e0]' 
+                  : 'text-[#a0a0a0] group-hover:text-white'
+            }`}
+          >
+            {node.name}
           </span>
         </div>
 
-        {/* Nodos Hijos */}
+        {/* Nodos Hijos (Desplegable) */}
         {hasChildren && isExpanded && (
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {node.children.map((child) => renderPermissionTreeNode(child, depth + 1, node))}
           </div>
         )}
