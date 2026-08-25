@@ -322,6 +322,37 @@ export default function RootTab({
   const [sidebarOculto, setSidebarOculto] = useState(false);
   const [cargando, setCargando] = useState(true);
 
+  const esRoot = Boolean(
+    usuario && (
+      usuario.role?.toLowerCase() === 'root' ||
+      tienePermiso('full_access')
+    )
+  );
+
+  const esAdminORoot = Boolean(
+    usuario && (
+      usuario.role?.toLowerCase() === 'admin' ||
+      usuario.role?.toLowerCase() === 'administrador' ||
+      usuario.role?.toLowerCase() === 'root' ||
+      usuario.email?.toLowerCase() === 'admin@vamaar.com' ||
+      tienePermiso('full_access') ||
+      tienePermiso('admin_section') ||
+      tienePermiso('dashboard') ||
+      tienePermiso('appearance') ||
+      tienePermiso('campanas') ||
+      tienePermiso('secciones') ||
+      tienePermiso('banners') ||
+      tienePermiso('moderation') ||
+      tienePermiso('system') ||
+      tienePermiso('users') ||
+      tienePermiso('roles') ||
+      tienePermiso('permissions') ||
+      tienePermiso('sections') ||
+      tienePermiso('sessions') ||
+      tienePermiso('logs')
+    )
+  );
+
   // Bloquear el scroll del body principal mientras la Consola de Administración está abierta
   useEffect(() => {
     const prevOverflow = document.body.style.overflow;
@@ -955,13 +986,11 @@ export default function RootTab({
   const [logPage, setLogPage] = useState(1);
   const LOGS_PER_PAGE = 10;
 
-  const esRoot = Boolean(usuario && (usuario.role?.toLowerCase() === 'root' || usuario.role === 'ROOT'));
-
   useEffect(() => {
-    if (esRoot && token) {
+    if (esAdminORoot && token) {
       cargarDatos();
     }
-  }, [token, esRoot, activeConsoleTab]);
+  }, [token, esAdminORoot, activeConsoleTab]);
 
   const abrirFormularioRango = (modo: 'crear' | 'editar', rango?: RoleItem) => {
     if (modo === 'editar' && rango) {
@@ -1397,8 +1426,11 @@ export default function RootTab({
     if (esRoot) return true;
     if (!usuario) return false;
 
-    const userPerms = usuario.permissions || [];
+    const userPerms = (usuario.permissions || []).map(p => p.toLowerCase());
     if (userPerms.includes('full_access')) return true;
+
+    // Comprobación directa contra usuario.permissions
+    if (userPerms.includes(tab.toLowerCase())) return true;
 
     // Obtener los permisos del rol actual
     const rolesMatching = rangosList.find(r => r.code.toLowerCase() === usuario.role?.toLowerCase());
@@ -1422,7 +1454,8 @@ export default function RootTab({
     }
 
     // Default para rol admin mientras no existan restricciones explícitas
-    if (usuario.role?.toLowerCase() === 'admin') {
+    const roleClean = usuario.role?.toLowerCase() || '';
+    if (roleClean === 'admin' || roleClean === 'administrador' || usuario.email?.toLowerCase() === 'admin@vamaar.com') {
       if (['dashboard', 'moderation', 'appearance', 'campanas', 'secciones', 'banners'].includes(tab)) {
         const hasExplicitRestrictions = activePerms.some(p => p.target_section && p.target_section.trim().length > 0);
         if (!hasExplicitRestrictions) return true;
@@ -1467,14 +1500,20 @@ export default function RootTab({
     }
   };
 
-  if (!esRoot) {
+  if (!esAdminORoot) {
     return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center bg-[#121214] text-white rounded-3xl">
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 text-center bg-[#121214] text-white">
         <ShieldAlert className="h-12 w-12 text-red-500 mb-3 animate-pulse" />
-        <h2 className="text-xl font-black">Acceso Restringido - Programador Root</h2>
+        <h2 className="text-xl font-black">Acceso Restringido</h2>
         <p className="text-xs text-gray-400 max-w-xs mt-2">
-          Esta consola está protegida exclusivamente para la cuenta de desarrollo Root del sistema.
+          No cuentas con los permisos administrativos necesarios para acceder a esta consola.
         </p>
+        <button
+          onClick={onVolverAMiEspacio}
+          className="mt-4 px-4 py-2 bg-[#252525] border border-[#333333] text-white rounded-xl text-xs font-semibold hover:bg-[#333333] transition cursor-pointer"
+        >
+          Volver a Mi Espacio
+        </button>
       </div>
     );
   }
