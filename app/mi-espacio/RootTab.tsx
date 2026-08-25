@@ -1265,14 +1265,14 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                             <div
                               key={perm.id}
                               onClick={() => togglePermissionId(perm.id)}
-                              className={`p-3 rounded-[10px] border transition cursor-pointer flex items-start gap-2.5 font-sans select-none ${
+                              className={`p-3 rounded-[10px] border transition cursor-pointer flex items-center gap-2.5 font-sans select-none ${
                                 isChecked
                                   ? 'bg-[#87a9ff]/10 border-[#87a9ff]/50 text-white shadow-xs'
                                   : 'bg-[#191919] border-[#262626] text-[#8c8c8c] hover:bg-[#222222] hover:border-[#383838]'
                               }`}
                             >
                               <div
-                                className={`w-4 h-4 rounded-[4px] border flex items-center justify-center flex-shrink-0 mt-0.5 transition-all ${
+                                className={`w-4 h-4 rounded-[4px] border flex items-center justify-center flex-shrink-0 transition-all ${
                                   isChecked
                                     ? 'bg-[#87a9ff] border-[#87a9ff] text-[#121212] shadow-xs'
                                     : 'bg-[#252525] border-[#383838] hover:border-[#555555]'
