@@ -13,6 +13,7 @@ import {
   Filter,
   CheckCircle2
 } from 'lucide-react';
+import { getApiUrl } from '../../lib/config';
 
 interface CustomizationsTabProps {
   tieneCambiosSecciones: boolean;
@@ -43,6 +44,29 @@ export default function CustomizationsTab({
 }: CustomizationsTabProps) {
 
   const [draggedSectionIndex, setDraggedSectionIndex] = useState<number | null>(null);
+
+  // Auto-cargar secciones desde el backend si la lista viene vacía
+  useEffect(() => {
+    if (!seccionesList || seccionesList.length === 0) {
+      const cargarSecciones = async () => {
+        try {
+          const token = typeof window !== 'undefined' ? (localStorage.getItem('token') || localStorage.getItem('vamaar_token') || '') : '';
+          const res = await fetch(`${getApiUrl()}/cms/admin/sections`, {
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+          });
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+              setSeccionesList(data);
+            }
+          }
+        } catch (e) {
+          console.error("Error al autocargar secciones:", e);
+        }
+      };
+      cargarSecciones();
+    }
+  }, []);
 
   // Escuchar la liberación global del puntero para garantizar que el mouse nunca quede bloqueado
   useEffect(() => {

@@ -261,9 +261,10 @@ function MiEspacioContent() {
     }
   };
 
-  // Cargar datos CMS (Admin)
+  // Cargar datos CMS (Admin y Root)
   useEffect(() => {
-    if (usuario && usuario.role?.toLowerCase() === "admin") {
+    const esAdminORoot = usuario && (usuario.role?.toLowerCase() === "admin" || usuario.role?.toLowerCase() === "root" || usuario.email?.toLowerCase() === "admin@vamaar.com");
+    if (esAdminORoot) {
       const fetchCMS = async () => {
         try {
           const res = await fetch(`${getApiUrl()}/cms/layout/`);
@@ -283,6 +284,7 @@ function MiEspacioContent() {
             setBrandFontSize(marca.brand_font_size || "1.5rem");
             
             cargarHistorialLogos();
+            cargarSeccionesAdmin();
 
             const resBanners = await fetch(`${getApiUrl()}/cms/admin/banners`, {
               headers: {
