@@ -154,11 +154,18 @@ select option {
   color: #ffffff !important;
 }
 
-/* Asegurar placeholders nítidos y legibles en campos oscuros */
+/* Asegurar que los placeholders tengan un tono gris suave distintivo (#6e6e73) para no confundirse con texto real ingresado */
+input::placeholder,
+textarea::placeholder,
+input::-webkit-input-placeholder,
+textarea::-webkit-input-placeholder,
 input.text-white::placeholder,
 textarea.text-white::placeholder,
 [class*="bg-[#1"] input::placeholder,
-[class*="bg-[#2"] input::placeholder {
-  color: #8c8c8c !important;
+[class*="bg-[#2"] input::placeholder,
+[class*="bg-[#1"] input::-webkit-input-placeholder,
+[class*="bg-[#2"] input::-webkit-input-placeholder {
+  color: #6e6e73 !important;
+  -webkit-text-fill-color: #6e6e73 !important;
   opacity: 1 !important;
 }
