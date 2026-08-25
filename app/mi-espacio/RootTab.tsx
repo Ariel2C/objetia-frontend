@@ -299,45 +299,42 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
     const hasActions = node.actions && node.actions.length > 0;
 
     return (
-      <div key={node.code} className="space-y-2 font-sans">
-        {/* FILA DE SECCIÓN / NODO ÁRBOL */}
+      <div key={node.code} className="font-sans text-xs select-none">
+        {/* FILA DE SECCIÓN (CARPETA EN ÁRBOL ESTILO EXPLORADOR VS CODE) */}
         <div 
-          style={{ paddingLeft: `${depth * 16 + 12}px` }}
-          className="py-2.5 pr-3 bg-[#191919] hover:bg-[#222222] border border-[#262626] rounded-[10px] flex items-center justify-between gap-3 transition"
+          style={{ paddingLeft: `${depth * 18 + 8}px` }}
+          className="group py-1.5 pr-2 hover:bg-[#252525] rounded-[6px] flex items-center justify-between gap-2 transition-colors cursor-pointer"
         >
-          <div className="flex items-center gap-2.5 min-w-0 flex-1">
-            <button 
-              type="button"
-              onClick={() => toggleExpandSection(node.code)}
-              className="text-[#8c8c8c] hover:text-white p-0.5 rounded cursor-pointer flex-shrink-0"
-            >
-              {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-            </button>
+          <div 
+            onClick={() => toggleExpandSection(node.code)}
+            className="flex items-center gap-2 min-w-0 flex-1 py-0.5"
+          >
+            <span className="text-[#8c8c8c] hover:text-white transition flex-shrink-0">
+              {isExpanded ? <ChevronDown className="h-4 w-4 text-[#cccccc]" /> : <ChevronRight className="h-4 w-4 text-[#8c8c8c]" />}
+            </span>
 
             {isExpanded ? (
-              <FolderOpen className="h-4 w-4 text-[#87a9ff] flex-shrink-0" />
+              <FolderOpen className="h-4 w-4 text-[#cccccc] fill-[#cccccc]/20 flex-shrink-0" />
             ) : (
               <Folder className="h-4 w-4 text-[#8c8c8c] flex-shrink-0" />
             )}
 
-            <div className="flex items-center gap-2 min-w-0 flex-wrap">
-              <span className="text-xs font-bold text-white truncate">{node.name}</span>
-              <span className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#87a9ff] border border-[#333333] text-[10px] font-medium uppercase tracking-wider">
-                {node.category}
-              </span>
-              <span className="text-[10px] text-[#666666] font-mono">[{node.code}]</span>
-            </div>
+            <span className="text-[13px] text-[#cccccc] group-hover:text-white font-sans font-medium truncate">
+              {node.name}
+            </span>
+            <span className="text-[10px] text-[#666666] font-mono">[{node.code}]</span>
           </div>
 
-          <div className="flex items-center gap-1.5 flex-shrink-0">
+          {/* ACCIONES DE EDICIÓN Y CREACIÓN EN HOVER */}
+          <div className="flex items-center gap-1 flex-shrink-0 opacity-80 group-hover:opacity-100 transition">
             <button
               type="button"
               onClick={() => setModalAccion({ section_code: node.code, code: '', name: '', description: '' })}
-              className="px-2.5 h-[26px] bg-[#252525] border border-[#87a9ff]/40 text-[#87a9ff] hover:bg-[#87a9ff]/20 rounded-[6px] text-[11px] font-medium transition cursor-pointer flex items-center gap-1 font-sans"
-              title="Agregar acción específica dentro de esta sección"
+              className="p-1 text-[#8c8c8c] hover:text-[#87a9ff] hover:bg-[#333333] rounded transition cursor-pointer flex items-center gap-1 font-sans text-[11px]"
+              title="Agregar Acción a esta sección"
             >
-              <Zap className="h-3 w-3" />
-              <span>+ Acción</span>
+              <Zap className="h-3.5 w-3.5 text-amber-400" />
+              <span className="hidden sm:inline">+ Acción</span>
             </button>
 
             <button
@@ -350,7 +347,8 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 description: node.description || '',
                 parent_code: node.parent_code || ''
               })}
-              className="px-2.5 h-[26px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white rounded-[6px] text-[11px] font-medium transition cursor-pointer font-sans"
+              className="p-1 text-[#8c8c8c] hover:text-white hover:bg-[#333333] rounded transition cursor-pointer font-sans text-[11px]"
+              title="Editar sección"
             >
               Editar
             </button>
@@ -358,7 +356,8 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             <button
               type="button"
               onClick={() => eliminarSeccion(node.id, node.name)}
-              className="px-2.5 h-[26px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white rounded-[6px] text-[11px] font-medium transition cursor-pointer font-sans"
+              className="p-1 text-[#8c8c8c] hover:text-red-400 hover:bg-[#333333] rounded transition cursor-pointer font-sans text-[11px]"
+              title="Eliminar sección"
             >
               Eliminar
             </button>
@@ -367,40 +366,35 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
         {/* NODOS HIJOS Y ACCIONES ESPECÍFICAS (CUANDO ESTÁ EXPANDIDO) */}
         {isExpanded && (
-          <div style={{ paddingLeft: `${depth * 16 + 20}px` }} className="space-y-2 border-l border-[#262626] ml-3 pt-1 pb-1">
-            {/* LISTA DE ACCIONES ASOCIADAS A ESTA SECCIÓN */}
-            {hasActions && (
-              <div className="space-y-1.5 mb-2 pl-2">
-                <p className="text-[10px] font-bold text-[#8c8c8c] uppercase tracking-wider flex items-center gap-1">
-                  <Zap className="h-3 w-3 text-amber-400" />
-                  <span>Acciones de {node.name}</span>
-                </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {node.actions.map((act) => (
-                    <div key={act.id} className="p-2 bg-[#171717] border border-[#262626] rounded-[8px] flex items-center justify-between gap-2">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-xs font-semibold text-amber-300">{act.name}</span>
-                          <span className="text-[9px] text-[#666666] font-mono">[{act.code}]</span>
-                        </div>
-                        {act.description && <p className="text-[10px] text-[#8c8c8c] truncate">{act.description}</p>}
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => eliminarAccion(act.id, act.name)}
-                        className="p-1 text-[#8c8c8c] hover:text-red-400 transition cursor-pointer"
-                        title="Eliminar acción"
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
+          <div className="space-y-0.5">
             {/* SECCIONES HIJAS */}
             {hasChildren && node.children.map((child) => renderSectionNode(child, depth + 1))}
+
+            {/* ACCIONES DENTRO DE LA SECCIÓN (ARCHIVOS HOJAS DEL ÁRBOL) */}
+            {hasActions && node.actions.map((act) => (
+              <div 
+                key={act.id} 
+                style={{ paddingLeft: `${(depth + 1) * 18 + 26}px` }}
+                className="group py-1 pr-2 hover:bg-[#252525] rounded-[6px] flex items-center justify-between gap-2 transition-colors"
+              >
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <FileText className="h-3.5 w-3.5 text-[#87a9ff] flex-shrink-0" />
+                  <span className="text-[12px] text-[#a0a0a0] group-hover:text-white font-sans truncate">
+                    {act.name}
+                  </span>
+                  <span className="text-[9px] text-[#666666] font-mono">[{act.code}]</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => eliminarAccion(act.id, act.name)}
+                  className="p-1 text-[#666666] hover:text-red-400 hover:bg-[#333333] rounded transition cursor-pointer"
+                  title="Eliminar acción"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
           </div>
         )}
       </div>
