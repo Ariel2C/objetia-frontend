@@ -9,7 +9,7 @@ import {
   Sliders, Database, Terminal, ChevronDown, ChevronUp, ChevronLeft, Bell, Settings, Copy, 
   ExternalLink, Layers, ArrowUpRight, Lock, Eye, PanelLeftClose, PanelLeftOpen,
   FolderTree, Folder, FolderOpen, Zap, Plus, ChevronRight, Edit3, ShieldCheck,
-  LayoutDashboard, Palette, Calendar, Image as ImageIcon
+  LayoutDashboard, Palette, Calendar, Image as ImageIcon, Layout, UserCheck
 } from 'lucide-react';
 
 import DashboardTab from './DashboardTab';
@@ -1222,6 +1222,48 @@ export default function RootTab({
     return logsFiltrados.slice(start, start + LOGS_PER_PAGE);
   }, [logsFiltrados, logPage, LOGS_PER_PAGE]);
 
+  // Agrupación y ordenamiento de permisos según los 4 grupos principales
+  const permisosAgrupadosPorSeccion = useMemo(() => {
+    const CATEGORIAS_ORDEN = [
+      { key: "admin_section", label: "Sección Administrador", icon: Shield },
+      { key: "cms", label: "Gestión de Contenido", icon: Layout },
+      { key: "mi_espacio", label: "Mi Espacio", icon: UserCheck },
+      { key: "system", label: "Programador", icon: Terminal }
+    ];
+
+    const getGrupoKey = (perm: typeof allPermissions[0]) => {
+      const cat = (perm.category || "").toLowerCase();
+      const target = (perm.target_section || "").toLowerCase();
+      const code = (perm.code || "").toLowerCase();
+
+      if (cat.includes("admin") || target.includes("dashboard") || target.includes("moderation") || code.includes("product") || code.includes("moderate")) return "admin_section";
+      if (cat.includes("cms") || cat.includes("contenido") || target.includes("appearance") || target.includes("banner") || target.includes("campana") || target.includes("seccion") || code.includes("branding") || code.includes("banner") || code.includes("campaign")) return "cms";
+      if (cat.includes("espacio") || cat.includes("cuenta") || cat.includes("operacion") || target.includes("billetera") || target.includes("publication") || target.includes("purchase") || target.includes("sale") || target.includes("perfil") || code.includes("wallet") || code.includes("buy") || code.includes("sell")) return "mi_espacio";
+      if (cat.includes("programador") || cat.includes("sistema") || target.includes("user") || target.includes("role") || target.includes("permission") || target.includes("section") || target.includes("session") || target.includes("log") || code.includes("full_access") || code.includes("role") || code.includes("user") || code.includes("session") || code.includes("log")) return "system";
+      return "otros";
+    };
+
+    const grupos: Record<string, typeof allPermissions> = {};
+    allPermissions.forEach(p => {
+      const g = getGrupoKey(p);
+      if (!grupos[g]) grupos[g] = [];
+      grupos[g].push(p);
+    });
+
+    const resultado: { key: string; label: string; icon: any; items: typeof allPermissions }[] = [];
+    CATEGORIAS_ORDEN.forEach(c => {
+      if (grupos[c.key] && grupos[c.key].length > 0) {
+        resultado.push({ ...c, items: grupos[c.key] });
+      }
+    });
+
+    if (grupos["otros"] && grupos["otros"].length > 0) {
+      resultado.push({ key: "otros", label: "Otros Permisos", icon: Key, items: grupos["otros"] });
+    }
+
+    return resultado;
+  }, [allPermissions]);
+
   const cargarDatos = async () => {
     setCargando(true);
     try {
@@ -2398,41 +2440,58 @@ export default function RootTab({
                       />
                     </div>
 
-                    {/* SECCIÓN DE PERMISOS ASIGNADOS CON CHECKBOXES */}
-                    <div className="pt-3 border-t border-[#262626] space-y-3">
+                    {/* SECCIÓN DE PERMISOS ASIGNADOS AGRUPADOS POR SECCIÓN */}
+                    <div className="pt-3 border-t border-[#262626] space-y-4">
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1">
                         <h3 className="text-xs font-bold text-[#87a9ff] uppercase tracking-wider">Permisos Asignados al Rango</h3>
                         <span className="text-xs text-[#8c8c8c]">
-                          {rangoForm.selectedPermissionIds.length} de {allPermissions.length} permisos activos
+                          {rangoForm.selectedPermissionIds.length} de {allPermissions.length} permisos seleccionados
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                        {allPermissions.map((perm) => {
-                          const isChecked = rangoForm.selectedPermissionIds.includes(perm.id);
+                      <div className="space-y-4">
+                        {permisosAgrupadosPorSeccion.map((grupo) => {
+                          const IconoGrupo = grupo.icon;
                           return (
-                            <div
-                              key={perm.id}
-                              onClick={() => togglePermissionId(perm.id)}
-                              className={`p-3 rounded-[10px] border transition cursor-pointer flex items-center gap-2.5 font-sans select-none ${
-                                isChecked
-                                  ? 'bg-[#87a9ff]/10 border-[#87a9ff]/50 text-white shadow-xs'
-                                  : 'bg-[#191919] border-[#262626] text-[#8c8c8c] hover:bg-[#222222] hover:border-[#383838]'
-                              }`}
-                            >
-                              <div
-                                className={`w-4 h-4 rounded-[4px] border flex items-center justify-center flex-shrink-0 transition-all ${
-                                  isChecked
-                                    ? 'bg-[#87a9ff] border-[#87a9ff] text-[#121212] shadow-xs'
-                                    : 'bg-[#252525] border-[#383838] hover:border-[#555555]'
-                                }`}
-                              >
-                                {isChecked && <Check className="w-3 h-3 text-[#121212] stroke-[3]" />}
+                            <div key={grupo.key} className="space-y-2.5 bg-[#18181a] border border-[#262626] rounded-[10px] p-3">
+                              <div className="flex items-center gap-2 pb-1.5 border-b border-[#262626]">
+                                <IconoGrupo className="h-3.5 w-3.5 text-[#87a9ff]" />
+                                <span className="text-xs font-bold text-white uppercase tracking-wider">{grupo.label}</span>
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#252525] text-[#8c8c8c] border border-[#333333]">
+                                  {grupo.items.length}
+                                </span>
                               </div>
 
-                              <div className="min-w-0">
-                                <p className={`text-xs font-medium ${isChecked ? 'text-white' : 'text-[#d4d4d4]'}`}>{perm.name}</p>
-                                <p className="text-[11px] text-[#8c8c8c] truncate">{perm.description || perm.category}</p>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                                {grupo.items.map((perm) => {
+                                  const isChecked = rangoForm.selectedPermissionIds.includes(perm.id);
+                                  return (
+                                    <div
+                                      key={perm.id}
+                                      onClick={() => togglePermissionId(perm.id)}
+                                      className={`p-2.5 rounded-[8px] border transition cursor-pointer flex items-center gap-2.5 font-sans select-none ${
+                                        isChecked
+                                          ? 'bg-[#87a9ff]/10 border-[#87a9ff]/50 text-white shadow-xs'
+                                          : 'bg-[#141416] border-[#262626] text-[#8c8c8c] hover:bg-[#1f1f22] hover:border-[#383838]'
+                                      }`}
+                                    >
+                                      <div
+                                        className={`w-4 h-4 rounded-[4px] border flex items-center justify-center flex-shrink-0 transition-all ${
+                                          isChecked
+                                            ? 'bg-[#87a9ff] border-[#87a9ff] text-[#121212] shadow-xs'
+                                            : 'bg-[#252525] border-[#383838] hover:border-[#555555]'
+                                        }`}
+                                      >
+                                        {isChecked && <Check className="w-3 h-3 text-[#121212] stroke-[3]" />}
+                                      </div>
+
+                                      <div className="min-w-0">
+                                        <p className={`text-xs font-medium ${isChecked ? 'text-white' : 'text-[#d4d4d4]'}`}>{perm.name}</p>
+                                        <p className="text-[10px] text-[#8c8c8c] truncate">{perm.description || perm.category}</p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
                               </div>
                             </div>
                           );
@@ -2451,42 +2510,59 @@ export default function RootTab({
           {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'permissions' && (
             <div className="space-y-4">
               {modoVistaPermiso === 'lista' ? (
-                <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-5 space-y-4 font-sans">
+                <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-5 space-y-6 font-sans">
                   <div className="flex items-center justify-between border-b border-[#262626] pb-3">
                     <h2 className="text-sm font-bold text-[#87a9ff] uppercase tracking-wider">Catálogo de Permisos Registrados ({allPermissions.length})</h2>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {allPermissions.map((perm) => {
-                      const esBase = ["full_access", "manage_roles", "manage_users", "view_audit_logs", "manage_sessions"].includes(perm.code.toLowerCase());
+                  <div className="space-y-6">
+                    {permisosAgrupadosPorSeccion.map((grupo) => {
+                      const IconoGrupo = grupo.icon;
                       return (
-                        <div key={perm.id} className="p-3.5 bg-[#191919] border border-[#262626] rounded-[10px] space-y-2 font-sans flex flex-col justify-between">
-                          <div className="space-y-1">
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#87a9ff] border border-[#333333] text-[10px] font-medium uppercase tracking-wider">
-                                {perm.category || "Sistema"}
-                              </span>
-                              <span className="text-[10px] text-[#666666] font-mono">{perm.code}</span>
-                            </div>
-                            <h3 className="text-xs font-bold text-white pt-1">{perm.name}</h3>
-                            <p className="text-[11px] text-[#8c8c8c] leading-tight">{perm.description || "Sin descripción asignada."}</p>
+                        <div key={grupo.key} className="space-y-3">
+                          <div className="flex items-center gap-2 pb-2 border-b border-[#2b2b2e]">
+                            <IconoGrupo className="h-4 w-4 text-[#87a9ff]" />
+                            <h3 className="text-xs font-bold text-white uppercase tracking-wider">{grupo.label}</h3>
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#252528] text-[#87a9ff] border border-[#38383c] font-medium">
+                              {grupo.items.length} permiso(s)
+                            </span>
                           </div>
 
-                          <div className="pt-2 border-t border-[#262626] flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => abrirFormularioPermiso('editar', perm)}
-                              className="px-2.5 h-[26px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white rounded-[6px] text-[11px] font-medium transition cursor-pointer font-sans"
-                            >
-                              Editar
-                            </button>
-                            <button
-                              disabled={esBase}
-                              onClick={() => setModalEliminarPermiso(perm)}
-                              className="px-2.5 h-[26px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed rounded-[6px] text-[11px] font-medium transition cursor-pointer font-sans"
-                              title={esBase ? "Permiso base del sistema no eliminable" : "Eliminar permiso"}
-                            >
-                              Eliminar
-                            </button>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {grupo.items.map((perm) => {
+                              const esBase = ["full_access", "manage_roles", "manage_users", "view_audit_logs", "manage_sessions"].includes(perm.code.toLowerCase());
+                              return (
+                                <div key={perm.id} className="p-3.5 bg-[#191919] border border-[#262626] rounded-[10px] space-y-2 font-sans flex flex-col justify-between hover:border-[#383838] transition-colors">
+                                  <div className="space-y-1">
+                                    <div className="flex items-center justify-between gap-2">
+                                      <span className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#87a9ff] border border-[#333333] text-[10px] font-medium uppercase tracking-wider">
+                                        {grupo.label}
+                                      </span>
+                                      <span className="text-[10px] text-[#666666] font-mono">{perm.code}</span>
+                                    </div>
+                                    <h3 className="text-xs font-bold text-white pt-1">{perm.name}</h3>
+                                    <p className="text-[11px] text-[#8c8c8c] leading-tight">{perm.description || "Sin descripción asignada."}</p>
+                                  </div>
+
+                                  <div className="pt-2 border-t border-[#262626] flex items-center justify-end gap-2">
+                                    <button
+                                      onClick={() => abrirFormularioPermiso('editar', perm)}
+                                      className="px-2.5 h-[26px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white rounded-[6px] text-[11px] font-medium transition cursor-pointer font-sans"
+                                    >
+                                      Editar
+                                    </button>
+                                    <button
+                                      disabled={esBase}
+                                      onClick={() => setModalEliminarPermiso(perm)}
+                                      className="px-2.5 h-[26px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white disabled:opacity-40 disabled:cursor-not-allowed rounded-[6px] text-[11px] font-medium transition cursor-pointer font-sans"
+                                      title={esBase ? "Permiso base del sistema no eliminable" : "Eliminar permiso"}
+                                    >
+                                      Eliminar
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       );
