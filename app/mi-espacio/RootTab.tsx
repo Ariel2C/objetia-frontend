@@ -8,8 +8,16 @@ import {
   RefreshCw, ShieldAlert, CheckCircle2, XCircle, Crown, Shield, 
   Sliders, Database, Terminal, ChevronDown, ChevronUp, ChevronLeft, Bell, Settings, Copy, 
   ExternalLink, Layers, ArrowUpRight, Lock, Eye, PanelLeftClose, PanelLeftOpen,
-  FolderTree, Folder, FolderOpen, Zap, Plus, ChevronRight, Edit3, ShieldCheck
+  FolderTree, Folder, FolderOpen, Zap, Plus, ChevronRight, Edit3, ShieldCheck,
+  LayoutDashboard, Palette, Calendar, Image as ImageIcon
 } from 'lucide-react';
+
+import DashboardTab from './DashboardTab';
+import AppearanceTab from './AppearanceTab';
+import BannersTab from './BannersTab';
+import CustomizationsTab from './CustomizationsTab';
+import CampaignsTab from './CampaignsTab';
+import ModerationTab from './ModerationTab';
 
 interface UserData {
   id: number;
@@ -128,15 +136,187 @@ function CustomSelect({
   );
 }
 
+type ConsoleTabType = 'dashboard' | 'moderation' | 'appearance' | 'campanas' | 'secciones' | 'banners' | 'users' | 'roles' | 'permissions' | 'sections' | 'sessions' | 'logs' | 'keys';
+
 interface RootTabProps {
+  initialTab?: string;
   onVolverAMiEspacio?: () => void;
+  msgAsignar?: any;
+  emailAsignar?: string;
+  setEmailAsignar?: (val: string) => void;
+  rolAsignar?: string;
+  setRolAsignar?: (val: string) => void;
+  cargandoAsignar?: boolean;
+  handleAsignarRango?: (e: React.FormEvent) => void;
+  adminDashboardData?: any;
+  cargandoDashboard?: boolean;
+  tieneCambiosMarca?: boolean;
+  setTieneCambiosMarca?: (val: boolean) => void;
+  handlePublicarMarca?: () => void;
+  brandName?: string;
+  setBrandName?: (val: string) => void;
+  brandFontFamily?: string;
+  setBrandFontFamily?: (val: string) => void;
+  brandFontSize?: string;
+  setBrandFontSize?: (val: string) => void;
+  logoHistory?: any[];
+  setLogoHistory?: React.Dispatch<React.SetStateAction<any[]>>;
+  logoUrl?: string;
+  setLogoUrl?: (val: string) => void;
+  logoPreviaUrl?: string | null;
+  setLogoPreviaUrl?: (val: string | null) => void;
+  zoomLogo?: number;
+  setZoomLogo?: React.Dispatch<React.SetStateAction<number>>;
+  rotateLogo?: number;
+  setRotateLogo?: React.Dispatch<React.SetStateAction<number>>;
+  offsetX?: number;
+  setOffsetX?: React.Dispatch<React.SetStateAction<number>>;
+  offsetY?: number;
+  setOffsetY?: React.Dispatch<React.SetStateAction<number>>;
+  removerFondoBlanco?: boolean;
+  setRemoverFondoBlanco?: (val: boolean) => void;
+  toleranciaTransparencia?: number;
+  setToleranciaTransparencia?: (val: number) => void;
+  colorPrimary?: string;
+  setColorPrimary?: (val: string) => void;
+  colorSecondary?: string;
+  setColorSecondary?: (val: string) => void;
+  colorBackground?: string;
+  setColorBackground?: (val: string) => void;
+  colorNavbar?: string;
+  setColorNavbar?: (val: string) => void;
+  colorSectionTitle?: string;
+  setColorSectionTitle?: (val: string) => void;
+  colorCatalogLink?: string;
+  setColorCatalogLink?: (val: string) => void;
+  colorTextInput?: string;
+  setColorTextInput?: (val: string) => void;
+  handleEliminarLogoHistorial?: (index: number) => void;
+  tieneCambiosBanners?: boolean;
+  handlePublicarBanners?: () => void;
+  subiendoBanner?: boolean;
+  nuevoBannerTitulo?: string;
+  setNuevoBannerTitulo?: (val: string) => void;
+  nuevoBannerSubtitulo?: string;
+  setNuevoBannerSubtitulo?: (val: string) => void;
+  nuevoBannerLink?: string;
+  setNuevoBannerLink?: (val: string) => void;
+  nuevoBannerLinkPersonalizado?: string;
+  setNuevoBannerLinkPersonalizado?: (val: string) => void;
+  nuevoBannerArchivo?: File | null;
+  setNuevoBannerArchivo?: (val: File | null) => void;
+  nuevoBannerArchivoMovil?: File | null;
+  setNuevoBannerArchivoMovil?: (val: File | null) => void;
+  handleAgregarBorradorBanner?: (e?: any) => void;
+  bannerList?: any[];
+  setBannerList?: React.Dispatch<React.SetStateAction<any[]>>;
+  setTieneCambiosBanners?: (val: boolean) => void;
+  showToast?: (mensaje: string, tipo?: 'success' | 'error' | 'info') => void;
+  tieneCambiosSecciones?: boolean;
+  handlePublicarSecciones?: () => void;
+  nuevoSeccionTitulo?: string;
+  setNuevoSeccionTitulo?: (val: string) => void;
+  nuevoSeccionCategoria?: string;
+  setNuevoSeccionCategoria?: (val: string) => void;
+  handleAgregarSeccion?: (e?: any) => void;
+  seccionesList?: any[];
+  setSeccionesList?: React.Dispatch<React.SetStateAction<any[]>>;
+  setTieneCambiosSecciones?: (val: boolean) => void;
+  handleEliminarSeccion?: (id: number) => void;
 }
 
-export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
-  const { usuario, token } = useAuth();
+export default function RootTab({
+  initialTab,
+  onVolverAMiEspacio,
+  msgAsignar,
+  emailAsignar,
+  setEmailAsignar,
+  rolAsignar,
+  setRolAsignar,
+  cargandoAsignar,
+  handleAsignarRango,
+  adminDashboardData,
+  cargandoDashboard,
+  tieneCambiosMarca,
+  setTieneCambiosMarca,
+  handlePublicarMarca,
+  brandName,
+  setBrandName,
+  brandFontFamily,
+  setBrandFontFamily,
+  brandFontSize,
+  setBrandFontSize,
+  logoHistory,
+  setLogoHistory,
+  logoUrl,
+  setLogoUrl,
+  logoPreviaUrl,
+  setLogoPreviaUrl,
+  zoomLogo,
+  setZoomLogo,
+  rotateLogo,
+  setRotateLogo,
+  offsetX,
+  setOffsetX,
+  offsetY,
+  setOffsetY,
+  removerFondoBlanco,
+  setRemoverFondoBlanco,
+  toleranciaTransparencia,
+  setToleranciaTransparencia,
+  colorPrimary,
+  setColorPrimary,
+  colorSecondary,
+  setColorSecondary,
+  colorBackground,
+  setColorBackground,
+  colorNavbar,
+  setColorNavbar,
+  colorSectionTitle,
+  setColorSectionTitle,
+  colorCatalogLink,
+  setColorCatalogLink,
+  colorTextInput,
+  setColorTextInput,
+  handleEliminarLogoHistorial,
+  tieneCambiosBanners,
+  handlePublicarBanners,
+  subiendoBanner,
+  nuevoBannerTitulo,
+  setNuevoBannerTitulo,
+  nuevoBannerSubtitulo,
+  setNuevoBannerSubtitulo,
+  nuevoBannerLink,
+  setNuevoBannerLink,
+  nuevoBannerLinkPersonalizado,
+  setNuevoBannerLinkPersonalizado,
+  nuevoBannerArchivo,
+  setNuevoBannerArchivo,
+  nuevoBannerArchivoMovil,
+  setNuevoBannerArchivoMovil,
+  handleAgregarBorradorBanner,
+  bannerList,
+  setBannerList,
+  setTieneCambiosBanners,
+  showToast,
+  tieneCambiosSecciones,
+  handlePublicarSecciones,
+  nuevoSeccionTitulo,
+  setNuevoSeccionTitulo,
+  nuevoSeccionCategoria,
+  setNuevoSeccionCategoria,
+  handleAgregarSeccion,
+  seccionesList,
+  setSeccionesList,
+  setTieneCambiosSecciones,
+  handleEliminarSeccion
+}: RootTabProps) {
+  const { usuario, token, tienePermiso } = useAuth();
   const toast = useToast();
 
-  const [activeConsoleTab, setActiveConsoleTab] = useState<'users' | 'roles' | 'permissions' | 'sections' | 'sessions' | 'logs' | 'keys'>('users');
+  const [activeConsoleTab, setActiveConsoleTab] = useState<ConsoleTabType>(
+    initialTab && initialTab !== 'admin' && initialTab !== 'root' ? (initialTab as ConsoleTabType) : 'dashboard'
+  );
   const [seguridadMenuAbierto, setSeguridadMenuAbierto] = useState(false);
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   const [sidebarOculto, setSidebarOculto] = useState(false);
@@ -1081,10 +1261,90 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           </div>
         </div>
 
-        {/* NAVEGACIÓN - GRUPO 1: SISTEMA */}
+        {/* NAVEGACIÓN - GRUPO 1: SECCIÓN ADMINISTRADOR */}
         <div className="space-y-1 font-sans">
           <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5 font-sans">
-            SISTEMA
+            SECCIÓN ADMINISTRADOR
+          </p>
+          <button
+            onClick={() => { setActiveConsoleTab('dashboard'); setMenuMovilAbierto(false); }}
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+              activeConsoleTab === 'dashboard' 
+                ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+            }`}
+          >
+            <LayoutDashboard className="h-4 w-4 text-current flex-shrink-0" />
+            <span>Panel de Control</span>
+          </button>
+          <button
+            onClick={() => { setActiveConsoleTab('moderation'); setMenuMovilAbierto(false); }}
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+              activeConsoleTab === 'moderation' 
+                ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+            }`}
+          >
+            <ShieldAlert className="h-4 w-4 text-amber-500 flex-shrink-0" />
+            <span>Productos en Revisión</span>
+          </button>
+        </div>
+
+        {/* NAVEGACIÓN - GRUPO 2: DISEÑO GRÁFICO */}
+        <div className="space-y-1 font-sans">
+          <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5 font-sans">
+            DISEÑO GRÁFICO
+          </p>
+          <button
+            onClick={() => { setActiveConsoleTab('appearance'); setMenuMovilAbierto(false); }}
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+              activeConsoleTab === 'appearance' 
+                ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+            }`}
+          >
+            <Palette className="h-4 w-4 text-current flex-shrink-0" />
+            <span>Apariencia Web</span>
+          </button>
+          <button
+            onClick={() => { setActiveConsoleTab('campanas'); setMenuMovilAbierto(false); }}
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+              activeConsoleTab === 'campanas' 
+                ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+            }`}
+          >
+            <Calendar className="h-4 w-4 text-current flex-shrink-0" />
+            <span>Campañas y Eventos</span>
+          </button>
+          <button
+            onClick={() => { setActiveConsoleTab('secciones'); setMenuMovilAbierto(false); }}
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+              activeConsoleTab === 'secciones' 
+                ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+            }`}
+          >
+            <Sliders className="h-4 w-4 text-current flex-shrink-0" />
+            <span>Personalización</span>
+          </button>
+          <button
+            onClick={() => { setActiveConsoleTab('banners'); setMenuMovilAbierto(false); }}
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
+              activeConsoleTab === 'banners' 
+                ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+            }`}
+          >
+            <ImageIcon className="h-4 w-4 text-current flex-shrink-0" />
+            <span>Banners de Inicio</span>
+          </button>
+        </div>
+
+        {/* NAVEGACIÓN - GRUPO 3: PROGRAMADOR */}
+        <div className="space-y-1 font-sans">
+          <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5 font-sans">
+            PROGRAMADOR
           </p>
           <button
             onClick={() => { setActiveConsoleTab('users'); setMenuMovilAbierto(false); }}
@@ -1151,13 +1411,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
               </div>
             )}
           </div>
-        </div>
 
-        {/* NAVEGACIÓN - GRUPO 2: OBSERVAR */}
-        <div className="space-y-1">
-          <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5">
-            OBSERVAR
-          </p>
           <button
             onClick={() => { setActiveConsoleTab('sessions'); setMenuMovilAbierto(false); }}
             className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
@@ -1279,6 +1533,12 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             </button>
 
             <h1 className="text-[15px] sm:text-[20px] font-semibold text-[#d4d4d4] tracking-tight truncate">
+              {activeConsoleTab === 'dashboard' && "Panel de Control"}
+              {activeConsoleTab === 'moderation' && "Productos en Revisión"}
+              {activeConsoleTab === 'appearance' && "Apariencia Web"}
+              {activeConsoleTab === 'campanas' && "Campañas y Eventos"}
+              {activeConsoleTab === 'secciones' && "Personalización de Secciones"}
+              {activeConsoleTab === 'banners' && "Banners de Inicio"}
               {activeConsoleTab === 'users' && "Control de Usuarios"}
               {activeConsoleTab === 'roles' && (
                 modoVistaRango === 'formulario'
@@ -1571,6 +1831,134 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
 
         {/* ÁREA DE CONTENIDO DINÁMICO */}
         <div className="p-4 sm:p-6 flex-1 overflow-y-auto bg-[#191919]">
+
+          {/* ============================================================================== */}
+          {/* SECCIÓN ADMINISTRADOR / CMS TABS */}
+          {/* ============================================================================== */}
+          {activeConsoleTab === 'dashboard' && (
+            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 text-[#d4d4d4]">
+              <DashboardTab 
+                msgAsignar={msgAsignar || null}
+                emailAsignar={emailAsignar || ""}
+                setEmailAsignar={setEmailAsignar || (() => {})}
+                rolAsignar={rolAsignar || "admin"}
+                setRolAsignar={setRolAsignar || (() => {})}
+                cargandoAsignar={cargandoAsignar || false}
+                handleAsignarRango={handleAsignarRango || (() => {})}
+                adminDashboardData={adminDashboardData || null}
+                cargandoDashboard={cargandoDashboard || false}
+              />
+            </div>
+          )}
+
+          {activeConsoleTab === 'moderation' && (
+            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 text-[#d4d4d4]">
+              <ModerationTab token={token || ""} />
+            </div>
+          )}
+
+          {activeConsoleTab === 'appearance' && (
+            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 text-[#d4d4d4]">
+              <AppearanceTab 
+                tieneCambiosMarca={tieneCambiosMarca || false}
+                setTieneCambiosMarca={setTieneCambiosMarca || (() => {})}
+                handlePublicarMarca={handlePublicarMarca || (() => {})}
+                brandName={brandName || "Vamaar"}
+                setBrandName={setBrandName || (() => {})}
+                brandFontFamily={brandFontFamily || "Outfit"}
+                setBrandFontFamily={setBrandFontFamily || (() => {})}
+                brandFontSize={brandFontSize || "1.5rem"}
+                setBrandFontSize={setBrandFontSize || (() => {})}
+                logoHistory={logoHistory || []}
+                setLogoHistory={setLogoHistory || (() => {})}
+                logoUrl={logoUrl || ""}
+                setLogoUrl={setLogoUrl || (() => {})}
+                logoPreviaUrl={logoPreviaUrl || null}
+                setLogoPreviaUrl={setLogoPreviaUrl || (() => {})}
+                zoomLogo={zoomLogo || 1}
+                setZoomLogo={setZoomLogo || (() => {})}
+                rotateLogo={rotateLogo || 0}
+                setRotateLogo={setRotateLogo || (() => {})}
+                offsetX={offsetX || 0}
+                setOffsetX={setOffsetX || (() => {})}
+                offsetY={offsetY || 0}
+                setOffsetY={setOffsetY || (() => {})}
+                removerFondoBlanco={removerFondoBlanco || false}
+                setRemoverFondoBlanco={setRemoverFondoBlanco || (() => {})}
+                toleranciaTransparencia={toleranciaTransparencia || 30}
+                setToleranciaTransparencia={setToleranciaTransparencia || (() => {})}
+                colorPrimary={colorPrimary || "#2C3E50"}
+                setColorPrimary={setColorPrimary || (() => {})}
+                colorSecondary={colorSecondary || "#D4AF37"}
+                setColorSecondary={setColorSecondary || (() => {})}
+                colorBackground={colorBackground || "#FAFAFA"}
+                setColorBackground={setColorBackground || (() => {})}
+                colorNavbar={colorNavbar || "#FFFFFF"}
+                setColorNavbar={setColorNavbar || (() => {})}
+                colorSectionTitle={colorSectionTitle || "#111827"}
+                setColorSectionTitle={setColorSectionTitle || (() => {})}
+                colorCatalogLink={colorCatalogLink || "#3B82F6"}
+                setColorCatalogLink={setColorCatalogLink || (() => {})}
+                colorTextInput={colorTextInput || "#111827"}
+                setColorTextInput={setColorTextInput || (() => {})}
+                handleEliminarLogoHistorial={handleEliminarLogoHistorial || (() => {})}
+                apiUrl={getApiUrl()}
+              />
+            </div>
+          )}
+
+          {activeConsoleTab === 'campanas' && (
+            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 text-[#d4d4d4]">
+              <CampaignsTab apiUrl={getApiUrl()} token={token} />
+            </div>
+          )}
+
+          {activeConsoleTab === 'secciones' && (
+            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 text-[#d4d4d4]">
+              <CustomizationsTab 
+                tieneCambiosSecciones={tieneCambiosSecciones || false}
+                handlePublicarSecciones={handlePublicarSecciones || (() => {})}
+                nuevoSeccionTitulo={nuevoSeccionTitulo || ""}
+                setNuevoSeccionTitulo={setNuevoSeccionTitulo || (() => {})}
+                nuevoSeccionCategoria={nuevoSeccionCategoria || "Todos"}
+                setNuevoSeccionCategoria={setNuevoSeccionCategoria || (() => {})}
+                handleAgregarSeccion={handleAgregarSeccion || (() => {})}
+                seccionesList={seccionesList || []}
+                setSeccionesList={setSeccionesList || (() => {})}
+                setTieneCambiosSecciones={setTieneCambiosSecciones || (() => {})}
+                handleEliminarSeccion={handleEliminarSeccion || (() => {})}
+              />
+            </div>
+          )}
+
+          {activeConsoleTab === 'banners' && (
+            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 text-[#d4d4d4]">
+              <BannersTab 
+                tieneCambiosBanners={tieneCambiosBanners || false}
+                handlePublicarBanners={handlePublicarBanners || (() => {})}
+                subiendoBanner={subiendoBanner || false}
+                nuevoBannerTitulo={nuevoBannerTitulo || ""}
+                setNuevoBannerTitulo={setNuevoBannerTitulo || (() => {})}
+                nuevoBannerSubtitulo={nuevoBannerSubtitulo || ""}
+                setNuevoBannerSubtitulo={setNuevoBannerSubtitulo || (() => {})}
+                nuevoBannerLink={nuevoBannerLink || "/catalog"}
+                setNuevoBannerLink={setNuevoBannerLink || (() => {})}
+                nuevoBannerLinkPersonalizado={nuevoBannerLinkPersonalizado || ""}
+                setNuevoBannerLinkPersonalizado={setNuevoBannerLinkPersonalizado || (() => {})}
+                nuevoBannerArchivo={nuevoBannerArchivo || null}
+                setNuevoBannerArchivo={setNuevoBannerArchivo || (() => {})}
+                nuevoBannerArchivoMovil={nuevoBannerArchivoMovil || null}
+                setNuevoBannerArchivoMovil={setNuevoBannerArchivoMovil || (() => {})}
+                handleAgregarBorradorBanner={handleAgregarBorradorBanner || (() => {})}
+                bannerList={bannerList || []}
+                setBannerList={setBannerList || (() => {})}
+                setTieneCambiosBanners={setTieneCambiosBanners || (() => {})}
+                showToast={showToast || (() => {})}
+                token={token}
+                apiUrl={getApiUrl()}
+              />
+            </div>
+          )}
 
           {/* ============================================================================== */}
           {/* TAB 1: CONTROL DE USUARIOS */}

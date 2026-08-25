@@ -854,13 +854,98 @@ function MiEspacioContent() {
           />
         )}
 
-        {/* TAB: PANEL DE PROGRAMADOR ROOT (TEMA GOOGLE AI STUDIO - PANTALLA COMPLETA 100vw x 100vh) */}
-        {tabActual === "root" && esRoot && (
-          <div className="fixed inset-0 z-[999999] bg-[#121214] w-screen h-screen overflow-hidden flex flex-col animate-fade-in">
-            <RootTab onVolverAMiEspacio={() => {
-              setTabActual("menu");
-              router.push('/mi-espacio?tab=menu');
-            }} />
+        {/* SECCIÓN ADMINISTRADOR & PANEL DE PROGRAMADOR UNIFICADOS (TEMA GOOGLE AI STUDIO - PANTALLA COMPLETA 100vw x 100vh) */}
+        {(tabActual === "root" || tabActual === "admin" || tabActual === "dashboard" || tabActual === "moderation" || tabActual === "appearance" || tabActual === "campanas" || tabActual === "secciones" || tabActual === "banners" || tabActual === "users" || tabActual === "roles" || tabActual === "permissions" || tabActual === "sections" || tabActual === "sessions" || tabActual === "logs") && (esAdmin || esRoot) && (
+          <div className="fixed inset-0 z-[999999] bg-[#121214] w-screen h-screen overflow-hidden flex flex-col animate-fade-in font-sans">
+            <RootTab 
+              initialTab={tabActual}
+              onVolverAMiEspacio={() => {
+                setTabActual("menu");
+                router.push('/mi-espacio?tab=menu');
+              }} 
+              msgAsignar={msgAsignar}
+              emailAsignar={emailAsignar}
+              setEmailAsignar={setEmailAsignar}
+              rolAsignar={rolAsignar}
+              setRolAsignar={setRolAsignar}
+              cargandoAsignar={cargandoAsignar}
+              handleAsignarRango={handleAsignarRango}
+              adminDashboardData={adminDashboardData}
+              cargandoDashboard={cargandoDashboard}
+              tieneCambiosMarca={tieneCambiosMarca}
+              setTieneCambiosMarca={setTieneCambiosMarca}
+              handlePublicarMarca={handlePublicarMarca}
+              brandName={brandName}
+              setBrandName={setBrandName}
+              brandFontFamily={brandFontFamily}
+              setBrandFontFamily={setBrandFontFamily}
+              brandFontSize={brandFontSize}
+              setBrandFontSize={setBrandFontSize}
+              logoHistory={logoHistory}
+              setLogoHistory={setLogoHistory}
+              logoUrl={logoUrl}
+              setLogoUrl={setLogoUrl}
+              logoPreviaUrl={logoPreviaUrl}
+              setLogoPreviaUrl={setLogoPreviaUrl}
+              zoomLogo={zoomLogo}
+              setZoomLogo={setZoomLogo}
+              rotateLogo={rotateLogo}
+              setRotateLogo={setRotateLogo}
+              offsetX={offsetX}
+              setOffsetX={setOffsetX}
+              offsetY={offsetY}
+              setOffsetY={setOffsetY}
+              removerFondoBlanco={removerFondoBlanco}
+              setRemoverFondoBlanco={setRemoverFondoBlanco}
+              toleranciaTransparencia={toleranciaTransparencia}
+              setToleranciaTransparencia={setToleranciaTransparencia}
+              colorPrimary={colorPrimary}
+              setColorPrimary={setColorPrimary}
+              colorSecondary={colorSecondary}
+              setColorSecondary={setColorSecondary}
+              colorBackground={colorBackground}
+              setColorBackground={setColorBackground}
+              colorNavbar={colorNavbar}
+              setColorNavbar={setColorNavbar}
+              colorSectionTitle={colorSectionTitle}
+              setColorSectionTitle={setColorSectionTitle}
+              colorCatalogLink={colorCatalogLink}
+              setColorCatalogLink={setColorCatalogLink}
+              colorTextInput={colorTextInput}
+              setColorTextInput={setColorTextInput}
+              handleEliminarLogoHistorial={handleEliminarLogoHistorial}
+              tieneCambiosBanners={tieneCambiosBanners}
+              handlePublicarBanners={handlePublicarBanners}
+              subiendoBanner={subiendoBanner}
+              nuevoBannerTitulo={nuevoBannerTitulo}
+              setNuevoBannerTitulo={setNuevoBannerTitulo}
+              nuevoBannerSubtitulo={nuevoBannerSubtitulo}
+              setNuevoBannerSubtitulo={setNuevoBannerSubtitulo}
+              nuevoBannerLink={nuevoBannerLink}
+              setNuevoBannerLink={setNuevoBannerLink}
+              nuevoBannerLinkPersonalizado={nuevoBannerLinkPersonalizado}
+              setNuevoBannerLinkPersonalizado={setNuevoBannerLinkPersonalizado}
+              nuevoBannerArchivo={nuevoBannerArchivo}
+              setNuevoBannerArchivo={setNuevoBannerArchivo}
+              nuevoBannerArchivoMovil={nuevoBannerArchivoMovil}
+              setNuevoBannerArchivoMovil={setNuevoBannerArchivoMovil}
+              handleAgregarBorradorBanner={handleAgregarBorradorBanner}
+              bannerList={bannerList}
+              setBannerList={setBannerList}
+              setTieneCambiosBanners={setTieneCambiosBanners}
+              showToast={showToast}
+              tieneCambiosSecciones={tieneCambiosSecciones}
+              handlePublicarSecciones={handlePublicarSecciones}
+              nuevoSeccionTitulo={nuevoSeccionTitulo}
+              setNuevoSeccionTitulo={setNuevoSeccionTitulo}
+              nuevoSeccionCategoria={nuevoSeccionCategoria}
+              setNuevoSeccionCategoria={setNuevoSeccionCategoria}
+              handleAgregarSeccion={handleAgregarSeccion}
+              seccionesList={seccionesList}
+              setSeccionesList={setSeccionesList}
+              setTieneCambiosSecciones={setTieneCambiosSecciones}
+              handleEliminarSeccion={handleEliminarSeccion}
+            />
           </div>
         )}
 

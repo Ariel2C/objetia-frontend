@@ -14,7 +14,8 @@ import {
   Search,
   PlusCircle,
   Sparkles,
-  Shield
+  Shield,
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '../lib/config';
@@ -489,6 +490,16 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         >
                           <User className="h-4 w-4 text-purple-600" /> Mi Espacio
                         </Link>
+
+                        {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'root' || tienePermiso('full_access') || tienePermiso('manage_roles')) && (
+                          <Link 
+                            href="/mi-espacio?tab=dashboard" 
+                            onClick={() => setMenuAbierto(false)}
+                            className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-purple-800 hover:bg-purple-50 transition"
+                          >
+                            <ShieldCheck className="h-4 w-4 text-purple-600" /> Sección Administrador
+                          </Link>
+                        )}
 
                         <button 
                           onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}

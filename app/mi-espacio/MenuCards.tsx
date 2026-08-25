@@ -140,7 +140,7 @@ export default function MenuCards({ tabActual, setTabActual, esAdmin, esRoot, on
     }
   ];
 
-  // Tarjetas para Clientes
+  // Tarjetas para Mi Espacio
   const clientCards: { titulo: string; items: CardItem[] }[] = [
     {
       titulo: "Mi Espacio",
@@ -177,26 +177,10 @@ export default function MenuCards({ tabActual, setTabActual, esAdmin, esRoot, on
         },
         {
           id: "vender",
-          label: "Vender producto",
+          label: "Publicar producto",
           icon: PlusCircle,
           isExternalLink: true,
           href: "/products/new",
-          iconColor: "text-purple-700"
-        },
-        {
-          id: "chat",
-          label: "Mis mensajes",
-          icon: MessageSquare,
-          isExternalLink: true,
-          href: "/chat",
-          iconColor: "text-purple-700"
-        },
-        {
-          id: "favorites",
-          label: "Mis favoritos",
-          icon: Heart,
-          isExternalLink: true,
-          href: "/products/favorites",
           iconColor: "text-purple-700"
         }
       ]
@@ -210,7 +194,7 @@ export default function MenuCards({ tabActual, setTabActual, esAdmin, esRoot, on
     return true;
   };
 
-  const gruposRaw = (esAdmin || tieneAccesoAdmin) ? adminCards : clientCards;
+  const gruposRaw = clientCards;
   const grupos = gruposRaw.map(g => ({
     ...g,
     items: g.items.filter(item => itemPermitido(item.id))
