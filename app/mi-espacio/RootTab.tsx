@@ -586,6 +586,103 @@ export default function RootTab({
     );
   };
 
+  // Renderizador del Árbol de Secciones y Páginas con Checkboxes para la Selección de Permisos
+  const renderPermissionTreeNode = (node: SectionNode, depth = 0, parentNode?: SectionNode) => {
+    const isChecked = isSectionChecked(node.code);
+    const hasChildren = node.children && node.children.length > 0;
+    const fullyChecked = hasChildren ? isParentSectionFullyChecked(node) : isChecked;
+    const partiallyChecked = hasChildren ? isParentSectionPartiallyChecked(node) : false;
+    const isExpanded = expandedSectionCodes[node.code] ?? true;
+
+    return (
+      <div key={node.code} className="space-y-1 font-sans">
+        <div 
+          style={{ paddingLeft: `${depth * 20 + 8}px` }}
+          className={`py-2 pr-3 rounded-[10px] flex items-center justify-between gap-2 transition cursor-pointer select-none ${
+            fullyChecked 
+              ? 'bg-[#87a9ff]/15 border border-[#87a9ff]/40 text-white' 
+              : partiallyChecked 
+                ? 'bg-[#252525] border border-[#87a9ff]/30 text-[#e0e0e0]'
+                : 'bg-[#18181a] hover:bg-[#222222] border border-[#2b2b2b] text-[#8c8c8c]'
+          }`}
+        >
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            {/* Checkbox interactivo */}
+            <div 
+              onClick={(e) => {
+                e.stopPropagation();
+                if (hasChildren) {
+                  toggleSectionInPermission(node);
+                } else {
+                  toggleSingleSectionCode(node.code, parentNode);
+                }
+              }}
+              className={`w-4 h-4 rounded-[4px] border flex items-center justify-center flex-shrink-0 transition cursor-pointer ${
+                fullyChecked
+                  ? 'bg-[#87a9ff] border-[#87a9ff] text-[#121212]'
+                  : partiallyChecked
+                    ? 'bg-[#87a9ff]/40 border-[#87a9ff] text-white'
+                    : 'bg-[#252525] border-[#444444] hover:border-[#87a9ff]'
+              }`}
+            >
+              {fullyChecked && <Check className="w-3 h-3 text-[#121212] stroke-[3]" />}
+              {partiallyChecked && !fullyChecked && <div className="w-2 h-0.5 bg-white rounded-full" />}
+            </div>
+
+            {/* Toggle desplegable para carpetas */}
+            {hasChildren ? (
+              <button 
+                type="button"
+                onClick={(e) => { e.stopPropagation(); toggleExpandSection(node.code); }} 
+                className="text-[#8c8c8c] hover:text-white p-0.5 cursor-pointer"
+              >
+                {isExpanded ? <ChevronDown className="h-3.5 w-3.5" /> : <ChevronRight className="h-3.5 w-3.5" />}
+              </button>
+            ) : (
+              <span className="w-3.5" />
+            )}
+
+            {/* Icono de carpeta o archivo */}
+            {hasChildren ? (
+              isExpanded ? (
+                <FolderOpen className="h-4 w-4 text-[#87a9ff] flex-shrink-0" />
+              ) : (
+                <Folder className="h-4 w-4 text-[#8c8c8c] flex-shrink-0" />
+              )
+            ) : (
+              <FileText className="h-3.5 w-3.5 text-[#87a9ff] flex-shrink-0" />
+            )}
+
+            {/* Nombre y código */}
+            <span 
+              onClick={() => {
+                if (hasChildren) toggleSectionInPermission(node);
+                else toggleSingleSectionCode(node.code, parentNode);
+              }}
+              className={`text-xs font-medium truncate ${
+                fullyChecked ? 'text-white font-semibold' : 'text-[#d4d4d4]'
+              }`}
+            >
+              {node.name}
+            </span>
+            <span className="text-[10px] text-[#666666] font-mono">[{node.code}]</span>
+          </div>
+
+          <span className="text-[10px] px-2 py-0.5 rounded bg-[#252525] text-[#8c8c8c] border border-[#333333]">
+            {node.category}
+          </span>
+        </div>
+
+        {/* Nodos Hijos */}
+        {hasChildren && isExpanded && (
+          <div className="space-y-1">
+            {node.children.map((child) => renderPermissionTreeNode(child, depth + 1, node))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   // Filtros y estados
   const [usersList, setUsersList] = useState<UserData[]>([]);
   const [searchUser, setSearchUser] = useState('');
@@ -680,34 +777,120 @@ export default function RootTab({
     category: string;
     description: string;
     target_section: string;
+    selectedSectionCodes: string[];
   }>({
     code: '',
     name: '',
-    category: 'Sistema',
+    category: 'Gestión de Contenido',
     description: '',
-    target_section: ''
+    target_section: '',
+    selectedSectionCodes: []
   });
 
   const abrirFormularioPermiso = (modo: 'crear' | 'editar', permiso?: PermissionItem) => {
+    const rawTarget = permiso?.target_section || '';
+    const parsedSections = rawTarget
+      ? rawTarget.split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
+      : [];
+
     if (modo === 'editar' && permiso) {
       setPermisoForm({
         dbId: permiso.id,
         code: permiso.code,
         name: permiso.name,
-        category: permiso.category || 'Sistema',
+        category: permiso.category || 'Gestión de Contenido',
         description: permiso.description || '',
-        target_section: permiso.target_section || ''
+        target_section: permiso.target_section || '',
+        selectedSectionCodes: parsedSections
       });
     } else {
       setPermisoForm({
         code: '',
         name: '',
-        category: 'Sistema',
+        category: 'Gestión de Contenido',
         description: '',
-        target_section: ''
+        target_section: '',
+        selectedSectionCodes: []
       });
     }
     setModoVistaPermiso('formulario');
+  };
+
+  // Helper recursivo para obtener todos los códigos de un nodo de sección y sus descendientes
+  const getAllChildSectionCodes = (node: SectionNode): string[] => {
+    let codes = [node.code.toLowerCase()];
+    if (node.children && node.children.length > 0) {
+      for (const child of node.children) {
+        codes = codes.concat(getAllChildSectionCodes(child));
+      }
+    }
+    return codes;
+  };
+
+  const isSectionChecked = (code: string) => {
+    return (permisoForm.selectedSectionCodes || []).includes(code.toLowerCase());
+  };
+
+  const isParentSectionFullyChecked = (node: SectionNode): boolean => {
+    const allCodes = getAllChildSectionCodes(node);
+    const current = (permisoForm.selectedSectionCodes || []).map(c => c.toLowerCase());
+    return allCodes.every(c => current.includes(c));
+  };
+
+  const isParentSectionPartiallyChecked = (node: SectionNode): boolean => {
+    const allCodes = getAllChildSectionCodes(node);
+    const current = (permisoForm.selectedSectionCodes || []).map(c => c.toLowerCase());
+    const someChecked = allCodes.some(c => current.includes(c));
+    return someChecked && !isParentSectionFullyChecked(node);
+  };
+
+  const toggleSectionInPermission = (node: SectionNode) => {
+    const allCodes = getAllChildSectionCodes(node);
+    const fullyChecked = isParentSectionFullyChecked(node);
+
+    setPermisoForm(prev => {
+      const current = (prev.selectedSectionCodes || []).map(c => c.toLowerCase());
+      let next: string[];
+      if (fullyChecked) {
+        // Deseleccionar el padre y todos sus hijos
+        next = current.filter(c => !allCodes.includes(c));
+      } else {
+        // Seleccionar el padre y todos sus hijos automáticamente
+        next = Array.from(new Set([...current, ...allCodes]));
+      }
+      return {
+        ...prev,
+        selectedSectionCodes: next,
+        target_section: next.join(',')
+      };
+    });
+  };
+
+  const toggleSingleSectionCode = (code: string, parentNode?: SectionNode) => {
+    const cleanCode = code.toLowerCase();
+    setPermisoForm(prev => {
+      const current = (prev.selectedSectionCodes || []).map(c => c.toLowerCase());
+      const exists = current.includes(cleanCode);
+      let next = exists ? current.filter(c => c !== cleanCode) : [...current, cleanCode];
+
+      // Sincronizar estado del nodo padre si corresponde
+      if (parentNode) {
+        const parentClean = parentNode.code.toLowerCase();
+        const childCodes = (parentNode.children || []).map(c => c.code.toLowerCase());
+        const allChildrenChecked = childCodes.length > 0 && childCodes.every(c => next.includes(c));
+        if (allChildrenChecked && !next.includes(parentClean)) {
+          next.push(parentClean);
+        } else if (!allChildrenChecked && next.includes(parentClean)) {
+          next = next.filter(c => c !== parentClean);
+        }
+      }
+
+      return {
+        ...prev,
+        selectedSectionCodes: next,
+        target_section: next.join(',')
+      };
+    });
   };
 
   const guardarPermisoForm = async (e: React.FormEvent) => {
@@ -717,6 +900,7 @@ export default function RootTab({
       return;
     }
     const codeClean = permisoForm.dbId ? permisoForm.code : permisoForm.name.toLowerCase().trim().replace(/\s+/g, '_');
+    const finalTarget = (permisoForm.selectedSectionCodes || []).join(',');
 
     try {
       if (!permisoForm.dbId) {
@@ -730,9 +914,9 @@ export default function RootTab({
           body: JSON.stringify({
             code: codeClean,
             name: permisoForm.name.trim(),
-            category: permisoForm.category.trim() || 'Sistema',
+            category: permisoForm.category.trim() || 'Gestión de Contenido',
             description: permisoForm.description.trim(),
-            target_section: permisoForm.target_section || null
+            target_section: finalTarget || null
           })
         });
         const data = await res.json();
@@ -754,9 +938,9 @@ export default function RootTab({
           body: JSON.stringify({
             code: permisoForm.code,
             name: permisoForm.name.trim(),
-            category: permisoForm.category.trim() || 'Sistema',
+            category: permisoForm.category.trim() || 'Gestión de Contenido',
             description: permisoForm.description.trim(),
-            target_section: permisoForm.target_section || null
+            target_section: finalTarget || null
           })
         });
         const data = await res.json();
@@ -1099,14 +1283,16 @@ export default function RootTab({
           setRangosList(rolesMapeados);
         }
       } else if (activeConsoleTab === 'roles' || activeConsoleTab === 'permissions') {
-        const [resRoles, resPerms, resSecs] = await Promise.all([
+        const [resRoles, resPerms, resSecs, resTree] = await Promise.all([
           fetch(`${getApiUrl()}/root/roles`, { headers: { "Authorization": `Bearer ${token}` } }),
           fetch(`${getApiUrl()}/root/permissions`, { headers: { "Authorization": `Bearer ${token}` } }),
-          fetch(`${getApiUrl()}/root/app-sections`, { headers: { "Authorization": `Bearer ${token}` } })
+          fetch(`${getApiUrl()}/root/app-sections`, { headers: { "Authorization": `Bearer ${token}` } }),
+          fetch(`${getApiUrl()}/root/sections-tree`, { headers: { "Authorization": `Bearer ${token}` } })
         ]);
         const dataRoles = await resRoles.json();
         const dataPerms = await resPerms.json();
         const dataSecs = await resSecs.json();
+        const dataTree = await resTree.json();
 
         if (resPerms.ok && dataPerms.permissions) {
           setAllPermissions(dataPerms.permissions);
@@ -1114,6 +1300,11 @@ export default function RootTab({
 
         if (resSecs.ok && dataSecs.sections) {
           setAppSections(dataSecs.sections);
+        }
+
+        if (resTree.ok && dataTree.tree) {
+          setSectionsTree(dataTree.tree);
+          setFlatSections(dataTree.raw_sections || []);
         }
 
         if (resRoles.ok && dataRoles.roles) {
@@ -1188,6 +1379,45 @@ export default function RootTab({
     } catch (err: any) {
       toast.error(err.message || "Error al cambiar rol.");
     }
+  };
+
+  // Verificación dinámica de acceso a secciones y páginas según los permisos asignados
+  const tienePermisoTab = (tab: string): boolean => {
+    if (esRoot) return true;
+    if (!usuario) return false;
+
+    const userPerms = usuario.permissions || [];
+    if (userPerms.includes('full_access')) return true;
+
+    // Obtener los permisos del rol actual
+    const rolesMatching = rangosList.find(r => r.code.toLowerCase() === usuario.role?.toLowerCase());
+    const rolePermIds = rolesMatching?.permission_ids || [];
+
+    const activePerms = allPermissions.filter(p => 
+      rolePermIds.includes(p.id) || userPerms.includes(p.code.toLowerCase())
+    );
+
+    // Revisar si algún permiso tiene en target_section este tab o su categoría
+    for (const p of activePerms) {
+      if (!p.target_section) continue;
+      const allowedSections = p.target_section.split(',').map(s => s.trim().toLowerCase());
+      if (allowedSections.includes(tab.toLowerCase())) return true;
+      
+      // Herencia de grupo
+      if (['appearance', 'campanas', 'secciones', 'banners'].includes(tab) && (allowedSections.includes('cms') || allowedSections.includes('gestion_de_contenido'))) return true;
+      if (['dashboard', 'moderation'].includes(tab) && (allowedSections.includes('admin_section') || allowedSections.includes('admin'))) return true;
+      if (['users', 'roles', 'permissions', 'sections', 'sessions', 'logs'].includes(tab) && allowedSections.includes('system')) return true;
+    }
+
+    // Default para rol admin mientras no existan restricciones explícitas
+    if (usuario.role?.toLowerCase() === 'admin') {
+      if (['dashboard', 'moderation', 'appearance', 'campanas', 'secciones', 'banners'].includes(tab)) {
+        const hasExplicitRestrictions = activePerms.some(p => p.target_section && p.target_section.trim().length > 0);
+        if (!hasExplicitRestrictions) return true;
+      }
+    }
+
+    return false;
   };
 
   const [modalEliminarUser, setModalEliminarUser] = useState<{ id: number; email: string } | null>(null);
@@ -1301,10 +1531,10 @@ export default function RootTab({
           </button>
         </div>
 
-        {/* NAVEGACIÓN - GRUPO 2: DISEÑO GRÁFICO */}
+        {/* NAVEGACIÓN - GRUPO 2: GESTIÓN DE CONTENIDO */}
         <div className="space-y-1 font-sans">
           <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5 font-sans">
-            DISEÑO GRÁFICO
+            GESTIÓN DE CONTENIDO
           </p>
           <button
             onClick={() => { setActiveConsoleTab('appearance'); setMenuMovilAbierto(false); }}
@@ -1843,10 +2073,29 @@ export default function RootTab({
         {/* ÁREA DE CONTENIDO DINÁMICO CON SCROLLBAR FUNCIONAL */}
         <div className="p-4 sm:p-6 flex-1 min-h-0 overflow-y-auto bg-[#191919] custom-scrollbar">
 
+          {/* GUARDA DE PERMISO PARA PÁGINAS PROTEGIDAS */}
+          {!tienePermisoTab(activeConsoleTab) && (
+            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[16px] p-8 text-center space-y-4 max-w-md mx-auto my-12 font-sans shadow-xl animate-fade-in">
+              <div className="p-3 bg-amber-500/10 text-amber-400 rounded-2xl w-fit mx-auto border border-amber-500/20">
+                <Lock className="h-8 w-8" />
+              </div>
+              <h3 className="text-base font-bold text-white">Acceso Restringido por Permiso</h3>
+              <p className="text-xs text-[#8c8c8c] leading-relaxed">
+                Tu rol o permisos actuales no tienen autorización para acceder a la página de <strong className="text-[#d4d4d4]">{activeConsoleTab}</strong>.
+              </p>
+              <button
+                onClick={() => setActiveConsoleTab('dashboard')}
+                className="px-4 py-2 bg-[#252525] border border-[#383838] hover:bg-[#323232] text-[#87a9ff] rounded-xl text-xs font-bold transition cursor-pointer"
+              >
+                Volver al Panel de Control
+              </button>
+            </div>
+          )}
+
           {/* ============================================================================== */}
           {/* SECCIÓN ADMINISTRADOR / CMS TABS */}
           {/* ============================================================================== */}
-          {activeConsoleTab === 'dashboard' && (
+          {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'dashboard' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 text-[#d4d4d4]">
               <DashboardTab 
                 msgAsignar={msgAsignar || null}
@@ -1862,13 +2111,13 @@ export default function RootTab({
             </div>
           )}
 
-          {activeConsoleTab === 'moderation' && (
+          {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'moderation' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 text-[#d4d4d4]">
               <ModerationTab token={token || ""} />
             </div>
           )}
 
-          {activeConsoleTab === 'appearance' && (
+          {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'appearance' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 text-[#d4d4d4]">
               <AppearanceTab 
                 tieneCambiosMarca={tieneCambiosMarca || false}
@@ -1918,13 +2167,13 @@ export default function RootTab({
             </div>
           )}
 
-          {activeConsoleTab === 'campanas' && (
+          {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'campanas' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 text-[#d4d4d4]">
               <CampaignsTab apiUrl={getApiUrl()} token={token} />
             </div>
           )}
 
-          {activeConsoleTab === 'secciones' && (
+          {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'secciones' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 text-[#d4d4d4]">
               <CustomizationsTab 
                 tieneCambiosSecciones={tieneCambiosSecciones || false}
@@ -1942,7 +2191,7 @@ export default function RootTab({
             </div>
           )}
 
-          {activeConsoleTab === 'banners' && (
+          {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'banners' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 text-[#d4d4d4]">
               <BannersTab 
                 tieneCambiosBanners={tieneCambiosBanners || false}
@@ -1974,7 +2223,7 @@ export default function RootTab({
           {/* ============================================================================== */}
           {/* TAB 1: CONTROL DE USUARIOS */}
           {/* ============================================================================== */}
-          {activeConsoleTab === 'users' && (
+          {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'users' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-visible p-4 space-y-3">
               <div className="space-y-2">
                 {usuariosPaginados.length === 0 ? (
@@ -2065,7 +2314,7 @@ export default function RootTab({
           {/* ============================================================================== */}
           {/* TAB: CONTROL DE RANGOS */}
           {/* ============================================================================== */}
-          {activeConsoleTab === 'roles' && (
+          {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'roles' && (
             <div>
               {modoVistaRango === 'lista' ? (
                 /* VISTA LISTA DE TARJETAS DE RANGOS */
@@ -2229,7 +2478,7 @@ export default function RootTab({
           {/* ============================================================================== */}
           {/* TAB 1.3: CONTROL DE PERMISOS */}
           {/* ============================================================================== */}
-          {activeConsoleTab === 'permissions' && (
+          {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'permissions' && (
             <div className="space-y-4">
               {modoVistaPermiso === 'lista' ? (
                 <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-5 space-y-4 font-sans">
@@ -2305,21 +2554,31 @@ export default function RootTab({
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-[#8c8c8c] mb-1 font-medium">Sección Protegida de la App (Vínculo Dinámico)</label>
-                      <select
-                        value={permisoForm.target_section}
-                        onChange={(e) => setPermisoForm(f => ({ ...f, target_section: e.target.value }))}
-                        style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
-                        className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans cursor-pointer"
-                      >
-                        <option value="">-- Sin Sección Específica (Acceso General) --</option>
-                        {appSections.map((sec) => (
-                          <option key={sec.code} value={sec.code} className="bg-[#191919] text-white">
-                            {sec.name} ({sec.category}) - [{sec.code}]
-                          </option>
-                        ))}
-                      </select>
+                    {/* ÁRBOL JERÁRQUICO INTERACTIVO PARA SELECCIONAR ACCESO A PÁGINAS Y SECCIONES */}
+                    <div className="space-y-2 border border-[#2b2b2b] rounded-[12px] p-4 bg-[#18181a]">
+                      <div className="flex items-center justify-between pb-2.5 border-b border-[#2b2b2b]">
+                        <div className="flex items-center gap-2">
+                          <FolderTree className="h-4 w-4 text-[#87a9ff]" />
+                          <span className="text-xs font-bold text-white uppercase tracking-wider">
+                            Páginas y Secciones Autorizadas
+                          </span>
+                        </div>
+                        <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#252525] border border-[#383838] text-[#87a9ff] font-medium">
+                          {(permisoForm.selectedSectionCodes || []).length} seleccionada(s)
+                        </span>
+                      </div>
+
+                      <p className="text-[11px] text-[#8c8c8c]">
+                        Al marcar un grupo principal (ej: <strong>Gestión de Contenido</strong>), se seleccionan automáticamente todas sus páginas interiores (Apariencia Web, Campañas y Eventos, Personalización, Banners de Inicio).
+                      </p>
+
+                      <div className="space-y-1 pt-2 max-h-[350px] overflow-y-auto custom-scrollbar pr-1">
+                        {sectionsTree.length === 0 ? (
+                          <div className="py-6 text-center text-xs text-[#8c8c8c]">Cargando estructura de páginas...</div>
+                        ) : (
+                          sectionsTree.map((rootNode) => renderPermissionTreeNode(rootNode))
+                        )}
+                      </div>
                     </div>
 
                     <div>
@@ -2342,7 +2601,7 @@ export default function RootTab({
           {/* ============================================================================== */}
           {/* TAB 1.4: CONTROL DE SECCIONES Y ACCIONES (VISTA EN ÁRBOL JERÁRQUICO / TREE VIEW) */}
           {/* ============================================================================== */}
-          {activeConsoleTab === 'sections' && (
+          {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'sections' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-5 space-y-4 font-sans">
               <div className="flex items-center justify-between border-b border-[#262626] pb-3">
                 <div>
@@ -2370,7 +2629,7 @@ export default function RootTab({
           {/* ============================================================================== */}
           {/* TAB 2: MONITOR DE SESIONES */}
           {/* ============================================================================== */}
-          {activeConsoleTab === 'sessions' && (
+          {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'sessions' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden p-4 space-y-3">
               <div className="space-y-2">
                 {sesionesPaginadas.length === 0 ? (
@@ -2446,7 +2705,7 @@ export default function RootTab({
           {/* ============================================================================== */}
           {/* TAB 3: LOGS DE AUDITORÍA */}
           {/* ============================================================================== */}
-          {activeConsoleTab === 'logs' && (
+          {tienePermisoTab(activeConsoleTab) && activeConsoleTab === 'logs' && (
             <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] overflow-hidden p-4 space-y-3">
               <div className="space-y-2">
                 {logsPaginados.length === 0 ? (
