@@ -1375,6 +1375,7 @@ export default function RootTab({
       // Herencia de grupo
       if (['appearance', 'campanas', 'secciones', 'banners'].includes(tab) && (allowedSections.includes('cms') || allowedSections.includes('gestion_de_contenido'))) return true;
       if (['dashboard', 'moderation'].includes(tab) && (allowedSections.includes('admin_section') || allowedSections.includes('admin'))) return true;
+      if (['billetera', 'publications', 'purchases', 'sales', 'perfil'].includes(tab) && (allowedSections.includes('mi_espacio') || allowedSections.includes('cuenta') || allowedSections.includes('operaciones'))) return true;
       if (['users', 'roles', 'permissions', 'sections', 'sessions', 'logs'].includes(tab) && allowedSections.includes('system')) return true;
     }
 
