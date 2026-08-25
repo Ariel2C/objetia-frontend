@@ -1,6 +1,18 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { GripVertical, Trash2, Check, X } from 'lucide-react';
+import { 
+  GripVertical, 
+  Trash2, 
+  Check, 
+  X, 
+  Sparkles, 
+  Layers, 
+  Plus, 
+  Eye, 
+  Sliders, 
+  Filter,
+  CheckCircle2
+} from 'lucide-react';
 
 interface CustomizationsTabProps {
   tieneCambiosSecciones: boolean;
@@ -64,75 +76,177 @@ export default function CustomizationsTab({
     setTieneCambiosSecciones(true);
   };
 
+  const activasCount = seccionesList.filter(s => s.is_active !== false).length;
+
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div className="flex justify-between items-center border-b border-gray-200/50 pb-4">
-        <div>
-          <h3 className="text-xl font-bold text-gray-900 tracking-tight">Personalización</h3>
-          <p className="text-xs text-gray-500">Configura y ordena los carruseles de productos en la página principal.</p>
+    <div className="space-y-6 animate-fade-in font-sans text-[#d4d4d4]">
+      
+      {/* 1. CABECERA & CONTROLES ESTILO GOOGLE AI STUDIO */}
+      <div className="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-[#262626]">
+        <div className="flex items-center gap-2">
+          {/* Badge de Proyecto */}
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#252525] border border-[#333333] text-xs font-medium text-[#d4d4d4]">
+            <Layers className="h-3.5 w-3.5 text-[#87a9ff]" />
+            <span className="text-[#8c8c8c]">Módulo</span>
+            <span className="text-white font-semibold">Personalización de Carruseles</span>
+          </div>
+
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#252525] border border-[#333333] text-xs text-[#8c8c8c]">
+            <Eye className="h-3.5 w-3.5 text-emerald-400" />
+            <span>Reordenamiento Drag & Drop en vivo</span>
+          </div>
         </div>
+
+        {/* Botón Publicar Cambios */}
         {tieneCambiosSecciones && (
           <button 
             onClick={handlePublicarSecciones}
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-sm cursor-pointer"
+            className="px-4 py-1.5 bg-[#87a9ff] hover:bg-[#a5b4fc] text-[#121214] rounded-lg text-xs font-bold transition shadow-sm cursor-pointer flex items-center justify-center gap-1.5 active:scale-98 animate-pulse"
           >
+            <Check className="h-4 w-4 stroke-[2.5]" />
             Publicar Cambios
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Formulario Nueva Sección */}
-        <div className="lg:col-span-5 bg-white border border-gray-200/80 rounded-2xl p-5 space-y-4 shadow-sm h-fit">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-gray-700 border-b border-gray-50 pb-2">Crear Nuevo Carrusel</h4>
-          <form onSubmit={handleAgregarSeccion} className="space-y-4">
-            <div className="space-y-1">
-              <label htmlFor="nuevoSeccionTitulo" className="text-[10px] font-bold text-gray-500 uppercase">Título de la Sección</label>
-              <input id="nuevoSeccionTitulo" name="nuevoSeccionTitulo" type="text" required placeholder="Ej: Destacados de la Semana" value={nuevoSeccionTitulo} onChange={(e) => setNuevoSeccionTitulo(e.target.value)} className="w-full px-3 py-1.5 text-xs rounded-xl border border-gray-200 text-gray-800" />
+      {/* 2. MINI KPIS */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-[#1f1f1f] border border-[#2b2b2b] rounded-[14px] p-4 flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-medium text-[#8c8c8c] block">Carruseles Creados</span>
+            <div className="text-2xl font-bold text-white mt-0.5">{seccionesList.length}</div>
+          </div>
+          <div className="p-2.5 bg-[#252525] text-[#87a9ff] rounded-xl border border-[#383838]">
+            <Layers className="h-4 w-4" />
+          </div>
+        </div>
+
+        <div className="bg-[#1f1f1f] border border-[#2b2b2b] rounded-[14px] p-4 flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-medium text-[#8c8c8c] block">Activos en la Home</span>
+            <div className="text-2xl font-bold text-emerald-400 mt-0.5">{activasCount} en vivo</div>
+          </div>
+          <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl border border-emerald-500/20">
+            <CheckCircle2 className="h-4 w-4" />
+          </div>
+        </div>
+
+        <div className="bg-[#1f1f1f] border border-[#2b2b2b] rounded-[14px] p-4 flex items-center justify-between">
+          <div>
+            <span className="text-[11px] font-medium text-[#8c8c8c] block">Filtros Configurados</span>
+            <div className="text-2xl font-bold text-amber-400 mt-0.5">
+              {new Set(seccionesList.map(s => s.category_filter || 'Todos')).size} Categorías
             </div>
-            <div className="space-y-1">
-              <label htmlFor="nuevoSeccionCategoria" className="text-[10px] font-bold text-gray-500 uppercase">Filtrar por Categoría</label>
-              <select id="nuevoSeccionCategoria" name="nuevoSeccionCategoria" value={nuevoSeccionCategoria} onChange={(e) => setNuevoSeccionCategoria(e.target.value)} className="w-full px-3 py-1.5 text-xs rounded-xl border border-gray-200 bg-white font-semibold cursor-pointer text-gray-800">
-                <option value="Todos">Mostrar Todos (Sin Filtro)</option>
-                <option value="Sillones">Sillones</option>
-                <option value="Iluminación">Iluminación</option>
-                <option value="Mesas">Mesas</option>
-                <option value="Decoración">Decoración</option>
-                <option value="Muebles">Muebles</option>
+          </div>
+          <div className="p-2.5 bg-amber-500/10 text-amber-400 rounded-xl border border-amber-500/20">
+            <Filter className="h-4 w-4" />
+          </div>
+        </div>
+      </div>
+
+      {/* 3. DISPOSICIÓN PRINCIPAL EN 2 COLUMNAS */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* Formulario Nueva Sección */}
+        <div className="lg:col-span-5 bg-[#1f1f1f] border border-[#2b2b2b] rounded-[16px] p-5 space-y-4 shadow-sm h-fit">
+          <div className="flex items-center justify-between border-b border-[#2b2b2b] pb-3">
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <Plus className="h-4 w-4 text-[#87a9ff]" />
+              Crear Nuevo Carrusel
+            </h4>
+            <span className="text-[10px] text-[#8c8c8c] font-mono">SECTION_BUILDER</span>
+          </div>
+
+          <form onSubmit={handleAgregarSeccion} className="space-y-4">
+            <div className="space-y-1.5">
+              <label htmlFor="nuevoSeccionTitulo" className="text-xs font-medium text-[#d4d4d4] block">
+                Título de la Sección
+              </label>
+              <input 
+                id="nuevoSeccionTitulo" 
+                name="nuevoSeccionTitulo" 
+                type="text" 
+                required 
+                placeholder="Ej: Destacados de la Semana" 
+                value={nuevoSeccionTitulo} 
+                onChange={(e) => setNuevoSeccionTitulo(e.target.value)} 
+                style={{ color: '#ffffff', backgroundColor: '#18181a', caretColor: '#ffffff' }}
+                className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#333333] bg-[#18181a] text-white focus:outline-none focus:border-[#87a9ff] transition" 
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <label htmlFor="nuevoSeccionCategoria" className="text-xs font-medium text-[#d4d4d4] block">
+                Filtrar por Categoría
+              </label>
+              <select 
+                id="nuevoSeccionCategoria" 
+                name="nuevoSeccionCategoria" 
+                value={nuevoSeccionCategoria} 
+                onChange={(e) => setNuevoSeccionCategoria(e.target.value)} 
+                style={{ color: '#ffffff', backgroundColor: '#18181a' }}
+                className="w-full px-3.5 py-2 text-xs rounded-xl border border-[#333333] bg-[#18181a] text-white focus:outline-none focus:border-[#87a9ff] cursor-pointer appearance-none transition"
+              >
+                <option value="Todos" className="bg-[#1e1e1e] text-white">Mostrar Todos (Sin Filtro)</option>
+                <option value="Sillones" className="bg-[#1e1e1e] text-white">Sillones</option>
+                <option value="Iluminación" className="bg-[#1e1e1e] text-white">Iluminación</option>
+                <option value="Mesas" className="bg-[#1e1e1e] text-white">Mesas</option>
+                <option value="Decoración" className="bg-[#1e1e1e] text-white">Decoración</option>
+                <option value="Muebles" className="bg-[#1e1e1e] text-white">Muebles</option>
               </select>
             </div>
-            <button type="submit" className="w-full py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-xs font-bold transition">Añadir Sección</button>
+
+            <button 
+              type="submit" 
+              className="w-full py-2.5 bg-[#87a9ff] hover:bg-[#a5b4fc] text-[#121214] rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-center gap-2 shadow-xs active:scale-98"
+            >
+              <Plus className="h-4 w-4 stroke-[2.5]" />
+              Añadir Sección
+            </button>
           </form>
         </div>
 
-        {/* Cola de Secciones */}
-        <div className="lg:col-span-7 bg-white border border-gray-200/80 rounded-2xl p-5 space-y-4 shadow-sm">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-gray-700 border-b border-gray-50 pb-2">Secciones Activas</h4>
-          <div className="space-y-3">
+        {/* Cola de Secciones con Drag & Drop */}
+        <div className="lg:col-span-7 bg-[#1f1f1f] border border-[#2b2b2b] rounded-[16px] p-5 space-y-4 shadow-sm">
+          <div className="flex items-center justify-between border-b border-[#2b2b2b] pb-3">
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <Sliders className="h-4 w-4 text-[#87a9ff]" />
+              Secciones Activas ({seccionesList.length})
+            </h4>
+            <span className="text-[10px] text-[#8c8c8c]">Arrastra para cambiar el orden</span>
+          </div>
+
+          <div className="space-y-2.5">
             {seccionesList.length === 0 ? (
-              <div className="py-12 text-center text-gray-400 text-xs">No hay secciones configuradas. Agrega una a la izquierda.</div>
+              <div className="py-12 text-center text-[#8c8c8c] text-xs">
+                No hay secciones configuradas. Agrega una desde el panel izquierdo.
+              </div>
             ) : (
               seccionesList.map((sec, index) => (
                 <div 
                   key={sec.id}
                   onPointerDown={(e) => handlePointerDown(index, e)}
                   onPointerEnter={() => handlePointerEnter(index)}
-                  className={`flex items-center justify-between p-3 border rounded-xl transition-all duration-150 gap-4 select-none cursor-grab active:cursor-grabbing ${
+                  className={`flex items-center justify-between p-3.5 border rounded-xl transition-all duration-150 gap-4 select-none cursor-grab active:cursor-grabbing ${
                     draggedSectionIndex === index 
-                      ? 'border-2 border-purple-600 bg-purple-50/90 shadow-lg scale-[1.02] z-20' 
-                      : 'border-gray-100 bg-white hover:border-purple-200 hover:shadow-xs'
+                      ? 'border-[#87a9ff] bg-[#252525] shadow-[0_0_15px_rgba(135,169,255,0.25)] scale-[1.02] z-20' 
+                      : 'border-[#2b2b2b] bg-[#18181a] hover:border-[#383838]'
                   }`}
                 >
-                  <div className="flex items-center gap-2.5">
-                    <GripVertical className="h-5 w-5 text-gray-400" />
+                  <div className="flex items-center gap-3">
+                    <div className="text-[#8c8c8c] hover:text-white">
+                      <GripVertical className="h-4 w-4" />
+                    </div>
                     <div className="leading-tight">
-                      <h5 className="text-xs font-bold text-gray-800">{sec.title}</h5>
-                      <span className="text-[8px] font-bold text-gray-400 uppercase tracking-widest">Filtro: {sec.category_filter || 'Todos los Productos'}</span>
+                      <h5 className="text-xs font-bold text-white">{sec.title}</h5>
+                      <span className="text-[9px] text-[#8c8c8c] uppercase tracking-wider font-mono">
+                        Filtro: {sec.category_filter || 'Todos los Productos'}
+                      </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    {/* TOGGLE WITH ICON PARA ESTADO ACTIVO / INACTIVO */}
+                    {/* Switch Toggle Activo / Inactivo */}
                     <button
                       type="button"
                       role="switch"
@@ -145,26 +259,31 @@ export default function CustomizationsTab({
                       }}
                       className="flex items-center gap-2 cursor-pointer group/toggle select-none"
                     >
-                      <span className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        sec.is_active !== false ? 'bg-emerald-500' : 'bg-gray-300'
+                      <span className={`relative inline-flex h-5 w-9 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                        sec.is_active !== false ? 'bg-emerald-500' : 'bg-[#333333]'
                       }`}>
-                        <span className={`pointer-events-none h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out flex items-center justify-center leading-none ${
-                          sec.is_active !== false ? 'translate-x-5' : 'translate-x-0'
+                        <span className={`pointer-events-none h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out flex items-center justify-center leading-none ${
+                          sec.is_active !== false ? 'translate-x-4' : 'translate-x-0'
                         }`}>
                           {sec.is_active !== false ? (
-                            <Check className="w-3 h-3 text-emerald-600 stroke-[3] shrink-0" />
+                            <Check className="w-2.5 h-2.5 text-emerald-600 stroke-[3] shrink-0" />
                           ) : (
-                            <X className="w-3 h-3 text-gray-400 stroke-[3] shrink-0" />
+                            <X className="w-2.5 h-2.5 text-gray-500 stroke-[3] shrink-0" />
                           )}
                         </span>
                       </span>
                       <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                        sec.is_active !== false ? 'text-emerald-700' : 'text-gray-400'
+                        sec.is_active !== false ? 'text-emerald-400' : 'text-[#8c8c8c]'
                       }`}>
                         {sec.is_active !== false ? 'Activa' : 'Inactiva'}
                       </span>
                     </button>
-                    <button onClick={() => handleEliminarSeccion(sec.id)} className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg cursor-pointer">
+
+                    <button 
+                      onClick={() => handleEliminarSeccion(sec.id)} 
+                      className="p-1.5 text-[#8c8c8c] hover:text-red-400 hover:bg-red-500/10 rounded-lg transition cursor-pointer"
+                      title="Eliminar sección"
+                    >
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -173,6 +292,7 @@ export default function CustomizationsTab({
             )}
           </div>
         </div>
+
       </div>
     </div>
   );
