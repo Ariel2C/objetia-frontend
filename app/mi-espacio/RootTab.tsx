@@ -1115,7 +1115,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   placeholder="Filtrar usuarios..."
                   style={{ 
                     color: '#ffffff', 
-                    WebkitTextFillColor: searchUser ? '#ffffff' : undefined,
+                    WebkitTextFillColor: '#ffffff',
                     backgroundColor: '#191919', 
                     caretColor: '#ffffff' 
                   }}
@@ -1170,7 +1170,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   placeholder="Buscar por email..."
                   style={{ 
                     color: '#ffffff', 
-                    WebkitTextFillColor: searchSessionEmail ? '#ffffff' : undefined,
+                    WebkitTextFillColor: '#ffffff',
                     backgroundColor: '#191919', 
                     caretColor: '#ffffff' 
                   }}
@@ -1210,7 +1210,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   placeholder="Buscar por email..."
                   style={{ 
                     color: '#ffffff', 
-                    WebkitTextFillColor: searchLogEmail ? '#ffffff' : undefined,
+                    WebkitTextFillColor: '#ffffff',
                     backgroundColor: '#191919', 
                     caretColor: '#ffffff' 
                   }}
@@ -1567,7 +1567,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                       <select
                         value={permisoForm.target_section}
                         onChange={(e) => setPermisoForm(f => ({ ...f, target_section: e.target.value }))}
-                        style={{ color: '#ffffff', backgroundColor: '#191919' }}
+                        style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
                         className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans cursor-pointer"
                       >
                         <option value="">-- Sin Sección Específica (Acceso General) --</option>
