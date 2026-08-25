@@ -7,7 +7,8 @@ import {
   Menu, X, Key, Users, Activity, FileText, Search, Trash2, Check,
   RefreshCw, ShieldAlert, CheckCircle2, XCircle, Crown, Shield, 
   Sliders, Database, Terminal, ChevronDown, ChevronUp, ChevronLeft, Bell, Settings, Copy, 
-  ExternalLink, Layers, ArrowUpRight, Lock, Eye, PanelLeftClose, PanelLeftOpen
+  ExternalLink, Layers, ArrowUpRight, Lock, Eye, PanelLeftClose, PanelLeftOpen,
+  FolderTree, Folder, FolderOpen, Zap, Plus, ChevronRight, Edit3, ShieldCheck
 } from 'lucide-react';
 
 interface UserData {
@@ -135,10 +136,276 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
   const { usuario, token } = useAuth();
   const toast = useToast();
 
-  const [activeConsoleTab, setActiveConsoleTab] = useState<'users' | 'roles' | 'permissions' | 'sessions' | 'logs' | 'keys'>('users');
+  const [activeConsoleTab, setActiveConsoleTab] = useState<'users' | 'roles' | 'permissions' | 'sections' | 'sessions' | 'logs' | 'keys'>('users');
+  const [seguridadMenuAbierto, setSeguridadMenuAbierto] = useState(true);
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
   const [sidebarOculto, setSidebarOculto] = useState(false);
   const [cargando, setCargando] = useState(true);
+
+  interface SectionNode {
+    id: number;
+    code: string;
+    name: string;
+    category: string;
+    description?: string;
+    parent_code?: string;
+    icon_name?: string;
+    is_active: boolean;
+    actions: { id: number; code: string; name: string; description?: string; is_active: boolean }[];
+    children: SectionNode[];
+  }
+
+  const [sectionsTree, setSectionsTree] = useState<SectionNode[]>([]);
+  const [flatSections, setFlatSections] = useState<{ id: number; code: string; name: string; category: string }[]>([]);
+  const [expandedSectionCodes, setExpandedSectionCodes] = useState<Record<string, boolean>>({
+    'system': true,
+    'cms': true,
+    'operations': true
+  });
+
+  const [modalSeccion, setModalSeccion] = useState<{
+    id?: number;
+    code: string;
+    name: string;
+    category: string;
+    description: string;
+    parent_code: string;
+  } | null>(null);
+
+  const [modalAccion, setModalAccion] = useState<{
+    section_code: string;
+    code: string;
+    name: string;
+    description: string;
+  } | null>(null);
+
+  const toggleExpandSection = (code: string) => {
+    setExpandedSectionCodes(prev => ({ ...prev, [code]: !prev[code] }));
+  };
+
+  const guardarSeccion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!modalSeccion || !modalSeccion.name.trim()) return;
+    const codeClean = modalSeccion.id ? modalSeccion.code : modalSeccion.name.toLowerCase().trim().replace(/\s+/g, '_');
+
+    try {
+      if (!modalSeccion.id) {
+        const res = await fetch(`${getApiUrl()}/root/sections`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({
+            code: codeClean,
+            name: modalSeccion.name.trim(),
+            category: modalSeccion.category.trim() || 'General',
+            description: modalSeccion.description.trim(),
+            parent_code: modalSeccion.parent_code || null
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          toast.success(`Sección '${modalSeccion.name}' creada exitosamente.`);
+          setModalSeccion(null);
+          cargarDatos();
+        } else {
+          toast.error(data.detail || "Error al crear la sección.");
+        }
+      } else {
+        const res = await fetch(`${getApiUrl()}/root/sections/${modalSeccion.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({
+            code: modalSeccion.code,
+            name: modalSeccion.name.trim(),
+            category: modalSeccion.category.trim() || 'General',
+            description: modalSeccion.description.trim(),
+            parent_code: modalSeccion.parent_code || null
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          toast.success(`Sección '${modalSeccion.name}' actualizada.`);
+          setModalSeccion(null);
+          cargarDatos();
+        } else {
+          toast.error(data.detail || "Error al actualizar la sección.");
+        }
+      }
+    } catch {
+      toast.error("No se pudo conectar con el servidor.");
+    }
+  };
+
+  const eliminarSeccion = async (id: number, name: string) => {
+    try {
+      const res = await fetch(`${getApiUrl()}/root/sections/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Error al eliminar sección.");
+      toast.success(data.mensaje || `Sección '${name}' eliminada.`);
+      cargarDatos();
+    } catch (err: any) {
+      toast.error(err.message || "Error al eliminar sección.");
+    }
+  };
+
+  const guardarAccion = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!modalAccion || !modalAccion.name.trim()) return;
+    const codeClean = modalAccion.name.toLowerCase().trim().replace(/\s+/g, '_');
+
+    try {
+      const res = await fetch(`${getApiUrl()}/root/sections/${modalAccion.section_code}/actions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          code: codeClean,
+          name: modalAccion.name.trim(),
+          description: modalAccion.description.trim()
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        toast.success(`Acción '${modalAccion.name}' creada exitosamente.`);
+        setModalAccion(null);
+        cargarDatos();
+      } else {
+        toast.error(data.detail || "Error al crear acción.");
+      }
+    } catch {
+      toast.error("No se pudo conectar con el servidor.");
+    }
+  };
+
+  const eliminarAccion = async (id: number, name: string) => {
+    try {
+      const res = await fetch(`${getApiUrl()}/root/actions/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Error al eliminar acción.");
+      toast.success(data.mensaje || `Acción '${name}' eliminada.`);
+      cargarDatos();
+    } catch (err: any) {
+      toast.error(err.message || "Error al eliminar acción.");
+    }
+  };
+
+  const renderSectionNode = (node: SectionNode, depth = 0) => {
+    const isExpanded = expandedSectionCodes[node.code] ?? true;
+    const hasChildren = node.children && node.children.length > 0;
+    const hasActions = node.actions && node.actions.length > 0;
+
+    return (
+      <div key={node.code} className="space-y-2 font-sans">
+        {/* FILA DE SECCIÓN / NODO ÁRBOL */}
+        <div 
+          style={{ paddingLeft: `${depth * 16 + 12}px` }}
+          className="py-2.5 pr-3 bg-[#191919] hover:bg-[#222222] border border-[#262626] rounded-[10px] flex items-center justify-between gap-3 transition"
+        >
+          <div className="flex items-center gap-2.5 min-w-0 flex-1">
+            <button 
+              type="button"
+              onClick={() => toggleExpandSection(node.code)}
+              className="text-[#8c8c8c] hover:text-white p-0.5 rounded cursor-pointer flex-shrink-0"
+            >
+              {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </button>
+
+            {isExpanded ? (
+              <FolderOpen className="h-4 w-4 text-[#87a9ff] flex-shrink-0" />
+            ) : (
+              <Folder className="h-4 w-4 text-[#8c8c8c] flex-shrink-0" />
+            )}
+
+            <div className="flex items-center gap-2 min-w-0 flex-wrap">
+              <span className="text-xs font-bold text-white truncate">{node.name}</span>
+              <span className="px-2 py-0.5 rounded-[6px] bg-[#252525] text-[#87a9ff] border border-[#333333] text-[10px] font-medium uppercase tracking-wider">
+                {node.category}
+              </span>
+              <span className="text-[10px] text-[#666666] font-mono">[{node.code}]</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <button
+              type="button"
+              onClick={() => setModalAccion({ section_code: node.code, code: '', name: '', description: '' })}
+              className="px-2.5 h-[26px] bg-[#252525] border border-[#87a9ff]/40 text-[#87a9ff] hover:bg-[#87a9ff]/20 rounded-[6px] text-[11px] font-medium transition cursor-pointer flex items-center gap-1 font-sans"
+              title="Agregar acción específica dentro de esta sección"
+            >
+              <Zap className="h-3 w-3" />
+              <span>+ Acción</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setModalSeccion({
+                id: node.id,
+                code: node.code,
+                name: node.name,
+                category: node.category,
+                description: node.description || '',
+                parent_code: node.parent_code || ''
+              })}
+              className="px-2.5 h-[26px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white rounded-[6px] text-[11px] font-medium transition cursor-pointer font-sans"
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
+              onClick={() => eliminarSeccion(node.id, node.name)}
+              className="px-2.5 h-[26px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white rounded-[6px] text-[11px] font-medium transition cursor-pointer font-sans"
+            >
+              Eliminar
+            </button>
+          </div>
+        </div>
+
+        {/* NODOS HIJOS Y ACCIONES ESPECÍFICAS (CUANDO ESTÁ EXPANDIDO) */}
+        {isExpanded && (
+          <div style={{ paddingLeft: `${depth * 16 + 20}px` }} className="space-y-2 border-l border-[#262626] ml-3 pt-1 pb-1">
+            {/* LISTA DE ACCIONES ASOCIADAS A ESTA SECCIÓN */}
+            {hasActions && (
+              <div className="space-y-1.5 mb-2 pl-2">
+                <p className="text-[10px] font-bold text-[#8c8c8c] uppercase tracking-wider flex items-center gap-1">
+                  <Zap className="h-3 w-3 text-amber-400" />
+                  <span>Acciones de {node.name}</span>
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {node.actions.map((act) => (
+                    <div key={act.id} className="p-2 bg-[#171717] border border-[#262626] rounded-[8px] flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-semibold text-amber-300">{act.name}</span>
+                          <span className="text-[9px] text-[#666666] font-mono">[{act.code}]</span>
+                        </div>
+                        {act.description && <p className="text-[10px] text-[#8c8c8c] truncate">{act.description}</p>}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => eliminarAccion(act.id, act.name)}
+                        className="p-1 text-[#8c8c8c] hover:text-red-400 transition cursor-pointer"
+                        title="Eliminar acción"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* SECCIONES HIJAS */}
+            {hasChildren && node.children.map((child) => renderSectionNode(child, depth + 1))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Filtros y estados
   const [usersList, setUsersList] = useState<UserData[]>([]);
@@ -650,6 +917,15 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           }));
           setRangosList(rolesMapeados);
         }
+      } else if (activeConsoleTab === 'sections') {
+        const resTree = await fetch(`${getApiUrl()}/root/sections-tree`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+        const dataTree = await resTree.json();
+        if (resTree.ok && dataTree.tree) {
+          setSectionsTree(dataTree.tree);
+          setFlatSections(dataTree.raw_sections || []);
+        }
       } else if (activeConsoleTab === 'sessions') {
         const res = await fetch(`${getApiUrl()}/root/sessions?limit=100`, {
           headers: { "Authorization": `Bearer ${token}` }
@@ -779,13 +1055,13 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
         </div>
 
         {/* NAVEGACIÓN - GRUPO 1: SISTEMA */}
-        <div className="space-y-1">
-          <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5">
+        <div className="space-y-1 font-sans">
+          <p className="px-2 text-[11px] font-semibold text-[#8c8c8c] uppercase tracking-wider mb-1.5 font-sans">
             SISTEMA
           </p>
           <button
             onClick={() => { setActiveConsoleTab('users'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
+            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer font-sans ${
               activeConsoleTab === 'users' 
                 ? 'bg-[#2a2a2a] text-[#ffffff]' 
                 : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
@@ -795,29 +1071,59 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
             <span>Control de Usuarios</span>
           </button>
 
-          <button
-            onClick={() => { setActiveConsoleTab('roles'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
-              activeConsoleTab === 'roles' 
-                ? 'bg-[#2a2a2a] text-[#ffffff]' 
-                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-            }`}
-          >
-            <Sliders className="h-4 w-4 text-current flex-shrink-0" />
-            <span>Control de Rangos</span>
-          </button>
+          {/* ACORDEÓN / ÁRBOL DE SEGURIDAD Y ACCESOS */}
+          <div className="pt-1 font-sans">
+            <button
+              onClick={() => setSeguridadMenuAbierto(!seguridadMenuAbierto)}
+              className="w-full flex items-center justify-between px-3 h-[36px] rounded-[12px] text-[14px] font-medium text-[#d4d4d4] hover:bg-[#252525] transition-colors cursor-pointer font-sans"
+            >
+              <div className="flex items-center gap-2.5">
+                <ShieldCheck className="h-4 w-4 text-[#87a9ff] flex-shrink-0" />
+                <span>Seguridad y Accesos</span>
+              </div>
+              {seguridadMenuAbierto ? <ChevronDown className="h-3.5 w-3.5 text-[#8c8c8c]" /> : <ChevronRight className="h-3.5 w-3.5 text-[#8c8c8c]" />}
+            </button>
 
-          <button
-            onClick={() => { setActiveConsoleTab('permissions'); setMenuMovilAbierto(false); }}
-            className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
-              activeConsoleTab === 'permissions' 
-                ? 'bg-[#2a2a2a] text-[#ffffff]' 
-                : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
-            }`}
-          >
-            <Key className="h-4 w-4 text-current flex-shrink-0" />
-            <span>Control de Permisos</span>
-          </button>
+            {seguridadMenuAbierto && (
+              <div className="pl-3.5 mt-1 space-y-1 border-l border-[#262626] ml-4 font-sans">
+                <button
+                  onClick={() => { setActiveConsoleTab('roles'); setMenuMovilAbierto(false); }}
+                  className={`w-full flex items-center gap-2 px-2.5 h-[32px] rounded-[8px] text-[13px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                    activeConsoleTab === 'roles' 
+                      ? 'bg-[#2a2a2a] text-[#87a9ff]' 
+                      : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                  }`}
+                >
+                  <Sliders className="h-3.5 w-3.5 text-current flex-shrink-0" />
+                  <span>Control de Rangos</span>
+                </button>
+
+                <button
+                  onClick={() => { setActiveConsoleTab('permissions'); setMenuMovilAbierto(false); }}
+                  className={`w-full flex items-center gap-2 px-2.5 h-[32px] rounded-[8px] text-[13px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                    activeConsoleTab === 'permissions' 
+                      ? 'bg-[#2a2a2a] text-[#87a9ff]' 
+                      : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                  }`}
+                >
+                  <Key className="h-3.5 w-3.5 text-current flex-shrink-0" />
+                  <span>Control de Permisos</span>
+                </button>
+
+                <button
+                  onClick={() => { setActiveConsoleTab('sections'); setMenuMovilAbierto(false); }}
+                  className={`w-full flex items-center gap-2 px-2.5 h-[32px] rounded-[8px] text-[13px] font-medium transition-colors text-left cursor-pointer font-sans ${
+                    activeConsoleTab === 'sections' 
+                      ? 'bg-[#2a2a2a] text-[#87a9ff]' 
+                      : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                  }`}
+                >
+                  <FolderTree className="h-3.5 w-3.5 text-current flex-shrink-0" />
+                  <span>Secciones y Acciones</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* NAVEGACIÓN - GRUPO 2: OBSERVAR */}
@@ -957,6 +1263,7 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                   ? (permisoForm.dbId ? `Editar Permiso: ${permisoForm.name}` : "Crear Nuevo Permiso")
                   : "Control de Permisos"
               )}
+              {activeConsoleTab === 'sections' && "Control de Secciones y Acciones"}
               {activeConsoleTab === 'sessions' && "Monitor de Sesiones"}
               {activeConsoleTab === 'logs' && "Logs de Auditoría"}
               {activeConsoleTab === 'keys' && "Claves de API"}
@@ -1075,6 +1382,20 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* BARRA SECUNDARIA DE ACCIONES (Control de Secciones y Acciones) */}
+        {activeConsoleTab === 'sections' && (
+          <div className="px-3 sm:px-6 py-2 border-b border-[#262626] flex flex-row justify-between items-center gap-2.5 bg-[#1f1f1f]">
+            <button
+              onClick={() => setModalSeccion({ code: '', name: '', category: 'General', description: '', parent_code: '' })}
+              className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition cursor-pointer flex items-center gap-1 font-sans"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              <span>Nueva Sección</span>
+            </button>
+            <span className="text-xs text-[#8c8c8c] font-sans">Estructura Árbol Jerárquico</span>
           </div>
         )}
 
@@ -1597,6 +1918,34 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
           )}
 
           {/* ============================================================================== */}
+          {/* TAB 1.4: CONTROL DE SECCIONES Y ACCIONES (VISTA EN ÁRBOL JERÁRQUICO / TREE VIEW) */}
+          {/* ============================================================================== */}
+          {activeConsoleTab === 'sections' && (
+            <div className="bg-[#1f1f1f] border border-[#262626] rounded-[12px] p-4 sm:p-5 space-y-4 font-sans">
+              <div className="flex items-center justify-between border-b border-[#262626] pb-3">
+                <div>
+                  <h2 className="text-sm font-bold text-[#87a9ff] uppercase tracking-wider flex items-center gap-2">
+                    <FolderTree className="h-4 w-4 text-[#87a9ff]" />
+                    <span>Estructura Árbol de Secciones y Acciones</span>
+                  </h2>
+                  <p className="text-[11px] text-[#8c8c8c] mt-0.5">
+                    Configuración jerárquica de la plataforma y acciones específicas por sección (ej: Comprar vs Vender).
+                  </p>
+                </div>
+              </div>
+
+              {/* LISTADO DE NODOS EN ÁRBOL */}
+              <div className="space-y-3">
+                {sectionsTree.length === 0 ? (
+                  <p className="text-xs text-[#8c8c8c] text-center py-8 font-sans">Cargando árbol de secciones...</p>
+                ) : (
+                  sectionsTree.map((rootNode) => renderSectionNode(rootNode))
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ============================================================================== */}
           {/* TAB 2: MONITOR DE SESIONES */}
           {/* ============================================================================== */}
           {activeConsoleTab === 'sessions' && (
@@ -1870,6 +2219,172 @@ export default function RootTab({ onVolverAMiEspacio }: RootTabProps) {
                 Confirmar Eliminación
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL CREAR / EDITAR SECCIÓN */}
+      {modalSeccion && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs font-sans">
+          <div className="bg-[#1f1f1f] border border-[#262626] rounded-[16px] p-6 max-w-md w-full space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#262626] pb-3">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <FolderTree className="h-4.5 w-4.5 text-[#87a9ff]" />
+                <span>{modalSeccion.id ? 'Editar Sección' : 'Nueva Sección en Árbol'}</span>
+              </h3>
+              <button onClick={() => setModalSeccion(null)} className="text-[#8c8c8c] hover:text-white transition cursor-pointer">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={guardarSeccion} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Nombre de la Sección</label>
+                <input
+                  type="text"
+                  required
+                  value={modalSeccion.name}
+                  onChange={(e) => setModalSeccion(s => s ? ({ ...s, name: e.target.value }) : null)}
+                  placeholder="Ej: Mis Ventas"
+                  style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
+                  className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Sección Padre (Jerarquía en Árbol)</label>
+                <select
+                  value={modalSeccion.parent_code}
+                  onChange={(e) => setModalSeccion(s => s ? ({ ...s, parent_code: e.target.value }) : null)}
+                  style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
+                  className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans cursor-pointer"
+                >
+                  <option value="">-- Nodo Raíz Principal (Sin Padre) --</option>
+                  {flatSections
+                    .filter(s => !modalSeccion.id || s.id !== modalSeccion.id)
+                    .map((s) => (
+                      <option key={s.code} value={s.code} className="bg-[#191919] text-white">
+                        {s.name} ({s.category}) - [{s.code}]
+                      </option>
+                    ))}
+                </select>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[#8c8c8c] mb-1 font-medium">Categoría</label>
+                  <input
+                    type="text"
+                    value={modalSeccion.category}
+                    onChange={(e) => setModalSeccion(s => s ? ({ ...s, category: e.target.value }) : null)}
+                    placeholder="Ej: Operaciones"
+                    style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
+                    className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[#8c8c8c] mb-1 font-medium">Código Interno</label>
+                  <input
+                    type="text"
+                    disabled={Boolean(modalSeccion.id)}
+                    value={modalSeccion.code || (modalSeccion.name ? modalSeccion.name.toLowerCase().replace(/\s+/g, '_') : '')}
+                    onChange={(e) => setModalSeccion(s => s ? ({ ...s, code: e.target.value }) : null)}
+                    placeholder="Auto-generado..."
+                    style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
+                    className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white disabled:opacity-50"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Descripción Explicativa</label>
+                <textarea
+                  rows={2}
+                  value={modalSeccion.description}
+                  onChange={(e) => setModalSeccion(s => s ? ({ ...s, description: e.target.value }) : null)}
+                  placeholder="Finalidad de esta sección..."
+                  style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
+                  className="w-full p-2.5 bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#262626]">
+                <button
+                  type="button"
+                  onClick={() => setModalSeccion(null)}
+                  className="px-3.5 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 h-[32px] bg-[#393f51] border border-[#454d63] text-white rounded-[8px] text-xs font-medium hover:bg-[#454d63] transition cursor-pointer font-sans"
+                >
+                  {modalSeccion.id ? 'Guardar Cambios' : 'Crear Sección'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL CREAR ACCIÓN */}
+      {modalAccion && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs font-sans">
+          <div className="bg-[#1f1f1f] border border-[#262626] rounded-[16px] p-6 max-w-sm w-full space-y-4 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-[#262626] pb-3">
+              <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                <Zap className="h-4.5 w-4.5 text-amber-400" />
+                <span>Nueva Acción ({modalAccion.section_code})</span>
+              </h3>
+              <button onClick={() => setModalAccion(null)} className="text-[#8c8c8c] hover:text-white transition cursor-pointer">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <form onSubmit={guardarAccion} className="space-y-3 text-xs">
+              <div>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Nombre de la Acción (Ej: Vender Artículos)</label>
+                <input
+                  type="text"
+                  required
+                  value={modalAccion.name}
+                  onChange={(e) => setModalAccion(a => a ? ({ ...a, name: e.target.value }) : null)}
+                  placeholder="Ej: Publicar y Vender C2C"
+                  style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
+                  className="w-full px-3 h-[36px] bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[#8c8c8c] mb-1 font-medium">Descripción</label>
+                <textarea
+                  rows={2}
+                  value={modalAccion.description}
+                  onChange={(e) => setModalAccion(a => a ? ({ ...a, description: e.target.value }) : null)}
+                  placeholder="Permite al usuario vender artículos..."
+                  style={{ color: '#ffffff', WebkitTextFillColor: '#ffffff', backgroundColor: '#191919', caretColor: '#ffffff' }}
+                  className="w-full p-2.5 bg-[#191919] border border-[#262626] rounded-[8px] text-white text-xs focus:outline-none focus:border-[#87a9ff] font-sans caret-white"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#262626]">
+                <button
+                  type="button"
+                  onClick={() => setModalAccion(null)}
+                  className="px-3.5 h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] hover:bg-[#323232] rounded-[8px] text-xs font-medium transition cursor-pointer font-sans"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 h-[32px] bg-amber-600/30 border border-amber-500/50 text-amber-300 rounded-[8px] text-xs font-medium hover:bg-amber-600/40 transition cursor-pointer font-sans"
+                >
+                  Crear Acción
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
