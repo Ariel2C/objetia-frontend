@@ -144,6 +144,18 @@ export default function Sidebar({
     window.history.pushState(null, '', '/mi-espacio?tab=dashboard');
   };
 
+  const esEsRoot = Boolean(
+    esRoot ||
+    roleClean === 'root' ||
+    roleClean.includes('root') ||
+    emailClean === 'root@objetia.com'
+  );
+
+  const badgeText = esEsRoot ? 'Root' : 'Admin';
+  const badgeClasses = esEsRoot
+    ? 'bg-amber-50 text-amber-800 border-amber-200 font-bold'
+    : 'bg-[#e8f0fe] text-[#1a73e8] border-[#d2e3fc] font-bold';
+
   const renderNavContent = () => (
     <div className="flex flex-col h-full justify-between">
       {/* Navegación Principal */}
@@ -194,11 +206,13 @@ export default function Sidebar({
               className="w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] font-semibold text-[#202124] hover:bg-[#e8f0fe] hover:text-[#1a73e8] transition-all text-left cursor-pointer group"
             >
               <div className="flex items-center gap-3 min-w-0">
-                <ShieldCheck className="h-4 w-4 text-[#1a73e8] group-hover:scale-110 transition-transform flex-shrink-0" />
+                <ShieldCheck className={`h-4 w-4 flex-shrink-0 transition-transform group-hover:scale-110 ${
+                  esEsRoot ? 'text-amber-600' : 'text-[#1a73e8]'
+                }`} />
                 <span className="truncate">OBJETIA studio</span>
               </div>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc]">
-                Admin
+              <span className={`text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider border ${badgeClasses}`}>
+                {badgeText}
               </span>
             </button>
           </div>
