@@ -746,33 +746,63 @@ function MiEspacioContent() {
                 <MenuIcon className="h-5 w-5" />
               </button>
 
-              {/* Botón interactivo con icono CSS animado de Colapso/Expansión */}
+              {/* Botón interactivo con icono SVG/CSS animado de Colapso/Expansión */}
               <button
                 onClick={() => setSidebarOculto(!sidebarOculto)}
-                className="hidden lg:flex items-center justify-center w-9 h-9 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#f1f3f4] active:bg-[#e8f0fe] rounded-xl transition-all cursor-pointer flex-shrink-0 group"
+                className="hidden lg:flex items-center justify-center w-10 h-10 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#f1f3f4] active:bg-[#e8f0fe] active:scale-95 rounded-xl transition-all cursor-pointer flex-shrink-0 group"
                 title={sidebarOculto ? "Mostrar barra lateral" : "Ocultar barra lateral"}
                 aria-label={sidebarOculto ? "Mostrar barra lateral" : "Ocultar barra lateral"}
               >
-                <div className="relative w-[20px] h-[20px] rounded-[5px] border-2 border-current flex items-center p-[2px] transition-all duration-300 group-hover:scale-105">
-                  {/* Panel izquierdo que se anima (se llena / colapsa) */}
-                  <div
-                    className={`h-full rounded-[2px] transition-all duration-300 ease-in-out ${
-                      sidebarOculto
-                        ? 'w-[2px] bg-current opacity-40'
-                        : 'w-[5px] bg-[#1a73e8] shadow-2xs'
+                <svg
+                  viewBox="0 0 28 28"
+                  className="w-6 h-6 transition-transform duration-300 group-hover:scale-105"
+                >
+                  {/* Marco exterior estilo ventana Google Studio */}
+                  <rect
+                    x="2.5"
+                    y="3"
+                    width="23"
+                    height="22"
+                    rx="4.5"
+                    className="stroke-[#5f6368] group-hover:stroke-[#1a73e8] transition-colors duration-300"
+                    strokeWidth="1.8"
+                    fill="none"
+                  />
+
+                  {/* Panel lateral que se expande en azul o se contrae en gris */}
+                  <rect
+                    x="4.5"
+                    y="5"
+                    width={sidebarOculto ? "3" : "7.5"}
+                    height="18"
+                    rx="2"
+                    className={`transition-all duration-300 ease-in-out ${
+                      sidebarOculto ? 'fill-[#dadce0]' : 'fill-[#1a73e8]'
                     }`}
                   />
-                  {/* Flecha chevron indicadora con rotación y desplazamiento fluido */}
-                  <div
-                    className={`ml-auto flex items-center justify-center transition-all duration-300 ease-in-out ${
-                      sidebarOculto ? 'translate-x-0 rotate-180 text-current' : 'translate-x-[-1px] rotate-0 text-[#1a73e8]'
-                    }`}
-                  >
-                    <svg className="w-2.5 h-2.5 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="15 18 9 12 15 6" />
-                    </svg>
-                  </div>
-                </div>
+
+                  {/* Línea divisoria vertical */}
+                  <line
+                    x1={sidebarOculto ? "9.5" : "13.5"}
+                    y1="5"
+                    x2={sidebarOculto ? "9.5" : "13.5"}
+                    y2="23"
+                    stroke="#dadce0"
+                    strokeWidth="1.2"
+                    className="transition-all duration-300 ease-in-out"
+                  />
+
+                  {/* Flecha chevron indicadora con transformación fluida */}
+                  <path
+                    d={sidebarOculto ? "M 14 9.5 L 18.5 14 L 14 18.5" : "M 20.5 9.5 L 16 14 L 20.5 18.5"}
+                    fill="none"
+                    stroke="#1a73e8"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="transition-all duration-300 ease-in-out"
+                  />
+                </svg>
               </button>
 
               {/* Título y Descripción de la Pestaña en Top Bar (Sin Icono) */}
