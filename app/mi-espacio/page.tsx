@@ -6,8 +6,6 @@ import {
   Loader2, 
   LayoutGrid, 
   ChevronLeft, 
-  PanelLeftClose, 
-  PanelLeftOpen, 
   Menu as MenuIcon, 
   DollarSign, 
   ShoppingBag, 
@@ -748,18 +746,33 @@ function MiEspacioContent() {
                 <MenuIcon className="h-5 w-5" />
               </button>
 
-              {/* Botón colapsar / expandir sidebar escritorio antes del título */}
+              {/* Botón interactivo con icono CSS animado de Colapso/Expansión */}
               <button
                 onClick={() => setSidebarOculto(!sidebarOculto)}
-                className="hidden lg:flex p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer flex-shrink-0"
+                className="hidden lg:flex items-center justify-center w-9 h-9 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#f1f3f4] active:bg-[#e8f0fe] rounded-xl transition-all cursor-pointer flex-shrink-0 group"
                 title={sidebarOculto ? "Mostrar barra lateral" : "Ocultar barra lateral"}
                 aria-label={sidebarOculto ? "Mostrar barra lateral" : "Ocultar barra lateral"}
               >
-                {sidebarOculto ? (
-                  <PanelLeftOpen className="h-4 w-4" />
-                ) : (
-                  <PanelLeftClose className="h-4 w-4" />
-                )}
+                <div className="relative w-[20px] h-[20px] rounded-[5px] border-2 border-current flex items-center p-[2px] transition-all duration-300 group-hover:scale-105">
+                  {/* Panel izquierdo que se anima (se llena / colapsa) */}
+                  <div
+                    className={`h-full rounded-[2px] transition-all duration-300 ease-in-out ${
+                      sidebarOculto
+                        ? 'w-[2px] bg-current opacity-40'
+                        : 'w-[5px] bg-[#1a73e8] shadow-2xs'
+                    }`}
+                  />
+                  {/* Flecha chevron indicadora con rotación y desplazamiento fluido */}
+                  <div
+                    className={`ml-auto flex items-center justify-center transition-all duration-300 ease-in-out ${
+                      sidebarOculto ? 'translate-x-0 rotate-180 text-current' : 'translate-x-[-1px] rotate-0 text-[#1a73e8]'
+                    }`}
+                  >
+                    <svg className="w-2.5 h-2.5 stroke-current" viewBox="0 0 24 24" fill="none" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="15 18 9 12 15 6" />
+                    </svg>
+                  </div>
+                </div>
               </button>
 
               {/* Título y Descripción de la Pestaña en Top Bar (Sin Icono) */}

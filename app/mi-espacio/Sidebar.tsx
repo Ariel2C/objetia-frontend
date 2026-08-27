@@ -161,63 +161,18 @@ export default function Sidebar({
 
             {/* Menú Scroll */}
             {renderNavList()}
-
-            {/* Footer Usuario Móvil */}
-            {usuario && (
-              <div className="pt-3 border-t border-[#dadce0]/80 mt-auto space-y-2">
-                <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl bg-[#f8f9fa] border border-[#dadce0]/60">
-                  <div className="w-8 h-8 rounded-full bg-[#e8f0fe] text-[#1a73e8] font-bold flex items-center justify-center text-xs flex-shrink-0">
-                    {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-[#202124] truncate">{usuario.full_name}</p>
-                    <p className="text-[10px] text-[#5f6368] truncate">{usuario.email}</p>
-                  </div>
-                </div>
-                <button
-                  onClick={logout}
-                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 border border-red-200 transition cursor-pointer"
-                >
-                  <LogOut className="h-3.5 w-3.5" />
-                  <span>Cerrar Sesión</span>
-                </button>
-              </div>
-            )}
           </div>
         </div>
       )}
 
       {/* SIDEBAR ESCRITORIO (Deslizamiento físico a la izquierda sin deformación) */}
       <aside 
-        className={`hidden lg:flex flex-col justify-between bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-64 p-4 min-h-[calc(100vh-64px)] ${
+        className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-64 p-4 min-h-[calc(100vh-64px)] ${
           sidebarOculto ? '-ml-64 pointer-events-none' : 'ml-0'
         }`}
       >
         {/* Lista de Navegación */}
         {renderNavList()}
-
-        {/* Footer Usuario Desktop */}
-        {usuario && (
-          <div className="pt-3 border-t border-[#dadce0]/80 mt-auto flex-shrink-0 space-y-2">
-            <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-[#f8f9fa] border border-[#dadce0]/70">
-              <div className="w-8 h-8 rounded-full bg-[#1a73e8] text-white font-bold flex items-center justify-center text-xs flex-shrink-0 shadow-2xs">
-                {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-[#202124] truncate leading-tight">{usuario.full_name}</p>
-                <p className="text-[11px] text-[#5f6368] truncate leading-tight">{usuario.email}</p>
-              </div>
-            </div>
-
-            <button
-              onClick={logout}
-              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 hover:border-red-300 border border-red-100 transition cursor-pointer"
-            >
-              <LogOut className="h-3.5 w-3.5 text-red-500" />
-              <span>Cerrar Sesión</span>
-            </button>
-          </div>
-        )}
       </aside>
     </>
   );
