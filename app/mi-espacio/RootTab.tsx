@@ -1536,7 +1536,7 @@ export default function RootTab({
   const renderSidebarContent = () => (
     <div className="flex flex-col h-full justify-between text-[14px] leading-[21px] font-medium select-none bg-[#191919] overflow-hidden">
       {/* BRANDING CABECERA SIDEBAR (Alineado con Panel de Control y con línea divisoria) */}
-      <div className="h-[64px] min-h-[64px] flex items-center justify-between px-4 border-b border-[#262626] flex-shrink-0">
+      <div className="h-[68px] min-h-[68px] flex items-center justify-between px-4 border-b border-[#262626] flex-shrink-0">
         <span className="px-2 font-bold text-[16px] tracking-tight text-white font-sans">
           OBJETIA Studio
         </span>
@@ -1835,8 +1835,8 @@ export default function RootTab({
       <main className="flex-1 flex flex-col min-w-0 h-full bg-[#191919] text-[14px] leading-[20px] font-normal overflow-hidden">
         
         {/* BARRA SUPERIOR DE ENCABEZADO */}
-        <header className="p-3 sm:px-6 sm:py-4 border-b border-[#262626] flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2.5 sm:gap-4 bg-[#191919] flex-shrink-0">
-          <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto min-w-0">
+        <header className="h-[68px] min-h-[68px] px-3 sm:px-6 border-b border-[#262626] flex items-center justify-between gap-4 bg-[#191919] flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             {/* BOTÓN MENÚ HAMBURGUESA EN MÓVIL (Estilo Segunda Imagen) */}
             <button
               onClick={() => setMenuMovilAbierto(true)}
