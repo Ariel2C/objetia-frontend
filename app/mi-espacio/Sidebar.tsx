@@ -98,7 +98,7 @@ export default function Sidebar({
   };
 
   const renderNavList = () => (
-    <div className="flex-1 overflow-y-auto space-y-1 custom-scrollbar pr-1 py-2 select-none">
+    <div className="flex-1 overflow-y-auto space-y-1.5 custom-scrollbar pr-1 pt-6 pb-2 select-none">
       {itemsVisibles.map((item) => {
         const Icono = item.icon;
         const activo = tabActual === item.id && !item.isExternalLink;
@@ -107,7 +107,7 @@ export default function Sidebar({
           <button
             key={item.id}
             onClick={() => cambiarTab(item)}
-            className={`w-full flex items-center justify-between px-3 h-[40px] rounded-xl text-[13.5px] font-medium transition-all text-left cursor-pointer group ${
+            className={`w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] font-medium transition-all text-left cursor-pointer group ${
               activo
                 ? 'bg-[#e8f0fe] text-[#1a73e8] shadow-2xs font-semibold'
                 : 'text-[#3c4043] hover:bg-[#f1f3f4] hover:text-[#1f1f1f]'
@@ -187,37 +187,39 @@ export default function Sidebar({
         </div>
       )}
 
-      {/* SIDEBAR ESCRITORIO (Google AI Studio Light Rail) */}
+      {/* SIDEBAR ESCRITORIO (Google AI Studio Light Rail con animación fluida sin fade) */}
       <aside 
-        className={`hidden lg:flex flex-col justify-between bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 ${
-          sidebarOculto ? 'w-0 opacity-0 overflow-hidden p-0 border-none pointer-events-none' : 'w-64 p-4 min-h-[calc(100vh-64px)]'
+        className={`hidden lg:block bg-white border-r border-[#dadce0] transition-[width] duration-300 ease-in-out select-none flex-shrink-0 overflow-hidden ${
+          sidebarOculto ? 'w-0 border-r-0 pointer-events-none' : 'w-64'
         }`}
       >
-        {/* Lista de Navegación */}
-        {renderNavList()}
+        <div className="w-64 h-full min-h-[calc(100vh-64px)] flex flex-col justify-between p-4">
+          {/* Lista de Navegación */}
+          {renderNavList()}
 
-        {/* Footer Usuario Desktop */}
-        {usuario && (
-          <div className="pt-3 border-t border-[#dadce0]/80 mt-auto flex-shrink-0 space-y-2">
-            <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-[#f8f9fa] border border-[#dadce0]/70">
-              <div className="w-8 h-8 rounded-full bg-[#1a73e8] text-white font-bold flex items-center justify-center text-xs flex-shrink-0 shadow-2xs">
-                {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
+          {/* Footer Usuario Desktop */}
+          {usuario && (
+            <div className="pt-3 border-t border-[#dadce0]/80 mt-auto flex-shrink-0 space-y-2">
+              <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-[#f8f9fa] border border-[#dadce0]/70">
+                <div className="w-8 h-8 rounded-full bg-[#1a73e8] text-white font-bold flex items-center justify-center text-xs flex-shrink-0 shadow-2xs">
+                  {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-[#202124] truncate leading-tight">{usuario.full_name}</p>
+                  <p className="text-[11px] text-[#5f6368] truncate leading-tight">{usuario.email}</p>
+                </div>
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold text-[#202124] truncate leading-tight">{usuario.full_name}</p>
-                <p className="text-[11px] text-[#5f6368] truncate leading-tight">{usuario.email}</p>
-              </div>
+
+              <button
+                onClick={logout}
+                className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 hover:border-red-300 border border-red-100 transition cursor-pointer"
+              >
+                <LogOut className="h-3.5 w-3.5 text-red-500" />
+                <span>Cerrar Sesión</span>
+              </button>
             </div>
-
-            <button
-              onClick={logout}
-              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 hover:border-red-300 border border-red-100 transition cursor-pointer"
-            >
-              <LogOut className="h-3.5 w-3.5 text-red-500" />
-              <span>Cerrar Sesión</span>
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </aside>
     </>
   );
