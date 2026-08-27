@@ -98,16 +98,34 @@ export default function Sidebar({
     window.history.pushState(null, '', `/mi-espacio?tab=${item.id}`);
   };
 
+  // Obtener usuario del contexto o de localStorage como fallback inmediato
+  const getStoredUser = () => {
+    if (usuario) return usuario;
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('vamaar_user');
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+    }
+    return null;
+  };
+
+  const currentUser = usuario || getStoredUser();
+  const roleClean = (currentUser?.role || '').toLowerCase();
+  const emailClean = (currentUser?.email || '').toLowerCase();
+
   const esUsuarioAdmin = Boolean(
     esRoot ||
     esAdmin ||
-    (usuario && (
-      usuario.role?.toLowerCase() === 'root' ||
-      usuario.role?.toLowerCase() === 'admin' ||
-      usuario.role?.toLowerCase() === 'administrador' ||
-      usuario.email?.toLowerCase() === 'admin@vamaar.com' ||
-      usuario.email?.toLowerCase() === 'root@objetia.com'
-    )) ||
+    roleClean === 'root' ||
+    roleClean === 'admin' ||
+    roleClean === 'administrador' ||
+    roleClean.includes('root') ||
+    roleClean.includes('admin') ||
+    emailClean === 'root@objetia.com' ||
+    emailClean === 'admin@vamaar.com' ||
+    emailClean.includes('root') ||
+    emailClean.includes('admin') ||
     tienePermiso('full_access') ||
     tienePermiso('admin_section') ||
     tienePermiso('dashboard') ||
@@ -167,25 +185,25 @@ export default function Sidebar({
             </button>
           );
         })}
-      </div>
 
-      {/* SECCIÓN OBJETIA STUDIO (Sólo para Administradores / Root) */}
-      {esUsuarioAdmin && (
-        <div className="pt-3 border-t border-[#dadce0] mt-6 pb-2 flex-shrink-0">
-          <button
-            onClick={abrirAdminStudio}
-            className="w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] font-semibold text-[#202124] hover:bg-[#e8f0fe] hover:text-[#1a73e8] transition-all text-left cursor-pointer group"
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <ShieldCheck className="h-4 w-4 text-[#1a73e8] group-hover:scale-110 transition-transform flex-shrink-0" />
-              <span className="truncate">OBJETIA studio</span>
-            </div>
-            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc]">
-              Admin
-            </span>
-          </button>
-        </div>
-      )}
+        {/* SECCIÓN OBJETIA STUDIO (Sólo para Administradores / Root) */}
+        {esUsuarioAdmin && (
+          <div className="pt-4 mt-4 border-t border-[#dadce0]">
+            <button
+              onClick={abrirAdminStudio}
+              className="w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] font-semibold text-[#202124] hover:bg-[#e8f0fe] hover:text-[#1a73e8] transition-all text-left cursor-pointer group"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <ShieldCheck className="h-4 w-4 text-[#1a73e8] group-hover:scale-110 transition-transform flex-shrink-0" />
+                <span className="truncate">OBJETIA studio</span>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc]">
+                Admin
+              </span>
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 
@@ -219,7 +237,7 @@ export default function Sidebar({
 
       {/* SIDEBAR ESCRITORIO (Deslizamiento físico a la izquierda sin deformación) */}
       <aside 
-        className={`hidden lg:flex flex-col justify-between bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-64 p-4 sticky top-[58px] h-[calc(100vh-58px)] overflow-hidden ${
+        className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-64 p-4 min-h-[calc(100vh-58px)] overflow-y-auto custom-scrollbar ${
           sidebarOculto ? '-ml-64 pointer-events-none' : 'ml-0'
         }`}
       >
