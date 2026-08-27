@@ -746,7 +746,7 @@ function MiEspacioContent() {
                 <MenuIcon className="h-5 w-5" />
               </button>
 
-              {/* Botón interactivo con icono SVG/CSS animado de Colapso/Expansión */}
+              {/* Botón interactivo animado menú <-> colapso según diseño exacto */}
               <button
                 onClick={() => setSidebarOculto(!sidebarOculto)}
                 className="hidden lg:flex items-center justify-center w-10 h-10 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#f1f3f4] active:bg-[#e8f0fe] active:scale-95 rounded-xl transition-all cursor-pointer flex-shrink-0 group"
@@ -754,53 +754,49 @@ function MiEspacioContent() {
                 aria-label={sidebarOculto ? "Mostrar barra lateral" : "Ocultar barra lateral"}
               >
                 <svg
-                  viewBox="0 0 28 28"
-                  className="w-6 h-6 transition-transform duration-300 group-hover:scale-105"
+                  viewBox="0 0 24 24"
+                  className="w-5 h-5 transition-transform duration-300 group-hover:scale-105"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  {/* Marco exterior estilo ventana Google Studio */}
-                  <rect
-                    x="2.5"
-                    y="3"
-                    width="23"
-                    height="22"
-                    rx="4.5"
-                    className="stroke-[#5f6368] group-hover:stroke-[#1a73e8] transition-colors duration-300"
-                    strokeWidth="1.8"
-                    fill="none"
-                  />
-
-                  {/* Panel lateral que se expande en azul o se contrae en gris */}
-                  <rect
-                    x="4.5"
-                    y="5"
-                    width={sidebarOculto ? "3" : "7.5"}
-                    height="18"
-                    rx="2"
-                    className={`transition-all duration-300 ease-in-out ${
-                      sidebarOculto ? 'fill-[#dadce0]' : 'fill-[#1a73e8]'
-                    }`}
-                  />
-
-                  {/* Línea divisoria vertical */}
+                  {/* Línea Superior */}
                   <line
-                    x1={sidebarOculto ? "9.5" : "13.5"}
-                    y1="5"
-                    x2={sidebarOculto ? "9.5" : "13.5"}
-                    y2="23"
-                    stroke="#dadce0"
-                    strokeWidth="1.2"
+                    x1="3"
+                    y1="6"
+                    x2={sidebarOculto ? "21" : "12"}
+                    y2="6"
                     className="transition-all duration-300 ease-in-out"
                   />
 
-                  {/* Flecha chevron indicadora con transformación fluida */}
-                  <path
-                    d={sidebarOculto ? "M 14 9.5 L 18.5 14 L 14 18.5" : "M 20.5 9.5 L 16 14 L 20.5 18.5"}
-                    fill="none"
-                    stroke="#1a73e8"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  {/* Línea Central */}
+                  <line
+                    x1="3"
+                    y1="12"
+                    x2={sidebarOculto ? "21" : "9"}
+                    y2="12"
                     className="transition-all duration-300 ease-in-out"
+                  />
+
+                  {/* Línea Inferior */}
+                  <line
+                    x1="3"
+                    y1="18"
+                    x2={sidebarOculto ? "21" : "12"}
+                    y2="18"
+                    className="transition-all duration-300 ease-in-out"
+                  />
+
+                  {/* Chevron < a la derecha (aparece cuando el sidebar está abierto para indicar colapso) */}
+                  <path
+                    d="M 19 7 L 14 12 L 19 17"
+                    className={`transition-all duration-300 ease-in-out ${
+                      sidebarOculto
+                        ? 'opacity-0 translate-x-2 pointer-events-none'
+                        : 'opacity-100 translate-x-0'
+                    }`}
                   />
                 </svg>
               </button>
