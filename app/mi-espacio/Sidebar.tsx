@@ -18,7 +18,8 @@ import {
   ShieldAlert,
   ChevronRight,
   ExternalLink,
-  PlusCircle
+  PlusCircle,
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from '../../components/AuthContext';
 
@@ -139,6 +140,38 @@ export default function Sidebar({
     </div>
   );
 
+  const esUsuarioAdmin = Boolean(
+    esRoot ||
+    esAdmin ||
+    (usuario && (
+      usuario.role?.toLowerCase() === 'admin' ||
+      usuario.role?.toLowerCase() === 'administrador' ||
+      usuario.role?.toLowerCase() === 'root' ||
+      usuario.email?.toLowerCase() === 'admin@vamaar.com' ||
+      tienePermiso('full_access') ||
+      tienePermiso('admin_section') ||
+      tienePermiso('dashboard') ||
+      tienePermiso('appearance') ||
+      tienePermiso('campanas') ||
+      tienePermiso('secciones') ||
+      tienePermiso('banners') ||
+      tienePermiso('moderation') ||
+      tienePermiso('system') ||
+      tienePermiso('users') ||
+      tienePermiso('roles') ||
+      tienePermiso('permissions') ||
+      tienePermiso('sections') ||
+      tienePermiso('sessions') ||
+      tienePermiso('logs')
+    ))
+  );
+
+  const abrirAdminStudio = () => {
+    if (setMenuMovilAbierto) setMenuMovilAbierto(false);
+    setTabActual('dashboard');
+    window.history.pushState(null, '', '/mi-espacio?tab=dashboard');
+  };
+
   return (
     <>
       {/* DRAWER MÓVIL (Off-canvas en Light Mode) */}
@@ -161,6 +194,24 @@ export default function Sidebar({
 
             {/* Menú Scroll */}
             {renderNavList()}
+
+            {/* SECCIÓN OBJETIA STUDIO (Sólo para Administradores / Root) */}
+            {esUsuarioAdmin && (
+              <div className="pt-3 border-t border-[#dadce0] mt-auto flex-shrink-0">
+                <button
+                  onClick={abrirAdminStudio}
+                  className="w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] font-semibold text-[#202124] hover:bg-[#e8f0fe] hover:text-[#1a73e8] transition-all text-left cursor-pointer group"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <ShieldCheck className="h-4 w-4 text-[#1a73e8] group-hover:scale-110 transition-transform flex-shrink-0" />
+                    <span className="truncate">OBJETIA studio</span>
+                  </div>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc]">
+                    Admin
+                  </span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -173,6 +224,24 @@ export default function Sidebar({
       >
         {/* Lista de Navegación */}
         {renderNavList()}
+
+        {/* SECCIÓN OBJETIA STUDIO (Sólo para Administradores / Root) */}
+        {esUsuarioAdmin && (
+          <div className="pt-3 border-t border-[#dadce0] mt-auto flex-shrink-0">
+            <button
+              onClick={abrirAdminStudio}
+              className="w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] font-semibold text-[#202124] hover:bg-[#e8f0fe] hover:text-[#1a73e8] transition-all text-left cursor-pointer group"
+            >
+              <div className="flex items-center gap-3 min-w-0">
+                <ShieldCheck className="h-4 w-4 text-[#1a73e8] group-hover:scale-110 transition-transform flex-shrink-0" />
+                <span className="truncate">OBJETIA studio</span>
+              </div>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc]">
+                Admin
+              </span>
+            </button>
+          </div>
+        )}
       </aside>
     </>
   );
