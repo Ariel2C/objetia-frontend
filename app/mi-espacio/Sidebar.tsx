@@ -7,15 +7,20 @@ import {
   Image as ImageIcon, 
   DollarSign, 
   UserCheck, 
-  LogOut,
-  Settings,
-  ShoppingBag,
-  TrendingUp,
-  Package,
-  LayoutGrid,
-  Terminal,
-  Crown
+  LogOut, 
+  ShoppingBag, 
+  TrendingUp, 
+  Package, 
+  LayoutGrid, 
+  Terminal, 
+  PanelLeftClose, 
+  X,
+  ShieldAlert,
+  ChevronRight,
+  ExternalLink,
+  PlusCircle
 } from 'lucide-react';
+import { useAuth } from '../../components/AuthContext';
 
 interface SidebarProps {
   tabActual: string;
@@ -23,162 +28,263 @@ interface SidebarProps {
   esAdmin: boolean;
   esRoot?: boolean;
   logout: () => void;
+  sidebarOculto?: boolean;
+  setSidebarOculto?: (oculto: boolean) => void;
+  menuMovilAbierto?: boolean;
+  setMenuMovilAbierto?: (abierto: boolean) => void;
 }
 
 interface TabItem {
   id: string;
   label: string;
   icon: React.ElementType;
-  soloAdmin?: boolean;
-  soloRoot?: boolean;
+  isExternalLink?: boolean;
+  href?: string;
+  badge?: string;
+  badgeColor?: string;
 }
 
-const GRUPOS: { titulo: string; soloAdmin?: boolean; soloRoot?: boolean; items: TabItem[] }[] = [
-  {
-    titulo: "Navegación",
-    items: [
-      { id: "menu", label: "Menú de Tarjetas", icon: LayoutGrid },
-    ],
-  },
-  {
-    titulo: "Programador Root",
-    soloRoot: true,
-    items: [
-      { id: "root", label: "Panel Programador", icon: Terminal },
-    ],
-  },
-  {
-    titulo: "Gestión General",
-    soloAdmin: true,
-    items: [
-      { id: "dashboard", label: "Panel de Control", icon: LayoutDashboard },
-      { id: "appearance", label: "Apariencia", icon: Palette },
-      { id: "secciones", label: "Personalización", icon: Sliders },
-      { id: "banners", label: "Banners publicitarios", icon: ImageIcon },
-    ],
-  },
-  {
-    titulo: "Mi Cuenta",
-    items: [
-      { id: "billetera", label: "Billetera", icon: DollarSign },
-      { id: "publications", label: "Mis Publicaciones", icon: Package },
-      { id: "purchases", label: "Mis Compras", icon: ShoppingBag },
-      { id: "sales", label: "Mis Ventas", icon: TrendingUp },
-      { id: "perfil", label: "Mi Perfil", icon: UserCheck },
-    ],
-  },
-];
-
-import { useAuth } from '../../components/AuthContext';
-
-export default function Sidebar({ tabActual, setTabActual, esAdmin, esRoot, logout }: SidebarProps) {
-  const { tienePermiso } = useAuth();
+export default function Sidebar({
+  tabActual,
+  setTabActual,
+  esAdmin,
+  esRoot,
+  logout,
+  sidebarOculto = false,
+  setSidebarOculto,
+  menuMovilAbierto = false,
+  setMenuMovilAbierto
+}: SidebarProps) {
+  const { usuario, tienePermiso } = useAuth();
 
   const tieneAccesoItem = (id: string) => {
     if (esRoot || tienePermiso('full_access')) return true;
+    if (id === 'menu') return true;
     if (id === 'root') return tienePermiso('system') || tienePermiso('users') || tienePermiso('roles') || tienePermiso('permissions') || tienePermiso('sections') || tienePermiso('sessions') || tienePermiso('logs');
-    if (id === 'dashboard') return tienePermiso('dashboard') || tienePermiso('admin_section');
-    if (id === 'appearance') return tienePermiso('appearance') || tienePermiso('cms');
-    if (id === 'secciones') return tienePermiso('secciones') || tienePermiso('cms');
-    if (id === 'banners') return tienePermiso('banners') || tienePermiso('cms');
+    if (id === 'dashboard') return tienePermiso('dashboard') || tienePermiso('admin_section') || esAdmin;
+    if (id === 'moderation') return tienePermiso('moderation') || tienePermiso('manage_products') || esAdmin;
+    if (id === 'appearance') return tienePermiso('appearance') || tienePermiso('cms') || esAdmin;
+    if (id === 'campanas') return tienePermiso('campanas') || tienePermiso('cms') || esAdmin;
+    if (id === 'secciones') return tienePermiso('secciones') || tienePermiso('cms') || esAdmin;
+    if (id === 'banners') return tienePermiso('banners') || tienePermiso('cms') || esAdmin;
     if (id === 'billetera') return tienePermiso('billetera');
     if (id === 'publications') return tienePermiso('publications');
     if (id === 'purchases') return tienePermiso('purchases');
     if (id === 'sales') return tienePermiso('sales');
+    if (id === 'vender') return tienePermiso('publications') || tienePermiso('sales');
     if (id === 'perfil') return tienePermiso('perfil') || true;
     return tienePermiso(id);
   };
 
-  const gruposVisibles = GRUPOS.map(g => ({
+  const gruposNavegacion: Array<{ titulo: string; items: TabItem[] }> = [
+    {
+      titulo: "General",
+      items: [
+        { id: "menu", label: "Menú Principal", icon: LayoutGrid },
+      ]
+    },
+    {
+      titulo: "Mi Espacio",
+      items: [
+        { id: "billetera", label: "Mi Billetera", icon: DollarSign },
+        { id: "publications", label: "Mis Publicaciones", icon: Package },
+        { id: "purchases", label: "Mis Compras", icon: ShoppingBag },
+        { id: "sales", label: "Mis Ventas", icon: TrendingUp },
+        { id: "perfil", label: "Mi Perfil", icon: UserCheck },
+        { id: "vender", label: "Publicar Producto", icon: PlusCircle, isExternalLink: true, href: "/products/new" }
+      ]
+    },
+    ...(esAdmin || esRoot ? [{
+      titulo: "Administración",
+      items: [
+        ...(esAdmin ? [
+          { id: "dashboard", label: "Panel de Control", icon: LayoutDashboard },
+          { id: "moderation", label: "Productos en Revisión", icon: ShieldAlert },
+          { id: "appearance", label: "Apariencia Web", icon: Palette },
+          { id: "banners", label: "Banners de Inicio", icon: ImageIcon },
+        ] : []),
+        ...(esRoot ? [
+          { id: "root", label: "Consola Programador", icon: Terminal, badge: "ROOT", badgeColor: "bg-amber-100 text-amber-800" }
+        ] : [])
+      ]
+    }] : [])
+  ];
+
+  const gruposVisibles = gruposNavegacion.map(g => ({
     ...g,
     items: g.items.filter(item => tieneAccesoItem(item.id))
   })).filter(g => g.items.length > 0);
-  const todosLosItems = gruposVisibles.flatMap(g => g.items);
 
-  const cambiarTab = (id: string) => {
-    setTabActual(id);
-    window.history.pushState(null, '', `/mi-espacio?tab=${id}`);
+  const cambiarTab = (item: TabItem) => {
+    if (item.isExternalLink && item.href) {
+      window.location.href = item.href;
+      return;
+    }
+    setTabActual(item.id);
+    if (setMenuMovilAbierto) setMenuMovilAbierto(false);
+    window.history.pushState(null, '', `/mi-espacio?tab=${item.id}`);
   };
+
+  const renderNavList = () => (
+    <div className="flex-1 overflow-y-auto space-y-5 custom-scrollbar pr-1 py-2 select-none">
+      {gruposVisibles.map((grupo) => (
+        <div key={grupo.titulo} className="space-y-1">
+          <p className="px-3 text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider mb-1 font-sans">
+            {grupo.titulo}
+          </p>
+          <div className="space-y-0.5">
+            {grupo.items.map((item) => {
+              const Icono = item.icon;
+              const activo = tabActual === item.id && !item.isExternalLink;
+
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => cambiarTab(item)}
+                  className={`w-full flex items-center justify-between px-3 h-[38px] rounded-xl text-[13.5px] font-medium transition-all text-left cursor-pointer group ${
+                    activo
+                      ? 'bg-[#e8f0fe] text-[#1a73e8] shadow-xs'
+                      : 'text-[#3c4043] hover:bg-[#f1f3f4] hover:text-[#1f1f1f]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Icono 
+                      className={`h-4 w-4 flex-shrink-0 transition-transform duration-150 ${
+                        activo 
+                          ? 'text-[#1a73e8]' 
+                          : 'text-[#5f6368] group-hover:text-[#1f1f1f]'
+                      }`} 
+                    />
+                    <span className="truncate">{item.label}</span>
+                  </div>
+
+                  {item.badge ? (
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider ${item.badgeColor || 'bg-gray-100 text-gray-700'}`}>
+                      {item.badge}
+                    </span>
+                  ) : item.isExternalLink ? (
+                    <ExternalLink className="h-3 w-3 text-[#9aa0a6] group-hover:text-[#5f6368]" />
+                  ) : activo ? (
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#1a73e8]" />
+                  ) : null}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <>
-      {/* MÓVIL: barra de pestañas horizontal deslizable */}
-      <div className="lg:hidden bg-[#EAEAEA] border-b border-gray-200/60 px-3 py-2.5">
-        <div className="flex gap-2 overflow-x-auto no-scrollbar" style={{ scrollbarWidth: 'none' }}>
-          {todosLosItems.map((item) => {
-            const Icono = item.icon;
-            const activo = tabActual === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => cambiarTab(item.id)}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition cursor-pointer border ${
-                  activo
-                    ? 'bg-purple-700 text-white border-purple-700 shadow-sm'
-                    : 'bg-white text-[#5F6368] border-gray-200 hover:border-gray-400'
-                }`}
+      {/* DRAWER MÓVIL (Off-canvas en Light Mode) */}
+      {menuMovilAbierto && (
+        <div className="fixed inset-0 z-[100] lg:hidden animate-fade-in">
+          <div 
+            className="fixed inset-0 bg-black/30 backdrop-blur-xs transition-opacity" 
+            onClick={() => setMenuMovilAbierto && setMenuMovilAbierto(false)} 
+          />
+          <div className="fixed inset-y-0 left-0 w-[280px] bg-white border-r border-[#dadce0] shadow-2xl flex flex-col p-4 z-10 animate-slide-right">
+            {/* Cabecera Móvil */}
+            <div className="flex items-center justify-between pb-3 border-b border-[#dadce0]/80">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-lg bg-[#e8f0fe] flex items-center justify-center text-[#1a73e8] font-bold text-sm">
+                  V
+                </div>
+                <span className="font-semibold text-base tracking-tight text-[#202124]">
+                  Mi Espacio
+                </span>
+              </div>
+              <button 
+                onClick={() => setMenuMovilAbierto && setMenuMovilAbierto(false)}
+                className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition"
               >
-                <Icono className="h-3.5 w-3.5" />
-                <span className="whitespace-nowrap">{item.label}</span>
+                <X className="h-5 w-5" />
               </button>
-            );
-          })}
-          <button
-            onClick={logout}
-            className="flex-shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-semibold transition cursor-pointer border bg-white text-red-500 border-red-200 hover:bg-red-50"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-            <span className="whitespace-nowrap">Salir</span>
-          </button>
-        </div>
-      </div>
+            </div>
 
-      {/* DESKTOP: sidebar vertical */}
-      <aside className="hidden lg:flex w-64 bg-[#EAEAEA] border-r border-gray-200/60 p-6 flex-col justify-between flex-shrink-0 select-none">
-        <div className="space-y-6">
-          <div className="flex items-center gap-2 px-3 pb-2 border-b border-gray-300/50">
-            <Settings className="h-4 w-4 text-[#5F6368]" />
-            <h2 className="text-[15px] font-semibold text-[#202124] tracking-tight">Configuración</h2>
+            {/* Menú Scroll */}
+            {renderNavList()}
+
+            {/* Footer Usuario Móvil */}
+            {usuario && (
+              <div className="pt-3 border-t border-[#dadce0]/80 mt-auto space-y-2">
+                <div className="flex items-center gap-2.5 px-2 py-1.5 rounded-xl bg-[#f8f9fa] border border-[#dadce0]/60">
+                  <div className="w-8 h-8 rounded-full bg-[#e8f0fe] text-[#1a73e8] font-bold flex items-center justify-center text-xs flex-shrink-0">
+                    {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-semibold text-[#202124] truncate">{usuario.full_name}</p>
+                    <p className="text-[10px] text-[#5f6368] truncate">{usuario.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={logout}
+                  className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 border border-red-200 transition cursor-pointer"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                  <span>Cerrar Sesión</span>
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* SIDEBAR ESCRITORIO (Google AI Studio Light Rail) */}
+      <aside 
+        className={`hidden lg:flex flex-col justify-between bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 ${
+          sidebarOculto ? 'w-0 opacity-0 overflow-hidden p-0 border-none' : 'w-64 p-4 min-h-[calc(100vh-64px)]'
+        }`}
+      >
+        {/* Cabecera Sidebar Desktop */}
+        <div className="flex items-center justify-between pb-3 border-b border-[#dadce0]/80 flex-shrink-0">
+          <div className="flex items-center gap-2.5 px-1">
+            <div className="w-7 h-7 rounded-lg bg-[#e8f0fe] border border-[#d2e3fc] flex items-center justify-center text-[#1a73e8] font-bold text-xs shadow-2xs">
+              V
+            </div>
+            <span className="font-semibold text-[15px] tracking-tight text-[#202124]">
+              Mi Espacio
+            </span>
           </div>
 
-          <nav className="space-y-6">
-            {gruposVisibles.map((grupo, gIdx) => (
-              <div key={grupo.titulo} className={`space-y-1.5 ${gIdx > 0 ? 'pt-2 border-t border-gray-300/40' : ''}`}>
-                <div className="flex items-center gap-1.5 px-3 pb-1 border-b border-gray-300/30">
-                  <span className="text-[11px] font-bold text-[#5F6368] uppercase tracking-wider">{grupo.titulo}</span>
-                </div>
-                {grupo.items.map((item) => {
-                  const Icono = item.icon;
-                  const activo = tabActual === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => cambiarTab(item.id)}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-[13.5px] transition text-left cursor-pointer ${
-                        activo
-                          ? 'bg-purple-700 text-white font-medium shadow-sm'
-                          : 'text-[#5F6368] hover:bg-gray-200/50 font-normal'
-                      }`}
-                    >
-                      <Icono className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            ))}
-          </nav>
+          {setSidebarOculto && (
+            <button
+              onClick={() => setSidebarOculto(true)}
+              className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
+              title="Ocultar barra lateral"
+            >
+              <PanelLeftClose className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
-        <div className="border-t border-gray-300 pt-4 mt-6">
-          <button 
-            onClick={logout} 
-            className="w-full py-2 border border-red-200 hover:bg-red-50 text-red-500 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <LogOut className="h-3.5 w-3.5" />
-            <span>Cerrar sesión</span>
-          </button>
-        </div>
+        {/* Lista de Navegación */}
+        {renderNavList()}
+
+        {/* Footer Usuario Desktop */}
+        {usuario && (
+          <div className="pt-3 border-t border-[#dadce0]/80 mt-auto flex-shrink-0 space-y-2">
+            <div className="flex items-center gap-2.5 px-2.5 py-2 rounded-xl bg-[#f8f9fa] border border-[#dadce0]/70">
+              <div className="w-8 h-8 rounded-full bg-[#1a73e8] text-white font-bold flex items-center justify-center text-xs flex-shrink-0 shadow-2xs">
+                {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-[#202124] truncate leading-tight">{usuario.full_name}</p>
+                <p className="text-[11px] text-[#5f6368] truncate leading-tight">{usuario.email}</p>
+              </div>
+            </div>
+
+            <button
+              onClick={logout}
+              className="w-full flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs font-semibold text-red-600 hover:bg-red-50 hover:border-red-300 border border-red-100 transition cursor-pointer"
+            >
+              <LogOut className="h-3.5 w-3.5 text-red-500" />
+              <span>Cerrar Sesión</span>
+            </button>
+          </div>
+        )}
       </aside>
     </>
   );

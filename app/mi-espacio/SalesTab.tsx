@@ -292,14 +292,14 @@ export default function SalesTab({ token }: SalesTabProps) {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="h-8 w-8 border-4 border-gray-900 border-t-transparent rounded-full animate-spin" />
+        <div className="h-8 w-8 border-3 border-[#1a73e8] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
+      <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-xs font-semibold">
         ⚠️ Error: {error}
       </div>
     );
@@ -307,112 +307,110 @@ export default function SalesTab({ token }: SalesTabProps) {
 
   if (sales.length === 0) {
     return (
-      <div className="text-center py-16 bg-white border border-gray-100 rounded-2xl shadow-sm">
-        <TrendingUp className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-        <h4 className="text-sm font-bold text-gray-700">No has realizado ventas</h4>
-        <p className="text-xs text-gray-400 mt-1">Cuando publiques un producto y lo compren, la información de despacho aparecerá acá.</p>
+      <div className="text-center py-16 bg-white border border-[#dadce0] rounded-2xl shadow-xs">
+        <div className="w-12 h-12 rounded-2xl bg-[#e6f4ea] text-[#137333] flex items-center justify-center mx-auto mb-3">
+          <TrendingUp className="h-6 w-6 stroke-[1.8]" />
+        </div>
+        <h4 className="text-sm font-bold text-[#202124]">No has realizado ventas</h4>
+        <p className="text-xs text-[#5f6368] mt-1 max-w-sm mx-auto">Cuando publiques un producto y lo compren, la información de despacho y cobro aparecerá acá.</p>
+        <Link href="/products/new" className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 bg-[#1a73e8] text-white rounded-xl text-xs font-semibold hover:bg-[#1557b0] transition shadow-2xs">
+          Publicar un Producto
+        </Link>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      <div>
-        <h3 className="text-xl font-bold text-gray-900 tracking-tight">Mis Ventas</h3>
-        <p className="text-xs text-gray-500">Historial transaccional de ventas y gestión logística de despachos.</p>
-      </div>
-
-      <div className="space-y-4">
-        {sales.map((venta) => (
-          <div 
-            key={venta.id}
-            className="bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md transition duration-200 flex flex-col md:flex-row md:items-center justify-between gap-5"
-          >
-            {/* Foto e Información del Producto */}
-            <div className="flex items-center gap-4 flex-grow min-w-0">
-              {venta.image_url ? (
-                <img 
-                  src={venta.image_url} 
-                  alt={formatearTituloProducto(venta.product_title)} 
-                  className="h-16 w-16 rounded-xl object-cover border border-gray-100 flex-shrink-0"
-                />
-              ) : (
-                <div className="h-16 w-16 bg-gray-50 border border-gray-100 rounded-xl flex items-center justify-center text-gray-400 flex-shrink-0">
-                  <TrendingUp className="h-6 w-6" />
-                </div>
-              )}
-              <div className="min-w-0">
-                <span className="text-[9px] font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100 uppercase tracking-wider mb-1.5 inline-block">
-                  Venta #{venta.id}
-                </span>
-                <h4 className="font-bold text-gray-800 text-sm truncate leading-snug">
-                  {formatearTituloProducto(venta.product_title)}
-                </h4>
-                <div className="flex items-center gap-4 mt-2 text-[10px] text-gray-400">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {new Date(venta.created_at).toLocaleDateString()}
-                  </span>
-                  <span className="font-bold text-gray-700">
-                    Cobrado: {formatearARS(venta.product_price)}
-                  </span>
-                </div>
+    <div className="space-y-4 animate-fade-in select-none">
+      {sales.map((venta) => (
+        <div 
+          key={venta.id}
+          className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 shadow-xs hover:border-[#bdc1c6] hover:shadow-sm transition duration-200 flex flex-col md:flex-row md:items-center justify-between gap-5"
+        >
+          {/* Foto e Información del Producto */}
+          <div className="flex items-center gap-4 flex-grow min-w-0">
+            {venta.image_url ? (
+              <img 
+                src={venta.image_url} 
+                alt={formatearTituloProducto(venta.product_title)} 
+                className="h-16 w-16 rounded-xl object-cover border border-[#dadce0] flex-shrink-0"
+              />
+            ) : (
+              <div className="h-16 w-16 bg-[#f8f9fa] border border-[#dadce0] rounded-xl flex items-center justify-center text-[#5f6368] flex-shrink-0">
+                <TrendingUp className="h-6 w-6" />
               </div>
-            </div>
-
-            {/* Impresión de Etiqueta / Logística Correo Argentino */}
-            <div className="flex flex-col md:items-end gap-2.5 flex-shrink-0 border-t md:border-t-0 pt-4 md:pt-0 border-gray-50">
-              <div className="flex items-center gap-1.5 text-xs text-gray-600 font-medium">
-                <span className={`h-2 w-2 rounded-full ${(ESTADOS_ORDEN[venta.status] || ESTADOS_ORDEN.pending_payment).dot}`} />
-                <span className={`font-bold ${(ESTADOS_ORDEN[venta.status] || ESTADOS_ORDEN.pending_payment).color}`}>
-                  {(ESTADOS_ORDEN[venta.status] || { label: venta.status }).label}
+            )}
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.5 rounded-full border border-[#d2e3fc] uppercase tracking-wider mb-1.5 inline-block">
+                Venta #{venta.id}
+              </span>
+              <h4 className="font-bold text-[#202124] text-sm truncate leading-snug">
+                {formatearTituloProducto(venta.product_title)}
+              </h4>
+              <div className="flex items-center gap-4 mt-1.5 text-[11px] text-[#5f6368]">
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-3.5 w-3.5" />
+                  {new Date(venta.created_at).toLocaleDateString()}
+                </span>
+                <span className="font-bold text-[#202124]">
+                  Cobrado: {formatearARS(venta.product_price)}
                 </span>
               </div>
-              
-              {venta.tracking_number ? (
-                <div className="space-y-2 w-full md:text-right">
-                  <div className="text-[10px] text-gray-400">
-                    Código de Seguimiento: <span className="font-mono font-bold text-gray-600">{venta.tracking_number}</span>
-                  </div>
-                  {venta.shipment_status && ESTADOS_ENVIO[venta.shipment_status] && (
-                    <div className="flex md:justify-end">
-                      <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
-                        ["DELIVERED", "ARRIVED"].includes(venta.shipment_status)
-                          ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-                          : venta.shipment_status === "LABEL_GENERATED"
-                            ? "bg-amber-50 text-amber-700 border-amber-100"
-                            : "bg-indigo-50 text-indigo-700 border-indigo-100"
-                      }`}>
-                        Envío: {ESTADOS_ENVIO[venta.shipment_status]}
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex flex-col sm:flex-row md:justify-end gap-2">
-                    <button 
-                      onClick={() => handleImprimirEtiqueta(venta)}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-[11px] font-bold transition justify-center cursor-pointer"
-                    >
-                      <Printer className="h-3.5 w-3.5" />
-                      <span>Imprimir Etiqueta</span>
-                    </button>
-                    <Link
-                      href={`/shipping/tracking?number=${venta.tracking_number}`}
-                      className="inline-flex items-center gap-1.5 px-3 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-xl text-[11px] font-bold transition justify-center"
-                    >
-                      Seguir Envío
-                    </Link>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex items-center gap-1.5 text-xs text-amber-600 font-bold bg-amber-50 px-2 py-1 rounded-lg border border-amber-100">
-                  <AlertCircle className="h-3.5 w-3.5" />
-                  <span>Pendiente de guía</span>
-                </div>
-              )}
             </div>
           </div>
-        ))}
-      </div>
+
+          {/* Impresión de Etiqueta / Logística Correo Argentino */}
+          <div className="flex flex-col md:items-end gap-2.5 flex-shrink-0 border-t md:border-t-0 pt-4 md:pt-0 border-[#f1f3f4]">
+            <div className="flex items-center gap-1.5 text-xs text-[#3c4043] font-medium">
+              <span className={`h-2 w-2 rounded-full ${(ESTADOS_ORDEN[venta.status] || ESTADOS_ORDEN.pending_payment).dot}`} />
+              <span className={`font-bold ${(ESTADOS_ORDEN[venta.status] || ESTADOS_ORDEN.pending_payment).color}`}>
+                {(ESTADOS_ORDEN[venta.status] || { label: venta.status }).label}
+              </span>
+            </div>
+            
+            {venta.tracking_number ? (
+              <div className="space-y-2 w-full md:text-right">
+                <div className="text-[11px] text-[#5f6368]">
+                  Código de Seguimiento: <span className="font-mono font-bold text-[#202124]">{venta.tracking_number}</span>
+                </div>
+                {venta.shipment_status && ESTADOS_ENVIO[venta.shipment_status] && (
+                  <div className="flex md:justify-end">
+                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+                      ["DELIVERED", "ARRIVED"].includes(venta.shipment_status)
+                        ? "bg-[#e6f4ea] text-[#137333] border-[#ceead6]"
+                        : venta.shipment_status === "LABEL_GENERATED"
+                          ? "bg-[#fef7e0] text-[#b06000] border-[#feefc3]"
+                          : "bg-[#e8f0fe] text-[#1a73e8] border-[#d2e3fc]"
+                    }`}>
+                      Envío: {ESTADOS_ENVIO[venta.shipment_status]}
+                    </span>
+                  </div>
+                )}
+                <div className="flex flex-col sm:flex-row md:justify-end gap-2">
+                  <button 
+                    onClick={() => handleImprimirEtiqueta(venta)}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-xl text-xs font-semibold shadow-2xs transition justify-center cursor-pointer"
+                  >
+                    <Printer className="h-3.5 w-3.5" />
+                    <span>Imprimir Etiqueta</span>
+                  </button>
+                  <Link
+                    href={`/shipping/tracking?number=${venta.tracking_number}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#e8f0fe] text-[#1a73e8] hover:bg-[#d2e3fc]/60 rounded-xl text-xs font-semibold transition justify-center border border-[#d2e3fc]"
+                  >
+                    Seguir Envío
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center gap-1.5 text-xs text-amber-700 font-semibold bg-[#fef7e0] px-2.5 py-1 rounded-xl border border-[#feefc3]">
+                <AlertCircle className="h-3.5 w-3.5" />
+                <span>Pendiente de guía</span>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

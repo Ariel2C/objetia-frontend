@@ -104,53 +104,69 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
   return (
     <div className="space-y-6 animate-fade-in select-none">
-      <div>
-        <h3 className="text-base font-semibold leading-7 text-slate-900">Billetera</h3>
-        <p className="text-xs text-slate-500">
-          El dinero de tus ventas se puede usar para comprar en Vamaar al instante; para retirarlo al banco hay que esperar 7 días desde cada venta.
-        </p>
-      </div>
-
+      {/* 3 Tarjetas de Balance Google AI Studio Light */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-2 shadow-sm">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Saldo para compras</span>
-          <h4 className="text-3xl font-black text-white leading-none">
-            {cargandoBalance ? "Cargando..." : formatearARS(saldoParaCompras)}
+        {/* Card 1: Saldo total para compras */}
+        <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 space-y-3 shadow-xs relative overflow-hidden">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider">Saldo para compras</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc]">Inmediato</span>
+          </div>
+          <h4 className="text-3xl font-extrabold text-[#202124] tracking-tight leading-none">
+            {cargandoBalance ? "..." : formatearARS(saldoParaCompras)}
           </h4>
-          <span className="text-[10px] text-emerald-400 font-semibold">Usalo ya mismo para comprar dentro de la app</span>
+          <p className="text-xs text-[#137333] font-medium flex items-center gap-1">
+            <span>●</span> Disponible para comprar dentro de la app
+          </p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-2 shadow-sm">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Retirable ahora</span>
-          <h4 className="text-3xl font-black text-slate-900 leading-none">
-            {cargandoBalance ? "Cargando..." : formatearARS(balance.available)}
+
+        {/* Card 2: Retirable ahora */}
+        <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 space-y-3 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider">Retirable ahora</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e6f4ea] text-[#137333] border border-[#ceead6]">Banco</span>
+          </div>
+          <h4 className="text-3xl font-extrabold text-[#202124] tracking-tight leading-none">
+            {cargandoBalance ? "..." : formatearARS(balance.available)}
           </h4>
-          <span className="text-[10px] text-emerald-600 font-semibold">Listo para transferir a tu CBU/CVU</span>
+          <p className="text-xs text-[#137333] font-medium flex items-center gap-1">
+            <span>●</span> Listo para transferir a tu CBU/CVU
+          </p>
         </div>
-        <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-2 shadow-sm">
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">En espera (7 días)</span>
-          <h4 className="text-3xl font-black text-slate-900 leading-none">
-            {cargandoBalance ? "Cargando..." : formatearARS(balance.frozen)}
+
+        {/* Card 3: En espera */}
+        <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 space-y-3 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider">En garantía (7 días)</span>
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#fef7e0] text-[#b06000] border border-[#feefc3]">Garantía</span>
+          </div>
+          <h4 className="text-3xl font-extrabold text-[#202124] tracking-tight leading-none">
+            {cargandoBalance ? "..." : formatearARS(balance.frozen)}
           </h4>
-          <span className="text-[10px] text-slate-400 font-semibold">Ventas recientes: se habilitan para retiro a los 7 días</span>
+          <p className="text-xs text-[#5f6368] font-medium">
+            Se habilita para retiro a los 7 días de cada venta
+          </p>
         </div>
       </div>
 
       {/* Detalle por venta: cuánto falta para que se libere cada una */}
       {ventasEnEspera.length > 0 && (
-        <div className="bg-amber-50/60 border border-amber-200/60 rounded-xl p-5 space-y-3">
-          <h4 className="text-xs font-bold text-amber-900 uppercase tracking-wider">Próximas liberaciones</h4>
-          <div className="divide-y divide-amber-200/40">
+        <div className="bg-amber-50/70 border border-amber-200/80 rounded-2xl p-5 sm:p-6 space-y-3">
+          <h4 className="text-xs font-bold text-amber-900 uppercase tracking-wider flex items-center gap-2">
+            <span>Próximas liberaciones de fondos</span>
+          </h4>
+          <div className="divide-y divide-amber-200/60">
             {ventasEnEspera.map((tx) => (
-              <div key={tx.id} className="py-2.5 flex items-center justify-between gap-3 first:pt-0 last:pb-0">
+              <div key={tx.id} className="py-3 flex items-center justify-between gap-3 first:pt-1 last:pb-1">
                 <div>
-                  <p className="text-xs font-bold text-slate-800">
+                  <p className="text-xs font-bold text-gray-900">
                     Venta del {parsearFechaUTC(tx.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })}
                   </p>
-                  <p className="text-[10px] text-amber-800 font-semibold">
+                  <p className="text-[11px] text-amber-800 font-medium">
                     {tiempoRestanteLiberacion(tx.available_at)} · se libera el {parsearFechaUTC(tx.available_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })}
                   </p>
                 </div>
-                <span className="text-sm font-black text-slate-900">{formatearARS(tx.amount)}</span>
+                <span className="text-sm font-extrabold text-gray-900">{formatearARS(tx.amount)}</span>
               </div>
             ))}
           </div>
@@ -158,85 +174,89 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
       )}
 
       {/* Formulario de Retiro */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-4">
-        <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-          <Landmark className="h-4 w-4 text-slate-600" /> Retirar a mi banco
-        </h4>
-        <p className="text-[11px] text-slate-400 -mt-2">
-          Solo se puede retirar el saldo "Retirable ahora". Lo que está en espera se habilita automáticamente a los 7 días de cada venta.
-        </p>
+      <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+        <div>
+          <h4 className="text-sm font-semibold text-[#202124] flex items-center gap-2">
+            <Landmark className="h-4 w-4 text-[#1a73e8]" /> Retirar a cuenta bancaria
+          </h4>
+          <p className="text-xs text-[#5f6368] mt-0.5">
+            Solo se puede retirar el saldo "Retirable ahora". Las transferencias se acreditan en tu cuenta bancaria o billetera virtual.
+          </p>
+        </div>
+
         {msgRetiro && (
-          <div className={`p-3 rounded-lg text-xs font-semibold border ${
+          <div className={`p-3.5 rounded-xl text-xs font-semibold border ${
             msgRetiro.tipo === 'exito'
-              ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+              ? 'bg-[#e6f4ea] text-[#137333] border-[#ceead6]'
               : 'bg-red-50 text-red-700 border-red-200'
           }`}>
             {msgRetiro.texto}
           </div>
         )}
-        <form onSubmit={handleRetirar} className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+
+        <form onSubmit={handleRetirar} className="grid grid-cols-1 md:grid-cols-3 gap-3.5 items-end">
           <div>
-            <label className="text-xs font-medium text-slate-700 block mb-1">Monto (mín. $1.000)</label>
+            <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Monto a retirar (mín. $1.000)</label>
             <input
               type="number"
               min="1000"
               step="0.01"
               value={montoRetiro}
               onChange={(e) => setMontoRetiro(e.target.value)}
-              placeholder="10000"
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-slate-400 text-slate-800 bg-white"
+              placeholder="Ej: 10000"
+              className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
               required
             />
           </div>
           <div>
-            <label className="text-xs font-medium text-slate-700 block mb-1">CBU / CVU / Alias</label>
+            <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">CBU / CVU / Alias</label>
             <input
               type="text"
               value={cbuCvu}
               onChange={(e) => setCbuCvu(e.target.value)}
-              placeholder="0000003100010000000001 o mi.alias.mp"
-              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-slate-400 text-slate-800 bg-white"
+              placeholder="0000003100010000000001 o mi.alias"
+              className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
               required
             />
           </div>
           <button
             type="submit"
             disabled={retirando || balance.available <= 0}
-            className="px-4 py-2.5 bg-slate-900 text-white rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-slate-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="px-5 py-2.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-xl text-xs font-semibold shadow-2xs transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer h-[42px]"
           >
             {retirando ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {retirando ? "Procesando..." : "Retirar"}
+            {retirando ? "Procesando..." : "Solicitar Retiro"}
           </button>
         </form>
       </div>
 
       {/* Historial de Movimientos */}
-      <div className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm space-y-4">
-        <h4 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-          <History className="h-4 w-4 text-slate-600" /> Movimientos
+      <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+        <h4 className="text-sm font-semibold text-[#202124] flex items-center gap-2">
+          <History className="h-4 w-4 text-[#1a73e8]" /> Historial de Movimientos
         </h4>
         {cargandoTx ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="h-5 w-5 animate-spin text-slate-400" />
+            <Loader2 className="h-5 w-5 animate-spin text-[#1a73e8]" />
           </div>
         ) : transacciones.length === 0 ? (
-          <p className="text-xs text-slate-400 text-center py-6">Todavía no tenés movimientos en tu billetera.</p>
+          <p className="text-xs text-[#5f6368] text-center py-6">Todavía no tenés movimientos en tu billetera.</p>
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-[#f1f3f4]">
             {transacciones.map((tx) => (
               <div key={tx.id} className="py-3 flex items-center justify-between gap-3">
                 <div>
-                  <p className="text-xs font-bold text-slate-800">{LABEL_TIPO[tx.type] || tx.type}</p>
-                  <p className="text-[10px] text-slate-400">
+                  <p className="text-xs font-bold text-[#202124]">{LABEL_TIPO[tx.type] || tx.type}</p>
+                  <p className="text-[11px] text-[#5f6368] mt-0.5">
                     {parsearFechaUTC(tx.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })}
                     {' · '}
-                    {LABEL_ESTADO[tx.status] || tx.status}
+                    <span className="font-medium text-[#3c4043]">{LABEL_ESTADO[tx.status] || tx.status}</span>
                     {tx.status === 'frozen' && tx.amount > 0 && (
-                      <span className="text-amber-700 font-semibold"> · {tiempoRestanteLiberacion(tx.available_at)} para retirar</span>
+                      <span className="text-amber-800 font-semibold"> · {tiempoRestanteLiberacion(tx.available_at)} para retiro</span>
                     )}
                   </p>
                 </div>
-                <span className={`text-sm font-black ${tx.amount < 0 ? 'text-red-600' : 'text-emerald-700'}`}>
+                <span className={`text-sm font-bold ${tx.amount < 0 ? 'text-red-600' : 'text-[#137333]'}`}>
                   {tx.amount < 0 ? '-' : '+'}{formatearARS(Math.abs(tx.amount))}
                 </span>
               </div>

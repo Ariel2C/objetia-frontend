@@ -70,54 +70,51 @@ export default function ProfileTab() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in select-none max-w-2xl">
-      <div>
-        <h3 className="text-base font-semibold leading-7 text-slate-900">Perfil</h3>
-        <p className="text-xs text-slate-500">Configuración de información personal y dirección de entrega.</p>
-      </div>
-
+    <div className="space-y-6 animate-fade-in select-none max-w-3xl">
       {successMsg && (
-        <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-xs font-bold flex items-center gap-2">
-          <ShieldCheck className="h-4 w-4" /> {successMsg}
+        <div className="p-3.5 bg-[#e6f4ea] border border-[#ceead6] text-[#137333] rounded-xl text-xs font-semibold flex items-center gap-2">
+          <ShieldCheck className="h-4 w-4 text-[#137333]" /> {successMsg}
         </div>
       )}
 
       {errorMsg && (
-        <div className="p-3.5 bg-red-50 border border-red-200 text-red-800 rounded-lg text-xs font-bold">
+        <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
           ⚠️ {errorMsg}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Información Personal */}
-        <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
-          <h4 className="text-base font-semibold leading-7 text-slate-900 border-b border-slate-100 pb-2">Información Personal</h4>
+        <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs">
+          <h4 className="text-sm font-semibold text-[#202124] border-b border-[#f1f3f4] pb-3">
+            Información Personal
+          </h4>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium text-slate-700 block mb-1">Nombre Completo *</label>
+              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Nombre Completo *</label>
               <input
                 type="text"
                 required
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-slate-800 bg-white transition"
+                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 block mb-1">Correo Electrónico (No editable)</label>
+              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Correo Electrónico (No editable)</label>
               <input
                 type="email"
                 disabled
                 value={usuario?.email || ""}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-400 font-medium cursor-not-allowed"
+                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0]/60 bg-[#f1f3f4] text-[#5f6368] font-medium cursor-not-allowed"
               />
             </div>
 
             {usuario?.role && usuario.role !== "client" && (
               <div className="md:col-span-2 space-y-1">
-                <span className="text-sm font-medium text-slate-700 block">Rol de Sistema</span>
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-100 uppercase">
+                <span className="text-xs font-semibold text-[#3c4043] block">Rol Asignado</span>
+                <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc] uppercase tracking-wider">
                   {usuario.role}
                 </span>
               </div>
@@ -126,70 +123,70 @@ export default function ProfileTab() {
         </div>
 
         {/* Dirección de Envío */}
-        <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-sm">
-          <h4 className="text-base font-semibold leading-7 text-slate-900 flex items-center gap-1.5 border-b border-slate-100 pb-2">
-            <MapPin className="h-5 w-5 text-slate-700" /> Dirección de Envío Predeterminada
+        <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs">
+          <h4 className="text-sm font-semibold text-[#202124] flex items-center gap-2 border-b border-[#f1f3f4] pb-3">
+            <MapPin className="h-4 w-4 text-[#1a73e8]" /> Dirección de Entrega Predeterminada
           </h4>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
-              <label className="text-sm font-medium text-slate-700 block mb-1">Calle</label>
+              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Calle</label>
               <input
                 type="text"
                 placeholder="Av. Colón"
                 value={street}
                 onChange={(e) => setStreet(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-slate-800 bg-white transition"
+                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 block mb-1">Número</label>
+              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Número</label>
               <input
                 type="text"
                 placeholder="1234"
                 value={number}
                 onChange={(e) => setNumber(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-slate-800 bg-white transition"
+                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 block mb-1">Piso/Departamento</label>
+              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Piso / Depto</label>
               <input
                 type="text"
                 placeholder="2° B"
                 value={floorDept}
                 onChange={(e) => setFloorDept(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-slate-800 bg-white transition"
+                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 block mb-1">Código Postal</label>
+              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Código Postal</label>
               <input
                 type="text"
                 placeholder="X5000"
                 value={postalCode}
                 onChange={(e) => setPostalCode(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-slate-800 bg-white transition font-mono font-bold"
+                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition font-mono font-semibold"
               />
             </div>
             <div>
-              <label className="text-sm font-medium text-slate-700 block mb-1">Ciudad / Localidad</label>
+              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Ciudad / Localidad</label>
               <input
                 type="text"
                 placeholder="Córdoba"
                 value={city}
                 onChange={(e) => setCity(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-slate-800 bg-white transition"
+                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
               />
             </div>
             <div className="md:col-span-3">
-              <label className="text-sm font-medium text-slate-700 block mb-1">Provincia</label>
+              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Provincia</label>
               <input
                 type="text"
                 placeholder="Córdoba"
                 value={province}
                 onChange={(e) => setProvince(e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-[#4F46E5] focus:border-[#4F46E5] text-slate-800 bg-white transition"
+                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
               />
             </div>
           </div>
@@ -199,7 +196,7 @@ export default function ProfileTab() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full md:w-auto px-6 py-2.5 bg-[#4F46E5] hover:bg-[#4F46E5]/90 text-white font-semibold rounded-lg text-sm transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-sm active:scale-98"
+          className="px-6 py-2.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white font-semibold rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-2xs active:scale-98 h-[42px]"
         >
           {loading ? (
             <>

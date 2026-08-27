@@ -2,11 +2,28 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Loader2, LayoutGrid, ChevronLeft } from 'lucide-react';
+import { 
+  Loader2, 
+  LayoutGrid, 
+  ChevronLeft, 
+  PanelLeftClose, 
+  PanelLeftOpen, 
+  Menu as MenuIcon, 
+  DollarSign, 
+  ShoppingBag, 
+  TrendingUp, 
+  Package, 
+  UserCheck, 
+  PlusCircle, 
+  Sparkles, 
+  ArrowRight, 
+  ExternalLink 
+} from 'lucide-react';
 import { useAuth } from '../../components/AuthContext';
 import { useToast } from '../../components/ToastContext';
 import { getApiUrl } from '../../lib/config';
 
+import Sidebar from './Sidebar';
 import MenuCards from './MenuCards';
 import DashboardTab from './DashboardTab';
 import AppearanceTab from './AppearanceTab';
@@ -57,6 +74,9 @@ function MiEspacioContent() {
   const [tabActual, setTabActual] = useState(() =>
     tabDesdeUrl && TABS_VALIDOS.has(tabDesdeUrl) ? tabDesdeUrl : "menu"
   );
+
+  const [sidebarOculto, setSidebarOculto] = useState(false);
+  const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
 
   // Sincronizar el tab cuando el usuario usa los botones Atrás / Adelante del navegador
   useEffect(() => {
@@ -687,208 +707,232 @@ function MiEspacioContent() {
     )
   );
 
-  return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8 lg:py-10 animate-fade-in font-sans text-gray-800 antialiased">
-      {/* ÁREA DE CONTENIDO PRINCIPAL BASADA EN MENÚ DE TARJETAS */}
-      <main className="w-full space-y-6">
-        
-        {/* LINK DE NAVEGACIÓN CUANDO UN TAB DE SECCIÓN ESTÁ ACTIVO */}
-        {tabActual !== "menu" && (
-          <div className="mb-2 sm:mb-4">
-            <button 
-              onClick={() => {
-                setTabActual("menu");
-                router.push('/mi-espacio?tab=menu');
-              }}
-              className="inline-flex items-center gap-1 text-sm font-semibold text-[#2C3E50] hover:text-purple-700 transition cursor-pointer"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span>Volver a mi espacio</span>
-            </button>
-          </div>
-        )}
+  const TAB_INFO: Record<string, { label: string; description: string; icon: React.ElementType }> = {
+    menu: { label: "Menú Principal", description: "Resumen y accesos directos de tu espacio personal", icon: LayoutGrid },
+    billetera: { label: "Mi Billetera", description: "Consulta tu saldo, retira fondos a tu cuenta bancaria y revisa movimientos", icon: DollarSign },
+    purchases: { label: "Mis Compras", description: "Seguimiento de pedidos, estados de entrega y comprobantes", icon: ShoppingBag },
+    sales: { label: "Mis Ventas", description: "Administra las ventas realizadas y despachos de Correo", icon: TrendingUp },
+    publications: { label: "Mis Publicaciones", description: "Gestiona tu catálogo de productos publicados y stock", icon: Package },
+    perfil: { label: "Mi Perfil", description: "Configuración de datos personales y dirección de entrega", icon: UserCheck }
+  };
 
-        {/* TAB: MENÚ DE TARJETAS (Navegación principal exclusiva) */}
-        {tabActual === "menu" && (
-          <div className="space-y-6 animate-fade-in">
-            {/* CABECERA VIOLETA DE BIENVENIDA */}
-            <div className="bg-gradient-to-r from-purple-800 via-indigo-800 to-purple-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
-              <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-56 h-56 bg-white/10 rounded-full blur-2xl pointer-events-none" />
-              <div className="relative z-10">
-                <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-                  ¡Hola, {usuario.full_name.split(' ')[0]}!
-                </h1>
-              </div>
+  const currentTabMeta = TAB_INFO[tabActual] || TAB_INFO.menu;
+  const TabIcon = currentTabMeta.icon;
+
+  return (
+    <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-sans text-[#202124] antialiased">
+      {/* Workspace Shell Google AI Studio Light */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar Lateral Google AI Studio Light */}
+        <Sidebar 
+          tabActual={tabActual}
+          setTabActual={setTabActual}
+          esAdmin={esAdmin}
+          esRoot={esRoot}
+          logout={logout}
+          sidebarOculto={sidebarOculto}
+          setSidebarOculto={setSidebarOculto}
+          menuMovilAbierto={menuMovilAbierto}
+          setMenuMovilAbierto={setMenuMovilAbierto}
+        />
+
+        {/* Área Principal de Contenido */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+          {/* Top Bar Google AI Studio Light */}
+          <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xs border-b border-[#dadce0] px-4 sm:px-6 h-14 flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              {/* Botón menú móvil */}
+              <button
+                onClick={() => setMenuMovilAbierto(true)}
+                className="lg:hidden p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
+                title="Abrir menú"
+              >
+                <MenuIcon className="h-5 w-5" />
+              </button>
+
+              {/* Botón expandir sidebar escritorio */}
+              {sidebarOculto && (
+                <button
+                  onClick={() => setSidebarOculto(false)}
+                  className="hidden lg:flex p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
+                  title="Expandir barra lateral"
+                >
+                  <PanelLeftOpen className="h-4 w-4" />
+                </button>
+              )}
+
+              {/* Breadcrumb Google AI Studio */}
+              <nav className="flex items-center gap-1.5 text-xs font-medium text-[#5f6368] truncate">
+                <button 
+                  onClick={() => {
+                    setTabActual("menu");
+                    router.push('/mi-espacio?tab=menu');
+                  }}
+                  className="hover:text-[#1a73e8] transition cursor-pointer font-semibold"
+                >
+                  Mi Espacio
+                </button>
+                {tabActual !== "menu" && (
+                  <>
+                    <span className="text-[#dadce0]">/</span>
+                    <span className="text-[#202124] font-semibold flex items-center gap-1">
+                      <TabIcon className="h-3.5 w-3.5 text-[#1a73e8]" />
+                      {currentTabMeta.label}
+                    </span>
+                  </>
+                )}
+              </nav>
             </div>
 
-            {/* GRILLA DE TARJETAS EXCLUSIVA */}
-            <MenuCards 
-              tabActual={tabActual} 
-              setTabActual={setTabActual} 
-              esAdmin={esAdmin} 
-              esRoot={esRoot}
-              logout={logout}
-            />
-          </div>
-        )}
-        
-        {/* TAB: PANEL DE CONTROL (DASHBOARD) - Solo administradores */}
-        {tabActual === "dashboard" && esAdmin && (
-          <DashboardTab 
-            msgAsignar={msgAsignar}
-            emailAsignar={emailAsignar}
-            setEmailAsignar={setEmailAsignar}
-            rolAsignar={rolAsignar}
-            setRolAsignar={setRolAsignar}
-            cargandoAsignar={cargandoAsignar}
-            handleAsignarRango={handleAsignarRango}
-            adminDashboardData={adminDashboardData}
-            cargandoDashboard={cargandoDashboard}
-          />
-        )}
+            {/* Acciones Top Bar */}
+            <div className="flex items-center gap-2 sm:gap-3">
+              {/* Pill Saldo Rápido */}
+              <div 
+                onClick={() => {
+                  setTabActual("billetera");
+                  router.push('/mi-espacio?tab=billetera');
+                }}
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e8f0fe] border border-[#d2e3fc] text-xs font-semibold text-[#1a73e8] hover:bg-[#d2e3fc]/60 transition cursor-pointer"
+                title="Ver detalles de mi billetera"
+              >
+                <DollarSign className="h-3.5 w-3.5 text-[#1a73e8]" />
+                <span>Saldo: {cargandoBalance ? "..." : formatearARS(balance.available)}</span>
+              </div>
 
-        {/* TAB: APARIENCIA (BRANDING/CMS) */}
-        {tabActual === "appearance" && esAdmin && (
-          <AppearanceTab 
-            tieneCambiosMarca={tieneCambiosMarca}
-            setTieneCambiosMarca={setTieneCambiosMarca}
-            handlePublicarMarca={handlePublicarMarca}
-            brandName={brandName}
-            setBrandName={setBrandName}
-            brandFontFamily={brandFontFamily}
-            setBrandFontFamily={setBrandFontFamily}
-            brandFontSize={brandFontSize}
-            setBrandFontSize={setBrandFontSize}
-            logoHistory={logoHistory}
-            setLogoHistory={setLogoHistory}
-            logoUrl={logoUrl}
-            setLogoUrl={setLogoUrl}
-            logoPreviaUrl={logoPreviaUrl}
-            setLogoPreviaUrl={setLogoPreviaUrl}
-            zoomLogo={zoomLogo}
-            setZoomLogo={setZoomLogo}
-            rotateLogo={rotateLogo}
-            setRotateLogo={setRotateLogo}
-            offsetX={offsetX}
-            setOffsetX={setOffsetX}
-            offsetY={offsetY}
-            setOffsetY={setOffsetY}
-            removerFondoBlanco={removerFondoBlanco}
-            setRemoverFondoBlanco={setRemoverFondoBlanco}
-            toleranciaTransparencia={toleranciaTransparencia}
-            setToleranciaTransparencia={setToleranciaTransparencia}
-            colorPrimary={colorPrimary}
-            setColorPrimary={setColorPrimary}
-            colorSecondary={colorSecondary}
-            setColorSecondary={setColorSecondary}
-            colorBackground={colorBackground}
-            setColorBackground={setColorBackground}
-            colorNavbar={colorNavbar}
-            setColorNavbar={setColorNavbar}
-            colorSectionTitle={colorSectionTitle}
-            setColorSectionTitle={setColorSectionTitle}
-            colorCatalogLink={colorCatalogLink}
-            setColorCatalogLink={setColorCatalogLink}
-            colorTextInput={colorTextInput}
-            setColorTextInput={setColorTextInput}
-            handleEliminarLogoHistorial={handleEliminarLogoHistorial}
-            apiUrl={getApiUrl()}
-          />
-        )}
+              {/* Botón Publicar Producto */}
+              <button
+                onClick={() => router.push('/products/new')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white text-xs font-semibold shadow-2xs transition cursor-pointer"
+              >
+                <PlusCircle className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Publicar Producto</span>
+                <span className="sm:hidden">Publicar</span>
+              </button>
+            </div>
+          </header>
 
-        {/* TAB: CAMPAÑAS Y EVENTOS (ADMIN) */}
-        {tabActual === "campanas" && esAdmin && (
-          <CampaignsTab 
-            apiUrl={getApiUrl()}
-            token={token}
-          />
-        )}
-        {tabActual === "banners" && esAdmin && (
-          <BannersTab 
-            tieneCambiosBanners={tieneCambiosBanners}
-            handlePublicarBanners={handlePublicarBanners}
-            subiendoBanner={subiendoBanner}
-            nuevoBannerTitulo={nuevoBannerTitulo}
-            setNuevoBannerTitulo={setNuevoBannerTitulo}
-            nuevoBannerSubtitulo={nuevoBannerSubtitulo}
-            setNuevoBannerSubtitulo={setNuevoBannerSubtitulo}
-            nuevoBannerLink={nuevoBannerLink}
-            setNuevoBannerLink={setNuevoBannerLink}
-            nuevoBannerLinkPersonalizado={nuevoBannerLinkPersonalizado}
-            setNuevoBannerLinkPersonalizado={setNuevoBannerLinkPersonalizado}
-            nuevoBannerArchivo={nuevoBannerArchivo}
-            setNuevoBannerArchivo={setNuevoBannerArchivo}
-            nuevoBannerArchivoMovil={nuevoBannerArchivoMovil}
-            setNuevoBannerArchivoMovil={setNuevoBannerArchivoMovil}
-            handleAgregarBorradorBanner={handleAgregarBorradorBanner}
-            bannerList={bannerList}
-            setBannerList={setBannerList}
-            setTieneCambiosBanners={setTieneCambiosBanners}
-            showToast={showToast}
-            token={token}
-            apiUrl={getApiUrl()}
-          />
-        )}
+          {/* Cuerpo de Contenido */}
+          <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+            {/* Si estamos en una pestaña interna, mostramos el encabezado con botón para volver */}
+            {tabActual !== "menu" && (
+              <div className="flex items-center justify-between pb-4 border-b border-[#dadce0]/80">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      setTabActual("menu");
+                      router.push('/mi-espacio?tab=menu');
+                    }}
+                    className="p-2 rounded-xl bg-white border border-[#dadce0] text-[#5f6368] hover:text-[#1a73e8] hover:border-[#1a73e8] hover:bg-[#e8f0fe]/30 transition shadow-2xs cursor-pointer"
+                    title="Volver al Menú Principal"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <div>
+                    <h1 className="text-xl font-bold text-[#202124] tracking-tight flex items-center gap-2">
+                      {currentTabMeta.label}
+                    </h1>
+                    <p className="text-xs text-[#5f6368] mt-0.5">
+                      {currentTabMeta.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
-        {/* TAB: SECCIONES (CUSTOMIZATIONS) */}
-        {tabActual === "secciones" && esAdmin && (
-          <CustomizationsTab 
-            tieneCambiosSecciones={tieneCambiosSecciones}
-            handlePublicarSecciones={handlePublicarSecciones}
-            nuevoSeccionTitulo={nuevoSeccionTitulo}
-            setNuevoSeccionTitulo={setNuevoSeccionTitulo}
-            nuevoSeccionCategoria={nuevoSeccionCategoria}
-            setNuevoSeccionCategoria={setNuevoSeccionCategoria}
-            handleAgregarSeccion={handleAgregarSeccion}
-            seccionesList={seccionesList}
-            setSeccionesList={setSeccionesList}
-            setTieneCambiosSecciones={setTieneCambiosSecciones}
-            handleEliminarSeccion={handleEliminarSeccion}
-          />
-        )}
+            {/* TAB: MENÚ DE TARJETAS (Overview / Bienvenida en Modo Claro) */}
+            {tabActual === "menu" && (
+              <div className="space-y-6 animate-fade-in">
+                {/* HERO CARD GOOGLE AI STUDIO LIGHT */}
+                <div className="bg-white border border-[#dadce0] rounded-3xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
+                  <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-64 h-64 bg-[#e8f0fe]/60 rounded-full blur-3xl pointer-events-none" />
+                  <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#e8f0fe] text-[#1a73e8] text-[11px] font-bold uppercase tracking-wider mb-2">
+                        <Sparkles className="h-3 w-3" />
+                        <span>Espacio Personal</span>
+                      </div>
+                      <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#202124]">
+                        ¡Hola, {usuario.full_name.split(' ')[0]}!
+                      </h1>
+                      <p className="text-xs sm:text-sm text-[#5f6368] mt-1 max-w-xl">
+                        Gestiona tus compras, controla tu billetera con pagos en garantía y administra tus publicaciones desde un solo lugar.
+                      </p>
+                    </div>
 
-        {/* TAB: BILLETERA (CLIENTE COMÚN) */}
-        {tabActual === "billetera" && (esRoot || tienePermiso('full_access') || tienePermiso('billetera')) && (
-          <WalletTab 
-            cargandoBalance={cargandoBalance}
-            balance={balance}
-            formatearARS={formatearARS}
-            onBalanceUpdate={(available, frozen) => setBalance({ available, frozen })}
-          />
-        )}
+                    {/* Resumen Rápido de Saldo */}
+                    <div className="flex items-center gap-3 bg-[#f8f9fa] border border-[#dadce0] p-3.5 rounded-2xl flex-shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-[#e8f0fe] flex items-center justify-center text-[#1a73e8]">
+                        <DollarSign className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-[11px] font-medium text-[#5f6368]">Saldo Disponible</p>
+                        <p className="text-base sm:text-lg font-bold text-[#202124]">
+                          {cargandoBalance ? "Cargando..." : formatearARS(balance.available)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-        {/* TAB: PERFIL (CLIENT) */}
-        {tabActual === "perfil" && (
-          <ProfileTab />
-        )}
+                {/* GRILLA DE TARJETAS STUDIO LIGHT */}
+                <MenuCards 
+                  tabActual={tabActual} 
+                  setTabActual={setTabActual} 
+                  esAdmin={esAdmin} 
+                  esRoot={esRoot}
+                  logout={logout}
+                />
+              </div>
+            )}
 
-        {/* TAB: MIS COMPRAS */}
-        {tabActual === "purchases" && (esRoot || tienePermiso('full_access') || tienePermiso('purchases')) && (
-          <PurchasesTab 
-            token={token}
-          />
-        )}
+            {/* TAB: BILLETERA */}
+            {tabActual === "billetera" && (esRoot || tienePermiso('full_access') || tienePermiso('billetera')) && (
+              <div className="animate-fade-in">
+                <WalletTab 
+                  cargandoBalance={cargandoBalance}
+                  balance={balance}
+                  formatearARS={formatearARS}
+                  onBalanceUpdate={(available, frozen) => setBalance({ available, frozen })}
+                />
+              </div>
+            )}
 
-        {/* TAB: MIS VENTAS */}
-        {tabActual === "sales" && (esRoot || tienePermiso('full_access') || tienePermiso('sales')) && (
-          <SalesTab 
-            token={token}
-          />
-        )}
+            {/* TAB: PERFIL */}
+            {tabActual === "perfil" && (
+              <div className="animate-fade-in">
+                <ProfileTab />
+              </div>
+            )}
 
-        {/* TAB: MIS PUBLICACIONES */}
-        {tabActual === "publications" && (esRoot || tienePermiso('full_access') || tienePermiso('publications')) && (
-          <PublicationsTab 
-            token={token}
-          />
-        )}
+            {/* TAB: MIS COMPRAS */}
+            {tabActual === "purchases" && (esRoot || tienePermiso('full_access') || tienePermiso('purchases')) && (
+              <div className="animate-fade-in">
+                <PurchasesTab 
+                  token={token}
+                />
+              </div>
+            )}
 
-        {/* TAB: MODERACIÓN DE PRODUCTOS (ADMIN) */}
-        {tabActual === "moderation" && (
-          <ModerationTab 
-            token={token || ""}
-          />
-        )}
+            {/* TAB: MIS VENTAS */}
+            {tabActual === "sales" && (esRoot || tienePermiso('full_access') || tienePermiso('sales')) && (
+              <div className="animate-fade-in">
+                <SalesTab 
+                  token={token}
+                />
+              </div>
+            )}
+
+            {/* TAB: MIS PUBLICACIONES */}
+            {tabActual === "publications" && (esRoot || tienePermiso('full_access') || tienePermiso('publications')) && (
+              <div className="animate-fade-in">
+                <PublicationsTab 
+                  token={token}
+                />
+              </div>
+            )}
+          </main>
+        </div>
+      </div>
 
         {/* SECCIÓN ADMINISTRADOR & PANEL DE PROGRAMADOR UNIFICADOS (TEMA GOOGLE AI STUDIO - PANTALLA COMPLETA 100vw x 100vh) */}
         {(tabActual === "root" || tabActual === "admin" || tabActual === "dashboard" || tabActual === "moderation" || tabActual === "appearance" || tabActual === "campanas" || tabActual === "secciones" || tabActual === "banners" || tabActual === "users" || tabActual === "roles" || tabActual === "permissions" || tabActual === "sections" || tabActual === "sessions" || tabActual === "logs") && (esAdmin || esRoot) && (
@@ -984,8 +1028,6 @@ function MiEspacioContent() {
             />
           </div>
         )}
-
-      </main>
     </div>
   );
 }
