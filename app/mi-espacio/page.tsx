@@ -24,7 +24,6 @@ import { useToast } from '../../components/ToastContext';
 import { getApiUrl } from '../../lib/config';
 
 import Sidebar from './Sidebar';
-import MenuCards from './MenuCards';
 import DashboardTab from './DashboardTab';
 import AppearanceTab from './AppearanceTab';
 import BannersTab from './BannersTab';
@@ -39,8 +38,8 @@ import ModerationTab from './ModerationTab';
 import RootTab from './RootTab';
 
 const TABS_VALIDOS = new Set([
-  "menu", "dashboard", "appearance", "campanas", "secciones", "banners",
-  "billetera", "perfil", "purchases", "sales", "publications", "moderation", "root"
+  "billetera", "perfil", "purchases", "sales", "publications",
+  "dashboard", "appearance", "campanas", "secciones", "banners", "moderation", "root"
 ]);
 
 export default function MiEspacioPage() {
@@ -70,9 +69,9 @@ function MiEspacioContent() {
     }
   }, [usuario, cargando]);
 
-  // Tab actual seleccionado
+  // Tab actual seleccionado (por defecto billetera)
   const [tabActual, setTabActual] = useState(() =>
-    tabDesdeUrl && TABS_VALIDOS.has(tabDesdeUrl) ? tabDesdeUrl : "menu"
+    tabDesdeUrl && TABS_VALIDOS.has(tabDesdeUrl) ? tabDesdeUrl : "billetera"
   );
 
   const [sidebarOculto, setSidebarOculto] = useState(false);
@@ -80,7 +79,7 @@ function MiEspacioContent() {
 
   // Sincronizar el tab cuando el usuario usa los botones Atrás / Adelante del navegador
   useEffect(() => {
-    const tabValida = tabDesdeUrl && TABS_VALIDOS.has(tabDesdeUrl) ? tabDesdeUrl : "menu";
+    const tabValida = tabDesdeUrl && TABS_VALIDOS.has(tabDesdeUrl) ? tabDesdeUrl : "billetera";
     setTabActual(tabValida);
   }, [tabDesdeUrl]);
 
@@ -708,15 +707,14 @@ function MiEspacioContent() {
   );
 
   const TAB_INFO: Record<string, { label: string; description: string; icon: React.ElementType }> = {
-    menu: { label: "Menú Principal", description: "Resumen y accesos directos de tu espacio personal", icon: LayoutGrid },
     billetera: { label: "Mi Billetera", description: "Consulta tu saldo, retira fondos a tu cuenta bancaria y revisa movimientos", icon: DollarSign },
+    publications: { label: "Mis Publicaciones", description: "Gestiona tu catálogo de productos publicados y stock", icon: Package },
     purchases: { label: "Mis Compras", description: "Seguimiento de pedidos, estados de entrega y comprobantes", icon: ShoppingBag },
     sales: { label: "Mis Ventas", description: "Administra las ventas realizadas y despachos de Correo", icon: TrendingUp },
-    publications: { label: "Mis Publicaciones", description: "Gestiona tu catálogo de productos publicados y stock", icon: Package },
     perfil: { label: "Mi Perfil", description: "Configuración de datos personales y dirección de entrega", icon: UserCheck }
   };
 
-  const currentTabMeta = TAB_INFO[tabActual] || TAB_INFO.menu;
+  const currentTabMeta = TAB_INFO[tabActual] || TAB_INFO.billetera;
   const TabIcon = currentTabMeta.icon;
 
   return (
@@ -762,25 +760,9 @@ function MiEspacioContent() {
               )}
 
               {/* Breadcrumb Google AI Studio */}
-              <nav className="flex items-center gap-1.5 text-xs font-medium text-[#5f6368] truncate">
-                <button 
-                  onClick={() => {
-                    setTabActual("menu");
-                    router.push('/mi-espacio?tab=menu');
-                  }}
-                  className="hover:text-[#1a73e8] transition cursor-pointer font-semibold"
-                >
-                  Mi Espacio
-                </button>
-                {tabActual !== "menu" && (
-                  <>
-                    <span className="text-[#dadce0]">/</span>
-                    <span className="text-[#202124] font-semibold flex items-center gap-1">
-                      <TabIcon className="h-3.5 w-3.5 text-[#1a73e8]" />
-                      {currentTabMeta.label}
-                    </span>
-                  </>
-                )}
+              <nav className="flex items-center gap-2 text-xs font-semibold text-[#202124] truncate">
+                <TabIcon className="h-4 w-4 text-[#1a73e8]" />
+                <span>{currentTabMeta.label}</span>
               </nav>
             </div>
 
@@ -813,77 +795,15 @@ function MiEspacioContent() {
 
           {/* Cuerpo de Contenido */}
           <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-            {/* Si estamos en una pestaña interna, mostramos el encabezado con botón para volver */}
-            {tabActual !== "menu" && (
-              <div className="flex items-center justify-between pb-4 border-b border-[#dadce0]/80">
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      setTabActual("menu");
-                      router.push('/mi-espacio?tab=menu');
-                    }}
-                    className="p-2 rounded-xl bg-white border border-[#dadce0] text-[#5f6368] hover:text-[#1a73e8] hover:border-[#1a73e8] hover:bg-[#e8f0fe]/30 transition shadow-2xs cursor-pointer"
-                    title="Volver al Menú Principal"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-                  <div>
-                    <h1 className="text-xl font-bold text-[#202124] tracking-tight flex items-center gap-2">
-                      {currentTabMeta.label}
-                    </h1>
-                    <p className="text-xs text-[#5f6368] mt-0.5">
-                      {currentTabMeta.description}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* TAB: MENÚ DE TARJETAS (Overview / Bienvenida en Modo Claro) */}
-            {tabActual === "menu" && (
-              <div className="space-y-6 animate-fade-in">
-                {/* HERO CARD GOOGLE AI STUDIO LIGHT */}
-                <div className="bg-white border border-[#dadce0] rounded-3xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
-                  <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-64 h-64 bg-[#e8f0fe]/60 rounded-full blur-3xl pointer-events-none" />
-                  <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#e8f0fe] text-[#1a73e8] text-[11px] font-bold uppercase tracking-wider mb-2">
-                        <Sparkles className="h-3 w-3" />
-                        <span>Espacio Personal</span>
-                      </div>
-                      <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#202124]">
-                        ¡Hola, {usuario.full_name.split(' ')[0]}!
-                      </h1>
-                      <p className="text-xs sm:text-sm text-[#5f6368] mt-1 max-w-xl">
-                        Gestiona tus compras, controla tu billetera con pagos en garantía y administra tus publicaciones desde un solo lugar.
-                      </p>
-                    </div>
-
-                    {/* Resumen Rápido de Saldo */}
-                    <div className="flex items-center gap-3 bg-[#f8f9fa] border border-[#dadce0] p-3.5 rounded-2xl flex-shrink-0">
-                      <div className="w-10 h-10 rounded-xl bg-[#e8f0fe] flex items-center justify-center text-[#1a73e8]">
-                        <DollarSign className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <p className="text-[11px] font-medium text-[#5f6368]">Saldo Disponible</p>
-                        <p className="text-base sm:text-lg font-bold text-[#202124]">
-                          {cargandoBalance ? "Cargando..." : formatearARS(balance.available)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* GRILLA DE TARJETAS STUDIO LIGHT */}
-                <MenuCards 
-                  tabActual={tabActual} 
-                  setTabActual={setTabActual} 
-                  esAdmin={esAdmin} 
-                  esRoot={esRoot}
-                  logout={logout}
-                />
-              </div>
-            )}
+            {/* Encabezado limpio de la pestaña activa sin botón volver */}
+            <div className="pb-4 border-b border-[#dadce0]/80">
+              <h1 className="text-xl font-bold text-[#202124] tracking-tight flex items-center gap-2">
+                {currentTabMeta.label}
+              </h1>
+              <p className="text-xs text-[#5f6368] mt-0.5">
+                {currentTabMeta.description}
+              </p>
+            </div>
 
             {/* TAB: BILLETERA */}
             {tabActual === "billetera" && (esRoot || tienePermiso('full_access') || tienePermiso('billetera')) && (

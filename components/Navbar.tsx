@@ -572,80 +572,82 @@ export default function Navbar({ logoUrl }: NavbarProps) {
         </div>
       </div>
 
-      {/* SUB-BARRA DE MENÚ DE NAVEGACIÓN (Nuevos ingresos / Descubrir / Decoración / Iluminación / Alfombras / Exterior) */}
-      <div className="border-t border-gray-100/60 bg-white/95 backdrop-blur-xs hidden md:block">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-8 py-2.5 text-xs font-extrabold tracking-wide text-gray-700">
-            
-            {/* 1. Nuevos ingresos */}
-            <Link href="/catalog?sort=newest" className="hover:text-purple-700 transition flex items-center gap-1">
-              Nuevos ingresos
-            </Link>
+      {/* SUB-BARRA DE MENÚ DE NAVEGACIÓN (Nuevos ingresos / Descubrir / Decoración / Iluminación / Alfombras / Exterior) - Se oculta en Mi Espacio y Consolas Root */}
+      {!pathname?.startsWith('/mi-espacio') && !pathname?.startsWith('/root') && (
+        <div className="border-t border-gray-100/60 bg-white/95 backdrop-blur-xs hidden md:block">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center space-x-8 py-2.5 text-xs font-extrabold tracking-wide text-gray-700">
+              
+              {/* 1. Nuevos ingresos */}
+              <Link href="/catalog?sort=newest" className="hover:text-purple-700 transition flex items-center gap-1">
+                Nuevos ingresos
+              </Link>
 
-            {/* 2. Descubrir (Dropdown) */}
-            <div 
-              className="relative" 
-              onMouseEnter={() => setDescubrirAbierto(true)} 
-              onMouseLeave={() => setDescubrirAbierto(false)}
-            >
-              <button className="hover:text-purple-700 transition flex items-center gap-1 cursor-pointer py-1">
-                <span>Descubrir</span>
-                <ChevronDown className={`h-3.5 w-3.5 transition-transform ${descubrirAbierto ? 'rotate-180 text-purple-700' : ''}`} />
-              </button>
+              {/* 2. Descubrir (Dropdown) */}
+              <div 
+                className="relative" 
+                onMouseEnter={() => setDescubrirAbierto(true)} 
+                onMouseLeave={() => setDescubrirAbierto(false)}
+              >
+                <button className="hover:text-purple-700 transition flex items-center gap-1 cursor-pointer py-1">
+                  <span>Descubrir</span>
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${descubrirAbierto ? 'rotate-180 text-purple-700' : ''}`} />
+                </button>
 
-              {descubrirAbierto && (
-                <div className="absolute left-0 top-full w-64 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in origin-top-left">
-                  <Link
-                    href="/catalog?filter=selected"
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
-                  >
-                    ⭐ Seleccionados de Objetia
-                  </Link>
-                  <Link
-                    href="/catalog?max_price=50000"
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
-                  >
-                    🏷️ Hallazgos por menos de $50.000
-                  </Link>
-                  <Link
-                    href="/catalog?condition=used"
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
-                  >
-                    📜 Vintage & Usados Selección
-                  </Link>
-                  <Link
-                    href="/catalog?sort=popular"
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
-                  >
-                    🔥 Tendencias
-                  </Link>
-                </div>
-              )}
+                {descubrirAbierto && (
+                  <div className="absolute left-0 top-full w-64 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in origin-top-left">
+                    <Link
+                      href="/catalog?filter=selected"
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                    >
+                      ⭐ Seleccionados de Objetia
+                    </Link>
+                    <Link
+                      href="/catalog?max_price=50000"
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                    >
+                      🏷️ Hallazgos por menos de $50.000
+                    </Link>
+                    <Link
+                      href="/catalog?condition=used"
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                    >
+                      📜 Vintage & Usados Selección
+                    </Link>
+                    <Link
+                      href="/catalog?sort=popular"
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                    >
+                      🔥 Tendencias
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* 3. Decoración */}
+              <Link href="/catalog?category=Adornos+y+Cuadros" className="hover:text-purple-700 transition">
+                Decoración
+              </Link>
+
+              {/* 4. Iluminación */}
+              <Link href="/catalog?category=Iluminación" className="hover:text-purple-700 transition">
+                Iluminación
+              </Link>
+
+              {/* 5. Alfombras */}
+              <Link href="/catalog?category=Alfombras" className="hover:text-purple-700 transition">
+                Alfombras
+              </Link>
+
+              {/* 6. Exterior */}
+              <Link href="/catalog?category=Jardín+y+Exterior" className="hover:text-purple-700 transition">
+                Exterior
+              </Link>
+
             </div>
-
-            {/* 3. Decoración */}
-            <Link href="/catalog?category=Adornos+y+Cuadros" className="hover:text-purple-700 transition">
-              Decoración
-            </Link>
-
-            {/* 4. Iluminación */}
-            <Link href="/catalog?category=Iluminación" className="hover:text-purple-700 transition">
-              Iluminación
-            </Link>
-
-            {/* 5. Alfombras */}
-            <Link href="/catalog?category=Alfombras" className="hover:text-purple-700 transition">
-              Alfombras
-            </Link>
-
-            {/* 6. Exterior */}
-            <Link href="/catalog?category=Jardín+y+Exterior" className="hover:text-purple-700 transition">
-              Exterior
-            </Link>
-
           </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 }

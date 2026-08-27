@@ -76,44 +76,16 @@ export default function Sidebar({
     return tienePermiso(id);
   };
 
-  const gruposNavegacion: Array<{ titulo: string; items: TabItem[] }> = [
-    {
-      titulo: "General",
-      items: [
-        { id: "menu", label: "Menú Principal", icon: LayoutGrid },
-      ]
-    },
-    {
-      titulo: "Mi Espacio",
-      items: [
-        { id: "billetera", label: "Mi Billetera", icon: DollarSign },
-        { id: "publications", label: "Mis Publicaciones", icon: Package },
-        { id: "purchases", label: "Mis Compras", icon: ShoppingBag },
-        { id: "sales", label: "Mis Ventas", icon: TrendingUp },
-        { id: "perfil", label: "Mi Perfil", icon: UserCheck },
-        { id: "vender", label: "Publicar Producto", icon: PlusCircle, isExternalLink: true, href: "/products/new" }
-      ]
-    },
-    ...(esAdmin || esRoot ? [{
-      titulo: "Administración",
-      items: [
-        ...(esAdmin ? [
-          { id: "dashboard", label: "Panel de Control", icon: LayoutDashboard },
-          { id: "moderation", label: "Productos en Revisión", icon: ShieldAlert },
-          { id: "appearance", label: "Apariencia Web", icon: Palette },
-          { id: "banners", label: "Banners de Inicio", icon: ImageIcon },
-        ] : []),
-        ...(esRoot ? [
-          { id: "root", label: "Consola Programador", icon: Terminal, badge: "ROOT", badgeColor: "bg-amber-100 text-amber-800" }
-        ] : [])
-      ]
-    }] : [])
+  const itemsNavegacion: TabItem[] = [
+    { id: "billetera", label: "Mi Billetera", icon: DollarSign },
+    { id: "publications", label: "Mis Publicaciones", icon: Package },
+    { id: "purchases", label: "Mis Compras", icon: ShoppingBag },
+    { id: "sales", label: "Mis Ventas", icon: TrendingUp },
+    { id: "perfil", label: "Mi Perfil", icon: UserCheck },
+    { id: "vender", label: "Publicar Producto", icon: PlusCircle, isExternalLink: true, href: "/products/new" }
   ];
 
-  const gruposVisibles = gruposNavegacion.map(g => ({
-    ...g,
-    items: g.items.filter(item => tieneAccesoItem(item.id))
-  })).filter(g => g.items.length > 0);
+  const itemsVisibles = itemsNavegacion.filter(item => tieneAccesoItem(item.id));
 
   const cambiarTab = (item: TabItem) => {
     if (item.isExternalLink && item.href) {
@@ -126,53 +98,44 @@ export default function Sidebar({
   };
 
   const renderNavList = () => (
-    <div className="flex-1 overflow-y-auto space-y-5 custom-scrollbar pr-1 py-2 select-none">
-      {gruposVisibles.map((grupo) => (
-        <div key={grupo.titulo} className="space-y-1">
-          <p className="px-3 text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider mb-1 font-sans">
-            {grupo.titulo}
-          </p>
-          <div className="space-y-0.5">
-            {grupo.items.map((item) => {
-              const Icono = item.icon;
-              const activo = tabActual === item.id && !item.isExternalLink;
+    <div className="flex-1 overflow-y-auto space-y-1 custom-scrollbar pr-1 py-2 select-none">
+      {itemsVisibles.map((item) => {
+        const Icono = item.icon;
+        const activo = tabActual === item.id && !item.isExternalLink;
 
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => cambiarTab(item)}
-                  className={`w-full flex items-center justify-between px-3 h-[38px] rounded-xl text-[13.5px] font-medium transition-all text-left cursor-pointer group ${
-                    activo
-                      ? 'bg-[#e8f0fe] text-[#1a73e8] shadow-xs'
-                      : 'text-[#3c4043] hover:bg-[#f1f3f4] hover:text-[#1f1f1f]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <Icono 
-                      className={`h-4 w-4 flex-shrink-0 transition-transform duration-150 ${
-                        activo 
-                          ? 'text-[#1a73e8]' 
-                          : 'text-[#5f6368] group-hover:text-[#1f1f1f]'
-                      }`} 
-                    />
-                    <span className="truncate">{item.label}</span>
-                  </div>
+        return (
+          <button
+            key={item.id}
+            onClick={() => cambiarTab(item)}
+            className={`w-full flex items-center justify-between px-3 h-[40px] rounded-xl text-[13.5px] font-medium transition-all text-left cursor-pointer group ${
+              activo
+                ? 'bg-[#e8f0fe] text-[#1a73e8] shadow-2xs font-semibold'
+                : 'text-[#3c4043] hover:bg-[#f1f3f4] hover:text-[#1f1f1f]'
+            }`}
+          >
+            <div className="flex items-center gap-3 min-w-0">
+              <Icono 
+                className={`h-4 w-4 flex-shrink-0 transition-transform duration-150 ${
+                  activo 
+                    ? 'text-[#1a73e8]' 
+                    : 'text-[#5f6368] group-hover:text-[#1f1f1f]'
+                }`} 
+              />
+              <span className="truncate">{item.label}</span>
+            </div>
 
-                  {item.badge ? (
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider ${item.badgeColor || 'bg-gray-100 text-gray-700'}`}>
-                      {item.badge}
-                    </span>
-                  ) : item.isExternalLink ? (
-                    <ExternalLink className="h-3 w-3 text-[#9aa0a6] group-hover:text-[#5f6368]" />
-                  ) : activo ? (
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#1a73e8]" />
-                  ) : null}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      ))}
+            {item.badge ? (
+              <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider ${item.badgeColor || 'bg-gray-100 text-gray-700'}`}>
+                {item.badge}
+              </span>
+            ) : item.isExternalLink ? (
+              <ExternalLink className="h-3.5 w-3.5 text-[#9aa0a6] group-hover:text-[#5f6368]" />
+            ) : activo ? (
+              <span className="w-1.5 h-1.5 rounded-full bg-[#1a73e8]" />
+            ) : null}
+          </button>
+        );
+      })}
     </div>
   );
 
@@ -187,18 +150,10 @@ export default function Sidebar({
           />
           <div className="fixed inset-y-0 left-0 w-[280px] bg-white border-r border-[#dadce0] shadow-2xl flex flex-col p-4 z-10 animate-slide-right">
             {/* Cabecera Móvil */}
-            <div className="flex items-center justify-between pb-3 border-b border-[#dadce0]/80">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#e8f0fe] flex items-center justify-center text-[#1a73e8] font-bold text-sm">
-                  V
-                </div>
-                <span className="font-semibold text-base tracking-tight text-[#202124]">
-                  Mi Espacio
-                </span>
-              </div>
+            <div className="flex items-center justify-end pb-2 border-b border-[#dadce0]/80">
               <button 
                 onClick={() => setMenuMovilAbierto && setMenuMovilAbierto(false)}
-                className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition"
+                className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -238,18 +193,9 @@ export default function Sidebar({
           sidebarOculto ? 'w-0 opacity-0 overflow-hidden p-0 border-none' : 'w-64 p-4 min-h-[calc(100vh-64px)]'
         }`}
       >
-        {/* Cabecera Sidebar Desktop */}
-        <div className="flex items-center justify-between pb-3 border-b border-[#dadce0]/80 flex-shrink-0">
-          <div className="flex items-center gap-2.5 px-1">
-            <div className="w-7 h-7 rounded-lg bg-[#e8f0fe] border border-[#d2e3fc] flex items-center justify-center text-[#1a73e8] font-bold text-xs shadow-2xs">
-              V
-            </div>
-            <span className="font-semibold text-[15px] tracking-tight text-[#202124]">
-              Mi Espacio
-            </span>
-          </div>
-
-          {setSidebarOculto && (
+        {/* Cabecera Sidebar Desktop con botón de colapso */}
+        {setSidebarOculto && (
+          <div className="flex items-center justify-end pb-2 border-b border-[#dadce0]/80 flex-shrink-0">
             <button
               onClick={() => setSidebarOculto(true)}
               className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
@@ -257,8 +203,8 @@ export default function Sidebar({
             >
               <PanelLeftClose className="h-4 w-4" />
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Lista de Navegación */}
         {renderNavList()}
