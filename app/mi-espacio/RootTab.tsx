@@ -1534,10 +1534,10 @@ export default function RootTab({
 
   // Renderizador del Sidebar / Drawer de Navegación Lateral (Google AI Studio Theme)
   const renderSidebarContent = () => (
-    <div className="flex flex-col h-full justify-between text-[14px] leading-[21px] font-medium select-none bg-[#191919] p-4 overflow-hidden">
-      {/* BRANDING CABECERA SIDEBAR */}
-      <div className="flex items-center justify-between pb-2 flex-shrink-0">
-        <span className="font-bold text-[16px] tracking-tight text-white font-sans">
+    <div className="flex flex-col h-full justify-between text-[14px] leading-[21px] font-medium select-none bg-[#191919] overflow-hidden">
+      {/* BRANDING CABECERA SIDEBAR (Alineado con Panel de Control y con línea divisoria) */}
+      <div className="h-[64px] min-h-[64px] flex items-center justify-between px-4 border-b border-[#262626] flex-shrink-0">
+        <span className="px-2 font-bold text-[16px] tracking-tight text-white font-sans">
           OBJETIA Studio
         </span>
 
@@ -1553,7 +1553,7 @@ export default function RootTab({
       </div>
 
       {/* ÁREA DE ÍTEMS DE NAVEGACIÓN DESPLAZABLE */}
-      <div className="flex-1 overflow-y-auto space-y-6 custom-scrollbar pr-1 pt-10 pb-2">
+      <div className="flex-1 overflow-y-auto space-y-6 custom-scrollbar p-4 pt-4 pb-2">
 
         {/* NAVEGACIÓN - GRUPO 1: SECCIÓN ADMINISTRADOR */}
         {(tienePermisoTab('dashboard') || tienePermisoTab('moderation')) && (
@@ -1765,7 +1765,7 @@ export default function RootTab({
       </div>
 
       {/* FOOTER SIDEBAR - BARRA DE ÍCONOS Y PILL DE USUARIO ROOT */}
-      <div className="pt-3 border-t border-[#262626] space-y-3">
+      <div className="p-4 pt-3 border-t border-[#262626] space-y-3">
         <div className="flex items-center justify-around text-[#8c8c8c]">
           <button title="Notificaciones" className="p-1.5 hover:text-white rounded-lg hover:bg-[#2a2a2a] transition">
             <Bell className="h-4 w-4 text-current" />
