@@ -1537,12 +1537,9 @@ export default function RootTab({
     <div className="flex flex-col h-full justify-between text-[14px] leading-[21px] font-medium select-none bg-[#191919] p-4 overflow-hidden">
       {/* BRANDING CABECERA SIDEBAR */}
       <div className="flex items-center justify-between pb-2 flex-shrink-0">
-        <div className="flex items-center gap-2 cursor-pointer group">
-          <span className="font-semibold text-[15px] tracking-tight text-white group-hover:text-blue-400 transition">
-            Objetia
-          </span>
-          <ChevronDown className="h-4 w-4 text-[#8c8c8c]" />
-        </div>
+        <span className="font-bold text-[16px] tracking-tight text-white font-sans">
+          OBJETIA Studio
+        </span>
 
         <div className="flex items-center gap-1">
           {/* Botón cerrar en móvil */}
@@ -1556,7 +1553,7 @@ export default function RootTab({
       </div>
 
       {/* ÁREA DE ÍTEMS DE NAVEGACIÓN DESPLAZABLE */}
-      <div className="flex-1 overflow-y-auto space-y-6 custom-scrollbar pr-1 my-2">
+      <div className="flex-1 overflow-y-auto space-y-6 custom-scrollbar pr-1 pt-10 pb-2">
 
         {/* NAVEGACIÓN - GRUPO 1: SECCIÓN ADMINISTRADOR */}
         {(tienePermisoTab('dashboard') || tienePermisoTab('moderation')) && (
