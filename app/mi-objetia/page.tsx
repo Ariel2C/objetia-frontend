@@ -1,4 +1,4 @@
-// app/mi-espacio/page.tsx
+// app/mi-objetia/page.tsx
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -40,7 +40,7 @@ const TABS_VALIDOS = new Set([
   "dashboard", "appearance", "campanas", "secciones", "banners", "moderation", "root"
 ]);
 
-export default function MiEspacioPage() {
+export default function MiObjetiaPage() {
   return (
     <React.Suspense
       fallback={
@@ -49,12 +49,12 @@ export default function MiEspacioPage() {
         </div>
       }
     >
-      <MiEspacioContent />
+      <MiObjetiaContent />
     </React.Suspense>
   );
 }
 
-function MiEspacioContent() {
+function MiObjetiaContent() {
   const { usuario, token, logout, cargando, tienePermiso } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -818,7 +818,7 @@ function MiEspacioContent() {
               <div 
                 onClick={() => {
                   setTabActual("billetera");
-                  router.push('/mi-espacio?tab=billetera');
+                  router.push('/mi-objetia?tab=billetera');
                 }}
                 className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#e8f0fe] border border-[#d2e3fc] text-xs font-semibold text-[#1a73e8] hover:bg-[#d2e3fc]/60 transition cursor-pointer"
                 title="Ver detalles de mi billetera"
@@ -896,8 +896,8 @@ function MiEspacioContent() {
             <RootTab 
               initialTab={tabActual}
               onVolverAMiEspacio={() => {
-                setTabActual("menu");
-                router.push('/mi-espacio?tab=menu');
+                setTabActual("billetera");
+                router.push('/mi-objetia?tab=billetera');
               }} 
               msgAsignar={msgAsignar}
               emailAsignar={emailAsignar}

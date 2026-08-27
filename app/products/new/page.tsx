@@ -90,7 +90,7 @@ export default function NewProductPage() {
         router.push("/auth");
       } else if (!tienePermiso('sell_products') && !tienePermiso('full_access') && usuario.role?.toLowerCase() !== 'root') {
         toast.error("No tienes permiso para publicar o vender productos.");
-        router.push("/mi-espacio");
+        router.push("/mi-objetia");
       }
     }
   }, [usuario, cargando, router, tienePermiso, toast]);
@@ -445,7 +445,7 @@ export default function NewProductPage() {
       }
 
       toast.success("Tu publicación fue recibida y está activa en el catálogo.", "¡Producto publicado!");
-      router.push("/mi-espacio?tab=publications");
+      router.push("/mi-objetia?tab=publications");
       router.refresh();
 
     } catch (err: any) {
@@ -459,7 +459,7 @@ export default function NewProductPage() {
     <div className="max-w-3xl mx-auto px-4 py-6 select-none animate-fade-in">
       {/* Botón Volver */}
       <div className="mb-4">
-        <Link href="/mi-espacio" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 transition">
+        <Link href="/mi-objetia" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800 transition">
           <ChevronLeft className="h-4 w-4" /> Cancelar y salir
         </Link>
       </div>

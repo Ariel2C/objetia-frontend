@@ -1,4 +1,4 @@
-// app/mi-espacio/ModerationTab.tsx
+// app/mi-objetia/ModerationTab.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";

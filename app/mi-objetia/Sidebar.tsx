@@ -95,7 +95,7 @@ export default function Sidebar({
     }
     setTabActual(item.id);
     if (setMenuMovilAbierto) setMenuMovilAbierto(false);
-    window.history.pushState(null, '', `/mi-espacio?tab=${item.id}`);
+    window.history.pushState(null, '', `/mi-objetia?tab=${item.id}`);
   };
 
   // Obtener usuario del contexto o de localStorage como fallback inmediato
@@ -141,7 +141,7 @@ export default function Sidebar({
   const abrirAdminStudio = () => {
     if (setMenuMovilAbierto) setMenuMovilAbierto(false);
     setTabActual('dashboard');
-    window.history.pushState(null, '', '/mi-espacio?tab=dashboard');
+    window.history.pushState(null, '', '/mi-objetia?tab=dashboard');
   };
 
   const esEsRoot = Boolean(

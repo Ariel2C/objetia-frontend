@@ -21,7 +21,7 @@ export default function Footer() {
   const searchParams = useSearchParams();
   const tab = searchParams.get('tab');
 
-  const isRootTab = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && tab === 'root');
+  const isRootTab = pathname === '/root/dashboard' || ((pathname === '/mi-objetia' || pathname === '/mi-espacio') && tab === 'root');
 
   if (isRootTab) return null;
   return (
@@ -125,13 +125,13 @@ export default function Footer() {
 
           {/* COLUMNA 4: MI CUENTA */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Mi Espacio</h4>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Mi Objetia</h4>
             <ul className="space-y-2 text-xs">
-              <li><Link href="/mi-espacio" className="text-gray-400 hover:text-white transition">Panel General</Link></li>
-              <li><Link href="/mi-espacio?tab=publications" className="text-gray-400 hover:text-white transition flex items-center gap-1.5"><Package className="h-3 w-3 text-purple-400" /> Mis Publicaciones</Link></li>
-              <li><Link href="/mi-espacio?tab=purchases" className="text-gray-400 hover:text-white transition flex items-center gap-1.5"><ShoppingBag className="h-3 w-3 text-emerald-400" /> Mis Compras</Link></li>
+              <li><Link href="/mi-objetia" className="text-gray-400 hover:text-white transition">Panel General</Link></li>
+              <li><Link href="/mi-objetia?tab=publications" className="text-gray-400 hover:text-white transition flex items-center gap-1.5"><Package className="h-3 w-3 text-purple-400" /> Mis Publicaciones</Link></li>
+              <li><Link href="/mi-objetia?tab=purchases" className="text-gray-400 hover:text-white transition flex items-center gap-1.5"><ShoppingBag className="h-3 w-3 text-emerald-400" /> Mis Compras</Link></li>
               <li><Link href="/chat" className="text-gray-400 hover:text-white transition flex items-center gap-1.5"><MessageSquare className="h-3 w-3 text-blue-400" /> Mis Mensajes</Link></li>
-              <li><Link href="/mi-espacio?tab=billetera" className="text-gray-400 hover:text-white transition">Mi Billetera</Link></li>
+              <li><Link href="/mi-objetia?tab=billetera" className="text-gray-400 hover:text-white transition">Mi Billetera</Link></li>
             </ul>
           </div>
 

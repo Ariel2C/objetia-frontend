@@ -1256,7 +1256,7 @@ export default function RootTab({
     const CATEGORIAS_ORDEN = [
       { key: "admin_section", label: "Sección Administrador", icon: Shield },
       { key: "cms", label: "Gestión de Contenido", icon: Layout },
-      { key: "mi_espacio", label: "Mi Espacio", icon: UserCheck },
+      { key: "mi_espacio", label: "Mi Objetia", icon: UserCheck },
       { key: "system", label: "Programador", icon: Terminal }
     ];
 
@@ -1526,7 +1526,7 @@ export default function RootTab({
           onClick={onVolverAMiEspacio}
           className="mt-4 px-4 py-2 bg-[#252525] border border-[#333333] text-white rounded-xl text-xs font-semibold hover:bg-[#333333] transition cursor-pointer"
         >
-          Volver a Mi Espacio
+          Volver a Mi Objetia
         </button>
       </div>
     );
@@ -1934,7 +1934,7 @@ export default function RootTab({
                 className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#87a9ff]/40 text-[#87a9ff] hover:text-white hover:bg-[#87a9ff]/20 rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium transition flex items-center gap-1 cursor-pointer whitespace-nowrap shadow-xs"
               >
                 <ChevronLeft className="h-3.5 w-3.5 flex-shrink-0" />
-                <span className="whitespace-nowrap">Volver a Mi Espacio</span>
+                <span className="whitespace-nowrap">Volver a Mi Objetia</span>
               </button>
             )}
 

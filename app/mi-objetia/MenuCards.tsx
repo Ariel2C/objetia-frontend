@@ -133,7 +133,7 @@ export default function MenuCards({ tabActual, setTabActual, esAdmin, esRoot, on
     if (onSelectCard) {
       onSelectCard(item.id);
     }
-    router.push(`/mi-espacio?tab=${item.id}`);
+    router.push(`/mi-objetia?tab=${item.id}`);
   };
 
   return (

@@ -61,7 +61,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     )
   );
 
-  const isRootTab = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && tab && ADMIN_TABS.has(tab) && esUsuarioAdmin);
+  const isRootTab = pathname === '/root/dashboard' || ((pathname === '/mi-objetia' || pathname === '/mi-espacio') && tab && ADMIN_TABS.has(tab) && esUsuarioAdmin);
 
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [notifAbierto, setNotifAbierto] = useState(false);
@@ -181,7 +181,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               texto: `⚠️ Atención Administrador: Hay ${pendientesORechazados.length} producto(s) en revisión o rechazado(s) por la IA.`,
               leida: false,
               fecha: "Reciente",
-              link: "/mi-espacio?tab=moderation"
+              link: "/mi-objetia?tab=moderation"
             }
           ]);
         }
@@ -495,7 +495,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                       <ChevronDown className={`h-3.5 w-3.5 transition-transform ${esNavOscuro ? "text-gray-300" : "text-gray-600"} ${menuAbierto ? 'rotate-180' : ''}`} />
                     </button>
 
-                    {/* MENÚ DESPLEGABLE DE MI ESPACIO Y CONFIGURACIÓN */}
+                    {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN */}
                     {menuAbierto && (
                       <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in origin-top-right">
                         <div className="px-3 py-2 border-b border-gray-50">
@@ -514,11 +514,11 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         </div>
 
                         <Link 
-                          href="/mi-espacio" 
+                          href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
                           className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
                         >
-                          <User className="h-4 w-4 text-purple-600" /> Mi Espacio
+                          <User className="h-4 w-4 text-purple-600" /> Mi Objetia
                         </Link>
 
                         <button 
@@ -562,8 +562,8 @@ export default function Navbar({ logoUrl }: NavbarProps) {
         </div>
       </div>
 
-      {/* SUB-BARRA DE MENÚ DE NAVEGACIÓN (Nuevos ingresos / Descubrir / Decoración / Iluminación / Alfombras / Exterior) - Se oculta en Mi Espacio y Consolas Root */}
-      {!pathname?.startsWith('/mi-espacio') && !pathname?.startsWith('/root') && (
+      {/* SUB-BARRA DE MENÚ DE NAVEGACIÓN (Nuevos ingresos / Descubrir / Decoración / Iluminación / Alfombras / Exterior) - Se oculta en Mi Objetia y Consolas Root */}
+      {!pathname?.startsWith('/mi-objetia') && !pathname?.startsWith('/mi-espacio') && !pathname?.startsWith('/root') && (
         <div className="border-t border-gray-100/60 bg-white/95 backdrop-blur-xs hidden md:block">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center space-x-8 py-2.5 text-xs font-extrabold tracking-wide text-gray-700">

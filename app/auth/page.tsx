@@ -758,7 +758,7 @@ function LoginContent() {
                   <p className="font-bold text-gray-900">1. Protección de Datos Personales</p>
                   <p>En Objetia garantizamos la privacidad de tus datos de acuerdo con las normativas vigentes. La información recopilada se utiliza exclusivamente para validar transacciones, gestionar envíos y ofrecerte una experiencia personalizada.</p>
                   <p className="font-bold text-gray-900">2. Comunicaciones y Preferencias</p>
-                  <p>Podés gestionar tus preferencias de correo electrónico y novedades en cualquier momento desde tu panel de usuario en Mi Espacio.</p>
+                  <p>Podés gestionar tus preferencias de correo electrónico y novedades en cualquier momento desde tu panel de usuario en Mi Objetia.</p>
                 </>
               )}
             </div>

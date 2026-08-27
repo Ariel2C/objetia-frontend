@@ -8,7 +8,7 @@ export default function AnnouncementBar() {
   const searchParams = useSearchParams();
   const tab = searchParams.get('tab');
 
-  const isRootTab = pathname === '/root/dashboard' || (pathname === '/mi-espacio' && tab === 'root');
+  const isRootTab = pathname === '/root/dashboard' || ((pathname === '/mi-objetia' || pathname === '/mi-espacio') && tab === 'root');
   const [visible, setVisible] = useState(false);
   const [mensajeState, setMensajeState] = useState("");
   const [finISOState, setFinISOState] = useState<string | null>(null);
