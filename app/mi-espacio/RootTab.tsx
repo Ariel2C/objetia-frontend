@@ -1545,19 +1545,10 @@ export default function RootTab({
         </div>
 
         <div className="flex items-center gap-1">
-          {/* Botón Ocultar en Escritorio */}
-          <button 
-            onClick={() => setSidebarOculto(true)} 
-            className="hidden lg:flex p-2 text-[#8c8c8c] hover:text-white hover:bg-[#252525] rounded-[10px] transition cursor-pointer"
-            title="Ocultar menú lateral"
-          >
-            <PanelLeftClose className="h-5 w-5" />
-          </button>
-
           {/* Botón cerrar en móvil */}
           <button 
             onClick={() => setMenuMovilAbierto(false)} 
-            className="lg:hidden text-[#8c8c8c] hover:text-white p-1 rounded-lg"
+            className="lg:hidden text-[#8c8c8c] hover:text-white p-1 rounded-lg cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -1817,14 +1808,11 @@ export default function RootTab({
       className="h-full w-full bg-[#191919] text-[#d4d4d4] flex flex-col lg:flex-row border-none relative overflow-hidden"
     >
       
-      {/* 1. SIDEBAR ESCRITORIO (Google AI Studio Theme) */}
+      {/* 1. SIDEBAR ESCRITORIO (Google AI Studio Theme con deslizamiento fluido) */}
       <aside 
-        style={{
-          width: sidebarOculto ? '0px' : '256px',
-          opacity: sidebarOculto ? 0 : 1,
-          transition: 'width 300ms cubic-bezier(0.4, 0, 0.2, 1), opacity 300ms cubic-bezier(0.4, 0, 0.2, 1)'
-        }}
-        className="hidden lg:block bg-[#191919] border-r border-[#262626] flex-shrink-0 h-full overflow-hidden"
+        className={`hidden lg:flex flex-col bg-[#191919] border-r border-[#262626] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-64 h-full ${
+          sidebarOculto ? '-ml-64 pointer-events-none' : 'ml-0'
+        }`}
       >
         <div className="w-64 h-full flex flex-col">
           {renderSidebarContent()}
@@ -1861,13 +1849,59 @@ export default function RootTab({
               <Menu className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
             </button>
 
-            {/* BOTÓN MOSTRAR SIDEBAR EN ESCRITORIO CUANDO ESTÁ OCULTO */}
+            {/* BOTÓN INTERACTIVO ANIMADO MENÚ <-> COLAPSO EN ESCRITORIO */}
             <button
-              onClick={() => setSidebarOculto(false)}
-              className={`hidden ${sidebarOculto ? 'lg:flex' : 'lg:hidden'} p-2 rounded-[12px] bg-[#252525] text-[#d4d4d4] hover:text-white hover:bg-[#323232] transition cursor-pointer flex-shrink-0`}
-              title="Mostrar menú lateral"
+              onClick={() => setSidebarOculto(!sidebarOculto)}
+              className="hidden lg:flex items-center justify-center w-10 h-10 rounded-[12px] bg-[#252525] text-[#d4d4d4] hover:text-white hover:bg-[#323232] active:bg-[#383838] active:scale-95 transition-all cursor-pointer flex-shrink-0 group"
+              title={sidebarOculto ? "Mostrar menú lateral" : "Ocultar menú lateral"}
+              aria-label={sidebarOculto ? "Mostrar menú lateral" : "Ocultar menú lateral"}
             >
-              <PanelLeftOpen className="h-5 w-5 text-current" />
+              <svg
+                viewBox="0 0 24 24"
+                className="w-5 h-5 transition-transform duration-300 group-hover:scale-105"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                {/* Línea Superior */}
+                <line
+                  x1="3"
+                  y1="6"
+                  x2={sidebarOculto ? "21" : "12"}
+                  y2="6"
+                  className="transition-all duration-300 ease-in-out"
+                />
+
+                {/* Línea Central */}
+                <line
+                  x1="3"
+                  y1="12"
+                  x2={sidebarOculto ? "21" : "9"}
+                  y2="12"
+                  className="transition-all duration-300 ease-in-out"
+                />
+
+                {/* Línea Inferior */}
+                <line
+                  x1="3"
+                  y1="18"
+                  x2={sidebarOculto ? "21" : "12"}
+                  y2="18"
+                  className="transition-all duration-300 ease-in-out"
+                />
+
+                {/* Chevron < a la derecha (aparece cuando el sidebar está abierto para indicar colapso) */}
+                <path
+                  d="M 19 7 L 14 12 L 19 17"
+                  className={`transition-all duration-300 ease-in-out ${
+                    sidebarOculto
+                      ? 'opacity-0 translate-x-2 pointer-events-none'
+                      : 'opacity-100 translate-x-0 text-[#87a9ff]'
+                  }`}
+                />
+              </svg>
             </button>
 
             <h1 className="text-[15px] sm:text-[20px] font-semibold text-[#d4d4d4] tracking-tight truncate">
