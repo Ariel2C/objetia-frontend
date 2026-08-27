@@ -157,9 +157,26 @@ export default function Sidebar({
     : 'bg-[#e8f0fe] text-[#1a73e8] border-[#d2e3fc] font-bold';
 
   const renderNavContent = () => (
-    <div className="flex flex-col h-full justify-between">
+    <div className="flex flex-col h-full justify-between overflow-hidden">
+      {/* Cabecera con título Mi OBJETIA y línea divisoria inferior alineada con la topbar */}
+      <div className="h-[60px] min-h-[60px] flex items-center justify-between px-4 border-b border-[#dadce0] flex-shrink-0">
+        <span className="px-2 font-bold text-[16px] tracking-tight text-[#202124] font-sans">
+          Mi OBJETIA
+        </span>
+
+        <div className="flex items-center gap-1">
+          {/* Botón cerrar en móvil */}
+          <button 
+            onClick={() => setMenuMovilAbierto && setMenuMovilAbierto(false)} 
+            className="lg:hidden text-[#5f6368] hover:text-[#202124] p-1 rounded-lg cursor-pointer"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
+
       {/* Navegación Principal */}
-      <div className="space-y-1.5 pt-8 select-none">
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 pt-3 space-y-1.5 select-none">
         {itemsVisibles.map((item) => {
           const Icono = item.icon;
           const activo = tabActual === item.id && !item.isExternalLink;
@@ -230,28 +247,15 @@ export default function Sidebar({
             className="fixed inset-0 bg-black/30 backdrop-blur-xs transition-opacity" 
             onClick={() => setMenuMovilAbierto && setMenuMovilAbierto(false)} 
           />
-          <div className="fixed inset-y-0 left-0 w-[280px] bg-white border-r border-[#dadce0] shadow-2xl flex flex-col p-4 z-10 animate-slide-right">
-            {/* Cabecera Móvil */}
-            <div className="flex items-center justify-end pb-2 border-b border-[#dadce0]/80">
-              <button 
-                onClick={() => setMenuMovilAbierto && setMenuMovilAbierto(false)}
-                className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            {/* Menú Scroll */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar pr-1">
-              {renderNavContent()}
-            </div>
+          <div className="fixed inset-y-0 left-0 w-[280px] bg-white border-r border-[#dadce0] shadow-2xl flex flex-col z-10 animate-slide-right overflow-hidden">
+            {renderNavContent()}
           </div>
         </div>
       )}
 
       {/* SIDEBAR ESCRITORIO (Deslizamiento físico a la izquierda sin deformación) */}
       <aside 
-        className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-64 p-4 min-h-[calc(100vh-58px)] overflow-y-auto custom-scrollbar ${
+        className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-64 min-h-[calc(100vh-58px)] overflow-hidden ${
           sidebarOculto ? '-ml-64 pointer-events-none' : 'ml-0'
         }`}
       >

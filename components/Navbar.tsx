@@ -518,7 +518,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                           onClick={() => setMenuAbierto(false)}
                           className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
                         >
-                          <User className="h-4 w-4 text-purple-600" /> Mi Objetia
+                          <User className="h-4 w-4 text-purple-600" /> Mi OBJETIA
                         </Link>
 
                         <button 

@@ -735,7 +735,7 @@ function MiObjetiaContent() {
         {/* Área Principal de Contenido */}
         <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
           {/* Top Bar Google AI Studio Light */}
-          <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xs border-b border-[#dadce0] px-4 sm:px-6 py-2.5 min-h-[58px] flex items-center justify-between flex-shrink-0 gap-3">
+          <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xs border-b border-[#dadce0] px-4 sm:px-6 h-[60px] min-h-[60px] flex items-center justify-between flex-shrink-0 gap-3">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               {/* Botón menú móvil */}
               <button
