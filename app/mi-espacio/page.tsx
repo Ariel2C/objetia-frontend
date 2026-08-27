@@ -748,16 +748,19 @@ function MiEspacioContent() {
                 <MenuIcon className="h-5 w-5" />
               </button>
 
-              {/* Botón expandir sidebar escritorio */}
-              {sidebarOculto && (
-                <button
-                  onClick={() => setSidebarOculto(false)}
-                  className="hidden lg:flex p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer flex-shrink-0"
-                  title="Expandir barra lateral"
-                >
+              {/* Botón colapsar / expandir sidebar escritorio antes del título */}
+              <button
+                onClick={() => setSidebarOculto(!sidebarOculto)}
+                className="hidden lg:flex p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer flex-shrink-0"
+                title={sidebarOculto ? "Mostrar barra lateral" : "Ocultar barra lateral"}
+                aria-label={sidebarOculto ? "Mostrar barra lateral" : "Ocultar barra lateral"}
+              >
+                {sidebarOculto ? (
                   <PanelLeftOpen className="h-4 w-4" />
-                </button>
-              )}
+                ) : (
+                  <PanelLeftClose className="h-4 w-4" />
+                )}
+              </button>
 
               {/* Título y Descripción de la Pestaña en Top Bar (Sin Icono) */}
               <div className="flex flex-col min-w-0">

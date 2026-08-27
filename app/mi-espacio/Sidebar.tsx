@@ -190,22 +190,9 @@ export default function Sidebar({
       {/* SIDEBAR ESCRITORIO (Google AI Studio Light Rail) */}
       <aside 
         className={`hidden lg:flex flex-col justify-between bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 ${
-          sidebarOculto ? 'w-0 opacity-0 overflow-hidden p-0 border-none' : 'w-64 p-4 min-h-[calc(100vh-64px)]'
+          sidebarOculto ? 'w-0 opacity-0 overflow-hidden p-0 border-none pointer-events-none' : 'w-64 p-4 min-h-[calc(100vh-64px)]'
         }`}
       >
-        {/* Cabecera Sidebar Desktop con botón de colapso */}
-        {setSidebarOculto && (
-          <div className="flex items-center justify-end pb-2 border-b border-[#dadce0]/80 flex-shrink-0">
-            <button
-              onClick={() => setSidebarOculto(true)}
-              className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
-              title="Ocultar barra lateral"
-            >
-              <PanelLeftClose className="h-4 w-4" />
-            </button>
-          </div>
-        )}
-
         {/* Lista de Navegación */}
         {renderNavList()}
 
