@@ -693,14 +693,7 @@ function MiObjetiaContent() {
   const esRoot = Boolean(
     usuario && (
       usuario.role?.toLowerCase() === "root" ||
-      tienePermiso('full_access') ||
-      tienePermiso('system') ||
-      tienePermiso('users') ||
-      tienePermiso('roles') ||
-      tienePermiso('permissions') ||
-      tienePermiso('sections') ||
-      tienePermiso('sessions') ||
-      tienePermiso('logs')
+      usuario.email?.toLowerCase() === "root@objetia.com"
     )
   );
 

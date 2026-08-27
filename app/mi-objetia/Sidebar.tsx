@@ -145,10 +145,9 @@ export default function Sidebar({
   };
 
   const esEsRoot = Boolean(
-    esRoot ||
     roleClean === 'root' ||
-    roleClean.includes('root') ||
-    emailClean === 'root@objetia.com'
+    emailClean === 'root@objetia.com' ||
+    (usuario && (usuario.role?.toLowerCase() === 'root' || usuario.email?.toLowerCase() === 'root@objetia.com'))
   );
 
   const badgeText = esEsRoot ? 'Root' : 'Admin';
