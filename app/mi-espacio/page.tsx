@@ -759,14 +759,11 @@ function MiEspacioContent() {
                 </button>
               )}
 
-              {/* Título y Descripción de la Pestaña en Top Bar */}
+              {/* Título y Descripción de la Pestaña en Top Bar (Sin Icono) */}
               <div className="flex flex-col min-w-0">
-                <div className="flex items-center gap-2">
-                  <TabIcon className="h-4 w-4 text-[#1a73e8] flex-shrink-0" />
-                  <span className="text-sm sm:text-[15px] font-bold text-[#202124] leading-tight truncate">
-                    {currentTabMeta.label}
-                  </span>
-                </div>
+                <span className="text-sm sm:text-base font-bold text-[#202124] leading-tight truncate">
+                  {currentTabMeta.label}
+                </span>
                 <span className="hidden md:inline text-[11px] text-[#5f6368] truncate leading-tight mt-0.5">
                   {currentTabMeta.description}
                 </span>
@@ -800,8 +797,8 @@ function MiEspacioContent() {
             </div>
           </header>
 
-          {/* Cuerpo de Contenido */}
-          <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+          {/* Cuerpo de Contenido (Ocupa todo el ancho de la página) */}
+          <main className="flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-6">
             {/* TAB: BILLETERA */}
             {tabActual === "billetera" && (esRoot || tienePermiso('full_access') || tienePermiso('billetera')) && (
               <div className="animate-fade-in">
