@@ -737,12 +737,12 @@ function MiEspacioContent() {
         {/* Área Principal de Contenido */}
         <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
           {/* Top Bar Google AI Studio Light */}
-          <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xs border-b border-[#dadce0] px-4 sm:px-6 h-14 flex items-center justify-between flex-shrink-0">
+          <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xs border-b border-[#dadce0] px-4 sm:px-6 py-2.5 min-h-[58px] flex items-center justify-between flex-shrink-0 gap-3">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               {/* Botón menú móvil */}
               <button
                 onClick={() => setMenuMovilAbierto(true)}
-                className="lg:hidden p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
+                className="lg:hidden p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer flex-shrink-0"
                 title="Abrir menú"
               >
                 <MenuIcon className="h-5 w-5" />
@@ -752,29 +752,36 @@ function MiEspacioContent() {
               {sidebarOculto && (
                 <button
                   onClick={() => setSidebarOculto(false)}
-                  className="hidden lg:flex p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
+                  className="hidden lg:flex p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer flex-shrink-0"
                   title="Expandir barra lateral"
                 >
                   <PanelLeftOpen className="h-4 w-4" />
                 </button>
               )}
 
-              {/* Breadcrumb Google AI Studio */}
-              <nav className="flex items-center gap-2 text-xs font-semibold text-[#202124] truncate">
-                <TabIcon className="h-4 w-4 text-[#1a73e8]" />
-                <span>{currentTabMeta.label}</span>
-              </nav>
+              {/* Título y Descripción de la Pestaña en Top Bar */}
+              <div className="flex flex-col min-w-0">
+                <div className="flex items-center gap-2">
+                  <TabIcon className="h-4 w-4 text-[#1a73e8] flex-shrink-0" />
+                  <span className="text-sm sm:text-[15px] font-bold text-[#202124] leading-tight truncate">
+                    {currentTabMeta.label}
+                  </span>
+                </div>
+                <span className="hidden md:inline text-[11px] text-[#5f6368] truncate leading-tight mt-0.5">
+                  {currentTabMeta.description}
+                </span>
+              </div>
             </div>
 
             {/* Acciones Top Bar */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               {/* Pill Saldo Rápido */}
               <div 
                 onClick={() => {
                   setTabActual("billetera");
                   router.push('/mi-espacio?tab=billetera');
                 }}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#e8f0fe] border border-[#d2e3fc] text-xs font-semibold text-[#1a73e8] hover:bg-[#d2e3fc]/60 transition cursor-pointer"
+                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#e8f0fe] border border-[#d2e3fc] text-xs font-semibold text-[#1a73e8] hover:bg-[#d2e3fc]/60 transition cursor-pointer"
                 title="Ver detalles de mi billetera"
               >
                 <DollarSign className="h-3.5 w-3.5 text-[#1a73e8]" />
@@ -784,7 +791,7 @@ function MiEspacioContent() {
               {/* Botón Publicar Producto */}
               <button
                 onClick={() => router.push('/products/new')}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white text-xs font-semibold shadow-2xs transition cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white text-xs font-semibold shadow-2xs transition cursor-pointer"
               >
                 <PlusCircle className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">Publicar Producto</span>
@@ -795,16 +802,6 @@ function MiEspacioContent() {
 
           {/* Cuerpo de Contenido */}
           <main className="flex-1 max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
-            {/* Encabezado limpio de la pestaña activa sin botón volver */}
-            <div className="pb-4 border-b border-[#dadce0]/80">
-              <h1 className="text-xl font-bold text-[#202124] tracking-tight flex items-center gap-2">
-                {currentTabMeta.label}
-              </h1>
-              <p className="text-xs text-[#5f6368] mt-0.5">
-                {currentTabMeta.description}
-              </p>
-            </div>
-
             {/* TAB: BILLETERA */}
             {tabActual === "billetera" && (esRoot || tienePermiso('full_access') || tienePermiso('billetera')) && (
               <div className="animate-fade-in">
