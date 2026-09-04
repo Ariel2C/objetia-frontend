@@ -67,13 +67,12 @@ export default function Sidebar({
     if (id === 'appearance') return tienePermiso('appearance') || tienePermiso('cms') || esAdmin;
     if (id === 'campanas') return tienePermiso('campanas') || tienePermiso('cms') || esAdmin;
     if (id === 'secciones') return tienePermiso('secciones') || tienePermiso('cms') || esAdmin;
-    if (id === 'banners') return tienePermiso('banners') || tienePermiso('cms') || esAdmin;
-    if (id === 'billetera') return tienePermiso('billetera');
-    if (id === 'publications') return tienePermiso('publications');
-    if (id === 'purchases') return tienePermiso('purchases');
-    if (id === 'sales') return tienePermiso('sales');
-    if (id === 'vender') return tienePermiso('publications') || tienePermiso('sales');
-    if (id === 'perfil') return tienePermiso('perfil') || true;
+    if (id === 'billetera') return true;
+    if (id === 'publications') return true;
+    if (id === 'purchases') return true;
+    if (id === 'sales') return true;
+    if (id === 'vender') return true;
+    if (id === 'perfil') return true;
     return tienePermiso(id);
   };
 

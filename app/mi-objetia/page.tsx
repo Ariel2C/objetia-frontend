@@ -172,11 +172,10 @@ function MiObjetiaContent() {
     }
   }, [tabActual, usuario, token]);
 
-  // Cargar saldo de billetera (usuarios no administradores arrancan en su billetera)
+  // Cargar saldo de billetera y fijar tab inicial por defecto
   const tabInicializado = React.useRef(false);
   useEffect(() => {
-    const esAdminCheck = usuario && (usuario.role?.toLowerCase() === "admin" || usuario.email?.toLowerCase() === "admin@vamaar.com");
-    if (usuario && !esAdminCheck) {
+    if (usuario) {
       // Solo fijar el tab por defecto la primera vez: si el usuario ya navegó
       // a otra pestaña, no pisarla cuando la ventana recupera el foco
       if (!tabInicializado.current) {
@@ -185,7 +184,7 @@ function MiObjetiaContent() {
         if (tabDesdeUrl && TABS_VALIDOS.has(tabDesdeUrl)) {
           setTabActual(tabDesdeUrl);
         } else {
-          setTabActual("menu");
+          setTabActual("billetera");
         }
       }
       const fetchBalance = async () => {
@@ -211,7 +210,7 @@ function MiObjetiaContent() {
       };
       fetchBalance();
     }
-  }, [usuario, token]);
+  }, [usuario, token, tabDesdeUrl]);
 
   // Cargar historial de logos (Admin)
   const cargarHistorialLogos = async () => {
@@ -835,7 +834,7 @@ function MiObjetiaContent() {
           {/* Cuerpo de Contenido (Ocupa todo el ancho de la página) */}
           <main className="flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-6">
             {/* TAB: BILLETERA */}
-            {tabActual === "billetera" && (esRoot || tienePermiso('full_access') || tienePermiso('billetera')) && (
+            {tabActual === "billetera" && (
               <div className="animate-fade-in">
                 <WalletTab 
                   cargandoBalance={cargandoBalance}
@@ -854,7 +853,7 @@ function MiObjetiaContent() {
             )}
 
             {/* TAB: MIS COMPRAS */}
-            {tabActual === "purchases" && (esRoot || tienePermiso('full_access') || tienePermiso('purchases')) && (
+            {tabActual === "purchases" && (
               <div className="animate-fade-in">
                 <PurchasesTab 
                   token={token}
@@ -863,7 +862,7 @@ function MiObjetiaContent() {
             )}
 
             {/* TAB: MIS VENTAS */}
-            {tabActual === "sales" && (esRoot || tienePermiso('full_access') || tienePermiso('sales')) && (
+            {tabActual === "sales" && (
               <div className="animate-fade-in">
                 <SalesTab 
                   token={token}
@@ -872,7 +871,7 @@ function MiObjetiaContent() {
             )}
 
             {/* TAB: MIS PUBLICACIONES */}
-            {tabActual === "publications" && (esRoot || tienePermiso('full_access') || tienePermiso('publications')) && (
+            {tabActual === "publications" && (
               <div className="animate-fade-in">
                 <PublicationsTab 
                   token={token}
