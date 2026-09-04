@@ -4,7 +4,11 @@ import { useAuth } from '../../components/AuthContext';
 import { getApiUrl } from '../../lib/config';
 import { ShieldCheck, MapPin, Loader2, Save, Pencil, X } from 'lucide-react';
 
-export default function ProfileTab() {
+interface ProfileTabProps {
+  onSavingChange?: (saving: boolean) => void;
+}
+
+export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
   const { usuario, token, login } = useAuth();
   
   const [fullName, setFullName] = useState("");
@@ -41,6 +45,7 @@ export default function ProfileTab() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    onSavingChange?.(true);
     setSuccessMsg("");
     setErrorMsg("");
 
@@ -72,6 +77,7 @@ export default function ProfileTab() {
       setErrorMsg(err.message || "Error al intentar actualizar tus datos.");
     } finally {
       setLoading(false);
+      onSavingChange?.(false);
     }
   };
 
@@ -89,7 +95,7 @@ export default function ProfileTab() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6 w-full">
+      <form id="perfil-form" onSubmit={handleSubmit} className="space-y-6 w-full">
         {/* Información Personal */}
         <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs w-full">
           <h4 className="text-sm font-semibold text-[#202124] border-b border-[#f1f3f4] pb-3">
@@ -233,23 +239,6 @@ export default function ProfileTab() {
             </div>
           )}
         </div>
-
-        {/* Botón de Guardado */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-6 py-2.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white font-semibold rounded-xl text-xs uppercase tracking-wider transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shadow-2xs active:scale-98 h-[42px]"
-        >
-          {loading ? (
-            <>
-              <Loader2 className="h-4 w-4 animate-spin" /> Guardando...
-            </>
-          ) : (
-            <>
-              <Save className="h-4 w-4" /> Guardar Cambios
-            </>
-          )}
-        </button>
       </form>
     </div>
   );

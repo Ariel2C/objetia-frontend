@@ -12,6 +12,7 @@ import {
   TrendingUp, 
   Package, 
   UserCheck, 
+  Save, 
   Sparkles, 
   ArrowRight, 
   ExternalLink 
@@ -83,6 +84,7 @@ function MiObjetiaContent() {
   // --- ESTADOS DE BILLETERA (CLIENT) ---
   const [balance, setBalance] = useState({ available: 0, frozen: 0 });
   const [cargandoBalance, setCargandoBalance] = useState(false);
+  const [guardandoPerfil, setGuardandoPerfil] = useState(false);
 
   // --- ESTADOS DE BRANDING/CMS (ADMIN) ---
   const [brandName, setBrandName] = useState("Vamaar");
@@ -802,6 +804,38 @@ function MiObjetiaContent() {
                 </span>
               </div>
             </div>
+
+            {/* Acciones Top Bar: Guardar Cambios en Mi Perfil (diseño Actualizar de OBJETIA Studio) */}
+            {tabActual === "perfil" && (
+              <button
+                type="submit"
+                form="perfil-form"
+                disabled={guardandoPerfil}
+                onClick={() => {
+                  const form = document.getElementById('perfil-form') as HTMLFormElement;
+                  if (form) {
+                    if (typeof form.requestSubmit === 'function') {
+                      form.requestSubmit();
+                    } else {
+                      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                    }
+                  }
+                }}
+                className="px-2.5 sm:px-3 h-[28px] sm:h-[32px] bg-[#252525] border border-[#333333] text-[#d4d4d4] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-medium hover:bg-[#323232] hover:text-white transition flex items-center gap-1.5 cursor-pointer whitespace-nowrap shadow-xs disabled:opacity-50"
+              >
+                {guardandoPerfil ? (
+                  <>
+                    <Loader2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-spin flex-shrink-0" />
+                    <span className="whitespace-nowrap">Guardando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0 text-[#d4d4d4]" />
+                    <span className="whitespace-nowrap">Guardar Cambios</span>
+                  </>
+                )}
+              </button>
+            )}
           </header>
 
           {/* Cuerpo de Contenido (Ocupa todo el ancho de la página) */}
@@ -821,7 +855,7 @@ function MiObjetiaContent() {
             {/* TAB: PERFIL */}
             {tabActual === "perfil" && (
               <div className="animate-fade-in w-full">
-                <ProfileTab />
+                <ProfileTab onSavingChange={setGuardandoPerfil} />
               </div>
             )}
 
