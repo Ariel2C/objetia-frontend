@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Eye, Copy, Trash2, Plus, Check, Edit2, X, Loader2 } from 'lucide-react';
+import { Eye, Copy, Trash2, Check, Edit2, X, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { getApiUrl } from '../../lib/config';
 import { useToast } from '../../components/ToastContext';
@@ -259,14 +259,6 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             Vendidas ({vendidas.length})
           </button>
         </div>
-
-        <Link 
-          href="/products/new"
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
-        >
-          <Plus className="h-4 w-4" />
-          <span>Publicar Producto</span>
-        </Link>
       </div>
 
       {/* Tabla de Publicaciones Google AI Studio Light */}
