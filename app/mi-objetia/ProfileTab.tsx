@@ -4,6 +4,33 @@ import { useAuth } from '../../components/AuthContext';
 import { getApiUrl } from '../../lib/config';
 import { ShieldCheck, MapPin, Loader2, Save, Pencil, X } from 'lucide-react';
 
+const PROVINCIAS_ARGENTINA = [
+  "Buenos Aires",
+  "Ciudad Autónoma de Buenos Aires (CABA)",
+  "Catamarca",
+  "Chaco",
+  "Chubut",
+  "Córdoba",
+  "Corrientes",
+  "Entre Ríos",
+  "Formosa",
+  "Jujuy",
+  "La Pampa",
+  "La Rioja",
+  "Mendoza",
+  "Misiones",
+  "Neuquén",
+  "Río Negro",
+  "Salta",
+  "San Juan",
+  "San Luis",
+  "Santa Cruz",
+  "Santa Fe",
+  "Santiago del Estero",
+  "Tierra del Fuego",
+  "Tucumán"
+];
+
 interface ProfileTabProps {
   onSavingChange?: (saving: boolean) => void;
 }
@@ -108,9 +135,10 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
               <input
                 type="text"
                 required
+                placeholder="Ingresá tu nombre y apellido"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
+                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
               />
             </div>
             <div>
@@ -169,60 +197,63 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
                   <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Calle</label>
                   <input
                     type="text"
-                    placeholder="Av. Colón"
+                    placeholder="Ej: Av. San Martín"
                     value={street}
                     onChange={(e) => setStreet(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
+                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
                   />
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Número</label>
                   <input
                     type="text"
-                    placeholder="1234"
+                    placeholder="Ej: 1240"
                     value={number}
                     onChange={(e) => setNumber(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
+                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Piso / Depto</label>
+                  <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Piso / Depto <span className="text-[#80868b] font-normal">(Opcional)</span></label>
                   <input
                     type="text"
-                    placeholder="2° B"
+                    placeholder="Ej: 2° B"
                     value={floorDept}
                     onChange={(e) => setFloorDept(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
+                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
                   />
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Código Postal</label>
                   <input
                     type="text"
-                    placeholder="X5000"
+                    placeholder="Ej: 5000"
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition font-mono font-semibold"
+                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition font-mono font-semibold"
                   />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Provincia</label>
+                  <select
+                    value={province}
+                    onChange={(e) => setProvince(e.target.value)}
+                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition cursor-pointer"
+                  >
+                    <option value="">Seleccioná tu provincia...</option>
+                    {PROVINCIAS_ARGENTINA.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
                 </div>
                 <div>
                   <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Ciudad / Localidad</label>
                   <input
                     type="text"
-                    placeholder="Córdoba"
+                    placeholder="Ej: Córdoba Capital"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
-                  />
-                </div>
-                <div className="md:col-span-3">
-                  <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Provincia</label>
-                  <input
-                    type="text"
-                    placeholder="Córdoba"
-                    value={province}
-                    onChange={(e) => setProvince(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition"
+                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
                   />
                 </div>
               </div>
