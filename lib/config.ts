@@ -27,3 +27,8 @@ export const getMercadoPagoPublicKey = (): string => {
 export const getGoogleClientId = (): string => {
   return process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "1065116989777-17ck4sqpppqshagt9h7kg91uu91jd51u.apps.googleusercontent.com";
 };
+
+export const getGoogleMapsApiKey = (): string => {
+  return process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
+};
+
