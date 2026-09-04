@@ -169,3 +169,33 @@ textarea.text-white::placeholder,
   -webkit-text-fill-color: #6e6e73 !important;
   opacity: 1 !important;
 }
+
+/* Estilos de integración para el menú desplegable de Google Places Autocomplete */
+.pac-container {
+  z-index: 99999 !important;
+  border-radius: 14px !important;
+  margin-top: 6px !important;
+  border: 1px solid #dadce0 !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.08) !important;
+  font-family: inherit !important;
+  background-color: #ffffff !important;
+}
+.pac-item {
+  padding: 10px 14px !important;
+  font-size: 13px !important;
+  color: #202124 !important;
+  border-top: 1px solid #f1f3f4 !important;
+  cursor: pointer !important;
+}
+.pac-item:hover {
+  background-color: #f8f9fa !important;
+}
+.pac-item-query {
+  font-size: 13px !important;
+  color: #1a73e8 !important;
+  font-weight: 600 !important;
+}
+.pac-matched {
+  font-weight: 700 !important;
+}
+

@@ -1,8 +1,8 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../components/AuthContext';
-import { getApiUrl } from '../../lib/config';
-import { ShieldCheck, MapPin, Loader2, Save, Pencil, X } from 'lucide-react';
+import { getApiUrl, getGoogleMapsApiKey } from '../../lib/config';
+import { ShieldCheck, MapPin, Loader2, Save, Pencil, X, Sparkles } from 'lucide-react';
 
 const PROVINCIAS_ARGENTINA = [
   "Buenos Aires",
@@ -50,6 +50,118 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
   const [loading, setLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+
+  const streetInputRef = useRef<HTMLInputElement>(null);
+  const autocompleteRef = useRef<any>(null);
+  const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
+
+  // Cargar Google Places API si hay API key configurada
+  useEffect(() => {
+    const apiKey = getGoogleMapsApiKey();
+    if (!apiKey || typeof window === 'undefined') return;
+
+    if ((window as any).google?.maps?.places) {
+      setGoogleMapsLoaded(true);
+      return;
+    }
+
+    const scriptId = 'google-maps-places-script';
+    let script = document.getElementById(scriptId) as HTMLScriptElement | null;
+    if (!script) {
+      script = document.createElement('script');
+      script.id = scriptId;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=es&region=AR`;
+      script.async = true;
+      script.defer = true;
+      script.onload = () => setGoogleMapsLoaded(true);
+      document.head.appendChild(script);
+    } else {
+      script.addEventListener('load', () => setGoogleMapsLoaded(true));
+    }
+  }, []);
+
+  // Inicializar Autocomplete cuando se edite la dirección y la API esté lista
+  useEffect(() => {
+    if (!editandoDireccion || !googleMapsLoaded || !streetInputRef.current) return;
+
+    const google = (window as any).google;
+    if (!google?.maps?.places?.Autocomplete) return;
+
+    try {
+      const autocomplete = new google.maps.places.Autocomplete(streetInputRef.current, {
+        componentRestrictions: { country: 'ar' },
+        fields: ['address_components', 'name', 'formatted_address'],
+        types: ['address']
+      });
+
+      autocomplete.addListener('place_changed', () => {
+        const place = autocomplete.getPlace();
+        if (!place || !place.address_components) return;
+
+        let parsedStreet = '';
+        let parsedNumber = '';
+        let parsedCity = '';
+        let parsedProvince = '';
+        let parsedPostalCode = '';
+
+        for (const comp of place.address_components) {
+          const types: string[] = comp.types || [];
+          if (types.includes('route')) {
+            parsedStreet = comp.long_name;
+          } else if (types.includes('street_number')) {
+            parsedNumber = comp.long_name;
+          } else if (types.includes('locality')) {
+            parsedCity = comp.long_name;
+          } else if (types.includes('sublocality') || types.includes('sublocality_level_1')) {
+            if (!parsedCity) parsedCity = comp.long_name;
+          } else if (types.includes('administrative_area_level_2')) {
+            if (!parsedCity) parsedCity = comp.long_name;
+          } else if (types.includes('administrative_area_level_1')) {
+            parsedProvince = comp.long_name;
+          } else if (types.includes('postal_code')) {
+            parsedPostalCode = comp.long_name;
+          }
+        }
+
+        if (parsedStreet) setStreet(parsedStreet);
+        if (parsedNumber) setNumber(parsedNumber);
+        if (parsedCity) setCity(parsedCity);
+        if (parsedPostalCode) setPostalCode(parsedPostalCode);
+
+        if (parsedProvince) {
+          const normGoogle = parsedProvince.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          if (
+            normGoogle.includes('caba') ||
+            normGoogle.includes('ciudad autonoma') ||
+            normGoogle.includes('capital federal') ||
+            normGoogle.includes('buenos aires capital')
+          ) {
+            setProvince('Ciudad Autónoma de Buenos Aires (CABA)');
+          } else {
+            const matched = PROVINCIAS_ARGENTINA.find((p) => {
+              const pNorm = p.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+              return normGoogle.includes(pNorm) || pNorm.includes(normGoogle);
+            });
+            if (matched) {
+              setProvince(matched);
+            } else {
+              setProvince(parsedProvince);
+            }
+          }
+        }
+      });
+
+      autocompleteRef.current = autocomplete;
+    } catch (err) {
+      console.warn('Error inicializando Google Places Autocomplete:', err);
+    }
+
+    return () => {
+      if (autocompleteRef.current && (window as any).google?.maps?.event?.clearInstanceListeners) {
+        (window as any).google.maps.event.clearInstanceListeners(autocompleteRef.current);
+      }
+    };
+  }, [editandoDireccion, googleMapsLoaded]);
 
   // Cargar datos actuales del usuario al montar o al cambiar usuario
   useEffect(() => {
@@ -194,12 +306,24 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
             <div className="space-y-4 animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
-                  <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Calle</label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-xs font-semibold text-[#3c4043] block">Calle y Altura</label>
+                    {googleMapsLoaded && (
+                      <span className="text-[11px] font-medium text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <Sparkles className="w-3 h-3 text-[#1a73e8]" />
+                        Autocompletado Google activo
+                      </span>
+                    )}
+                  </div>
                   <input
+                    ref={streetInputRef}
                     type="text"
-                    placeholder="Ej: Av. San Martín"
+                    placeholder="Ej: Av. San Martín 1240"
                     value={street}
                     onChange={(e) => setStreet(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') e.preventDefault();
+                    }}
                     className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
                   />
                 </div>
