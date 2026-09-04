@@ -12,7 +12,6 @@ import {
   TrendingUp, 
   Package, 
   UserCheck, 
-  PlusCircle, 
   Sparkles, 
   ArrowRight, 
   ExternalLink 
@@ -802,32 +801,6 @@ function MiObjetiaContent() {
                   {currentTabMeta.description}
                 </span>
               </div>
-            </div>
-
-            {/* Acciones Top Bar */}
-            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-              {/* Pill Saldo Rápido */}
-              <div 
-                onClick={() => {
-                  setTabActual("billetera");
-                  router.push('/mi-objetia?tab=billetera');
-                }}
-                className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#e8f0fe] border border-[#d2e3fc] text-xs font-semibold text-[#1a73e8] hover:bg-[#d2e3fc]/60 transition cursor-pointer"
-                title="Ver detalles de mi billetera"
-              >
-                <DollarSign className="h-3.5 w-3.5 text-[#1a73e8]" />
-                <span>Saldo: {cargandoBalance ? "..." : formatearARS(balance.available)}</span>
-              </div>
-
-              {/* Botón Publicar Producto */}
-              <button
-                onClick={() => router.push('/products/new')}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#1a73e8] hover:bg-[#1557b0] text-white text-xs font-semibold shadow-2xs transition cursor-pointer"
-              >
-                <PlusCircle className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Publicar Producto</span>
-                <span className="sm:hidden">Publicar</span>
-              </button>
             </div>
           </header>
 
