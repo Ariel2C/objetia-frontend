@@ -820,7 +820,7 @@ function MiObjetiaContent() {
 
             {/* TAB: PERFIL */}
             {tabActual === "perfil" && (
-              <div className="animate-fade-in">
+              <div className="animate-fade-in w-full">
                 <ProfileTab />
               </div>
             )}
