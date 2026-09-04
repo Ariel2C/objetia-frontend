@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../../components/AuthContext';
 import { getApiUrl, getGoogleMapsApiKey } from '../../lib/config';
-import { ShieldCheck, MapPin, Loader2, Save, Pencil, X, Sparkles } from 'lucide-react';
+import { ShieldCheck, MapPin, Loader2, Save, Pencil, X } from 'lucide-react';
 
 const PROVINCIAS_ARGENTINA = [
   "Buenos Aires",
@@ -90,7 +90,7 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
     try {
       const autocomplete = new google.maps.places.Autocomplete(streetInputRef.current, {
         componentRestrictions: { country: 'ar' },
-        fields: ['address_components', 'name', 'formatted_address'],
+        fields: ['address_components', 'name', 'formatted_address', 'place_id', 'geometry'],
         types: ['address']
       });
 
@@ -118,7 +118,7 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
             if (!parsedCity) parsedCity = comp.long_name;
           } else if (types.includes('administrative_area_level_1')) {
             parsedProvince = comp.long_name;
-          } else if (types.includes('postal_code')) {
+          } else if (types.includes('postal_code') || types.includes('postal_code_prefix')) {
             parsedPostalCode = comp.long_name;
           }
         }
@@ -126,7 +126,23 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
         if (parsedStreet) setStreet(parsedStreet);
         if (parsedNumber) setNumber(parsedNumber);
         if (parsedCity) setCity(parsedCity);
-        if (parsedPostalCode) setPostalCode(parsedPostalCode);
+
+        if (parsedPostalCode) {
+          setPostalCode(parsedPostalCode);
+        } else if (place.place_id && google.maps?.Geocoder) {
+          // Respaldo: si Google Places no devolvió el CP directo, consultar Geocoder por el placeId
+          const geocoder = new google.maps.Geocoder();
+          geocoder.geocode({ placeId: place.place_id }, (results: any, status: string) => {
+            if (status === 'OK' && results && results[0]?.address_components) {
+              for (const c of results[0].address_components) {
+                if (c.types.includes('postal_code') || c.types.includes('postal_code_prefix')) {
+                  setPostalCode(c.long_name);
+                  break;
+                }
+              }
+            }
+          });
+        }
 
         if (parsedProvince) {
           const normGoogle = parsedProvince.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -162,6 +178,40 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
       }
     };
   }, [editandoDireccion, googleMapsLoaded]);
+
+  // Si el usuario escribe directamente el Código Postal (ej 5000), autocompletar provincia y ciudad
+  const handlePostalCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setPostalCode(val);
+
+    const clean = val.trim();
+    if ((clean.length === 4 && /^\d{4}$/.test(clean)) || (clean.length === 8 && /^[A-Z]\d{4}[A-Z]{3}$/i.test(clean))) {
+      const google = typeof window !== 'undefined' && (window as any).google;
+      if (google?.maps?.Geocoder) {
+        const geocoder = new google.maps.Geocoder();
+        geocoder.geocode(
+          { address: `CP ${clean}, Argentina`, componentRestrictions: { country: 'ar' } },
+          (results: any, status: string) => {
+            if (status === 'OK' && results && results[0]?.address_components) {
+              for (const comp of results[0].address_components) {
+                const types = comp.types || [];
+                if (types.includes('locality') || types.includes('sublocality') || types.includes('administrative_area_level_2')) {
+                  setCity((prev) => prev || comp.long_name);
+                }
+                if (types.includes('administrative_area_level_1')) {
+                  const pName = comp.long_name;
+                  const matched = PROVINCIAS_ARGENTINA.find((p) =>
+                    p.toLowerCase().includes(pName.toLowerCase()) || pName.toLowerCase().includes(p.toLowerCase())
+                  );
+                  if (matched) setProvince(matched);
+                }
+              }
+            }
+          }
+        );
+      }
+    }
+  };
 
   // Cargar datos actuales del usuario al montar o al cambiar usuario
   useEffect(() => {
@@ -306,15 +356,7 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
             <div className="space-y-4 animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-semibold text-[#3c4043] block">Calle y Altura</label>
-                    {googleMapsLoaded && (
-                      <span className="text-[11px] font-medium text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <Sparkles className="w-3 h-3 text-[#1a73e8]" />
-                        Autocompletado Google activo
-                      </span>
-                    )}
-                  </div>
+                  <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Calle</label>
                   <input
                     ref={streetInputRef}
                     type="text"
@@ -353,7 +395,7 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
                     type="text"
                     placeholder="Ej: 5000"
                     value={postalCode}
-                    onChange={(e) => setPostalCode(e.target.value)}
+                    onChange={handlePostalCodeChange}
                     className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition font-mono font-semibold"
                   />
                 </div>
