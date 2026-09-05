@@ -324,28 +324,26 @@ export default function TrackingModal({
                       key={step.code} 
                       className={`relative rounded-xl border transition-all flex items-stretch overflow-visible ${
                         step.current
-                          ? 'bg-white border-[#1a73e8]/40 shadow-xs ring-1 ring-[#1a73e8]/15'
+                          ? 'bg-white border-[#202124] shadow-xs ring-2 ring-[#1a73e8]/25'
                           : step.done
-                            ? 'bg-[#f8f9fa] hover:bg-white border-[#edf0f2] hover:border-[#dadce0]'
-                            : 'bg-[#fafbfc] border-[#f1f3f4] opacity-80'
+                            ? 'bg-[#f8f9fa] hover:bg-white border-[#202124]'
+                            : 'bg-[#fafbfc] border-[#202124]/35 opacity-80'
                       }`}
                     >
                       {/* LADO IZQUIERDO: SOCKET CIRCULAR CON EL CAMINO ABIERTO Y LA LÍNEA VERTICAL CONECTORA (SEGÚN CROQUIS) */}
-                      <div className="relative w-14 sm:w-16 flex-shrink-0 flex items-center justify-center self-stretch">
+                      <div className="relative w-16 flex-shrink-0 flex items-center justify-center self-stretch">
                         
                         {/* Camino superior (canal abierto que interrumpe el borde de la tarjeta para que no toque la línea) */}
                         {!isFirst && (
                           <div 
-                            className={`absolute left-1/2 -translate-x-1/2 w-4 bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
-                              step.current
-                                ? 'border-[#1a73e8]/40'
-                                : step.done
-                                  ? 'border-[#202124]/25'
-                                  : 'border-[#dadce0]'
+                            className={`absolute left-1/2 -translate-x-1/2 w-[18px] bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
+                              step.current || step.done
+                                ? 'border-[#202124]'
+                                : 'border-[#202124]/35'
                             }`}
                             style={{
                               top: '-1px',
-                              bottom: 'calc(50% + 22.5px)',
+                              bottom: 'calc(50% + 23px)',
                             }}
                           />
                         )}
@@ -353,28 +351,24 @@ export default function TrackingModal({
                         {/* Camino inferior (canal abierto que interrumpe el borde de la tarjeta para que no toque la línea) */}
                         {!isLast && (
                           <div 
-                            className={`absolute left-1/2 -translate-x-1/2 w-4 bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
-                              step.current
-                                ? 'border-[#1a73e8]/40'
-                                : step.done
-                                  ? 'border-[#202124]/25'
-                                  : 'border-[#dadce0]'
+                            className={`absolute left-1/2 -translate-x-1/2 w-[18px] bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
+                              step.current || step.done
+                                ? 'border-[#202124]'
+                                : 'border-[#202124]/35'
                             }`}
                             style={{
-                              top: 'calc(50% + 22.5px)',
+                              top: 'calc(50% + 23px)',
                               bottom: '-1px',
                             }}
                           />
                         )}
 
-                        {/* Cavidad / Socket circular concéntrico que sigue la forma del círculo con espacio libre */}
+                        {/* Cavidad / Socket circular concéntrico (50px) que sigue la forma del círculo con espacio libre */}
                         <div 
-                          className={`absolute w-12 h-12 rounded-full border-[1.5px] bg-white z-[1] transition-colors ${
-                            step.current
-                              ? 'border-[#1a73e8]/40'
-                              : step.done
-                                ? 'border-[#202124]/25'
-                                : 'border-[#dadce0]'
+                          className={`absolute w-[50px] h-[50px] rounded-full border-[1.5px] bg-white z-[1] transition-colors ${
+                            step.current || step.done
+                              ? 'border-[#202124]'
+                              : 'border-[#202124]/35'
                           }`}
                           style={{
                             top: '50%',
@@ -384,18 +378,18 @@ export default function TrackingModal({
                         >
                           {/* Abertura superior del socket hacia el camino */}
                           {!isFirst && (
-                            <div className="absolute -top-[1.5px] left-1/2 -translate-x-1/2 w-[15px] h-[3px] bg-white z-[2]" />
+                            <div className="absolute -top-[1.5px] left-1/2 -translate-x-1/2 w-[17px] h-[3.5px] bg-white z-[2]" />
                           )}
                           {/* Abertura inferior del socket hacia el camino */}
                           {!isLast && (
-                            <div className="absolute -bottom-[1.5px] left-1/2 -translate-x-1/2 w-[15px] h-[3px] bg-white z-[2]" />
+                            <div className="absolute -bottom-[1.5px] left-1/2 -translate-x-1/2 w-[17px] h-[3.5px] bg-white z-[2]" />
                           )}
                         </div>
 
-                        {/* Línea vertical superior conectora (entra por el centro del camino sin que la tarjeta la toque y se une al icono) */}
+                        {/* Línea vertical superior conectora (3px) que entra por el centro del camino y se une al icono */}
                         {!isFirst && (
                           <div 
-                            className={`absolute left-1/2 -translate-x-1/2 w-[2px] z-[3] ${
+                            className={`absolute left-1/2 -translate-x-1/2 w-[3px] z-[3] ${
                               step.done ? 'bg-[#202124]' : step.current ? 'bg-[#1a73e8]' : 'bg-[#dadce0]'
                             }`}
                             style={{
@@ -405,10 +399,10 @@ export default function TrackingModal({
                           />
                         )}
 
-                        {/* Línea vertical inferior conectora (sale desde el icono por el centro del camino y conecta con la siguiente etapa) */}
+                        {/* Línea vertical inferior conectora (3px) que sale desde el icono por el centro del camino */}
                         {!isLast && (
                           <div 
-                            className={`absolute left-1/2 -translate-x-1/2 w-[2px] z-[3] ${bgLineClass}`}
+                            className={`absolute left-1/2 -translate-x-1/2 w-[3px] z-[3] ${bgLineClass}`}
                             style={{
                               top: '50%',
                               bottom: '-15px',
@@ -416,9 +410,9 @@ export default function TrackingModal({
                           />
                         )}
 
-                        {/* Ícono redondo interior concéntrico (unido a la línea, sin tocar el borde de la tarjeta) */}
+                        {/* Ícono redondo interior concéntrico (35px, unido a la línea, sin tocar la cavidad) */}
                         <div 
-                          className={`relative w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all z-[4] ${
+                          className={`relative w-[35px] h-[35px] rounded-full flex items-center justify-center border-2 transition-all z-[4] ${
                             step.current
                               ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-sm ring-2 ring-[#1a73e8]/20 scale-105'
                               : step.done
