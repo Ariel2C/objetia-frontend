@@ -634,8 +634,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                     {menuAbierto && (
                       <div className="absolute right-0 mt-2 w-52 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-1.5 space-y-0.5 animate-scale-in origin-top-right">
                         <div className="px-3 py-2 border-b border-[#282a2c] mb-1">
-                          <p className="text-xs font-semibold text-[#e3e3e3] truncate">{usuario.full_name}</p>
-                          <p className="text-[10px] text-[#8e918f] truncate">{usuario.email}</p>
+                          <p className="text-[11px] text-[#8e918f] truncate">{usuario.email}</p>
                           {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'administrador') && (
                             <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#282a2c] text-[#87a9ff] border border-[#3c4043]">
                               Administrador
