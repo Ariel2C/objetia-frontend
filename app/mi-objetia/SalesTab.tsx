@@ -83,11 +83,13 @@ export default function SalesTab({ token }: SalesTabProps) {
     isOpen: boolean;
     trackingNumber: string | null;
     productTitle?: string | null;
+    productImage?: string | null;
     orderId?: number | string | null;
   }>({
     isOpen: false,
     trackingNumber: null,
     productTitle: null,
+    productImage: null,
     orderId: null,
   });
 
@@ -633,6 +635,7 @@ export default function SalesTab({ token }: SalesTabProps) {
                             isOpen: true,
                             trackingNumber: venta.tracking_number,
                             productTitle: formatearTituloProducto(venta.product_title),
+                            productImage: venta.image_url || null,
                             orderId: venta.id
                           })}
                           className="font-mono font-bold text-[#202124] bg-white px-2 py-0.5 rounded border border-[#e8eaed] hover:border-[#202124] transition cursor-pointer"
@@ -674,6 +677,7 @@ export default function SalesTab({ token }: SalesTabProps) {
                             isOpen: true,
                             trackingNumber: venta.tracking_number,
                             productTitle: formatearTituloProducto(venta.product_title),
+                            productImage: venta.image_url || null,
                             orderId: venta.id
                           })}
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#202124] hover:bg-[#f1f3f4] border border-[#dadce0] rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
@@ -751,6 +755,7 @@ export default function SalesTab({ token }: SalesTabProps) {
         onClose={() => setTrackingModalData(prev => ({ ...prev, isOpen: false }))}
         trackingNumber={trackingModalData.trackingNumber}
         productTitle={trackingModalData.productTitle}
+        productImage={trackingModalData.productImage}
         orderId={trackingModalData.orderId}
       />
     </div>

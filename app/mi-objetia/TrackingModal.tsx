@@ -17,7 +17,8 @@ import {
   Warehouse,
   ShieldCheck,
   AlertCircle,
-  Loader2
+  Loader2,
+  ShoppingBag
 } from 'lucide-react';
 import { apiFetch } from '../../lib/api';
 
@@ -53,6 +54,7 @@ interface TrackingModalProps {
   onClose: () => void;
   trackingNumber: string | null;
   productTitle?: string | null;
+  productImage?: string | null;
   orderId?: number | string | null;
 }
 
@@ -77,6 +79,7 @@ export default function TrackingModal({
   onClose,
   trackingNumber,
   productTitle,
+  productImage,
   orderId
 }: TrackingModalProps) {
   const [cargando, setCargando] = useState(false);
@@ -148,9 +151,6 @@ export default function TrackingModal({
 
   if (!isOpen || !mounted) return null;
 
-  const esEntregado = trackingData?.status === 'Entregado' || trackingData?.timeline?.some(t => t.code === 'DELIVERED' && t.done);
-  const esEnCamino = trackingData?.status === 'En camino' || trackingData?.timeline?.some(t => ['IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DISPATCHED'].includes(t.code) && t.done);
-
   return createPortal(
     <div 
       className="fixed inset-0 bg-black/50 backdrop-blur-xs z-[99999] flex items-center justify-center p-3 sm:p-4 animate-fade-in select-none"
@@ -161,28 +161,16 @@ export default function TrackingModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* ================================================================= */}
-        {/* CABECERA ESTILO GOOGLE AI STUDIO LIGHT */}
+        {/* 1. CABECERA: TÍTULO SEGUIMIENTO DE PAQUETE Y ACCIONES */}
         {/* ================================================================= */}
-        <div className="px-5 py-4 border-b border-[#edf0f2] flex items-center justify-between gap-3 bg-white">
-          <div className="space-y-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[10.5px] font-bold uppercase tracking-wider text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full border border-[#d2e3fc] inline-flex items-center gap-1.5">
-                <Truck className="h-3 w-3" /> Correo Argentino
-              </span>
-              {orderId && (
-                <span className="text-[11px] font-mono text-[#5f6368]">
-                  Orden #{orderId}
-                </span>
-              )}
-            </div>
-            <h3 className="text-[15px] font-semibold text-[#202124] truncate">
-              Seguimiento del paquete
+        <div className="px-5 py-3.5 border-b border-[#edf0f2] flex items-center justify-between gap-3 bg-white">
+          <div className="flex items-center gap-2.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full border border-[#d2e3fc] inline-flex items-center gap-1.5">
+              <Truck className="h-3 w-3" /> Correo Argentino
+            </span>
+            <h3 className="text-sm sm:text-base font-bold text-[#202124]">
+              Seguimiento de paquete
             </h3>
-            {productTitle && (
-              <p className="text-[11px] text-[#5f6368] truncate max-w-sm sm:max-w-md">
-                {productTitle}
-              </p>
-            )}
           </div>
 
           <div className="flex items-center gap-1 flex-shrink-0">
@@ -191,7 +179,7 @@ export default function TrackingModal({
                 type="button"
                 onClick={() => fetchTracking(trackingNumber)}
                 disabled={cargando}
-                className="p-2 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-xl transition cursor-pointer disabled:opacity-40"
+                className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer disabled:opacity-40"
                 title="Actualizar estado"
               >
                 <RotateCw className={`h-4 w-4 ${cargando ? 'animate-spin text-[#1a73e8]' : ''}`} />
@@ -200,7 +188,7 @@ export default function TrackingModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-2 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-xl transition cursor-pointer"
+              className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
               title="Cerrar ventana (Esc)"
             >
               <X className="h-4 w-4" />
@@ -209,130 +197,201 @@ export default function TrackingModal({
         </div>
 
         {/* ================================================================= */}
-        {/* BARRA DE GUÍA Y COPIAR */}
+        {/* CUERPO PRINCIPAL DEL MODAL (SCROLLABLE) */}
         {/* ================================================================= */}
-        <div className="bg-[#f8f9fa] px-5 py-2.5 border-b border-[#edf0f2] flex items-center justify-between gap-2 flex-wrap text-xs">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-[#5f6368] font-medium">Nº de Guía:</span>
-            <span className="font-mono font-bold text-[#202124] bg-white px-2.5 py-0.5 rounded-lg border border-[#dadce0] tracking-wider truncate">
-              {trackingNumber || "—"}
-            </span>
+        <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-4">
+
+          {/* =============================================================== */}
+          {/* 2. EL PRODUCTO CON LA IMAGEN EN UN CÍRCULO */}
+          {/* =============================================================== */}
+          <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-2xl p-3.5 flex items-center gap-3.5">
+            {/* Imagen en un círculo */}
+            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-xs flex-shrink-0 bg-white flex items-center justify-center">
+              {productImage ? (
+                <img
+                  src={productImage}
+                  alt={productTitle || "Producto"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <ShoppingBag className="w-6 h-6 text-[#5f6368]" />
+              )}
+            </div>
+
+            {/* Información del producto y orden */}
+            <div className="space-y-0.5 min-w-0 flex-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                {orderId && (
+                  <span className="text-[10px] font-mono font-bold text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.2 rounded">
+                    Orden #{orderId}
+                  </span>
+                )}
+                {trackingData?.status && (
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.2 rounded-full ${
+                    trackingData.status === 'Entregado'
+                      ? 'bg-[#e8f8ef] text-[#00a650] border border-[#ceead6]'
+                      : 'bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc]'
+                  }`}>
+                    {trackingData.status}
+                  </span>
+                )}
+              </div>
+              <h4 className="text-xs sm:text-sm font-bold text-[#202124] truncate leading-tight">
+                {productTitle || "Artículo adquirido en Objetia"}
+              </h4>
+              {trackingData?.date && (
+                <p className="text-[11px] text-[#5f6368]">
+                  Fecha de pedido: <strong className="font-mono text-[#202124]">{trackingData.date}</strong>
+                </p>
+              )}
+            </div>
           </div>
 
-          <button
-            type="button"
-            onClick={handleCopiarGuia}
-            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition border cursor-pointer ${
-              copiado
-                ? 'bg-[#e6f4ea] text-[#137333] border-[#ceead6]'
-                : 'bg-white text-[#3c4043] border-[#dadce0] hover:bg-[#f1f3f4] hover:text-[#202124]'
-            }`}
-          >
-            {copiado ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-            <span>{copiado ? "¡Copiado!" : "Copiar guía"}</span>
-          </button>
-        </div>
+          {/* =============================================================== */}
+          {/* 3. NRO DE GUÍA CON COPIAR A LA DERECHA */}
+          {/* =============================================================== */}
+          <div className="bg-[#f8f9fa] px-4 py-2.5 rounded-xl border border-[#edf0f2] flex items-center justify-between gap-2 flex-wrap text-xs">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-[#5f6368] font-medium">Nº de Guía:</span>
+              <span className="font-mono font-bold text-[#202124] bg-white px-2.5 py-0.5 rounded-lg border border-[#dadce0] tracking-wider truncate">
+                {trackingNumber || "—"}
+              </span>
+            </div>
 
-        {/* ================================================================= */}
-        {/* CONTENIDO DEL SEGUIMIENTO (SCROLLABLE) */}
-        {/* ================================================================= */}
-        <div className="flex-1 overflow-y-auto p-5 sm:p-6 space-y-5">
-          {cargando && !trackingData ? (
-            <div className="py-16 text-center space-y-3">
-              <Loader2 className="w-8 h-8 animate-spin text-[#1a73e8] mx-auto" />
-              <div className="space-y-1">
+            <button
+              type="button"
+              onClick={handleCopiarGuia}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition border cursor-pointer ${
+                copiado
+                  ? 'bg-[#e6f4ea] text-[#137333] border-[#ceead6]'
+                  : 'bg-white text-[#3c4043] border-[#dadce0] hover:bg-[#f1f3f4] hover:text-[#202124]'
+              }`}
+            >
+              {copiado ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+              <span>{copiado ? "¡Copiado!" : "Copiar guía"}</span>
+            </button>
+          </div>
+
+          {/* =============================================================== */}
+          {/* 4. HISTORIAL DE EVENTOS DEL CORREO CON CANTIDAD DE ETAPAS */}
+          {/* =============================================================== */}
+          <div className="pt-2 space-y-3">
+            <div className="flex items-center justify-between">
+              <h5 className="text-xs font-semibold text-[#202124]">
+                Historial de eventos del Correo
+              </h5>
+              {trackingData && (
+                <span className="text-[10.5px] font-mono font-medium text-[#5f6368]">
+                  {trackingData.timeline.filter(t => t.done).length} de {trackingData.timeline.length} etapas
+                </span>
+              )}
+            </div>
+
+            {/* ESTADOS DE CARGA / ERROR */}
+            {cargando && !trackingData ? (
+              <div className="py-12 text-center space-y-3">
+                <Loader2 className="w-8 h-8 animate-spin text-[#1a73e8] mx-auto" />
                 <p className="text-xs font-semibold text-[#202124]">Consultando servidor logístico...</p>
                 <p className="text-[11px] text-[#5f6368]">Obteniendo los últimos movimientos de Correo Argentino</p>
               </div>
-            </div>
-          ) : errorMsg ? (
-            <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 space-y-2">
-              <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
-                <span className="text-xs font-semibold">No se pudo cargar el seguimiento</span>
-              </div>
-              <p className="text-xs text-red-600 pl-6">{errorMsg}</p>
-            </div>
-          ) : trackingData ? (
-            <>
-              {/* Tarjeta de Resumen de Estado Principal */}
-              <div className={`p-4 rounded-2xl border flex items-center justify-between gap-3 ${
-                esEntregado
-                  ? 'bg-[#e8f8ef] border-[#ceead6] text-[#0f5132]'
-                  : esEnCamino
-                    ? 'bg-[#e8f0fe] border-[#d2e3fc] text-[#1a73e8]'
-                    : 'bg-[#fef7e0] border-[#feefc3] text-[#8a5300]'
-              }`}>
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    esEntregado
-                      ? 'bg-[#137333] text-white'
-                      : esEnCamino
-                        ? 'bg-[#1a73e8] text-white'
-                        : 'bg-[#b06000] text-white'
-                  }`}>
-                    {esEntregado ? (
-                      <CheckCircle2 className="w-5 h-5" />
-                    ) : esEnCamino ? (
-                      <Truck className="w-5 h-5" />
-                    ) : (
-                      <Package className="w-5 h-5" />
-                    )}
-                  </div>
-                  <div className="space-y-0.5 min-w-0">
-                    <span className="text-[10px] font-bold uppercase tracking-wider block opacity-80">
-                      Estado actual
-                    </span>
-                    <h4 className="text-sm font-bold truncate">
-                      {trackingData.status || "En proceso logístico"}
-                    </h4>
-                  </div>
+            ) : errorMsg ? (
+              <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 space-y-2">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+                  <span className="text-xs font-semibold">No se pudo cargar el seguimiento</span>
                 </div>
-
-                <div className="text-right flex-shrink-0 hidden sm:block">
-                  <span className="text-[10px] text-[#5f6368] block">Fecha de compra</span>
-                  <span className="text-xs font-mono font-semibold text-[#202124]">
-                    {trackingData.date}
-                  </span>
-                </div>
+                <p className="text-xs text-red-600 pl-6">{errorMsg}</p>
               </div>
-
-              {/* Timeline de Pasos (Estilo Google AI Studio Light) */}
+            ) : trackingData ? (
+              /* =========================================================== */
+              /* 5. LAS ETAPAS DENTRO DE TARJETAS CON MUESCA CIRCULAR */
+              /* =========================================================== */
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <h5 className="text-xs font-semibold text-[#202124]">
-                    Historial de eventos del Correo
-                  </h5>
-                  <span className="text-[10.5px] text-[#5f6368]">
-                    {trackingData.timeline.filter(t => t.done).length} de {trackingData.timeline.length} etapas
-                  </span>
-                </div>
+                {trackingData.timeline.map((step, idx) => {
+                  const Icono = ICONOS_PASO[step.code] || Check;
+                  const fecha = formatearFecha(step.date);
 
-                <div className="relative pl-7 space-y-6 before:absolute before:left-[11px] before:top-2.5 before:bottom-2.5 before:w-[2px] before:bg-[#e8eaed]">
-                  {trackingData.timeline.map((step) => {
-                    const Icono = ICONOS_PASO[step.code] || Check;
-                    const fecha = formatearFecha(step.date);
+                  // Color de borde del círculo:
+                  // Si es completado: carbón #202124 (o verde si es entrega)
+                  // Si es actual: azul #1a73e8
+                  // Si es pendiente: gris claro #dadce0
+                  const colorBordeCirculo = step.current
+                    ? '#1a73e8'
+                    : step.done
+                      ? '#202124'
+                      : '#dadce0';
 
-                    return (
-                      <div key={step.code} className="relative">
-                        {/* Nodo de estado */}
-                        <span
-                          className={`absolute -left-[27px] top-0.5 h-6 w-6 rounded-full flex items-center justify-center border transition-all ${
-                            step.current
-                              ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-xs ring-4 ring-[#1a73e8]/20 scale-105'
-                              : step.done
-                                ? 'bg-[#202124] border-[#202124] text-white'
-                                : 'bg-white border-[#dadce0] text-[#9aa0a6]'
+                  const bgLineClass = step.current
+                    ? 'bg-[#1a73e8]'
+                    : step.done
+                      ? 'bg-[#202124]'
+                      : 'bg-[#dadce0]';
+
+                  return (
+                    <div key={step.code} className="relative flex items-center pl-6">
+                      {/* Línea conectora superior que viene desde el círculo anterior */}
+                      {idx > 0 && (
+                        <div 
+                          className={`absolute left-0 top-0 h-1/2 w-[2px] -translate-x-1/2 z-0 ${
+                            step.done ? 'bg-[#202124]' : 'bg-[#dadce0]'
                           }`}
-                        >
-                          <Icono className="h-3 w-3 stroke-[2.2]" />
-                        </span>
+                        />
+                      )}
 
-                        {/* Detalle del paso */}
-                        <div className="space-y-0.5">
+                      {/* Línea conectora inferior que va hacia el círculo siguiente (mismo color que el borde del círculo) */}
+                      {idx < trackingData.timeline.length - 1 && (
+                        <div 
+                          className={`absolute left-0 top-1/2 -translate-x-1/2 w-[2px] z-0 ${bgLineClass}`}
+                          style={{ bottom: '-12px' }}
+                        />
+                      )}
+
+                      {/* Ícono redondo que entra la mitad dentro de la tarjeta */}
+                      <div 
+                        className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all z-10 ${
+                          step.current
+                            ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-sm ring-4 ring-[#1a73e8]/20 scale-105'
+                            : step.done
+                              ? 'bg-[#202124] border-[#202124] text-white'
+                              : 'bg-white border-[#dadce0] text-[#9aa0a6]'
+                        }`}
+                      >
+                        <Icono className="h-4 w-4 stroke-[2.2]" />
+                      </div>
+
+                      {/* Tarjeta con muesca circular en el lado izquierdo con la forma del círculo pero sin tocar el círculo */}
+                      <div 
+                        className={`relative flex-1 rounded-2xl p-3.5 pl-8 transition-all ${
+                          step.current
+                            ? 'bg-white border border-[#1a73e8]/40 shadow-xs ring-1 ring-[#1a73e8]/15'
+                            : step.done
+                              ? 'bg-[#f8f9fa] hover:bg-white border border-[#edf0f2] hover:border-[#dadce0]'
+                              : 'bg-[#fafbfc] border border-[#f1f3f4] opacity-80'
+                        }`}
+                        style={{
+                          maskImage: 'radial-gradient(circle 26px at 0px 50%, transparent 25px, black 26px)',
+                          WebkitMaskImage: 'radial-gradient(circle 26px at 0px 50%, transparent 25px, black 26px)',
+                        }}
+                      >
+                        {/* Borde exterior semicircular que dibuja el contorno de la muesca sin tocar el círculo */}
+                        <div
+                          className={`absolute -left-[26px] top-1/2 -translate-y-1/2 w-[52px] h-[52px] rounded-full border pointer-events-none transition-colors ${
+                            step.current
+                              ? 'border-[#1a73e8]/40'
+                              : step.done
+                                ? 'border-[#edf0f2]'
+                                : 'border-[#f1f3f4]'
+                          }`}
+                          style={{
+                            clipPath: 'polygon(50% 0, 100% 0, 100% 100%, 50% 100%)',
+                          }}
+                        />
+
+                        {/* Contenido de la etapa */}
+                        <div className="space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <h6
-                              className={`text-xs font-semibold ${
+                              className={`text-xs font-bold ${
                                 step.current
                                   ? 'text-[#1a73e8]'
                                   : step.done
@@ -377,51 +436,55 @@ export default function TrackingModal({
                           )}
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : null}
+          </div>
+
+          {/* =============================================================== */}
+          {/* DIRECCIÓN DE ENTREGA AL FINAL */}
+          {/* =============================================================== */}
+          {trackingData && (
+            <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-2xl p-3.5 space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-semibold text-[#202124] flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 text-[#1a73e8]" />
+                  Dirección de Entrega
+                </span>
+                <span className="text-[11px] text-[#5f6368] flex items-center gap-1">
+                  <ShieldCheck className="h-3.5 w-3.5 text-[#137333]" />
+                  Garantía Objetia
+                </span>
               </div>
 
-              {/* Tarjeta de Destino y Protección */}
-              <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-2xl p-4 space-y-3">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-semibold text-[#202124] flex items-center gap-1.5">
-                    <MapPin className="h-3.5 w-3.5 text-[#1a73e8]" />
-                    Dirección de Entrega
-                  </span>
-                  <span className="text-[11px] text-[#5f6368] flex items-center gap-1">
-                    <ShieldCheck className="h-3.5 w-3.5 text-[#137333]" />
-                    Garantía Objetia
-                  </span>
-                </div>
-
-                <div className="text-xs text-[#3c4043] space-y-0.5 bg-white p-3 rounded-xl border border-[#edf0f2]">
-                  <p className="font-semibold text-[#202124]">
-                    {trackingData.recipient_name || "Destinatario"}
-                  </p>
-                  <p className="text-[#5f6368]">
-                    {[
-                      trackingData.street ? `${trackingData.street} ${trackingData.number_addr || ''}`.trim() : null,
-                      trackingData.floor_dept ? `(${trackingData.floor_dept})` : null,
-                      trackingData.city,
-                      trackingData.province
-                    ].filter(Boolean).join(', ')}
-                    {trackingData.postal_code && (
-                      <span className="font-mono ml-1 font-semibold text-[#202124]">
-                        · CP {trackingData.postal_code}
-                      </span>
-                    )}
-                  </p>
-                </div>
+              <div className="text-xs text-[#3c4043] space-y-0.5 bg-white p-3 rounded-xl border border-[#edf0f2]">
+                <p className="font-semibold text-[#202124]">
+                  {trackingData.recipient_name || "Destinatario"}
+                </p>
+                <p className="text-[#5f6368]">
+                  {[
+                    trackingData.street ? `${trackingData.street} ${trackingData.number_addr || ''}`.trim() : null,
+                    trackingData.floor_dept ? `(${trackingData.floor_dept})` : null,
+                    trackingData.city,
+                    trackingData.province
+                  ].filter(Boolean).join(', ')}
+                  {trackingData.postal_code && (
+                    <span className="font-mono ml-1 font-semibold text-[#202124]">
+                      · CP {trackingData.postal_code}
+                    </span>
+                  )}
+                </p>
               </div>
-            </>
-          ) : null}
+            </div>
+          )}
         </div>
 
         {/* ================================================================= */}
         {/* PIE DEL MODAL */}
         {/* ================================================================= */}
-        <div className="px-5 py-3.5 border-t border-[#edf0f2] bg-[#fafbfc] flex items-center justify-between gap-3">
+        <div className="px-5 py-3 border-t border-[#edf0f2] bg-[#fafbfc] flex items-center justify-between gap-3">
           <div className="flex items-center gap-1.5 text-[11px] text-[#5f6368]">
             <span>Logística oficial</span>
             <span className="font-semibold text-[#202124]">Correo Argentino Paq.ar</span>
@@ -430,7 +493,7 @@ export default function TrackingModal({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 bg-[#202124] hover:bg-black text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-2xs"
+            className="px-4 py-1.5 bg-[#202124] hover:bg-black text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-2xs"
           >
             Cerrar
           </button>

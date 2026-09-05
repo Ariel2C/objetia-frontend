@@ -77,11 +77,13 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
     isOpen: boolean;
     trackingNumber: string | null;
     productTitle?: string | null;
+    productImage?: string | null;
     orderId?: number | string | null;
   }>({
     isOpen: false,
     trackingNumber: null,
     productTitle: null,
+    productImage: null,
     orderId: null,
   });
 
@@ -401,6 +403,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                             isOpen: true,
                             trackingNumber: compra.tracking_number,
                             productTitle: formatearTituloProducto(compra.product_title),
+                            productImage: compra.image_url || null,
                             orderId: compra.id
                           })}
                           className="font-mono font-bold text-[#202124] bg-white px-2 py-0.5 rounded border border-[#e8eaed] hover:border-[#202124] transition cursor-pointer"
@@ -432,6 +435,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                             isOpen: true,
                             trackingNumber: compra.tracking_number,
                             productTitle: formatearTituloProducto(compra.product_title),
+                            productImage: compra.image_url || null,
                             orderId: compra.id
                           })}
                           className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#202124] hover:bg-[#000000] text-white rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
@@ -519,6 +523,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
         onClose={() => setTrackingModalData(prev => ({ ...prev, isOpen: false }))}
         trackingNumber={trackingModalData.trackingNumber}
         productTitle={trackingModalData.productTitle}
+        productImage={trackingModalData.productImage}
         orderId={trackingModalData.orderId}
       />
     </div>
