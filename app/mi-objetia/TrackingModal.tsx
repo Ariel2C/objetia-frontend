@@ -157,18 +157,18 @@ export default function TrackingModal({
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-2xl border border-[#dadce0] shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-scale-in"
+        className="bg-white rounded-xl border border-[#dadce0] shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ================================================================= */}
-        {/* 1. CABECERA: TÍTULO SEGUIMIENTO DE PAQUETE Y ACCIONES */}
+        {/* 1. CABECERA: SEGUIMIENTO DE PAQUETE ABAJO DE CORREO ARGENTINO */}
         {/* ================================================================= */}
-        <div className="px-5 py-3.5 border-b border-[#edf0f2] flex items-center justify-between gap-3 bg-white">
-          <div className="flex items-center gap-2.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full border border-[#d2e3fc] inline-flex items-center gap-1.5">
+        <div className="px-5 py-4 border-b border-[#edf0f2] flex items-center justify-between gap-3 bg-white">
+          <div className="space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full border border-[#d2e3fc] inline-flex items-center gap-1.5 w-fit">
               <Truck className="h-3 w-3" /> Correo Argentino
             </span>
-            <h3 className="text-sm sm:text-base font-bold text-[#202124]">
+            <h3 className="text-base sm:text-lg font-bold text-[#202124] leading-tight">
               Seguimiento de paquete
             </h3>
           </div>
@@ -204,7 +204,7 @@ export default function TrackingModal({
           {/* =============================================================== */}
           {/* 2. EL PRODUCTO CON LA IMAGEN EN UN CÍRCULO */}
           {/* =============================================================== */}
-          <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-2xl p-3.5 flex items-center gap-3.5">
+          <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-xl p-3.5 flex items-center gap-3.5">
             {/* Imagen en un círculo */}
             <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-xs flex-shrink-0 bg-white flex items-center justify-center">
               {productImage ? (
@@ -306,20 +306,10 @@ export default function TrackingModal({
               /* =========================================================== */
               /* 5. LAS ETAPAS DENTRO DE TARJETAS CON MUESCA CIRCULAR */
               /* =========================================================== */
-              <div className="space-y-3">
+              <div className="space-y-3 pl-2">
                 {trackingData.timeline.map((step, idx) => {
                   const Icono = ICONOS_PASO[step.code] || Check;
                   const fecha = formatearFecha(step.date);
-
-                  // Color de borde del círculo:
-                  // Si es completado: carbón #202124 (o verde si es entrega)
-                  // Si es actual: azul #1a73e8
-                  // Si es pendiente: gris claro #dadce0
-                  const colorBordeCirculo = step.current
-                    ? '#1a73e8'
-                    : step.done
-                      ? '#202124'
-                      : '#dadce0';
 
                   const bgLineClass = step.current
                     ? 'bg-[#1a73e8]'
@@ -328,7 +318,7 @@ export default function TrackingModal({
                       : 'bg-[#dadce0]';
 
                   return (
-                    <div key={step.code} className="relative flex items-center pl-6">
+                    <div key={step.code} className="relative ml-6 sm:ml-7">
                       {/* Línea conectora superior que viene desde el círculo anterior */}
                       {idx > 0 && (
                         <div 
@@ -346,9 +336,9 @@ export default function TrackingModal({
                         />
                       )}
 
-                      {/* Ícono redondo que entra la mitad dentro de la tarjeta */}
+                      {/* Ícono redondo que entra exactamente la mitad dentro de la tarjeta */}
                       <div 
-                        className={`absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all z-10 ${
+                        className={`absolute -left-[18px] top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all z-10 ${
                           step.current
                             ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-sm ring-4 ring-[#1a73e8]/20 scale-105'
                             : step.done
@@ -361,7 +351,7 @@ export default function TrackingModal({
 
                       {/* Tarjeta con muesca circular en el lado izquierdo con la forma del círculo pero sin tocar el círculo */}
                       <div 
-                        className={`relative flex-1 rounded-2xl p-3.5 pl-8 transition-all ${
+                        className={`relative rounded-xl p-3.5 pl-8 transition-all ${
                           step.current
                             ? 'bg-white border border-[#1a73e8]/40 shadow-xs ring-1 ring-[#1a73e8]/15'
                             : step.done
@@ -447,7 +437,7 @@ export default function TrackingModal({
           {/* DIRECCIÓN DE ENTREGA AL FINAL */}
           {/* =============================================================== */}
           {trackingData && (
-            <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-2xl p-3.5 space-y-2">
+            <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-xl p-3.5 space-y-2">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-semibold text-[#202124] flex items-center gap-1.5">
                   <MapPin className="h-3.5 w-3.5 text-[#1a73e8]" />
@@ -459,7 +449,7 @@ export default function TrackingModal({
                 </span>
               </div>
 
-              <div className="text-xs text-[#3c4043] space-y-0.5 bg-white p-3 rounded-xl border border-[#edf0f2]">
+              <div className="text-xs text-[#3c4043] space-y-0.5 bg-white p-3 rounded-lg border border-[#edf0f2]">
                 <p className="font-semibold text-[#202124]">
                   {trackingData.recipient_name || "Destinatario"}
                 </p>
