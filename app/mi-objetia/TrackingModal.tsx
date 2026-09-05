@@ -306,7 +306,7 @@ export default function TrackingModal({
               /* =========================================================== */
               /* 5. LAS ETAPAS DENTRO DE TARJETAS CON MUESCA CIRCULAR */
               /* =========================================================== */
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 {trackingData.timeline.map((step, idx) => {
                   const Icono = ICONOS_PASO[step.code] || Check;
                   const fecha = formatearFecha(step.date);
@@ -322,7 +322,7 @@ export default function TrackingModal({
                   return (
                     <div 
                       key={step.code} 
-                      className={`relative rounded-xl border transition-all p-3.5 sm:p-4 flex items-center gap-3.5 sm:gap-4 overflow-visible ${
+                      className={`relative rounded-xl border transition-all flex items-stretch overflow-visible ${
                         step.current
                           ? 'bg-white border-[#1a73e8]/40 shadow-xs ring-1 ring-[#1a73e8]/15'
                           : step.done
@@ -330,38 +330,95 @@ export default function TrackingModal({
                             : 'bg-[#fafbfc] border-[#f1f3f4] opacity-80'
                       }`}
                     >
-                      {/* LADO IZQUIERDO: SOCKET CIRCULAR CON EL ÍCONO Y LA LÍNEA VERTICAL CONECTORA (SEGÚN CROQUIS) */}
-                      <div className="relative w-12 h-12 flex-shrink-0 flex items-center justify-center">
-                        {/* Línea vertical superior (conecta desde la tarjeta anterior por el medio) */}
+                      {/* LADO IZQUIERDO: SOCKET CIRCULAR CON EL CAMINO ABIERTO Y LA LÍNEA VERTICAL CONECTORA (SEGÚN CROQUIS) */}
+                      <div className="relative w-14 sm:w-16 flex-shrink-0 flex items-center justify-center self-stretch">
+                        
+                        {/* Camino superior (canal abierto que interrumpe el borde de la tarjeta para que no toque la línea) */}
                         {!isFirst && (
                           <div 
-                            className={`absolute -top-3 left-1/2 -translate-x-1/2 w-[2px] h-3 z-0 ${
-                              step.done ? 'bg-[#202124]' : 'bg-[#dadce0]'
+                            className={`absolute left-1/2 -translate-x-1/2 w-4 bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
+                              step.current
+                                ? 'border-[#1a73e8]/40'
+                                : step.done
+                                  ? 'border-[#202124]/25'
+                                  : 'border-[#dadce0]'
                             }`}
+                            style={{
+                              top: '-1px',
+                              bottom: 'calc(50% + 22.5px)',
+                            }}
                           />
                         )}
 
-                        {/* Línea vertical inferior (conecta hacia la siguiente tarjeta por el medio) */}
+                        {/* Camino inferior (canal abierto que interrumpe el borde de la tarjeta para que no toque la línea) */}
                         {!isLast && (
                           <div 
-                            className={`absolute -bottom-3 left-1/2 -translate-x-1/2 w-[2px] h-3 z-0 ${bgLineClass}`}
+                            className={`absolute left-1/2 -translate-x-1/2 w-4 bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
+                              step.current
+                                ? 'border-[#1a73e8]/40'
+                                : step.done
+                                  ? 'border-[#202124]/25'
+                                  : 'border-[#dadce0]'
+                            }`}
+                            style={{
+                              top: 'calc(50% + 22.5px)',
+                              bottom: '-1px',
+                            }}
                           />
                         )}
 
-                        {/* Cavidad / Socket circular que sigue la forma del círculo pero sin tocarlo */}
+                        {/* Cavidad / Socket circular concéntrico que sigue la forma del círculo con espacio libre */}
                         <div 
-                          className={`absolute inset-0 rounded-full border-2 transition-colors ${
+                          className={`absolute w-12 h-12 rounded-full border-[1.5px] bg-white z-[1] transition-colors ${
                             step.current
-                              ? 'border-[#1a73e8]/40 bg-[#e8f0fe]/30'
+                              ? 'border-[#1a73e8]/40'
                               : step.done
-                                ? 'border-[#202124]/30 bg-white'
-                                : 'border-[#dadce0] bg-white'
+                                ? 'border-[#202124]/25'
+                                : 'border-[#dadce0]'
                           }`}
-                        />
+                          style={{
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                          }}
+                        >
+                          {/* Abertura superior del socket hacia el camino */}
+                          {!isFirst && (
+                            <div className="absolute -top-[1.5px] left-1/2 -translate-x-1/2 w-[15px] h-[3px] bg-white z-[2]" />
+                          )}
+                          {/* Abertura inferior del socket hacia el camino */}
+                          {!isLast && (
+                            <div className="absolute -bottom-[1.5px] left-1/2 -translate-x-1/2 w-[15px] h-[3px] bg-white z-[2]" />
+                          )}
+                        </div>
 
-                        {/* Ícono redondo interior concéntrico */}
+                        {/* Línea vertical superior conectora (entra por el centro del camino sin que la tarjeta la toque y se une al icono) */}
+                        {!isFirst && (
+                          <div 
+                            className={`absolute left-1/2 -translate-x-1/2 w-[2px] z-[3] ${
+                              step.done ? 'bg-[#202124]' : step.current ? 'bg-[#1a73e8]' : 'bg-[#dadce0]'
+                            }`}
+                            style={{
+                              top: '-15px',
+                              bottom: '50%',
+                            }}
+                          />
+                        )}
+
+                        {/* Línea vertical inferior conectora (sale desde el icono por el centro del camino y conecta con la siguiente etapa) */}
+                        {!isLast && (
+                          <div 
+                            className={`absolute left-1/2 -translate-x-1/2 w-[2px] z-[3] ${bgLineClass}`}
+                            style={{
+                              top: '50%',
+                              bottom: '-15px',
+                            }}
+                          />
+                        )}
+
+                        {/* Ícono redondo interior concéntrico (unido a la línea, sin tocar el borde de la tarjeta) */}
                         <div 
-                          className={`relative w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all z-10 ${
+                          className={`relative w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all z-[4] ${
                             step.current
                               ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-sm ring-2 ring-[#1a73e8]/20 scale-105'
                               : step.done
@@ -374,7 +431,7 @@ export default function TrackingModal({
                       </div>
 
                       {/* LADO DERECHO: CONTENIDO DE LA ETAPA */}
-                      <div className="space-y-1 min-w-0 flex-1">
+                      <div className="space-y-1 min-w-0 flex-1 p-3.5 sm:p-4 pl-1 sm:pl-2">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h6
                             className={`text-xs sm:text-sm font-bold leading-tight ${
