@@ -630,37 +630,47 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                       <ChevronDown className={`h-3.5 w-3.5 transition-transform text-[#9aa0a6] shrink-0 ${menuAbierto ? 'rotate-180 text-white' : ''}`} />
                     </button>
 
-                    {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN - GOOGLE AI STUDIO DARK LIMPIO */}
+                    {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN - GOOGLE AI STUDIO DARK */}
                     {menuAbierto && (
-                      <div className="absolute right-0 mt-2 w-52 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-1.5 space-y-0.5 animate-scale-in origin-top-right">
-                        <div className="px-3 py-2 border-b border-[#282a2c] mb-1">
-                          <p className="text-[11px] text-[#8e918f] truncate">{usuario.email}</p>
-                          {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'administrador') && (
-                            <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#282a2c] text-[#87a9ff] border border-[#3c4043]">
+                      <div className="absolute right-0 mt-2 w-64 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1.5 animate-scale-in origin-top-right">
+                        {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'administrador') && (
+                          <div className="px-1 pt-0.5">
+                            <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#282a2c] text-[#87a9ff] border border-[#3c4043]">
                               Administrador
                             </span>
-                          )}
-                          {(usuario.role?.toLowerCase() === 'root') && (
-                            <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                          </div>
+                        )}
+                        {(usuario.role?.toLowerCase() === 'root') && (
+                          <div className="px-1 pt-0.5">
+                            <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20">
                               Programador Root
                             </span>
-                          )}
-                        </div>
+                          </div>
+                        )}
 
+                        {/* Badge tipo botón: Mi OBJETIA con título y descripción */}
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="block px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                          className="block p-3 rounded-xl bg-[#282a2c]/60 hover:bg-[#282a2c] border border-[#3c4043] hover:border-[#87a9ff]/40 transition group cursor-pointer text-left"
                         >
-                          Mi OBJETIA
+                          <div className="text-xs font-semibold text-white group-hover:text-[#87a9ff] transition-colors">
+                            Mi OBJETIA
+                          </div>
+                          <p className="text-[11px] text-[#9aa0a6] leading-relaxed mt-1 group-hover:text-[#c4c7c5] transition-colors">
+                            Gestioná tus compras, ventas, publicaciones y perfil personal.
+                          </p>
                         </Link>
 
-                        <button 
-                          onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}
-                          className="w-full block px-3 py-2 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition cursor-pointer text-left"
-                        >
-                          Cerrar Sesión
-                        </button>
+                        {/* Cerrar Sesión centrado abajo */}
+                        <div className="pt-0.5">
+                          <button 
+                            onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}
+                            className="w-full py-2 text-center text-xs font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition cursor-pointer"
+                          >
+                            Cerrar Sesión
+                          </button>
+                        </div>
                       </div>
                     )}
                   </div>
