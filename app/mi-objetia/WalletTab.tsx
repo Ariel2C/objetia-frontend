@@ -249,50 +249,66 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
   return (
     <div className="space-y-6 animate-fade-in select-none">
-      {/* 3 Tarjetas Métricas Google AI Studio Light con Estética Carbón */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Tarjetas Métricas Google AI Studio Light con Estética Carbón */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Card 1: Saldo total para compras */}
-        <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs relative overflow-hidden transition hover:border-[#dadce0]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#f1f3f4] border border-[#e8eaed] flex items-center justify-center text-[#202124]">
-                <ShoppingBag className="w-5 h-5" />
+        <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 sm:p-6 shadow-xs transition hover:border-[#dadce0] flex flex-col justify-between space-y-4">
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#f1f3f4] border border-[#e8eaed] flex items-center justify-center text-[#202124]">
+                  <ShoppingBag className="w-5 h-5" />
+                </div>
+                <span className="text-xs font-semibold text-[#5f6368] uppercase tracking-wider">Saldo para compras</span>
               </div>
-              <span className="text-xs font-semibold text-[#5f6368] uppercase tracking-wider">Saldo para compras</span>
+              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-[6px] bg-[#f1f3f4] text-[#202124] border border-[#e8eaed]">
+                Inmediato
+              </span>
             </div>
-            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-[6px] bg-[#f1f3f4] text-[#202124] border border-[#e8eaed]">
-              Inmediato
-            </span>
+            <div>
+              <h4 className="text-2xl sm:text-3xl font-bold text-[#202124] tracking-tight leading-none font-mono">
+                {cargandoBalance ? "..." : formatearARS(saldoParaCompras)}
+              </h4>
+              <p className="text-xs text-[#5f6368] font-medium mt-2 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#3c4043]" />
+                <span>Disponible para comprar dentro de la app</span>
+              </p>
+            </div>
           </div>
-          <div>
-            <h4 className="text-2xl sm:text-3xl font-bold text-[#202124] tracking-tight leading-none font-mono">
-              {cargandoBalance ? "..." : formatearARS(saldoParaCompras)}
-            </h4>
-            <p className="text-xs text-[#5f6368] font-medium mt-2 flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#3c4043]" />
-              <span>Disponible para comprar dentro de la app</span>
-            </p>
+
+          <div className="pt-3 border-t border-[#edf0f2] flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#f8f9fa] border border-[#e8eaed] flex items-center justify-center text-[#202124]">
+                <Sparkles className="w-4 h-4 text-[#202124]" />
+              </div>
+              <div>
+                <span className="text-xs font-semibold text-[#5f6368] uppercase tracking-wider block">
+                  Uso sin retención
+                </span>
+                <span className="text-[11px] text-[#80868b] block">
+                  Podés gastar el saldo disponible y el que está en garantía
+                </span>
+              </div>
+            </div>
+            <span className="text-[11px] font-mono font-semibold text-[#202124] bg-[#f1f3f4] px-2.5 py-1 rounded-lg border border-[#e8eaed]">
+              100% activo
+            </span>
           </div>
         </div>
 
-        {/* Card 2: Retirable ahora con Link para Retirar */}
-        <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs transition hover:border-[#dadce0]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#f1f3f4] border border-[#e8eaed] flex items-center justify-center text-[#202124]">
-                <Landmark className="w-5 h-5" />
+        {/* Card 2: Retiros y Garantía (Combinada: primero disponible para retirar y abajo en garantía) */}
+        <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 sm:p-6 shadow-xs transition hover:border-[#dadce0] flex flex-col justify-between space-y-4">
+          {/* Sección Superior: Disponible para retirar */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#f1f3f4] border border-[#e8eaed] flex items-center justify-center text-[#202124]">
+                  <Landmark className="w-5 h-5" />
+                </div>
+                <span className="text-xs font-semibold text-[#5f6368] uppercase tracking-wider">
+                  Disponible para retirar
+                </span>
               </div>
-              <span className="text-xs font-semibold text-[#5f6368] uppercase tracking-wider">Retirable ahora</span>
-            </div>
-            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-[6px] bg-[#f1f3f4] text-[#202124] border border-[#e8eaed]">
-              Banco
-            </span>
-          </div>
-          <div>
-            <div className="flex items-baseline justify-between gap-2 flex-wrap">
-              <h4 className="text-2xl sm:text-3xl font-bold text-[#202124] tracking-tight leading-none font-mono">
-                {cargandoBalance ? "..." : formatearARS(balance.available)}
-              </h4>
               
               {/* Link para retirar fondos */}
               <button
@@ -305,34 +321,41 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
-            <p className="text-xs text-[#5f6368] font-medium mt-2 flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#3c4043]" />
-              <span>Listo para transferir a tu CBU/CVU o Alias</span>
-            </p>
-          </div>
-        </div>
 
-        {/* Card 3: En espera */}
-        <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs transition hover:border-[#dadce0]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#f1f3f4] border border-[#e8eaed] flex items-center justify-center text-[#202124]">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <span className="text-xs font-semibold text-[#5f6368] uppercase tracking-wider">En garantía (7 días)</span>
+            <div>
+              <h4 className="text-2xl sm:text-3xl font-bold text-[#202124] tracking-tight leading-none font-mono">
+                {cargandoBalance ? "..." : formatearARS(balance.available)}
+              </h4>
+              <p className="text-xs text-[#5f6368] font-medium mt-2 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#3c4043]" />
+                <span>Listo para transferir a tu CBU/CVU o Alias</span>
+              </p>
             </div>
-            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-[6px] bg-[#f1f3f4] text-[#5f6368] border border-[#e8eaed]">
-              Garantía
-            </span>
           </div>
-          <div>
-            <h4 className="text-2xl sm:text-3xl font-bold text-[#202124] tracking-tight leading-none font-mono">
-              {cargandoBalance ? "..." : formatearARS(balance.frozen)}
-            </h4>
-            <p className="text-xs text-[#5f6368] font-medium mt-2 flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-[#5f6368]" />
-              <span>Se habilita para retiro a los 7 días de cada venta</span>
-            </p>
+
+          {/* Sección Inferior: En garantía */}
+          <div className="pt-3 border-t border-[#edf0f2] flex items-center justify-between gap-3 flex-wrap">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[#f8f9fa] border border-[#e8eaed] flex items-center justify-center text-[#5f6368]">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="text-xs font-semibold text-[#5f6368] uppercase tracking-wider block">
+                  En garantía (7 días)
+                </span>
+                <span className="text-[11px] text-[#80868b] block">
+                  Se habilita para retiro a los 7 días de cada venta
+                </span>
+              </div>
+            </div>
+            <div className="text-right">
+              <span className="text-lg sm:text-xl font-bold text-[#5f6368] font-mono block">
+                {cargandoBalance ? "..." : formatearARS(balance.frozen)}
+              </span>
+              <span className="text-[10px] font-mono text-[#80868b]">
+                Retención temporal
+              </span>
+            </div>
           </div>
         </div>
       </div>
