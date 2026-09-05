@@ -1,7 +1,20 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { TrendingUp, FileText, Printer, Shield, Calendar, AlertCircle } from 'lucide-react';
+import { 
+  TrendingUp, 
+  Printer, 
+  Calendar, 
+  AlertCircle, 
+  Search, 
+  X, 
+  ChevronLeft, 
+  ChevronRight, 
+  MapPin, 
+  Package, 
+  Loader2, 
+  ShoppingBag
+} from 'lucide-react';
 import { getApiUrl } from '../../lib/config';
 import { getToken } from '../../lib/api';
 import { formatearTituloProducto } from '../../lib/format';
@@ -57,6 +70,12 @@ export default function SalesTab({ token }: SalesTabProps) {
   const [sales, setSales] = useState<SaleItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Estados para búsqueda, filtros y paginación
+  const [busqueda, setBusqueda] = useState('');
+  const [filtroEstado, setFiltroEstado] = useState<'all' | 'pending' | 'shipped' | 'delivered'>('all');
+  const [paginaActual, setPaginaActual] = useState(1);
+  const elementosPorPagina = 5;
 
   const fetchSales = async () => {
     setLoading(true);
@@ -289,128 +308,413 @@ export default function SalesTab({ token }: SalesTabProps) {
     printWindow.document.close();
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-12">
-        <div className="h-8 w-8 border-3 border-[#1a73e8] border-t-transparent rounded-full animate-spin" />
-      </div>
-    );
-  }
+  // Contadores para badges de filtro
+  const todasCount = sales.length;
+  const porDespacharCount = sales.filter(v => ['pending_payment', 'paid'].includes(v.status) && !v.tracking_number).length;
+  const enCaminoCount = sales.filter(v => v.status === 'shipped' || (v.tracking_number && v.shipment_status !== 'DELIVERED')).length;
+  const entregadasCount = sales.filter(v => v.status === 'delivered' || v.shipment_status === 'DELIVERED').length;
 
-  if (error) {
-    return (
-      <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-xs font-semibold">
-        ⚠️ Error: {error}
-      </div>
-    );
-  }
+  // Filtrado por búsqueda y categoría
+  const ventasFiltradas = useMemo(() => {
+    let list = sales;
 
-  if (sales.length === 0) {
-    return (
-      <div className="text-center py-16 bg-white border border-[#dadce0] rounded-2xl shadow-xs">
-        <div className="w-12 h-12 rounded-2xl bg-[#e6f4ea] text-[#137333] flex items-center justify-center mx-auto mb-3">
-          <TrendingUp className="h-6 w-6 stroke-[1.8]" />
-        </div>
-        <h4 className="text-sm font-bold text-[#202124]">No has realizado ventas</h4>
-        <p className="text-xs text-[#5f6368] mt-1 max-w-sm mx-auto">Cuando publiques un producto y lo compren, la información de despacho y cobro aparecerá acá.</p>
-        <Link href="/products/new" className="inline-flex items-center gap-1.5 mt-4 px-4 py-2 bg-[#1a73e8] text-white rounded-xl text-xs font-semibold hover:bg-[#1557b0] transition shadow-2xs">
-          Publicar un Producto
-        </Link>
-      </div>
-    );
-  }
+    // Filtro por estado
+    if (filtroEstado === 'pending') {
+      list = list.filter(v => ['pending_payment', 'paid'].includes(v.status) && !v.tracking_number);
+    } else if (filtroEstado === 'shipped') {
+      list = list.filter(v => v.status === 'shipped' || (v.tracking_number && v.shipment_status !== 'DELIVERED'));
+    } else if (filtroEstado === 'delivered') {
+      list = list.filter(v => v.status === 'delivered' || v.shipment_status === 'DELIVERED');
+    }
+
+    // Filtro por texto de búsqueda
+    const q = busqueda.trim().toLowerCase();
+    if (!q) return list;
+
+    return list.filter(v => {
+      const matchTitulo = (v.product_title || '').toLowerCase().includes(q);
+      const matchId = v.id.toString().includes(q) || `#${v.id}`.includes(q);
+      const matchGuia = (v.tracking_number || '').toLowerCase().includes(q);
+      const matchComprador = (v.recipient_name || '').toLowerCase().includes(q);
+      const matchCiudad = (v.city || '').toLowerCase().includes(q);
+      const matchProvincia = (v.province || '').toLowerCase().includes(q);
+      return matchTitulo || matchId || matchGuia || matchComprador || matchCiudad || matchProvincia;
+    });
+  }, [sales, busqueda, filtroEstado]);
+
+  // Paginación
+  const totalPaginas = Math.ceil(ventasFiltradas.length / elementosPorPagina) || 1;
+
+  const ventasPaginadas = useMemo(() => {
+    const inicio = (paginaActual - 1) * elementosPorPagina;
+    return ventasFiltradas.slice(inicio, inicio + elementosPorPagina);
+  }, [ventasFiltradas, paginaActual, elementosPorPagina]);
+
+  const handleBusquedaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBusqueda(e.target.value);
+    setPaginaActual(1);
+  };
+
+  const cambiarFiltro = (filtro: 'all' | 'pending' | 'shipped' | 'delivered') => {
+    setFiltroEstado(filtro);
+    setPaginaActual(1);
+  };
 
   return (
-    <div className="space-y-4 animate-fade-in select-none">
-      {sales.map((venta) => (
-        <div 
-          key={venta.id}
-          className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 shadow-xs hover:border-[#bdc1c6] hover:shadow-sm transition duration-200 flex flex-col md:flex-row md:items-center justify-between gap-5"
-        >
-          {/* Foto e Información del Producto */}
-          <div className="flex items-center gap-4 flex-grow min-w-0">
-            {venta.image_url ? (
-              <img 
-                src={venta.image_url} 
-                alt={formatearTituloProducto(venta.product_title)} 
-                className="h-16 w-16 rounded-xl object-cover border border-[#dadce0] flex-shrink-0"
-              />
-            ) : (
-              <div className="h-16 w-16 bg-[#f8f9fa] border border-[#dadce0] rounded-xl flex items-center justify-center text-[#5f6368] flex-shrink-0">
-                <TrendingUp className="h-6 w-6" />
-              </div>
-            )}
-            <div className="min-w-0">
-              <span className="text-[10px] font-bold text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.5 rounded-full border border-[#d2e3fc] uppercase tracking-wider mb-1.5 inline-block">
-                Venta #{venta.id}
-              </span>
-              <h4 className="font-bold text-[#202124] text-sm truncate leading-snug">
-                {formatearTituloProducto(venta.product_title)}
-              </h4>
-              <div className="flex items-center gap-4 mt-1.5 text-[11px] text-[#5f6368]">
-                <span className="flex items-center gap-1">
-                  <Calendar className="h-3.5 w-3.5" />
-                  {new Date(venta.created_at).toLocaleDateString()}
-                </span>
-                <span className="font-bold text-[#202124]">
-                  Cobrado: {formatearARS(venta.product_price)}
-                </span>
-              </div>
-            </div>
+    <div className="animate-fade-in select-none w-full">
+      {/* Tarjeta Contenedora Principal (Estilo Direcciones de Entrega en Mi Perfil) */}
+      <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs w-full">
+        {/* Cabecera con Título, Subtítulo y Buscador a Nivel del Título */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#f1f3f4] pb-4">
+          <div className="space-y-0.5 min-w-0">
+            <h4 className="text-sm sm:text-base font-bold text-[#202124] flex items-center gap-2">
+              <TrendingUp className="h-4 w-4 text-[#1a73e8]" />
+              <span>Mis Ventas</span>
+            </h4>
+            <p className="text-xs text-[#5f6368]">
+              Historial de órdenes vendidas, seguimiento de envíos e impresión de etiquetas de despacho
+            </p>
           </div>
 
-          {/* Impresión de Etiqueta / Logística Correo Argentino */}
-          <div className="flex flex-col md:items-end gap-2.5 flex-shrink-0 border-t md:border-t-0 pt-4 md:pt-0 border-[#f1f3f4]">
-            <div className="flex items-center gap-1.5 text-xs text-[#3c4043] font-medium">
-              <span className={`h-2 w-2 rounded-full ${(ESTADOS_ORDEN[venta.status] || ESTADOS_ORDEN.pending_payment).dot}`} />
-              <span className={`font-bold ${(ESTADOS_ORDEN[venta.status] || ESTADOS_ORDEN.pending_payment).color}`}>
-                {(ESTADOS_ORDEN[venta.status] || { label: venta.status }).label}
-              </span>
-            </div>
-            
-            {venta.tracking_number ? (
-              <div className="space-y-2 w-full md:text-right">
-                <div className="text-[11px] text-[#5f6368]">
-                  Código de Seguimiento: <span className="font-mono font-bold text-[#202124]">{venta.tracking_number}</span>
-                </div>
-                {venta.shipment_status && ESTADOS_ENVIO[venta.shipment_status] && (
-                  <div className="flex md:justify-end">
-                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
-                      ["DELIVERED", "ARRIVED"].includes(venta.shipment_status)
-                        ? "bg-[#e6f4ea] text-[#137333] border-[#ceead6]"
-                        : venta.shipment_status === "LABEL_GENERATED"
-                          ? "bg-[#fef7e0] text-[#b06000] border-[#feefc3]"
-                          : "bg-[#e8f0fe] text-[#1a73e8] border-[#d2e3fc]"
-                    }`}>
-                      Envío: {ESTADOS_ENVIO[venta.shipment_status]}
-                    </span>
-                  </div>
-                )}
-                <div className="flex flex-col sm:flex-row md:justify-end gap-2">
-                  <button 
-                    onClick={() => handleImprimirEtiqueta(venta)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-xl text-xs font-semibold shadow-2xs transition justify-center cursor-pointer"
-                  >
-                    <Printer className="h-3.5 w-3.5" />
-                    <span>Imprimir Etiqueta</span>
-                  </button>
-                  <Link
-                    href={`/shipping/tracking?number=${venta.tracking_number}`}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#e8f0fe] text-[#1a73e8] hover:bg-[#d2e3fc]/60 rounded-xl text-xs font-semibold transition justify-center border border-[#d2e3fc]"
-                  >
-                    Seguir Envío
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-center gap-1.5 text-xs text-amber-700 font-semibold bg-[#fef7e0] px-2.5 py-1 rounded-xl border border-[#feefc3]">
-                <AlertCircle className="h-3.5 w-3.5" />
-                <span>Pendiente de guía</span>
-              </div>
+          {/* Buscador a la derecha a nivel del título */}
+          <div className="relative w-full md:w-72 lg:w-80 flex-shrink-0">
+            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#80868b] pointer-events-none" />
+            <input
+              type="text"
+              value={busqueda}
+              onChange={handleBusquedaChange}
+              placeholder="Buscar por producto, #orden, guía o comprador..."
+              className="w-full pl-9 pr-8 h-[36px] text-xs rounded-xl border border-[#e8eaed] bg-[#f8f9fa] text-[#202124] placeholder-[#80868b] focus:outline-none focus:border-[#202124] focus:bg-white transition"
+            />
+            {busqueda && (
+              <button
+                type="button"
+                onClick={() => { setBusqueda(''); setPaginaActual(1); }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#80868b] hover:text-[#202124] p-0.5 cursor-pointer"
+                title="Limpiar búsqueda"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
             )}
           </div>
         </div>
-      ))}
+
+        {/* Fila de Filtros "Agrupa por" */}
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="text-xs font-medium text-[#5f6368] mr-1">
+            Agrupa por:
+          </span>
+
+          {/* Badge: Todas */}
+          <button
+            type="button"
+            onClick={() => cambiarFiltro('all')}
+            className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+              filtroEstado === 'all'
+                ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+            }`}
+          >
+            <span>Todas</span>
+            <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+              filtroEstado === 'all' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+            }`}>
+              {todasCount}
+            </span>
+          </button>
+
+          {/* Badge: Por despachar */}
+          <button
+            type="button"
+            onClick={() => cambiarFiltro('pending')}
+            className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+              filtroEstado === 'pending'
+                ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+            }`}
+          >
+            <span>Por despachar</span>
+            <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+              filtroEstado === 'pending' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+            }`}>
+              {porDespacharCount}
+            </span>
+          </button>
+
+          {/* Badge: En camino */}
+          <button
+            type="button"
+            onClick={() => cambiarFiltro('shipped')}
+            className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+              filtroEstado === 'shipped'
+                ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+            }`}
+          >
+            <span>En camino</span>
+            <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+              filtroEstado === 'shipped' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+            }`}>
+              {enCaminoCount}
+            </span>
+          </button>
+
+          {/* Badge: Entregadas */}
+          <button
+            type="button"
+            onClick={() => cambiarFiltro('delivered')}
+            className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+              filtroEstado === 'delivered'
+                ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+            }`}
+          >
+            <span>Entregadas</span>
+            <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+              filtroEstado === 'delivered' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+            }`}>
+              {entregadasCount}
+            </span>
+          </button>
+        </div>
+
+        {/* Contenido: Estado de carga, errores o lista de ventas */}
+        {loading ? (
+          <div className="p-12 text-center text-[#5f6368] flex flex-col items-center justify-center gap-2">
+            <Loader2 className="w-6 h-6 animate-spin text-[#1a73e8]" />
+            <span className="text-xs">Cargando tus ventas...</span>
+          </div>
+        ) : error ? (
+          <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-xs font-semibold">
+            ⚠️ Error: {error}
+          </div>
+        ) : sales.length === 0 ? (
+          /* Estado vacío general */
+          <div className="p-8 sm:p-12 rounded-2xl border border-dashed border-[#dadce0] bg-[#f8f9fa] text-center space-y-3">
+            <div className="w-12 h-12 rounded-full bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center mx-auto">
+              <ShoppingBag className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <h5 className="text-sm font-bold text-[#202124]">Aún no has realizado ventas</h5>
+              <p className="text-xs text-[#5f6368] max-w-md mx-auto">
+                Cuando publiques tus productos y los compradores concreten compras, acá vas a gestionar los despachos, imprimir etiquetas y seguir el envío.
+              </p>
+            </div>
+            <Link
+              href="/products/new"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#202124] hover:bg-[#000000] text-white rounded-xl text-xs font-semibold shadow-2xs transition cursor-pointer"
+            >
+              Publicar un Producto
+            </Link>
+          </div>
+        ) : ventasFiltradas.length === 0 ? (
+          /* Estado sin resultados para la búsqueda actual */
+          <div className="p-8 rounded-2xl border border-dashed border-[#dadce0] bg-[#f8f9fa] text-center space-y-3">
+            <div className="w-10 h-10 rounded-full bg-[#f1f3f4] text-[#5f6368] flex items-center justify-center mx-auto">
+              <Search className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-semibold text-[#202124]">No encontramos ventas que coincidan</p>
+              <p className="text-xs text-[#5f6368]">
+                Probá buscando con otro término, número de venta o limpiando el buscador.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => { setBusqueda(''); setFiltroEstado('all'); setPaginaActual(1); }}
+              className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-xl text-xs font-semibold text-[#202124] bg-white border border-[#dadce0] hover:bg-[#f1f3f4] transition cursor-pointer shadow-2xs"
+            >
+              Restablecer filtros
+            </button>
+          </div>
+        ) : (
+          /* Lista de Tarjetas de Ventas (Estilo Direcciones de Entrega) */
+          <div className="space-y-3">
+            {ventasPaginadas.map((venta) => (
+              <div
+                key={venta.id}
+                className="p-4 sm:p-5 rounded-2xl border border-[#edf0f2] bg-[#f8f9fa] hover:border-[#dadce0] hover:bg-white transition-all shadow-2xs flex flex-col lg:flex-row lg:items-center justify-between gap-4"
+              >
+                {/* Foto e Información Principal */}
+                <div className="flex items-start sm:items-center gap-3.5 flex-1 min-w-0">
+                  {/* Miniatura del producto */}
+                  {venta.image_url ? (
+                    <img
+                      src={venta.image_url}
+                      alt={formatearTituloProducto(venta.product_title)}
+                      className="h-16 w-16 sm:h-20 sm:w-20 rounded-xl object-cover border border-[#e8eaed] bg-white flex-shrink-0 shadow-2xs"
+                    />
+                  ) : (
+                    <div className="h-16 w-16 sm:h-20 sm:w-20 bg-white border border-[#e8eaed] rounded-xl flex items-center justify-center text-[#80868b] flex-shrink-0">
+                      <Package className="h-7 w-7" />
+                    </div>
+                  )}
+
+                  {/* Datos del producto y del comprador */}
+                  <div className="space-y-1 min-w-0 flex-1">
+                    {/* Badges de estado superior */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[10px] font-mono font-bold text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.5 rounded-full border border-[#d2e3fc] uppercase tracking-wider">
+                        Venta #{venta.id}
+                      </span>
+
+                      <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-white border border-[#e8eaed]">
+                        <span className={`h-1.5 w-1.5 rounded-full ${(ESTADOS_ORDEN[venta.status] || ESTADOS_ORDEN.pending_payment).dot}`} />
+                        <span className={(ESTADOS_ORDEN[venta.status] || ESTADOS_ORDEN.pending_payment).color}>
+                          {(ESTADOS_ORDEN[venta.status] || { label: venta.status }).label}
+                        </span>
+                      </span>
+
+                      <span className="text-[11px] text-[#5f6368] flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {new Date(venta.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                      </span>
+                    </div>
+
+                    {/* Título de la publicación */}
+                    <h5 className="text-sm font-bold text-[#202124] truncate leading-tight">
+                      {formatearTituloProducto(venta.product_title)}
+                    </h5>
+
+                    {/* Domicilio de entrega (Estilo tarjeta de direcciones de entrega) */}
+                    {(venta.recipient_name || venta.street || venta.city) && (
+                      <div className="flex items-center gap-1.5 text-xs text-[#3c4043] flex-wrap">
+                        <MapPin className="h-3.5 w-3.5 text-[#1a73e8] flex-shrink-0" />
+                        <span className="font-semibold text-[#202124]">
+                          {venta.recipient_name || "Comprador"}
+                        </span>
+                        <span className="text-[#5f6368]">·</span>
+                        <span className="text-[#5f6368]">
+                          {[
+                            venta.street ? `${venta.street} ${venta.number || ''}`.trim() : null,
+                            venta.floor_dept ? `(${venta.floor_dept})` : null,
+                            venta.city,
+                            venta.province
+                          ].filter(Boolean).join(', ')}
+                          {venta.postal_code && (
+                            <span className="font-mono ml-1">· CP {venta.postal_code}</span>
+                          )}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Monto cobrado */}
+                    <div className="text-xs pt-0.5">
+                      <span className="text-[#5f6368]">Cobrado: </span>
+                      <span className="font-mono font-bold text-[#00a650]">
+                        {formatearARS(venta.product_price)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Lado Derecho: Logística Correo Argentino y Botones */}
+                <div className="flex flex-col sm:flex-row lg:flex-col lg:items-end justify-between sm:items-center gap-2.5 flex-shrink-0 border-t lg:border-t-0 pt-3 lg:pt-0 border-[#e8eaed]">
+                  {venta.tracking_number ? (
+                    <div className="space-y-1.5 w-full sm:w-auto lg:text-right">
+                      <div className="text-[11px] text-[#5f6368]">
+                        Guía Correo:{" "}
+                        <span className="font-mono font-bold text-[#202124] bg-white px-2 py-0.5 rounded border border-[#e8eaed]">
+                          {venta.tracking_number}
+                        </span>
+                      </div>
+
+                      {venta.shipment_status && ESTADOS_ENVIO[venta.shipment_status] && (
+                        <div className="flex lg:justify-end">
+                          <span className={`text-[10.5px] font-semibold px-2 py-0.5 rounded-full border ${
+                            ["DELIVERED", "ARRIVED"].includes(venta.shipment_status)
+                              ? "bg-[#e8f8ef] text-[#00a650] border-[#ceead6]"
+                              : venta.shipment_status === "LABEL_GENERATED"
+                                ? "bg-[#fef7e0] text-[#b06000] border-[#feefc3]"
+                                : "bg-[#e8f0fe] text-[#1a73e8] border-[#d2e3fc]"
+                          }`}>
+                            Envío: {ESTADOS_ENVIO[venta.shipment_status]}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Botones de acción alineados */}
+                      <div className="flex items-center gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={() => handleImprimirEtiqueta(venta)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#202124] hover:bg-[#000000] text-white rounded-xl text-xs font-semibold shadow-2xs transition cursor-pointer"
+                          title="Imprimir etiqueta de Correo Argentino"
+                        >
+                          <Printer className="h-3.5 w-3.5" />
+                          <span>Imprimir Etiqueta</span>
+                        </button>
+
+                        <Link
+                          href={`/shipping/tracking?number=${venta.tracking_number}`}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#202124] hover:bg-[#f1f3f4] border border-[#dadce0] rounded-xl text-xs font-semibold transition shadow-2xs"
+                          title="Ver seguimiento de envío"
+                        >
+                          <Package className="h-3.5 w-3.5 text-[#1a73e8]" />
+                          <span>Seguir Envío</span>
+                        </Link>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5 text-xs text-amber-700 font-semibold bg-[#fef7e0] px-3 py-1.5 rounded-xl border border-[#feefc3]">
+                      <AlertCircle className="h-4 w-4 text-amber-600" />
+                      <span>Pendiente de guía de envío</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Paginación estilo Google AI Studio */}
+        {totalPaginas > 1 && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-[#f1f3f4]">
+            <span className="text-xs text-[#5f6368]">
+              Mostrando {Math.min((paginaActual - 1) * elementosPorPagina + 1, ventasFiltradas.length)} a {Math.min(paginaActual * elementosPorPagina, ventasFiltradas.length)} de {ventasFiltradas.length} ventas
+            </span>
+
+            <div className="flex items-center gap-1 self-center sm:self-auto">
+              <button
+                type="button"
+                onClick={() => setPaginaActual(prev => Math.max(1, prev - 1))}
+                disabled={paginaActual === 1}
+                className="p-1.5 rounded-lg border border-[#e8eaed] text-[#5f6368] hover:bg-[#f8f9fa] hover:text-[#202124] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
+                title="Página anterior"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+
+              <div className="flex items-center gap-1 px-1">
+                {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => setPaginaActual(num)}
+                    className={`w-7 h-7 rounded-lg text-xs font-medium font-mono transition cursor-pointer ${
+                      paginaActual === num
+                        ? 'bg-[#202124] text-white'
+                        : 'text-[#5f6368] hover:bg-[#f8f9fa] hover:text-[#202124]'
+                    }`}
+                  >
+                    {num}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setPaginaActual(prev => Math.min(totalPaginas, prev + 1))}
+                disabled={paginaActual === totalPaginas}
+                className="p-1.5 rounded-lg border border-[#e8eaed] text-[#5f6368] hover:bg-[#f8f9fa] hover:text-[#202124] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
+                title="Página siguiente"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
