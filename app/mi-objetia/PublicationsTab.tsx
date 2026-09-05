@@ -282,23 +282,23 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             </div>
           </div>
 
-          {/* 2. Barra con Botones estilo Actualizar de Objetia Studio */}
-          <div className="flex flex-wrap items-center gap-2 pt-1">
+          {/* 2. Barra con Botones estilo Actualizar de Objetia Studio (Modo Light, tamaño y fuente exactos) */}
+          <div className="flex flex-wrap items-center gap-2.5 pt-1">
             {/* Botón 1: Visualizaciones */}
             <button
               type="button"
               onClick={() => setMetricaActiva('views')}
-              className={`px-3 h-[32px] rounded-[10px] text-[12px] font-medium transition flex items-center gap-2 cursor-pointer border ${
+              className={`px-3.5 h-[34px] sm:h-[36px] rounded-[10px] sm:rounded-[12px] text-[12px] sm:text-[13px] font-medium transition flex items-center gap-2 cursor-pointer border whitespace-nowrap ${
                 metricaActiva === 'views'
-                  ? 'bg-[#151515] text-white border-[#87a9ff] shadow-xs'
-                  : 'bg-[#252525] border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white'
+                  ? 'bg-[#e8f0fe] border-[#1a73e8] text-[#1a73e8] shadow-xs'
+                  : 'bg-white border-[#dadce0] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124]'
               }`}
             >
               <span>Visualizaciones</span>
-              <span className={`px-1.5 py-0.5 rounded-[6px] text-[11px] font-mono ${
+              <span className={`px-2 py-0.5 rounded-[6px] text-[11px] sm:text-[12px] font-mono font-semibold ${
                 metricaActiva === 'views'
-                  ? 'bg-[#87a9ff]/20 text-[#87a9ff] font-semibold'
-                  : 'bg-[#1e1e1e] text-[#a0a0a0]'
+                  ? 'bg-[#1a73e8] text-white'
+                  : 'bg-[#f1f3f4] text-[#5f6368]'
               }`}>
                 {metrics.total_views.toLocaleString('es-AR')}
               </span>
@@ -308,17 +308,17 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             <button
               type="button"
               onClick={() => setMetricaActiva('favorites')}
-              className={`px-3 h-[32px] rounded-[10px] text-[12px] font-medium transition flex items-center gap-2 cursor-pointer border ${
+              className={`px-3.5 h-[34px] sm:h-[36px] rounded-[10px] sm:rounded-[12px] text-[12px] sm:text-[13px] font-medium transition flex items-center gap-2 cursor-pointer border whitespace-nowrap ${
                 metricaActiva === 'favorites'
-                  ? 'bg-[#151515] text-white border-[#87a9ff] shadow-xs'
-                  : 'bg-[#252525] border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white'
+                  ? 'bg-rose-50 border-rose-500 text-rose-600 shadow-xs'
+                  : 'bg-white border-[#dadce0] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124]'
               }`}
             >
               <span>Favoritos</span>
-              <span className={`px-1.5 py-0.5 rounded-[6px] text-[11px] font-mono ${
+              <span className={`px-2 py-0.5 rounded-[6px] text-[11px] sm:text-[12px] font-mono font-semibold ${
                 metricaActiva === 'favorites'
-                  ? 'bg-[#87a9ff]/20 text-[#87a9ff] font-semibold'
-                  : 'bg-[#1e1e1e] text-[#a0a0a0]'
+                  ? 'bg-rose-500 text-white'
+                  : 'bg-[#f1f3f4] text-[#5f6368]'
               }`}>
                 {metrics.total_favorites.toLocaleString('es-AR')}
               </span>
@@ -328,33 +328,33 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             <button
               type="button"
               onClick={() => setMetricaActiva('sales')}
-              className={`px-3 h-[32px] rounded-[10px] text-[12px] font-medium transition flex items-center gap-2 cursor-pointer border ${
+              className={`px-3.5 h-[34px] sm:h-[36px] rounded-[10px] sm:rounded-[12px] text-[12px] sm:text-[13px] font-medium transition flex items-center gap-2 cursor-pointer border whitespace-nowrap ${
                 metricaActiva === 'sales'
-                  ? 'bg-[#151515] text-white border-[#87a9ff] shadow-xs'
-                  : 'bg-[#252525] border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white'
+                  ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-xs'
+                  : 'bg-white border-[#dadce0] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124]'
               }`}
             >
               <span>Ventas</span>
-              <span className={`px-1.5 py-0.5 rounded-[6px] text-[11px] font-mono ${
+              <span className={`px-2 py-0.5 rounded-[6px] text-[11px] sm:text-[12px] font-mono font-semibold ${
                 metricaActiva === 'sales'
-                  ? 'bg-[#87a9ff]/20 text-[#87a9ff] font-semibold'
-                  : 'bg-[#1e1e1e] text-[#a0a0a0]'
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-[#f1f3f4] text-[#5f6368]'
               }`}>
                 {metrics.total_sales.toLocaleString('es-AR')}
               </span>
             </button>
           </div>
 
-          {/* 3. Gráfico de los últimos 30 días estilo "Ganancia de la plataforma por mes" (Sobrio, monocromático, sin iconos ni limit) */}
-          <div className="bg-[#fafafa] border border-[#e0e0e0] rounded-xl p-4 space-y-3">
+          {/* 3. Gráfico de los últimos 30 días estilo "Ganancia de la plataforma por mes" (Sin Limit, CSS, Light) */}
+          <div className="bg-[#f8f9fa] border border-[#dadce0] rounded-xl p-4 sm:p-5 space-y-3">
             <div className="flex items-center justify-between text-xs text-[#5f6368]">
-              <span>
+              <span className="font-medium text-[#202124]">
                 {metricaActiva === 'views' && "Visualizaciones por día (últimos 30 días)"}
                 {metricaActiva === 'favorites' && "Guardados en favoritos por día (últimos 30 días)"}
                 {metricaActiva === 'sales' && "Ventas concretadas por día (últimos 30 días)"}
               </span>
               <span className="font-mono text-[11px]">
-                Total: {
+                Total acumulado: {
                   (metricaActiva === 'views' ? metrics.total_views :
                    metricaActiva === 'favorites' ? metrics.total_favorites :
                    metrics.total_sales).toLocaleString('es-AR')
@@ -362,49 +362,56 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               </span>
             </div>
 
-            {/* Lienzo del Gráfico con Líneas Horizontales Sutiles */}
-            <div className="relative h-44 w-full select-none flex flex-col justify-between pt-2 pb-1">
-              {/* Líneas horizontales de referencia sobrias */}
-              <div className="absolute inset-0 pointer-events-none flex flex-col justify-between pr-8">
-                <div className="border-b border-[#e0e0e0] w-full relative">
-                  <span className="absolute right-0 -top-2.5 text-[9px] text-[#80868b] font-mono">
+            {/* Lienzo del Gráfico con Líneas Horizontales */}
+            <div className="relative h-48 w-full select-none flex flex-col justify-between pt-2 pb-1">
+              {/* Líneas horizontales de referencia */}
+              <div className="absolute inset-0 pointer-events-none flex flex-col justify-between pr-10">
+                <div className="border-b border-[#dadce0] w-full relative">
+                  <span className="absolute right-0 -top-2.5 text-[10px] text-[#5f6368] font-mono">
                     {maxActiveVal}
                   </span>
                 </div>
-                <div className="border-b border-[#e0e0e0] border-dashed w-full relative">
-                  <span className="absolute right-0 -top-2.5 text-[9px] text-[#80868b] font-mono">
+                <div className="border-b border-[#dadce0] border-dashed w-full relative">
+                  <span className="absolute right-0 -top-2.5 text-[10px] text-[#5f6368] font-mono">
                     {Math.round(maxActiveVal * 0.5)}
                   </span>
                 </div>
-                <div className="border-b border-[#e0e0e0] w-full relative">
-                  <span className="absolute right-0 -top-2.5 text-[9px] text-[#80868b] font-mono">
+                <div className="border-b border-[#dadce0] w-full relative">
+                  <span className="absolute right-0 -top-2.5 text-[10px] text-[#5f6368] font-mono">
                     0
                   </span>
                 </div>
               </div>
 
-              {/* Barras sobrias en grafito / carbón */}
-              <div className="relative z-10 flex items-end justify-between h-36 w-full pr-10 pl-1 gap-1">
+              {/* Barras CSS con colores temáticos correspondientes */}
+              <div className="relative z-10 flex items-end justify-between h-40 w-full pr-12 pl-1 gap-1">
                 {activeTimelineData.map((d, idx) => {
                   const val = d.value;
                   const barH = val > 0 ? Math.max(8, Math.round((val / maxActiveVal) * 100)) : 2;
+
+                  const barColorClass =
+                    val > 0
+                      ? metricaActiva === 'views'
+                        ? 'bg-[#1a73e8] hover:bg-[#1557b0]'
+                        : metricaActiva === 'favorites'
+                        ? 'bg-rose-500 hover:bg-rose-600'
+                        : 'bg-emerald-500 hover:bg-emerald-600'
+                      : 'bg-[#dadce0] hover:bg-[#bcc1c8]';
 
                   return (
                     <div
                       key={idx}
                       className="flex-1 flex flex-col items-center justify-end h-full group relative cursor-pointer"
                     >
-                      {/* Tooltip sutil */}
-                      <div className="absolute -top-7 hidden group-hover:flex bg-[#202124] text-white text-[10px] px-1.5 py-0.5 rounded shadow z-20 whitespace-nowrap">
-                        {d.label}: {val}
+                      {/* Tooltip dinámico al pasar el cursor */}
+                      <div className="absolute -top-8 hidden group-hover:flex bg-[#202124] text-white text-[10px] px-2 py-0.5 rounded-md shadow-md z-20 whitespace-nowrap">
+                        {d.label}: {val} {metricaActiva === 'views' ? 'vistas' : metricaActiva === 'favorites' ? 'favoritos' : 'ventas'}
                       </div>
 
-                      {/* Barra sobria */}
+                      {/* Barra CSS */}
                       <div
                         style={{ height: `${barH}%` }}
-                        className={`w-full max-w-[20px] rounded-t-[3px] transition-colors ${
-                          val > 0 ? 'bg-[#3c4043] group-hover:bg-[#202124]' : 'bg-[#e0e0e0]'
-                        }`}
+                        className={`w-full max-w-[22px] rounded-t-[4px] transition-all ${barColorClass}`}
                       />
                     </div>
                   );
@@ -412,7 +419,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               </div>
 
               {/* Eje X de fechas */}
-              <div className="relative z-10 flex items-center justify-between text-[9px] text-[#80868b] font-mono pt-1.5 pr-10 pl-1 border-t border-[#e0e0e0]">
+              <div className="relative z-10 flex items-center justify-between text-[10px] text-[#5f6368] font-mono pt-2 pr-12 pl-1 border-t border-[#dadce0]">
                 {activeTimelineData.map((d, idx) => (
                   <span key={idx} className={idx % 5 === 0 ? "block" : "hidden sm:inline-block opacity-0 select-none"}>
                     {idx % 5 === 0 ? d.label : d.label}
