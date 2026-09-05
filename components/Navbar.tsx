@@ -519,7 +519,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                       <Bell className="h-5.5 w-5.5" />
                       {unreadNotifsCount > 0 && (
                         <span 
-                          className="absolute -top-1 -right-1 h-4 min-w-[16px] px-1 rounded-full text-[9px] font-semibold text-white flex items-center justify-center bg-[#1f1f1f] border-[1.5px] border-white shadow-2xs leading-none"
+                          className="absolute -top-1 -right-1 h-4 min-w-[16px] px-1 rounded-full text-[9.5px] font-bold text-[#202124] flex items-center justify-center bg-[#f1f3f4] border border-[#dadce0] shadow-xs leading-none"
                         >
                           {unreadNotifsCount}
                         </span>
