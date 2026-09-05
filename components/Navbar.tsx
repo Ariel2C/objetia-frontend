@@ -15,9 +15,7 @@ import {
   PlusCircle,
   Sparkles,
   Shield,
-  ShieldCheck,
-  Phone,
-  MapPin
+  ShieldCheck
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '../lib/config';
@@ -521,31 +519,42 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                       <Bell className="h-5.5 w-5.5" />
                       {unreadNotifsCount > 0 && (
                         <span 
-                          className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-white"
-                          style={{ backgroundColor: '#4D5E4F' }}
+                          className="absolute -top-1 -right-1 h-4 min-w-[16px] px-1 rounded-full text-[9px] font-bold text-white flex items-center justify-center bg-[#1a73e8] border border-white shadow-2xs"
                         >
                           {unreadNotifsCount}
                         </span>
                       )}
                     </button>
 
-                    {/* DROPDOWN NOTIFICACIONES */}
+                    {/* DROPDOWN NOTIFICACIONES - GOOGLE AI STUDIO LIGHT STYLE */}
                     {notifAbierto && (
-                      <div className="absolute right-0 mt-2 w-80 sm:w-88 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-4 space-y-3 animate-scale-in origin-top-right">
-                        <div className="flex justify-between items-center text-xs pb-1.5 border-b border-gray-100">
-                          <span className="font-extrabold text-gray-800">Notificaciones</span>
+                      <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[#dadce0] rounded-2xl shadow-xl shadow-black/8 z-50 overflow-hidden animate-scale-in origin-top-right">
+                        {/* Cabecera estilo Google AI Studio */}
+                        <div className="flex justify-between items-center px-4 py-3 border-b border-[#f1f3f4] bg-white">
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-[#202124]">Notificaciones</span>
+                            {unreadNotifsCount > 0 && (
+                              <span className="text-[10px] font-semibold bg-[#e8f0fe] text-[#1a73e8] px-1.5 py-0.5 rounded-full">
+                                {unreadNotifsCount}
+                              </span>
+                            )}
+                          </div>
                           {unreadNotifsCount > 0 && (
                             <button 
                               onClick={marcarTodasComoLeidas}
-                              className="text-[10px] text-[#1a73e8] hover:underline font-bold cursor-pointer"
+                              className="text-[11px] text-[#1a73e8] hover:text-[#1557b0] font-medium transition cursor-pointer"
                             >
-                              Leer todas
+                              Marcar leídas
                             </button>
                           )}
                         </div>
-                        <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
+
+                        {/* Lista de Notificaciones sin iconos */}
+                        <div className="p-2 space-y-1.5 max-h-[320px] overflow-y-auto">
                           {notificaciones.length === 0 ? (
-                            <p className="text-[11px] text-gray-400 text-center py-4">No tienes notificaciones pendientes.</p>
+                            <div className="py-8 text-center">
+                              <p className="text-xs text-[#5f6368]">No tienes notificaciones pendientes</p>
+                            </div>
                           ) : (
                             notificaciones.map(n => (
                               <div 
@@ -557,32 +566,43 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                                     router.push(n.link);
                                   }
                                 }}
-                                className={`p-3 rounded-xl text-[11px] leading-snug transition cursor-pointer flex items-start gap-2.5 ${
+                                className={`p-3 rounded-xl transition cursor-pointer text-left border ${
                                   n.leida 
-                                    ? 'bg-gray-50/80 text-gray-500 hover:bg-gray-100/80' 
-                                    : 'bg-amber-50/90 text-amber-950 font-medium border-l-4 border-amber-500 hover:bg-amber-100/80 shadow-2xs'
+                                    ? 'bg-white hover:bg-[#f8f9fa] border-transparent' 
+                                    : 'bg-[#f8faff] hover:bg-[#f1f6fd] border-[#e8f0fe]'
                                 }`}
                               >
-                                {n.tipo === 'telefono' ? (
-                                  <Phone className="w-4 h-4 text-[#1a73e8] shrink-0 mt-0.5" />
-                                ) : n.tipo === 'direccion' ? (
-                                  <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                                ) : n.tipo === 'moderacion' ? (
-                                  <Shield className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
-                                ) : (
-                                  <Bell className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" />
-                                )}
-                                <div className="flex-1 min-w-0">
-                                  <p>{n.texto}</p>
-                                  <div className="flex items-center justify-between mt-1.5 pt-1 border-t border-black/5">
-                                    <span className="text-[9px] text-amber-800/70 font-normal">{n.fecha}</span>
-                                    {n.link && (
-                                      <span className="text-[9px] text-[#1a73e8] font-bold hover:underline">
-                                        Completar en mi perfil &rarr;
-                                      </span>
+                                <div className="flex items-start justify-between gap-2">
+                                  <div className="flex items-center gap-1.5">
+                                    {!n.leida && (
+                                      <span className="w-1.5 h-1.5 rounded-full bg-[#1a73e8] shrink-0" />
                                     )}
+                                    <span className="text-[11px] font-semibold text-[#202124]">
+                                      {n.tipo === 'telefono' 
+                                        ? 'Teléfono de contacto' 
+                                        : n.tipo === 'direccion' 
+                                        ? 'Dirección de entrega' 
+                                        : n.tipo === 'moderacion'
+                                        ? 'Moderación'
+                                        : 'Aviso'}
+                                    </span>
                                   </div>
+                                  <span className="text-[10px] text-[#70757a] font-normal shrink-0">
+                                    {n.fecha}
+                                  </span>
                                 </div>
+
+                                <p className="text-xs text-[#3c4043] leading-relaxed mt-1.5">
+                                  {n.texto}
+                                </p>
+
+                                {n.link && (
+                                  <div className="mt-2 pt-2 border-t border-[#f1f3f4] flex justify-end">
+                                    <span className="text-[11px] font-medium text-[#1a73e8] hover:text-[#1557b0] transition">
+                                      Completar en mi perfil &rarr;
+                                    </span>
+                                  </div>
+                                )}
                               </div>
                             ))
                           )}
