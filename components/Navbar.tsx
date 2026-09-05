@@ -424,14 +424,12 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     return true;
   }, [navBgColorState]);
 
-  const iconClass = esNavOscuro 
-    ? "relative text-white hover:text-gray-100 transition p-1 cursor-pointer" 
-    : "relative text-gray-700 hover:text-gray-900 transition p-1 cursor-pointer";
+  const iconBtnClass = "relative text-[#c4c7c5] hover:text-[#f1f3f4] hover:bg-[#282a2c] p-2 rounded-xl transition cursor-pointer flex items-center justify-center";
 
   if (isRootTab) return null;
 
   return (
-    <nav style={{ backgroundColor: 'var(--bg-navbar)' }} className="border-b border-gray-100/30 sticky top-0 z-50 shadow-sm transition-colors duration-300">
+    <nav className="bg-[#131314] border-b border-[#282a2c] sticky top-0 z-50 transition-colors duration-200 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center gap-4">
           
@@ -441,52 +439,53 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               <img 
                 src={logoUrlState && logoUrlState !== "" && logoUrlState !== "https://" ? logoUrlState : "/objetia_logo.png"} 
                 alt="Logo" 
-                className="h-10 w-10 sm:h-11 sm:w-11 object-contain group-hover:scale-105 transition-transform" 
+                className="h-9 w-9 sm:h-10 sm:w-10 object-contain group-hover:scale-105 transition-transform" 
               />
               <span 
                 style={{ 
                   fontFamily: `var(--font-family-brand, ${brandFontFamilyState})`,
                   fontSize: `var(--font-size-brand, ${brandFontSizeState})`
                 }} 
-                className={`font-black tracking-wider uppercase leading-none ${
-                  esNavOscuro ? "text-white drop-shadow-xs" : "text-gray-900"
-                }`}
+                className="font-black tracking-wider uppercase leading-none text-[#f1f3f4]"
               >
                 {brandNameState || 'OBJETIA'}
               </span>
             </Link>
           </div>
 
-          {/* CUADRO DE BÚSQUEDA INTEGRADO */}
+          {/* CUADRO DE BÚSQUEDA INTEGRADO ESTILO GOOGLE AI STUDIO */}
           <div className="flex-1 max-w-md mx-4 hidden md:block">
-            <form onSubmit={handleNavbarSearch} className="flex items-stretch bg-white border border-gray-300 rounded-xl focus-within:border-purple-600 transition shadow-2xs">
+            <form onSubmit={handleNavbarSearch} className="flex items-center bg-[#1e1f20] border border-[#333538] hover:border-[#444746] focus-within:border-[#87a9ff] rounded-xl transition shadow-xs overflow-hidden">
+              <div className="pl-3.5 pr-1 flex items-center text-[#9aa0a6]">
+                <Search className="h-4 w-4" />
+              </div>
               <input 
                 type="text" 
                 value={navbarSearch}
                 onChange={(e) => setNavbarSearch(e.target.value)}
                 placeholder="Buscar muebles, iluminación, decoración..." 
-                className="w-full bg-transparent pl-3.5 pr-2 py-2 text-xs text-gray-900 placeholder-gray-400 focus:outline-none"
+                className="w-full bg-transparent px-2.5 py-2 text-xs text-[#e3e3e3] placeholder-[#80868b] focus:outline-none"
               />
-              <div className="w-[1px] bg-gray-200 my-1.5" />
-              <button 
-                type="submit"
-                aria-label="Buscar"
-                className="px-3.5 flex items-center justify-center text-gray-500 hover:text-purple-700 transition cursor-pointer bg-transparent"
-              >
-                <Search className="h-4 w-4" />
-              </button>
+              {navbarSearch.trim() && (
+                <button 
+                  type="submit"
+                  aria-label="Buscar"
+                  className="px-3 py-1 mr-1 text-[11px] font-medium text-[#87a9ff] hover:text-[#a8c7fa] cursor-pointer"
+                >
+                  Buscar
+                </button>
+              )}
             </form>
           </div>
 
           {/* SECCIÓN USUARIO Y ACCIONES DE CABECERA */}
-          <div className="flex items-center space-x-4 sm:space-x-5">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             
-            {/* BOTÓN VENDER (VISIBLE SOLO SI TIENE PERMISO DE VENTA O NO ESTÁ LOGUEADO) */}
+            {/* BOTÓN VENDER (ESTILO GOOGLE AI STUDIO ACCENT) */}
             {(!usuario || tienePermiso('sell_products') || tienePermiso('full_access') || usuario?.role === 'root') && (
               <button 
                 onClick={handleBotonVender}
-                className="inline-flex items-center justify-center text-white text-xs font-extrabold px-4 py-2 rounded-xl transition shadow-xs hover:opacity-90 cursor-pointer"
-                style={{ backgroundColor: 'var(--color-primary, #2C3E50)' }}
+                className="inline-flex items-center justify-center bg-[#87a9ff] hover:bg-[#a8c7fa] text-[#131314] text-xs font-bold px-3.5 py-1.5 rounded-lg transition shadow-xs active:scale-98 cursor-pointer"
               >
                 Vender
               </button>
@@ -499,10 +498,10 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                 /* ==================================================================== */
                 <>
                   {/* 1. FAVORITOS (CORAZÓN) */}
-                  <Link href="/products/favorites" className={iconClass} title="Mis Favoritos">
-                    <Heart className="h-5.5 w-5.5" />
+                  <Link href="/products/favorites" className={iconBtnClass} title="Mis Favoritos">
+                    <Heart className="h-5 w-5" />
                     {favoritosCount > 0 && (
-                      <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 text-white text-[9px] font-bold flex items-center justify-center border border-white animate-pulse">
+                      <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center border border-[#131314] shadow-xs animate-pulse">
                         {favoritosCount}
                       </span>
                     )}
@@ -513,28 +512,28 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                     <button 
                       onClick={() => setNotifAbierto(!notifAbierto)}
                       aria-label="Notificaciones"
-                      className={`${iconClass} focus:outline-none`}
+                      className={`${iconBtnClass} ${notifAbierto ? 'bg-[#282a2c] text-[#f1f3f4]' : ''} focus:outline-none`}
                       title="Notificaciones"
                     >
-                      <Bell className="h-5.5 w-5.5" />
+                      <Bell className="h-5 w-5" />
                       {unreadNotifsCount > 0 && (
                         <span 
-                          className="absolute -top-1 -right-1 h-4 min-w-[16px] px-1 rounded-full text-[9.5px] font-bold text-[#202124] flex items-center justify-center bg-[#f1f3f4] border border-[#dadce0] shadow-xs leading-none"
+                          className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full text-[9px] font-bold text-[#131314] bg-[#87a9ff] border border-[#131314] flex items-center justify-center shadow-xs leading-none"
                         >
                           {unreadNotifsCount}
                         </span>
                       )}
                     </button>
 
-                    {/* DROPDOWN NOTIFICACIONES - GOOGLE AI STUDIO LIGHT STYLE */}
+                    {/* DROPDOWN NOTIFICACIONES - GOOGLE AI STUDIO DARK STYLE */}
                     {notifAbierto && (
-                      <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[#dadce0] rounded-2xl shadow-xl shadow-black/8 z-50 overflow-hidden animate-scale-in origin-top-right">
+                      <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 overflow-hidden animate-scale-in origin-top-right">
                         {/* Cabecera estilo Google AI Studio */}
-                        <div className="flex justify-between items-center px-4 py-3 border-b border-[#f1f3f4] bg-white">
+                        <div className="flex justify-between items-center px-4 py-3 border-b border-[#282a2c] bg-[#1e1f20]">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-[#202124]">Notificaciones</span>
+                            <span className="text-xs font-semibold text-[#e3e3e3]">Notificaciones</span>
                             {unreadNotifsCount > 0 && (
-                              <span className="text-[10px] font-medium bg-[#f1f3f4] text-[#3c4043] px-1.5 py-0.5 rounded-full border border-[#dadce0]/70">
+                              <span className="text-[10px] font-semibold bg-[#282a2c] text-[#87a9ff] px-1.5 py-0.5 rounded-md border border-[#3c4043]">
                                 {unreadNotifsCount}
                               </span>
                             )}
@@ -542,18 +541,18 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                           {unreadNotifsCount > 0 && (
                             <button 
                               onClick={marcarTodasComoLeidas}
-                              className="text-[11px] text-[#1a73e8] hover:text-[#1557b0] font-medium transition cursor-pointer"
+                              className="text-[11px] text-[#87a9ff] hover:text-[#a8c7fa] font-medium transition cursor-pointer"
                             >
                               Marcar leídas
                             </button>
                           )}
                         </div>
 
-                        {/* Lista de Notificaciones sin iconos */}
-                        <div className="p-2 space-y-1.5 max-h-[320px] overflow-y-auto">
+                        {/* Lista de Notificaciones estilo Google AI Studio Dark */}
+                        <div className="p-2 space-y-1.5 max-h-[320px] overflow-y-auto custom-scrollbar">
                           {notificaciones.length === 0 ? (
                             <div className="py-8 text-center">
-                              <p className="text-xs text-[#5f6368]">No tienes notificaciones pendientes</p>
+                              <p className="text-xs text-[#8e918f]">No tienes notificaciones pendientes</p>
                             </div>
                           ) : (
                             notificaciones.map(n => (
@@ -568,16 +567,16 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                                 }}
                                 className={`p-3 rounded-xl transition cursor-pointer text-left border ${
                                   n.leida 
-                                    ? 'bg-white hover:bg-[#f8f9fa] border-transparent' 
-                                    : 'bg-[#fafafa] hover:bg-[#f5f5f5] border-[#e8eaed]'
+                                    ? 'bg-[#1e1f20] hover:bg-[#282a2c]/60 border-transparent text-[#8e918f]' 
+                                    : 'bg-[#282a2c]/50 hover:bg-[#282a2c] border-[#3c4043] text-[#e3e3e3]'
                                 }`}
                               >
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex items-center gap-1.5">
                                     {!n.leida && (
-                                      <span className="w-1.5 h-1.5 rounded-full bg-[#1f1f1f] shrink-0" />
+                                      <span className="w-1.5 h-1.5 rounded-full bg-[#87a9ff] shrink-0" />
                                     )}
-                                    <span className="text-[11px] font-semibold text-[#202124]">
+                                    <span className={`text-[11px] font-semibold ${n.leida ? 'text-[#c4c7c5]' : 'text-white'}`}>
                                       {n.tipo === 'telefono' 
                                         ? 'Teléfono de contacto' 
                                         : n.tipo === 'direccion' 
@@ -587,18 +586,18 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                                         : 'Aviso'}
                                     </span>
                                   </div>
-                                  <span className="text-[10px] text-[#70757a] font-normal shrink-0">
+                                  <span className="text-[10px] text-[#8e918f] font-normal shrink-0">
                                     {n.fecha}
                                   </span>
                                 </div>
 
-                                <p className="text-xs text-[#3c4043] leading-relaxed mt-1.5">
+                                <p className={`text-xs leading-relaxed mt-1.5 ${n.leida ? 'text-[#8e918f]' : 'text-[#c4c7c5]'}`}>
                                   {n.texto}
                                 </p>
 
                                 {n.link && (
-                                  <div className="mt-2 pt-2 border-t border-[#f1f3f4] flex justify-end">
-                                    <span className="text-[11px] font-medium text-[#1a73e8] hover:text-[#1557b0] transition">
+                                  <div className="mt-2 pt-2 border-t border-[#333538] flex justify-end">
+                                    <span className="text-[11px] font-semibold text-[#87a9ff] hover:text-[#a8c7fa] transition">
                                       Completar en mi perfil &rarr;
                                     </span>
                                   </div>
@@ -612,10 +611,10 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   </div>
 
                   {/* 3. CARRITO DE COMPRAS */}
-                  <Link href="/cart" className={iconClass} title="Carrito">
-                    <ShoppingCart className="h-5.5 w-5.5" />
+                  <Link href="/cart" className={iconBtnClass} title="Carrito">
+                    <ShoppingCart className="h-5 w-5" />
                     {cartCount > 0 && (
-                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-white bg-red-500 animate-pulse">
+                      <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-[#131314] bg-emerald-500 shadow-xs animate-pulse">
                         {cartCount}
                       </span>
                     )}
@@ -625,35 +624,35 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   <div className="relative" ref={dropdownRef}>
                     <button 
                       onClick={() => setMenuAbierto(!menuAbierto)}
-                      className="flex items-center gap-1.5 cursor-pointer focus:outline-none p-1 rounded-xl hover:bg-gray-100/50 transition group"
+                      className={`flex items-center gap-1.5 cursor-pointer focus:outline-none p-1 rounded-xl hover:bg-[#282a2c] transition group ${menuAbierto ? 'bg-[#282a2c]' : ''}`}
                       title="Mi Perfil"
                     >
                       <div className="relative">
                         {usuario.avatar_url ? (
-                          <img src={usuario.avatar_url} alt="Avatar" className="h-8 w-8 rounded-full border-2 border-emerald-500 object-cover shadow-xs" />
+                          <img src={usuario.avatar_url} alt="Avatar" className="h-8 w-8 rounded-full border border-[#3c4043] object-cover" />
                         ) : (
-                          <div className="h-8 w-8 rounded-full bg-purple-100 text-purple-700 font-extrabold flex items-center justify-center border-2 border-emerald-500 shadow-xs text-xs">
+                          <div className="h-8 w-8 rounded-full bg-[#282a2c] text-[#87a9ff] font-bold flex items-center justify-center border border-[#3c4043] text-xs">
                             {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
                           </div>
                         )}
-                        <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-500 border-2 border-white" title="En línea" />
+                        <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-400 border-2 border-[#131314]" title="En línea" />
                       </div>
-                      <ChevronDown className={`h-3.5 w-3.5 transition-transform ${esNavOscuro ? "text-gray-300" : "text-gray-600"} ${menuAbierto ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`h-3.5 w-3.5 transition-transform text-[#9aa0a6] ${menuAbierto ? 'rotate-180 text-white' : ''}`} />
                     </button>
 
-                    {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN */}
+                    {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN - GOOGLE AI STUDIO DARK */}
                     {menuAbierto && (
-                      <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in origin-top-right">
-                        <div className="px-3 py-2 border-b border-gray-50">
-                          <p className="text-xs font-bold text-gray-900 truncate">{usuario.full_name}</p>
-                          <p className="text-[10px] text-gray-400 truncate">{usuario.email}</p>
+                      <div className="absolute right-0 mt-2 w-56 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1 animate-scale-in origin-top-right">
+                        <div className="px-3 py-2 border-b border-[#282a2c]">
+                          <p className="text-xs font-semibold text-[#e3e3e3] truncate">{usuario.full_name}</p>
+                          <p className="text-[10px] text-[#8e918f] truncate">{usuario.email}</p>
                           {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'administrador') && (
-                            <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-purple-100 text-purple-700">
+                            <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#282a2c] text-[#87a9ff] border border-[#3c4043]">
                               Administrador
                             </span>
                           )}
                           {(usuario.role?.toLowerCase() === 'root') && (
-                            <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider rounded-full bg-amber-100 text-amber-800">
+                            <span className="inline-block mt-1 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20">
                               Programador Root
                             </span>
                           )}
@@ -662,16 +661,16 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                         >
-                          <User className="h-4 w-4 text-purple-600" /> Mi OBJETIA
+                          <User className="h-4 w-4 text-[#87a9ff]" /> Mi OBJETIA
                         </Link>
 
                         <button 
                           onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}
-                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-red-600 hover:bg-red-50 transition cursor-pointer text-left"
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition cursor-pointer text-left"
                         >
-                          <LogOut className="h-4 w-4 text-red-400" /> Cerrar Sesión
+                          <LogOut className="h-4 w-4 text-rose-400" /> Cerrar Sesión
                         </button>
                       </div>
                     )}
@@ -681,21 +680,17 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                 /* ==================================================================== */
                 /* USUARIO NO LOGUEADO / OFFLINE: MUESTRA CREA TU CUENTA E INGRESA */
                 /* ==================================================================== */
-                <div className="flex items-center space-x-3 text-xs font-extrabold">
+                <div className="flex items-center space-x-3 text-xs font-medium">
                   <Link 
                     href="/auth?mode=register" 
-                    className={`transition hover:underline ${
-                      esNavOscuro ? "text-white hover:text-purple-200" : "text-purple-700 hover:text-purple-900"
-                    }`}
+                    className="text-[#87a9ff] hover:text-[#a8c7fa] transition font-semibold"
                   >
                     Crea tu cuenta
                   </Link>
-                  <span className={esNavOscuro ? "text-gray-400" : "text-gray-300"}>|</span>
+                  <span className="text-[#3c4043]">|</span>
                   <Link 
                     href="/auth?mode=login" 
-                    className={`transition ${
-                      esNavOscuro ? "text-gray-200 hover:text-white" : "text-gray-700 hover:text-purple-700"
-                    }`}
+                    className="text-[#c4c7c5] hover:text-white transition"
                   >
                     Ingresa
                   </Link>
@@ -708,14 +703,14 @@ export default function Navbar({ logoUrl }: NavbarProps) {
         </div>
       </div>
 
-      {/* SUB-BARRA DE MENÚ DE NAVEGACIÓN (Nuevos ingresos / Descubrir / Decoración / Iluminación / Alfombras / Exterior) - Se oculta en Mi Objetia y Consolas Root */}
+      {/* SUB-BARRA DE MENÚ DE NAVEGACIÓN - GOOGLE AI STUDIO DARK */}
       {!pathname?.startsWith('/mi-objetia') && !pathname?.startsWith('/mi-espacio') && !pathname?.startsWith('/root') && (
-        <div className="border-t border-gray-100/60 bg-white/95 backdrop-blur-xs hidden md:block">
+        <div className="border-t border-[#282a2c] bg-[#18181a] hidden md:block">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center space-x-8 py-2.5 text-xs font-extrabold tracking-wide text-gray-700">
+            <div className="flex items-center space-x-2 py-1.5 text-xs font-medium text-[#9aa0a6]">
               
               {/* 1. Nuevos ingresos */}
-              <Link href="/catalog?sort=newest" className="hover:text-purple-700 transition flex items-center gap-1">
+              <Link href="/catalog?sort=newest" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition flex items-center gap-1">
                 Nuevos ingresos
               </Link>
 
@@ -725,34 +720,34 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                 onMouseEnter={() => setDescubrirAbierto(true)} 
                 onMouseLeave={() => setDescubrirAbierto(false)}
               >
-                <button className="hover:text-purple-700 transition flex items-center gap-1 cursor-pointer py-1">
+                <button className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer">
                   <span>Descubrir</span>
-                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${descubrirAbierto ? 'rotate-180 text-purple-700' : ''}`} />
+                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${descubrirAbierto ? 'rotate-180 text-[#87a9ff]' : ''}`} />
                 </button>
 
                 {descubrirAbierto && (
-                  <div className="absolute left-0 top-full w-64 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-2 space-y-1 animate-scale-in origin-top-left">
+                  <div className="absolute left-0 top-full w-64 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1 animate-scale-in origin-top-left">
                     <Link
                       href="/catalog?filter=selected"
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
                       ⭐ Seleccionados de Objetia
                     </Link>
                     <Link
                       href="/catalog?max_price=50000"
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
                       🏷️ Hallazgos por menos de $50.000
                     </Link>
                     <Link
                       href="/catalog?condition=used"
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
                       📜 Vintage & Usados Selección
                     </Link>
                     <Link
                       href="/catalog?sort=popular"
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold text-gray-700 hover:bg-purple-50 hover:text-purple-700 transition"
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
                       🔥 Tendencias
                     </Link>
@@ -761,22 +756,22 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               </div>
 
               {/* 3. Decoración */}
-              <Link href="/catalog?category=Adornos+y+Cuadros" className="hover:text-purple-700 transition">
+              <Link href="/catalog?category=Adornos+y+Cuadros" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition">
                 Decoración
               </Link>
 
               {/* 4. Iluminación */}
-              <Link href="/catalog?category=Iluminación" className="hover:text-purple-700 transition">
+              <Link href="/catalog?category=Iluminación" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition">
                 Iluminación
               </Link>
 
               {/* 5. Alfombras */}
-              <Link href="/catalog?category=Alfombras" className="hover:text-purple-700 transition">
+              <Link href="/catalog?category=Alfombras" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition">
                 Alfombras
               </Link>
 
               {/* 6. Exterior */}
-              <Link href="/catalog?category=Jardín+y+Exterior" className="hover:text-purple-700 transition">
+              <Link href="/catalog?category=Jardín+y+Exterior" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition">
                 Exterior
               </Link>
 
