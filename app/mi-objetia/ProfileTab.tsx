@@ -742,7 +742,7 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
 
             {addressFormStep === 1 ? (
               /* PASO 1: Campos de Calle, Número, Ciudad, CP y Mapa Interactivo */
-              <form onSubmit={handleNextStep} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start animate-fade-in">
+              <form onSubmit={editingAddressId ? handleSaveAddress : handleNextStep} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start animate-fade-in">
                 {/* COLUMNA IZQUIERDA: Campos de Dirección */}
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -886,15 +886,35 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
                     </div>
                   </div>
 
-                  {/* Botones de acción del Paso 1 */}
+                  {/* Botones de acción: "Actualizar dirección" si está editando, o "Siguiente" si está agregando */}
                   <div className="flex items-center gap-2.5 pt-3">
-                    <button
-                      type="submit"
-                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded-xl transition cursor-pointer shadow-xs active:scale-98"
-                    >
-                      <span>Siguiente</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </button>
+                    {editingAddressId ? (
+                      <button
+                        type="submit"
+                        disabled={savingAddress}
+                        className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded-xl transition cursor-pointer disabled:opacity-60 shadow-xs active:scale-98"
+                      >
+                        {savingAddress ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <span>Actualizando...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-3.5 h-3.5" />
+                            <span>Actualizar dirección</span>
+                          </>
+                        )}
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded-xl transition cursor-pointer shadow-xs active:scale-98"
+                      >
+                        <span>Siguiente</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+                    )}
 
                     <button
                       type="button"
