@@ -19,6 +19,7 @@ import {
 import Link from 'next/link';
 import { getApiUrl } from '../../lib/config';
 import { formatearTituloProducto } from '../../lib/format';
+import TrackingModal from './TrackingModal';
 
 const formatearARS = (val: number) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(val);
@@ -70,6 +71,19 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
   const [filtroEstado, setFiltroEstado] = useState<'all' | 'pending' | 'shipped' | 'delivered'>('all');
   const [paginaActual, setPaginaActual] = useState(1);
   const elementosPorPagina = 5;
+
+  // Estado del modal de seguimiento en tiempo real
+  const [trackingModalData, setTrackingModalData] = useState<{
+    isOpen: boolean;
+    trackingNumber: string | null;
+    productTitle?: string | null;
+    orderId?: number | string | null;
+  }>({
+    isOpen: false,
+    trackingNumber: null,
+    productTitle: null,
+    orderId: null,
+  });
 
   const fetchPurchases = async () => {
     setLoading(true);
@@ -381,9 +395,19 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                       <div className="flex items-center lg:justify-end gap-1.5 text-[11px] text-[#5f6368]">
                         <Truck className="h-3.5 w-3.5 text-[#1a73e8]" />
                         <span>Correo Argentino:</span>
-                        <span className="font-mono font-bold text-[#202124] bg-white px-2 py-0.5 rounded border border-[#e8eaed]">
+                        <button
+                          type="button"
+                          onClick={() => setTrackingModalData({
+                            isOpen: true,
+                            trackingNumber: compra.tracking_number,
+                            productTitle: formatearTituloProducto(compra.product_title),
+                            orderId: compra.id
+                          })}
+                          className="font-mono font-bold text-[#202124] bg-white px-2 py-0.5 rounded border border-[#e8eaed] hover:border-[#202124] transition cursor-pointer"
+                          title="Hacé clic para ver el seguimiento del paquete"
+                        >
                           {compra.tracking_number}
-                        </span>
+                        </button>
                       </div>
 
                       {compra.shipment_status && ESTADOS_ENVIO[compra.shipment_status] && (
@@ -400,16 +424,22 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                         </div>
                       )}
 
-                      {/* Botón de seguimiento */}
+                      {/* Botón de seguimiento con modal */}
                       <div className="pt-1">
-                        <Link
-                          href={`/shipping/tracking?number=${compra.tracking_number}`}
+                        <button
+                          type="button"
+                          onClick={() => setTrackingModalData({
+                            isOpen: true,
+                            trackingNumber: compra.tracking_number,
+                            productTitle: formatearTituloProducto(compra.product_title),
+                            orderId: compra.id
+                          })}
                           className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#202124] hover:bg-[#000000] text-white rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
                           title="Ver seguimiento del paquete en tiempo real"
                         >
                           <Package className="h-3.5 w-3.5" />
                           <span>Seguir Envío</span>
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   ) : compra.status === 'pending_payment' ? (
@@ -482,6 +512,15 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
           </div>
         )}
       </div>
+
+      {/* Modal de Seguimiento de Envío (Estilo Google AI Studio Light) */}
+      <TrackingModal
+        isOpen={trackingModalData.isOpen}
+        onClose={() => setTrackingModalData(prev => ({ ...prev, isOpen: false }))}
+        trackingNumber={trackingModalData.trackingNumber}
+        productTitle={trackingModalData.productTitle}
+        orderId={trackingModalData.orderId}
+      />
     </div>
   );
 }

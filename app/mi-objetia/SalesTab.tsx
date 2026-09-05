@@ -18,6 +18,7 @@ import {
 import { getApiUrl } from '../../lib/config';
 import { getToken } from '../../lib/api';
 import { formatearTituloProducto } from '../../lib/format';
+import TrackingModal from './TrackingModal';
 
 const formatearARS = (val: number) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(val);
@@ -76,6 +77,19 @@ export default function SalesTab({ token }: SalesTabProps) {
   const [filtroEstado, setFiltroEstado] = useState<'all' | 'pending' | 'shipped' | 'delivered'>('all');
   const [paginaActual, setPaginaActual] = useState(1);
   const elementosPorPagina = 5;
+
+  // Estado del modal de seguimiento en tiempo real
+  const [trackingModalData, setTrackingModalData] = useState<{
+    isOpen: boolean;
+    trackingNumber: string | null;
+    productTitle?: string | null;
+    orderId?: number | string | null;
+  }>({
+    isOpen: false,
+    trackingNumber: null,
+    productTitle: null,
+    orderId: null,
+  });
 
   const fetchSales = async () => {
     setLoading(true);
@@ -613,9 +627,19 @@ export default function SalesTab({ token }: SalesTabProps) {
                     <div className="space-y-1.5 w-full sm:w-auto lg:text-right">
                       <div className="text-[11px] text-[#5f6368]">
                         Guía Correo:{" "}
-                        <span className="font-mono font-bold text-[#202124] bg-white px-2 py-0.5 rounded border border-[#e8eaed]">
+                        <button
+                          type="button"
+                          onClick={() => setTrackingModalData({
+                            isOpen: true,
+                            trackingNumber: venta.tracking_number,
+                            productTitle: formatearTituloProducto(venta.product_title),
+                            orderId: venta.id
+                          })}
+                          className="font-mono font-bold text-[#202124] bg-white px-2 py-0.5 rounded border border-[#e8eaed] hover:border-[#202124] transition cursor-pointer"
+                          title="Hacé clic para ver el seguimiento del paquete"
+                        >
                           {venta.tracking_number}
-                        </span>
+                        </button>
                       </div>
 
                       {venta.shipment_status && ESTADOS_ENVIO[venta.shipment_status] && (
@@ -644,14 +668,20 @@ export default function SalesTab({ token }: SalesTabProps) {
                           <span>Imprimir Etiqueta</span>
                         </button>
 
-                        <Link
-                          href={`/shipping/tracking?number=${venta.tracking_number}`}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#202124] hover:bg-[#f1f3f4] border border-[#dadce0] rounded-xl text-xs font-semibold transition shadow-2xs"
+                        <button
+                          type="button"
+                          onClick={() => setTrackingModalData({
+                            isOpen: true,
+                            trackingNumber: venta.tracking_number,
+                            productTitle: formatearTituloProducto(venta.product_title),
+                            orderId: venta.id
+                          })}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#202124] hover:bg-[#f1f3f4] border border-[#dadce0] rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
                           title="Ver seguimiento de envío"
                         >
                           <Package className="h-3.5 w-3.5 text-[#1a73e8]" />
                           <span>Seguir Envío</span>
-                        </Link>
+                        </button>
                       </div>
                     </div>
                   ) : (
@@ -714,6 +744,15 @@ export default function SalesTab({ token }: SalesTabProps) {
           </div>
         )}
       </div>
+
+      {/* Modal de Seguimiento de Envío (Estilo Google AI Studio Light) */}
+      <TrackingModal
+        isOpen={trackingModalData.isOpen}
+        onClose={() => setTrackingModalData(prev => ({ ...prev, isOpen: false }))}
+        trackingNumber={trackingModalData.trackingNumber}
+        productTitle={trackingModalData.productTitle}
+        orderId={trackingModalData.orderId}
+      />
     </div>
   );
 }
