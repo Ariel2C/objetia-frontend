@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../components/AuthContext';
 import { getApiUrl, getGoogleMapsApiKey } from '../../lib/config';
-import { ShieldCheck, MapPin, Loader2, Save, Pencil, X, Trash2, Plus, Check, Navigation, AlertCircle } from 'lucide-react';
+import { ShieldCheck, MapPin, Loader2, Save, Pencil, X, Trash2, Plus, Check, Navigation, AlertCircle, ArrowRight, ArrowLeft, Tag } from 'lucide-react';
 
 const PROVINCIAS_ARGENTINA = [
   "Buenos Aires",
@@ -84,6 +84,7 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
 
   // Estado del formulario de dirección (Agregar / Editar)
   const [showAddressForm, setShowAddressForm] = useState(false);
+  const [addressFormStep, setAddressFormStep] = useState<1 | 2>(1);
   const [editingAddressId, setEditingAddressId] = useState<number | null>(null);
   const [formTitle, setFormTitle] = useState("Mi casa");
   const [formStreet, setFormStreet] = useState("");
@@ -461,6 +462,7 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
     setFormLat(null);
     setFormLng(null);
     setAddressError("");
+    setAddressFormStep(1);
     setShowAddressForm(true);
   };
 
@@ -477,7 +479,18 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
     setFormLat(addr.lat ?? null);
     setFormLng(addr.lng ?? null);
     setAddressError("");
+    setAddressFormStep(1);
     setShowAddressForm(true);
+  };
+
+  const handleNextStep = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!formStreet.trim() || !formNumber.trim() || !formCity.trim() || !formProvince.trim()) {
+      setAddressError("Por favor completá los campos obligatorios: Calle, Número, Ciudad y Provincia antes de continuar.");
+      return;
+    }
+    setAddressError("");
+    setAddressFormStep(2);
   };
 
   const handlePostalCodeChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -717,25 +730,9 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
           )}
         </div>
 
-        {/* 1. VISTA DE FORMULARIO DIVIDIDO (Campos a la izquierda, Mapa a la derecha) */}
+        {/* 1. VISTA DE FORMULARIO DE DIRECCIÓN (PASO 1 Y PASO 2) */}
         {showAddressForm ? (
           <div className="space-y-5 animate-fade-in">
-            <div className="flex items-center justify-between bg-[#f8f9fa] px-4 py-2.5 rounded-xl border border-[#dadce0]/60">
-              <span className="text-xs font-semibold text-[#202124]">
-                {editingAddressId ? "Editar dirección" : "Agregar nueva dirección"}
-              </span>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAddressForm(false);
-                  setEditingAddressId(null);
-                }}
-                className="inline-flex items-center gap-1 text-xs text-[#5f6368] hover:text-[#202124] transition cursor-pointer"
-              >
-                <X className="w-3.5 h-3.5" /> Cancelar
-              </button>
-            </div>
-
             {addressError && (
               <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
@@ -743,165 +740,266 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
               </div>
             )}
 
-            <form onSubmit={handleSaveAddress} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-              {/* COLUMNA IZQUIERDA: Campos de Dirección */}
-              <div className="space-y-4">
-                <div>
-                  <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
-                    Etiqueta de la dirección
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Ej: Mi casa, Oficina, Depto"
-                    value={formTitle}
-                    onChange={(e) => setFormTitle(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="sm:col-span-2 relative" ref={streetWrapperRef}>
-                    <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
-                      Calle *
-                    </label>
-                    <div className="relative">
-                      <input
-                        ref={streetInputRef}
-                        type="text"
-                        required
-                        placeholder="Ej: Av. San Martín o buscá tu calle"
-                        value={formStreet}
-                        onChange={(e) => handleStreetChange(e.target.value)}
-                        onFocus={() => {
-                          if (predictions.length > 0) setShowPredictionsDropdown(true);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === 'ArrowDown') {
-                            e.preventDefault();
-                            setHighlightedIndex((prev) => Math.min(prev + 1, predictions.length - 1));
-                          } else if (e.key === 'ArrowUp') {
-                            e.preventDefault();
-                            setHighlightedIndex((prev) => Math.max(prev - 1, 0));
-                          } else if (e.key === 'Enter') {
-                            if (showPredictionsDropdown && highlightedIndex >= 0 && predictions[highlightedIndex]) {
+            {addressFormStep === 1 ? (
+              /* PASO 1: Campos de Calle, Número, Ciudad, CP y Mapa Interactivo */
+              <form onSubmit={handleNextStep} className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start animate-fade-in">
+                {/* COLUMNA IZQUIERDA: Campos de Dirección */}
+                <div className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="sm:col-span-2 relative" ref={streetWrapperRef}>
+                      <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
+                        Calle *
+                      </label>
+                      <div className="relative">
+                        <input
+                          ref={streetInputRef}
+                          type="text"
+                          required
+                          placeholder="Ej: Av. San Martín o buscá tu calle"
+                          value={formStreet}
+                          onChange={(e) => handleStreetChange(e.target.value)}
+                          onFocus={() => {
+                            if (predictions.length > 0) setShowPredictionsDropdown(true);
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'ArrowDown') {
                               e.preventDefault();
-                              handleSelectPrediction(predictions[highlightedIndex]);
+                              setHighlightedIndex((prev) => Math.min(prev + 1, predictions.length - 1));
+                            } else if (e.key === 'ArrowUp') {
+                              e.preventDefault();
+                              setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+                            } else if (e.key === 'Enter') {
+                              if (showPredictionsDropdown && highlightedIndex >= 0 && predictions[highlightedIndex]) {
+                                e.preventDefault();
+                                handleSelectPrediction(predictions[highlightedIndex]);
+                              }
+                            } else if (e.key === 'Escape') {
+                              setShowPredictionsDropdown(false);
                             }
-                          } else if (e.key === 'Escape') {
-                            setShowPredictionsDropdown(false);
-                          }
-                        }}
-                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
-                        autoComplete="off"
-                      />
-                      {loadingPredictions && (
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                          <Loader2 className="w-4 h-4 text-[#1a73e8] animate-spin" />
+                          }}
+                          className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
+                          autoComplete="off"
+                        />
+                        {loadingPredictions && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <Loader2 className="w-4 h-4 text-[#1a73e8] animate-spin" />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Menú desplegable de sugerencias */}
+                      {showPredictionsDropdown && predictions.length > 0 && (
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#dadce0] rounded-xl shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                          {predictions.map((p, idx) => (
+                            <button
+                              key={p.id || idx}
+                              type="button"
+                              onClick={() => handleSelectPrediction(p)}
+                              onMouseEnter={() => setHighlightedIndex(idx)}
+                              className={`w-full text-left px-3.5 py-2.5 flex items-start gap-2.5 transition border-b border-[#f1f3f4] last:border-0 cursor-pointer ${
+                                highlightedIndex === idx ? "bg-[#e8f0fe] text-[#1a73e8]" : "hover:bg-[#f8f9fa] text-[#202124]"
+                              }`}
+                            >
+                              <MapPin className={`w-4 h-4 mt-0.5 shrink-0 ${highlightedIndex === idx ? "text-[#1a73e8]" : "text-[#5f6368]"}`} />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-xs font-semibold truncate text-[#202124]">{p.main_text}</p>
+                                {p.secondary_text && (
+                                  <p className="text-[11px] text-[#5f6368] truncate">{p.secondary_text}</p>
+                                )}
+                              </div>
+                            </button>
+                          ))}
                         </div>
                       )}
                     </div>
+                    <div>
+                      <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
+                        Número *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Ej: 1240"
+                        value={formNumber}
+                        onChange={(e) => setFormNumber(e.target.value)}
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
+                      />
+                    </div>
+                  </div>
 
-                    {/* Menú desplegable de sugerencias */}
-                    {showPredictionsDropdown && predictions.length > 0 && (
-                      <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#dadce0] rounded-xl shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
-                        {predictions.map((p, idx) => (
-                          <button
-                            key={p.id || idx}
-                            type="button"
-                            onClick={() => handleSelectPrediction(p)}
-                            onMouseEnter={() => setHighlightedIndex(idx)}
-                            className={`w-full text-left px-3.5 py-2.5 flex items-start gap-2.5 transition border-b border-[#f1f3f4] last:border-0 cursor-pointer ${
-                              highlightedIndex === idx ? "bg-[#e8f0fe] text-[#1a73e8]" : "hover:bg-[#f8f9fa] text-[#202124]"
-                            }`}
-                          >
-                            <MapPin className={`w-4 h-4 mt-0.5 shrink-0 ${highlightedIndex === idx ? "text-[#1a73e8]" : "text-[#5f6368]"}`} />
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-semibold truncate text-[#202124]">{p.main_text}</p>
-                              {p.secondary_text && (
-                                <p className="text-[11px] text-[#5f6368] truncate">{p.secondary_text}</p>
-                              )}
-                            </div>
-                          </button>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
+                        Piso / Depto <span className="text-[#80868b] font-normal">(Opcional)</span>
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Ej: 2° B"
+                        value={formFloorDept}
+                        onChange={(e) => setFormFloorDept(e.target.value)}
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
+                        Código Postal
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="Código postal"
+                        value={formPostalCode}
+                        onChange={handlePostalCodeChange}
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition font-mono font-semibold"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
+                        Provincia *
+                      </label>
+                      <select
+                        value={formProvince}
+                        required
+                        onChange={(e) => setFormProvince(e.target.value)}
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition cursor-pointer"
+                      >
+                        <option value="">Seleccioná tu provincia...</option>
+                        {PROVINCIAS_ARGENTINA.map((p) => (
+                          <option key={p} value={p}>{p}</option>
                         ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
+                        Ciudad / Localidad *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Ej: Córdoba Capital"
+                        value={formCity}
+                        onChange={(e) => setFormCity(e.target.value)}
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Botones de acción del Paso 1 */}
+                  <div className="flex items-center gap-2.5 pt-3">
+                    <button
+                      type="submit"
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded-xl transition cursor-pointer shadow-xs active:scale-98"
+                    >
+                      <span>Siguiente</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowAddressForm(false);
+                        setEditingAddressId(null);
+                        setAddressFormStep(1);
+                      }}
+                      className="px-3.5 py-2.5 text-xs font-medium text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-xl transition cursor-pointer"
+                    >
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+
+                {/* COLUMNA DERECHA: Mapa Interactivo con Pin Arrastrable */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs text-[#5f6368]">
+                    <span className="font-semibold text-[#3c4043] flex items-center gap-1.5">
+                      <Navigation className="w-3.5 h-3.5 text-[#1a73e8]" />
+                      Ubicación en el mapa
+                    </span>
+                    <span className="text-[11px] text-[#80868b]">
+                      Arrastrá el pin para afinar el punto exacto
+                    </span>
+                  </div>
+
+                  <div className="relative w-full h-[380px] rounded-2xl overflow-hidden border border-[#dadce0] bg-[#f8f9fa] shadow-2xs">
+                    <div ref={mapContainerRef} className="w-full h-full" />
+
+                    {!googleMapsLoaded && (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#f8f9fa]/95 text-[#5f6368]">
+                        <MapPin className="w-8 h-8 text-[#9aa0a6] mb-2 animate-bounce" />
+                        <p className="text-xs font-medium text-[#202124]">Cargando mapa interactivo...</p>
+                        <p className="text-[11px] text-[#80868b] mt-1 max-w-xs">
+                          Podés completar los campos a la izquierda o buscar la calle directamente.
+                        </p>
                       </div>
                     )}
                   </div>
-                  <div>
-                    <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
-                      Número *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Ej: 1240"
-                      value={formNumber}
-                      onChange={(e) => setFormNumber(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
-                    />
+
+                  <p className="text-[11px] text-[#80868b] italic">
+                    💡 Tip: Al mover el pin en el mapa o hacer clic en una calle, los campos de la izquierda se actualizan automáticamente.
+                  </p>
+                </div>
+              </form>
+            ) : (
+              /* PASO 2: Etiqueta de la dirección y Guardado */
+              <form onSubmit={handleSaveAddress} className="max-w-xl mx-auto space-y-5 animate-fade-in bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 shadow-xs">
+                {/* Resumen visual de la dirección ingresada */}
+                <div className="bg-[#f8f9fa] border border-[#dadce0]/70 rounded-xl p-4 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center shrink-0 mt-0.5">
+                    <MapPin className="w-4 h-4" />
+                  </div>
+                  <div className="space-y-1 min-w-0 flex-1">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5f6368]">Dirección ingresada</p>
+                    <p className="text-sm font-semibold text-[#202124] truncate">
+                      {formStreet} {formNumber} {formFloorDept ? `(${formFloorDept})` : ''}
+                    </p>
+                    <p className="text-xs text-[#5f6368] truncate">
+                      {[formCity, formProvince].filter(Boolean).join(', ')} {formPostalCode ? `· CP ${formPostalCode}` : ''}
+                    </p>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Campo para la Etiqueta */}
+                <div className="space-y-3">
                   <div>
-                    <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
-                      Piso / Depto <span className="text-[#80868b] font-normal">(Opcional)</span>
+                    <label className="text-xs font-semibold text-[#3c4043] flex items-center gap-1.5 mb-1.5">
+                      <Tag className="w-3.5 h-3.5 text-[#1a73e8]" />
+                      Etiqueta de la dirección *
                     </label>
                     <input
                       type="text"
-                      placeholder="Ej: 2° B"
-                      value={formFloorDept}
-                      onChange={(e) => setFormFloorDept(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
+                      required
+                      placeholder="Ej: Mi casa, Oficina, Depto"
+                      value={formTitle}
+                      onChange={(e) => setFormTitle(e.target.value)}
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition font-medium"
+                      autoFocus
                     />
                   </div>
-                  <div>
-                    <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
-                      Código Postal
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Código postal"
-                      value={formPostalCode}
-                      onChange={handlePostalCodeChange}
-                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition font-mono font-semibold"
-                    />
-                  </div>
-                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
-                      Provincia *
-                    </label>
-                    <select
-                      value={formProvince}
-                      required
-                      onChange={(e) => setFormProvince(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition cursor-pointer"
-                    >
-                      <option value="">Seleccioná tu provincia...</option>
-                      {PROVINCIAS_ARGENTINA.map((p) => (
-                        <option key={p} value={p}>{p}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
-                      Ciudad / Localidad *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="Ej: Córdoba Capital"
-                      value={formCity}
-                      onChange={(e) => setFormCity(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
-                    />
+                  {/* Sugerencias rápidas de etiquetas */}
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-[11px] text-[#5f6368]">Sugerencias:</span>
+                    {["Mi casa", "Trabajo", "Depto", "Casa de campo", "Otro"].map((sug) => (
+                      <button
+                        key={sug}
+                        type="button"
+                        onClick={() => setFormTitle(sug)}
+                        className={`px-2.5 py-1 text-xs rounded-lg border transition cursor-pointer ${
+                          formTitle === sug
+                            ? "bg-[#e8f0fe] text-[#1a73e8] border-[#1a73e8] font-semibold"
+                            : "bg-white text-[#5f6368] border-[#dadce0] hover:bg-[#f8f9fa]"
+                        }`}
+                      >
+                        {sug}
+                      </button>
+                    ))}
                   </div>
                 </div>
 
                 {/* Checkbox para fijar como activa */}
-                <label className="flex items-center gap-2.5 pt-1 cursor-pointer select-none">
+                <label className="flex items-center gap-2.5 pt-2 cursor-pointer select-none border-t border-[#f1f3f4]">
                   <input
                     type="checkbox"
                     checked={formIsDefault}
@@ -913,12 +1011,12 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
                   </span>
                 </label>
 
-                {/* Botones de acción */}
-                <div className="flex items-center gap-2.5 pt-3">
+                {/* Botones de acción del Paso 2 */}
+                <div className="flex items-center gap-2.5 pt-3 border-t border-[#f1f3f4]">
                   <button
                     type="submit"
                     disabled={savingAddress}
-                    className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-semibold text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded-xl transition cursor-pointer disabled:opacity-60 shadow-xs active:scale-98"
+                    className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded-xl transition cursor-pointer disabled:opacity-60 shadow-xs active:scale-98"
                   >
                     {savingAddress ? (
                       <>
@@ -935,48 +1033,27 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
 
                   <button
                     type="button"
+                    onClick={() => setAddressFormStep(1)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-medium text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-xl transition cursor-pointer"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" />
+                    <span>Atrás</span>
+                  </button>
+
+                  <button
+                    type="button"
                     onClick={() => {
                       setShowAddressForm(false);
                       setEditingAddressId(null);
+                      setAddressFormStep(1);
                     }}
                     className="px-3.5 py-2.5 text-xs font-medium text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-xl transition cursor-pointer"
                   >
                     Cancelar
                   </button>
                 </div>
-              </div>
-
-              {/* COLUMNA DERECHA: Mapa Interactivo con Pin Arrastrable */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs text-[#5f6368]">
-                  <span className="font-semibold text-[#3c4043] flex items-center gap-1.5">
-                    <Navigation className="w-3.5 h-3.5 text-[#1a73e8]" />
-                    Ubicación en el mapa
-                  </span>
-                  <span className="text-[11px] text-[#80868b]">
-                    Arrastrá el pin para afinar el punto exacto
-                  </span>
-                </div>
-
-                <div className="relative w-full h-[380px] rounded-2xl overflow-hidden border border-[#dadce0] bg-[#f8f9fa] shadow-2xs">
-                  <div ref={mapContainerRef} className="w-full h-full" />
-
-                  {!googleMapsLoaded && (
-                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#f8f9fa]/95 text-[#5f6368]">
-                      <MapPin className="w-8 h-8 text-[#9aa0a6] mb-2 animate-bounce" />
-                      <p className="text-xs font-medium text-[#202124]">Cargando mapa interactivo...</p>
-                      <p className="text-[11px] text-[#80868b] mt-1 max-w-xs">
-                        Podés completar los campos a la izquierda o buscar la calle directamente.
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                <p className="text-[11px] text-[#80868b] italic">
-                  💡 Tip: Al mover el pin en el mapa o hacer clic en una calle, los campos de la izquierda se actualizan automáticamente.
-                </p>
-              </div>
-            </form>
+              </form>
+            )}
           </div>
         ) : (
           /* 2. VISTA DE LISTA DE DIRECCIONES GUARDADAS */
@@ -1041,17 +1118,8 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
                         <div className="space-y-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-sm font-semibold text-[#202124]">
-                              {addr.street} {addr.number}{' '}
-                              {addr.floor_dept && (
-                                <span className="font-normal text-[#5f6368]">({addr.floor_dept})</span>
-                              )}
+                              {addr.title || "Dirección de Entrega"}
                             </span>
-
-                            {addr.title && addr.title !== "Principal" && (
-                              <span className="text-[11px] font-medium text-[#5f6368] bg-[#f1f3f4] px-2 py-0.5 rounded-md">
-                                {addr.title}
-                              </span>
-                            )}
 
                             {isActiva ? (
                               <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full flex items-center gap-1">
@@ -1068,6 +1136,13 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
                               </button>
                             )}
                           </div>
+
+                          <p className="text-xs font-medium text-[#3c4043]">
+                            {addr.street} {addr.number}{' '}
+                            {addr.floor_dept && (
+                              <span className="text-[#5f6368] font-normal">({addr.floor_dept})</span>
+                            )}
+                          </p>
 
                           <p className="text-xs text-[#5f6368]">
                             {[addr.city, addr.province].filter(Boolean).join(', ')}{' '}
