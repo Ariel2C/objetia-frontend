@@ -84,8 +84,6 @@ function MiObjetiaContent() {
   // --- ESTADOS DE BILLETERA (CLIENT) ---
   const [balance, setBalance] = useState({ available: 0, frozen: 0 });
   const [cargandoBalance, setCargandoBalance] = useState(false);
-  const [guardandoPerfil, setGuardandoPerfil] = useState(false);
-  const [hayCambiosPerfil, setHayCambiosPerfil] = useState(false);
 
   // --- ESTADOS DE BRANDING/CMS (ADMIN) ---
   const [brandName, setBrandName] = useState("Vamaar");
@@ -805,45 +803,6 @@ function MiObjetiaContent() {
                 </span>
               </div>
             </div>
-
-            {/* Acciones Top Bar: Guardar Cambios en Mi Perfil (diseño reactivo y dinámico) */}
-            {tabActual === "perfil" && (
-              <button
-                type="submit"
-                form="perfil-form"
-                disabled={guardandoPerfil || !hayCambiosPerfil}
-                onClick={() => {
-                  const form = document.getElementById('perfil-form') as HTMLFormElement;
-                  if (form) {
-                    if (typeof form.requestSubmit === 'function') {
-                      form.requestSubmit();
-                    } else {
-                      form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
-                    }
-                  }
-                }}
-                className={`px-2.5 sm:px-3 h-[28px] sm:h-[32px] rounded-[10px] sm:rounded-[12px] text-[11px] sm:text-[13px] font-semibold transition flex items-center gap-1.5 whitespace-nowrap shadow-2xs active:scale-98 ${
-                  hayCambiosPerfil
-                    ? 'bg-[#1a73e8] text-white hover:bg-[#1557b0] border border-[#1a73e8] shadow-xs cursor-pointer'
-                    : 'bg-white border border-[#dadce0] text-[#9aa0a6] cursor-not-allowed opacity-60'
-                }`}
-                title={hayCambiosPerfil ? "Guardar cambios en información personal" : "No hay cambios pendientes"}
-              >
-                {guardandoPerfil ? (
-                  <>
-                    <Loader2 className="h-3 w-3 sm:h-3.5 sm:w-3.5 animate-spin flex-shrink-0 text-white" />
-                    <span className="whitespace-nowrap">Guardando...</span>
-                  </>
-                ) : (
-                  <>
-                    <Save className={`h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0 ${hayCambiosPerfil ? 'text-white' : 'text-[#9aa0a6]'}`} />
-                    <span className="whitespace-nowrap">
-                      {hayCambiosPerfil ? "Guardar Cambios" : "Guardado"}
-                    </span>
-                  </>
-                )}
-              </button>
-            )}
           </header>
 
           {/* Cuerpo de Contenido (Ocupa todo el ancho de la página) */}
@@ -863,10 +822,7 @@ function MiObjetiaContent() {
             {/* TAB: PERFIL */}
             {tabActual === "perfil" && (
               <div className="animate-fade-in w-full">
-                <ProfileTab 
-                  onSavingChange={setGuardandoPerfil} 
-                  onHasChangesChange={setHayCambiosPerfil}
-                />
+                <ProfileTab />
               </div>
             )}
 

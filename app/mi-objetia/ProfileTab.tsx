@@ -702,21 +702,19 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
         <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs w-full">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#f1f3f4] pb-3.5">
             <div className="space-y-0.5">
-              <div className="flex items-center gap-2.5">
+              <div className="flex items-center gap-2">
                 <h4 className="text-sm font-semibold text-[#202124] flex items-center gap-2">
                   <User className="h-4 w-4 text-[#1a73e8]" /> Información Personal
                 </h4>
-                {hasProfileChanges ? (
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200/80 animate-fade-in">
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                    Cambios sin guardar
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/70">
-                    <Check className="w-3 h-3 text-emerald-600" />
-                    Al día
-                  </span>
-                )}
+                <span className="inline-flex items-center" title={loadingProfile ? "Guardando..." : hasProfileChanges ? "Editando..." : "Al día"}>
+                  {loadingProfile ? (
+                    <Loader2 className="w-3.5 h-3.5 text-[#202124] animate-spin" />
+                  ) : hasProfileChanges ? (
+                    <Pencil className="w-3.5 h-3.5 text-[#202124] animate-pulse" />
+                  ) : (
+                    <Check className="w-3.5 h-3.5 text-[#202124]" strokeWidth={2.5} />
+                  )}
+                </span>
               </div>
               <p className="text-xs text-[#5f6368]">
                 Gestioná tu nombre, teléfono y datos de contacto de tu cuenta
