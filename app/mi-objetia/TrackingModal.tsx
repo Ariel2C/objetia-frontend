@@ -306,10 +306,12 @@ export default function TrackingModal({
               /* =========================================================== */
               /* 5. LAS ETAPAS DENTRO DE TARJETAS CON MUESCA CIRCULAR */
               /* =========================================================== */
-              <div className="space-y-3 pl-2">
+              <div className="space-y-2.5">
                 {trackingData.timeline.map((step, idx) => {
                   const Icono = ICONOS_PASO[step.code] || Check;
                   const fecha = formatearFecha(step.date);
+                  const isFirst = idx === 0;
+                  const isLast = idx === trackingData.timeline.length - 1;
 
                   const bgLineClass = step.current
                     ? 'bg-[#1a73e8]'
@@ -318,113 +320,106 @@ export default function TrackingModal({
                       : 'bg-[#dadce0]';
 
                   return (
-                    <div key={step.code} className="relative ml-6 sm:ml-7">
-                      {/* Línea conectora superior que viene desde el círculo anterior */}
-                      {idx > 0 && (
+                    <div 
+                      key={step.code} 
+                      className={`relative rounded-xl border transition-all p-3.5 sm:p-4 flex items-center gap-3.5 sm:gap-4 overflow-visible ${
+                        step.current
+                          ? 'bg-white border-[#1a73e8]/40 shadow-xs ring-1 ring-[#1a73e8]/15'
+                          : step.done
+                            ? 'bg-[#f8f9fa] hover:bg-white border-[#edf0f2] hover:border-[#dadce0]'
+                            : 'bg-[#fafbfc] border-[#f1f3f4] opacity-80'
+                      }`}
+                    >
+                      {/* LADO IZQUIERDO: SOCKET CIRCULAR CON EL ÍCONO Y LA LÍNEA VERTICAL CONECTORA (SEGÚN CROQUIS) */}
+                      <div className="relative w-12 h-12 flex-shrink-0 flex items-center justify-center">
+                        {/* Línea vertical superior (conecta desde la tarjeta anterior por el medio) */}
+                        {!isFirst && (
+                          <div 
+                            className={`absolute -top-3 left-1/2 -translate-x-1/2 w-[2px] h-3 z-0 ${
+                              step.done ? 'bg-[#202124]' : 'bg-[#dadce0]'
+                            }`}
+                          />
+                        )}
+
+                        {/* Línea vertical inferior (conecta hacia la siguiente tarjeta por el medio) */}
+                        {!isLast && (
+                          <div 
+                            className={`absolute -bottom-3 left-1/2 -translate-x-1/2 w-[2px] h-3 z-0 ${bgLineClass}`}
+                          />
+                        )}
+
+                        {/* Cavidad / Socket circular que sigue la forma del círculo pero sin tocarlo */}
                         <div 
-                          className={`absolute left-0 top-0 h-1/2 w-[2px] -translate-x-1/2 z-0 ${
-                            step.done ? 'bg-[#202124]' : 'bg-[#dadce0]'
+                          className={`absolute inset-0 rounded-full border-2 transition-colors ${
+                            step.current
+                              ? 'border-[#1a73e8]/40 bg-[#e8f0fe]/30'
+                              : step.done
+                                ? 'border-[#202124]/30 bg-white'
+                                : 'border-[#dadce0] bg-white'
                           }`}
                         />
-                      )}
 
-                      {/* Línea conectora inferior que va hacia el círculo siguiente (mismo color que el borde del círculo) */}
-                      {idx < trackingData.timeline.length - 1 && (
+                        {/* Ícono redondo interior concéntrico */}
                         <div 
-                          className={`absolute left-0 top-1/2 -translate-x-1/2 w-[2px] z-0 ${bgLineClass}`}
-                          style={{ bottom: '-12px' }}
-                        />
-                      )}
-
-                      {/* Ícono redondo que entra exactamente la mitad dentro de la tarjeta */}
-                      <div 
-                        className={`absolute -left-[18px] top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center border-2 transition-all z-10 ${
-                          step.current
-                            ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-sm ring-4 ring-[#1a73e8]/20 scale-105'
-                            : step.done
-                              ? 'bg-[#202124] border-[#202124] text-white'
-                              : 'bg-white border-[#dadce0] text-[#9aa0a6]'
-                        }`}
-                      >
-                        <Icono className="h-4 w-4 stroke-[2.2]" />
+                          className={`relative w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all z-10 ${
+                            step.current
+                              ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-sm ring-2 ring-[#1a73e8]/20 scale-105'
+                              : step.done
+                                ? 'bg-[#202124] border-[#202124] text-white'
+                                : 'bg-white border-[#dadce0] text-[#9aa0a6]'
+                          }`}
+                        >
+                          <Icono className="h-4 w-4 stroke-[2.2]" />
+                        </div>
                       </div>
 
-                      {/* Tarjeta con muesca circular en el lado izquierdo con la forma del círculo pero sin tocar el círculo */}
-                      <div 
-                        className={`relative rounded-xl p-3.5 pl-8 transition-all ${
-                          step.current
-                            ? 'bg-white border border-[#1a73e8]/40 shadow-xs ring-1 ring-[#1a73e8]/15'
-                            : step.done
-                              ? 'bg-[#f8f9fa] hover:bg-white border border-[#edf0f2] hover:border-[#dadce0]'
-                              : 'bg-[#fafbfc] border border-[#f1f3f4] opacity-80'
-                        }`}
-                        style={{
-                          maskImage: 'radial-gradient(circle 26px at 0px 50%, transparent 25px, black 26px)',
-                          WebkitMaskImage: 'radial-gradient(circle 26px at 0px 50%, transparent 25px, black 26px)',
-                        }}
-                      >
-                        {/* Borde exterior semicircular que dibuja el contorno de la muesca sin tocar el círculo */}
-                        <div
-                          className={`absolute -left-[26px] top-1/2 -translate-y-1/2 w-[52px] h-[52px] rounded-full border pointer-events-none transition-colors ${
-                            step.current
-                              ? 'border-[#1a73e8]/40'
-                              : step.done
-                                ? 'border-[#edf0f2]'
-                                : 'border-[#f1f3f4]'
-                          }`}
-                          style={{
-                            clipPath: 'polygon(50% 0, 100% 0, 100% 100%, 50% 100%)',
-                          }}
-                        />
-
-                        {/* Contenido de la etapa */}
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <h6
-                              className={`text-xs font-bold ${
-                                step.current
-                                  ? 'text-[#1a73e8]'
-                                  : step.done
-                                    ? 'text-[#202124]'
-                                    : 'text-[#80868b]'
-                              }`}
-                            >
-                              {step.title}
-                            </h6>
-                            {step.current && (
-                              <span className="text-[9.5px] font-bold uppercase tracking-wider bg-[#1a73e8] text-white px-1.5 py-0.2 rounded">
-                                En curso
-                              </span>
-                            )}
-                          </div>
-
-                          {step.description && step.done && (
-                            <p className="text-[11px] text-[#5f6368] leading-tight">
-                              {step.description}
-                            </p>
-                          )}
-
-                          {step.done ? (
-                            <div className="flex items-center gap-2 text-[10.5px] text-[#80868b] font-mono flex-wrap pt-0.5">
-                              {fecha && (
-                                <span className="flex items-center gap-1">
-                                  <Clock className="h-3 w-3" />
-                                  {fecha}
-                                </span>
-                              )}
-                              {step.location && (
-                                <span className="flex items-center gap-1">
-                                  <MapPin className="h-3 w-3" />
-                                  {step.location}
-                                </span>
-                              )}
-                            </div>
-                          ) : (
-                            <span className="text-[10px] text-[#9aa0a6] block pt-0.5">
-                              Pendiente
+                      {/* LADO DERECHO: CONTENIDO DE LA ETAPA */}
+                      <div className="space-y-1 min-w-0 flex-1">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h6
+                            className={`text-xs sm:text-sm font-bold leading-tight ${
+                              step.current
+                                ? 'text-[#1a73e8]'
+                                : step.done
+                                  ? 'text-[#202124]'
+                                  : 'text-[#80868b]'
+                            }`}
+                          >
+                            {step.title}
+                          </h6>
+                          {step.current && (
+                            <span className="text-[9.5px] font-bold uppercase tracking-wider bg-[#1a73e8] text-white px-1.5 py-0.2 rounded">
+                              En curso
                             </span>
                           )}
                         </div>
+
+                        {step.description && step.done && (
+                          <p className="text-[11px] text-[#5f6368] leading-tight">
+                            {step.description}
+                          </p>
+                        )}
+
+                        {step.done ? (
+                          <div className="flex items-center gap-2 text-[10.5px] text-[#80868b] font-mono flex-wrap pt-0.5">
+                            {fecha && (
+                              <span className="flex items-center gap-1">
+                                <Clock className="h-3 w-3" />
+                                {fecha}
+                              </span>
+                            )}
+                            {step.location && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="h-3 w-3" />
+                                {step.location}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-[10px] text-[#9aa0a6] block pt-0.5">
+                            Pendiente de procesamiento
+                          </span>
+                        )}
                       </div>
                     </div>
                   );
