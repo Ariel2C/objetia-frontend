@@ -282,7 +282,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             </div>
           </div>
 
-          {/* 2. Barra con Botones estilo Actualizar de Objetia Studio (Modo Light, tamaño y fuente exactos) */}
+          {/* 2. Barra con Botones estilo Actualizar de Objetia Studio (Light con activo carbón Google AI Studio) */}
           <div className="flex flex-wrap items-center gap-2.5 pt-1">
             {/* Botón 1: Visualizaciones */}
             <button
@@ -290,14 +290,14 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               onClick={() => setMetricaActiva('views')}
               className={`px-3.5 h-[34px] sm:h-[36px] rounded-[10px] sm:rounded-[12px] text-[12px] sm:text-[13px] font-medium transition flex items-center gap-2 cursor-pointer border whitespace-nowrap ${
                 metricaActiva === 'views'
-                  ? 'bg-[#e8f0fe] border-[#1a73e8] text-[#1a73e8] shadow-xs'
+                  ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
                   : 'bg-white border-[#dadce0] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124]'
               }`}
             >
               <span>Visualizaciones</span>
               <span className={`px-2 py-0.5 rounded-[6px] text-[11px] sm:text-[12px] font-mono font-semibold ${
                 metricaActiva === 'views'
-                  ? 'bg-[#1a73e8] text-white'
+                  ? 'bg-white/20 text-white'
                   : 'bg-[#f1f3f4] text-[#5f6368]'
               }`}>
                 {metrics.total_views.toLocaleString('es-AR')}
@@ -310,14 +310,14 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               onClick={() => setMetricaActiva('favorites')}
               className={`px-3.5 h-[34px] sm:h-[36px] rounded-[10px] sm:rounded-[12px] text-[12px] sm:text-[13px] font-medium transition flex items-center gap-2 cursor-pointer border whitespace-nowrap ${
                 metricaActiva === 'favorites'
-                  ? 'bg-rose-50 border-rose-500 text-rose-600 shadow-xs'
+                  ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
                   : 'bg-white border-[#dadce0] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124]'
               }`}
             >
               <span>Favoritos</span>
               <span className={`px-2 py-0.5 rounded-[6px] text-[11px] sm:text-[12px] font-mono font-semibold ${
                 metricaActiva === 'favorites'
-                  ? 'bg-rose-500 text-white'
+                  ? 'bg-white/20 text-white'
                   : 'bg-[#f1f3f4] text-[#5f6368]'
               }`}>
                 {metrics.total_favorites.toLocaleString('es-AR')}
@@ -330,14 +330,14 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               onClick={() => setMetricaActiva('sales')}
               className={`px-3.5 h-[34px] sm:h-[36px] rounded-[10px] sm:rounded-[12px] text-[12px] sm:text-[13px] font-medium transition flex items-center gap-2 cursor-pointer border whitespace-nowrap ${
                 metricaActiva === 'sales'
-                  ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-xs'
+                  ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
                   : 'bg-white border-[#dadce0] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124]'
               }`}
             >
               <span>Ventas</span>
               <span className={`px-2 py-0.5 rounded-[6px] text-[11px] sm:text-[12px] font-mono font-semibold ${
                 metricaActiva === 'sales'
-                  ? 'bg-emerald-600 text-white'
+                  ? 'bg-white/20 text-white'
                   : 'bg-[#f1f3f4] text-[#5f6368]'
               }`}>
                 {metrics.total_sales.toLocaleString('es-AR')}
@@ -345,7 +345,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             </button>
           </div>
 
-          {/* 3. Gráfico de los últimos 30 días estilo "Ganancia de la plataforma por mes" (Sin Limit, CSS, Light) */}
+          {/* 3. Gráfico de los últimos 30 días estilo "Ganancia de la plataforma por mes" (Sin Limit, CSS, Light con barras carbón) */}
           <div className="bg-[#f8f9fa] border border-[#dadce0] rounded-xl p-4 sm:p-5 space-y-3">
             <div className="flex items-center justify-between text-xs text-[#5f6368]">
               <span className="font-medium text-[#202124]">
@@ -383,20 +383,11 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                 </div>
               </div>
 
-              {/* Barras CSS con colores temáticos correspondientes */}
+              {/* Barras CSS en carbón Google AI Studio (#3c4043 -> #202124) para todas las métricas */}
               <div className="relative z-10 flex items-end justify-between h-40 w-full pr-12 pl-1 gap-1">
                 {activeTimelineData.map((d, idx) => {
                   const val = d.value;
                   const barH = val > 0 ? Math.max(8, Math.round((val / maxActiveVal) * 100)) : 2;
-
-                  const barColorClass =
-                    val > 0
-                      ? metricaActiva === 'views'
-                        ? 'bg-[#1a73e8] hover:bg-[#1557b0]'
-                        : metricaActiva === 'favorites'
-                        ? 'bg-rose-500 hover:bg-rose-600'
-                        : 'bg-emerald-500 hover:bg-emerald-600'
-                      : 'bg-[#dadce0] hover:bg-[#bcc1c8]';
 
                   return (
                     <div
@@ -408,10 +399,12 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                         {d.label}: {val} {metricaActiva === 'views' ? 'vistas' : metricaActiva === 'favorites' ? 'favoritos' : 'ventas'}
                       </div>
 
-                      {/* Barra CSS */}
+                      {/* Barra CSS con tono carbón Google AI Studio */}
                       <div
                         style={{ height: `${barH}%` }}
-                        className={`w-full max-w-[22px] rounded-t-[4px] transition-all ${barColorClass}`}
+                        className={`w-full max-w-[22px] rounded-t-[4px] transition-all ${
+                          val > 0 ? 'bg-[#3c4043] group-hover:bg-[#202124]' : 'bg-[#dadce0] hover:bg-[#bcc1c8]'
+                        }`}
                       />
                     </div>
                   );
