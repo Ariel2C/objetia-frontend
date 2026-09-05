@@ -312,8 +312,10 @@ export default function TrackingModal({
                   const fecha = formatearFecha(step.date);
                   const isFirst = idx === 0;
                   const isLast = idx === trackingData.timeline.length - 1;
+                  const isDelivered = trackingData.status === 'Entregado' || step.code === 'DELIVERED';
+                  const isStepCurrent = step.current && !isDelivered && !isLast;
 
-                  const bgLineClass = step.current
+                  const bgLineClass = isStepCurrent
                     ? 'bg-[#1a73e8]'
                     : step.done
                       ? 'bg-[#202124]'
@@ -323,7 +325,7 @@ export default function TrackingModal({
                     <div 
                       key={step.code} 
                       className={`relative rounded-xl border transition-all flex items-stretch overflow-visible ${
-                        step.current
+                        isStepCurrent
                           ? 'bg-white border-[#dadce0] shadow-xs ring-2 ring-[#1a73e8]/20'
                           : step.done
                             ? 'bg-[#f8f9fa] hover:bg-white border-[#dadce0]'
@@ -336,14 +338,14 @@ export default function TrackingModal({
                         {/* Camino superior (canal abierto que interrumpe el borde de la tarjeta para que no toque la línea) */}
                         {!isFirst && (
                           <div 
-                            className={`absolute left-1/2 -translate-x-1/2 w-4 bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
-                              step.current || step.done
+                            className={`absolute left-1/2 -translate-x-1/2 w-[14px] bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
+                              isStepCurrent || step.done
                                 ? 'border-[#dadce0]'
                                 : 'border-[#dadce0]/70'
                             }`}
                             style={{
                               top: '-1px',
-                              bottom: 'calc(50% + 23.5px)',
+                              bottom: 'calc(50% + 24px)',
                             }}
                           />
                         )}
@@ -351,13 +353,13 @@ export default function TrackingModal({
                         {/* Camino inferior (canal abierto que interrumpe el borde de la tarjeta para que no toque la línea) */}
                         {!isLast && (
                           <div 
-                            className={`absolute left-1/2 -translate-x-1/2 w-4 bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
-                              step.current || step.done
+                            className={`absolute left-1/2 -translate-x-1/2 w-[14px] bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
+                              isStepCurrent || step.done
                                 ? 'border-[#dadce0]'
                                 : 'border-[#dadce0]/70'
                             }`}
                             style={{
-                              top: 'calc(50% + 23.5px)',
+                              top: 'calc(50% + 24px)',
                               bottom: '-1px',
                             }}
                           />
@@ -366,7 +368,7 @@ export default function TrackingModal({
                         {/* Cavidad / Socket circular concéntrico (50px) con borde gris claro */}
                         <div 
                           className={`absolute w-[50px] h-[50px] rounded-full border-[1.5px] bg-white z-[1] transition-colors ${
-                            step.current || step.done
+                            isStepCurrent || step.done
                               ? 'border-[#dadce0]'
                               : 'border-[#dadce0]/70'
                           }`}
@@ -378,11 +380,11 @@ export default function TrackingModal({
                         >
                           {/* Abertura superior del socket hacia el camino */}
                           {!isFirst && (
-                            <div className="absolute -top-[1.5px] left-1/2 -translate-x-1/2 w-[15px] h-[3px] bg-white z-[2]" />
+                            <div className="absolute -top-[1.5px] left-1/2 -translate-x-1/2 w-[13px] h-[3px] bg-white z-[2]" />
                           )}
                           {/* Abertura inferior del socket hacia el camino */}
                           {!isLast && (
-                            <div className="absolute -bottom-[1.5px] left-1/2 -translate-x-1/2 w-[15px] h-[3px] bg-white z-[2]" />
+                            <div className="absolute -bottom-[1.5px] left-1/2 -translate-x-1/2 w-[13px] h-[3px] bg-white z-[2]" />
                           )}
                         </div>
 
@@ -390,7 +392,7 @@ export default function TrackingModal({
                         {!isFirst && (
                           <div 
                             className={`absolute left-1/2 -translate-x-1/2 w-[3px] z-[3] ${
-                              step.done ? 'bg-[#202124]' : step.current ? 'bg-[#1a73e8]' : 'bg-[#dadce0]'
+                              step.done ? 'bg-[#202124]' : isStepCurrent ? 'bg-[#1a73e8]' : 'bg-[#dadce0]'
                             }`}
                             style={{
                               top: '-15px',
@@ -410,10 +412,10 @@ export default function TrackingModal({
                           />
                         )}
 
-                        {/* Ícono redondo interior concéntrico (37px, unido a la línea, sin tocar la cavidad) */}
+                        {/* Ícono redondo interior concéntrico (39px, unido a la línea, sin tocar la cavidad) */}
                         <div 
-                          className={`relative w-[37px] h-[37px] rounded-full flex items-center justify-center border-2 transition-all z-[4] ${
-                            step.current
+                          className={`relative w-[39px] h-[39px] rounded-full flex items-center justify-center border-2 transition-all z-[4] ${
+                            isStepCurrent
                               ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-sm ring-2 ring-[#1a73e8]/20 scale-105'
                               : step.done
                                 ? 'bg-[#202124] border-[#202124] text-white'
@@ -429,7 +431,7 @@ export default function TrackingModal({
                         <div className="flex items-center gap-2 flex-wrap">
                           <h6
                             className={`text-xs sm:text-sm font-bold leading-tight ${
-                              step.current
+                              isStepCurrent
                                 ? 'text-[#1a73e8]'
                                 : step.done
                                   ? 'text-[#202124]'
@@ -438,7 +440,7 @@ export default function TrackingModal({
                           >
                             {step.title}
                           </h6>
-                          {step.current && (
+                          {isStepCurrent && (
                             <span className="text-[9.5px] font-bold uppercase tracking-wider bg-[#1a73e8] text-white px-1.5 py-0.2 rounded">
                               En curso
                             </span>
