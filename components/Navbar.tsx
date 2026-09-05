@@ -612,19 +612,22 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   <div className="relative" ref={dropdownRef}>
                     <button 
                       onClick={() => setMenuAbierto(!menuAbierto)}
-                      className={`flex items-center gap-1.5 cursor-pointer focus:outline-none p-1 rounded-xl hover:bg-[#282a2c] transition group ${menuAbierto ? 'bg-[#282a2c]' : ''}`}
-                      title="Mi Perfil"
+                      className={`flex items-center gap-2 cursor-pointer focus:outline-none py-1 px-2 rounded-xl hover:bg-[#282a2c] transition group ${menuAbierto ? 'bg-[#282a2c]' : ''}`}
+                      title={usuario.full_name || "Mi Perfil"}
                     >
-                      <div className="relative">
+                      <div className="relative shrink-0">
                         {usuario.avatar_url ? (
-                          <img src={usuario.avatar_url} alt="Avatar" className="h-8 w-8 rounded-full border border-[#3c4043] object-cover" />
+                          <img src={usuario.avatar_url} alt="Avatar" className="h-7 w-7 sm:h-8 sm:w-8 rounded-full border border-[#3c4043] object-cover" />
                         ) : (
-                          <div className="h-8 w-8 rounded-full bg-[#282a2c] text-[#87a9ff] font-bold flex items-center justify-center border border-[#3c4043] text-xs">
+                          <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-[#282a2c] text-[#87a9ff] font-bold flex items-center justify-center border border-[#3c4043] text-xs">
                             {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
                           </div>
                         )}
                       </div>
-                      <ChevronDown className={`h-3.5 w-3.5 transition-transform text-[#9aa0a6] ${menuAbierto ? 'rotate-180 text-white' : ''}`} />
+                      <span className="text-xs font-medium text-[#e3e3e3] max-w-[100px] sm:max-w-[140px] truncate">
+                        {usuario.full_name || usuario.email?.split('@')[0]}
+                      </span>
+                      <ChevronDown className={`h-3.5 w-3.5 transition-transform text-[#9aa0a6] shrink-0 ${menuAbierto ? 'rotate-180 text-white' : ''}`} />
                     </button>
 
                     {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN - GOOGLE AI STUDIO DARK LIMPIO */}
