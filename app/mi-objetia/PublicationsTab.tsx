@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Eye, Copy, Trash2, Check, Edit2, X, Loader2, Heart, TrendingUp, ShoppingBag, BarChart3, ChevronDown, ChevronUp, Sparkles, Info } from 'lucide-react';
 import Link from 'next/link';
 import { getApiUrl } from '../../lib/config';
@@ -29,7 +29,7 @@ interface SellerMetrics {
   total_favorites: number;
   total_sales: number;
   conversion_rate: number;
-  views_timeline: { date: string; label: string; views: number }[];
+  views_timeline: { date: string; label: string; views: number; favorites?: number; sales?: number }[];
   top_products: any[];
 }
 
@@ -41,10 +41,28 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
   const toast = useToast();
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [metrics, setMetrics] = useState<SellerMetrics | null>(null);
-  const [mostrarGrafico, setMostrarGrafico] = useState(false);
+  const [metricaActiva, setMetricaActiva] = useState<'views' | 'favorites' | 'sales'>('views');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiandoId, setCopiandoId] = useState<number | null>(null);
+
+  // Datos de la métrica activa para el gráfico CSS de 30 días
+  const activeTimelineData = useMemo(() => {
+    if (!metrics?.views_timeline) return [];
+    return metrics.views_timeline.map(d => {
+      let val = 0;
+      if (metricaActiva === 'views') val = d.views || 0;
+      else if (metricaActiva === 'favorites') val = d.favorites || 0;
+      else if (metricaActiva === 'sales') val = d.sales || 0;
+      return { ...d, value: val };
+    });
+  }, [metrics, metricaActiva]);
+
+  const maxActiveVal = useMemo(() => {
+    const vals = activeTimelineData.map(d => d.value);
+    const max = Math.max(...vals, 1);
+    return Math.ceil(max * 1.2);
+  }, [activeTimelineData]);
 
   // Filtro de pestaña actual
   const [filtroActual, setFiltroActual] = useState<'published' | 'pending' | 'rejected' | 'sold'>('published');
@@ -242,214 +260,208 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
   return (
     <div className="space-y-6 animate-fade-in relative select-none">
       {/* ========================================================================= */}
-      {/* MÉTRICAS DE OPERACIÓN Y RENDIMIENTO (DISEÑO GOOGLE AI STUDIO LIGHT) */}
+      {/* MÉTRICAS DE RENDIMIENTO (DISEÑO INTERACTIVO CON BADGES, GRÁFICO CSS Y CONVERSIÓN) */}
       {/* ========================================================================= */}
       {metrics && (
         <div className="bg-white border border-[#dadce0] rounded-[16px] p-5 space-y-4 shadow-xs">
-          <div className="flex flex-wrap items-center justify-between gap-3">
+          {/* 1. Título y Subtítulo */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <h4 className="text-[14px] font-semibold text-[#202124] tracking-tight">
-                  Métricas de Operación y Rendimiento
+                <h4 className="text-[15px] font-bold text-[#202124] tracking-tight">
+                  Métricas de Rendimiento de tus Publicaciones
                 </h4>
                 <Info className="h-3.5 w-3.5 text-[#5f6368]" />
               </div>
               <p className="text-[11px] text-[#5f6368] mt-0.5">
-                Rendimiento de tus publicaciones y alcance de tu catálogo en comparación con el marketplace
+                Desempeño del catálogo y alcance de tus artículos en el marketplace
               </p>
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded-[6px] bg-[#e8f0fe] text-[#1a73e8] font-mono text-[11px] border border-[#d2e3fc]">
+              <span className="px-2.5 py-0.5 rounded-[6px] bg-[#e8f0fe] text-[#1a73e8] font-mono text-[11px] font-semibold border border-[#d2e3fc]">
                 En tiempo real
               </span>
-              {metrics.views_timeline && metrics.views_timeline.length > 0 && (
-                <button
-                  onClick={() => setMostrarGrafico(!mostrarGrafico)}
-                  className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg border border-[#dadce0] bg-[#f8f9fa] hover:bg-[#f1f3f4] text-[#202124] transition cursor-pointer"
-                >
-                  {mostrarGrafico ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                  {mostrarGrafico ? "Ocultar tendencia" : "Ver tendencia (30 días)"}
-                </button>
-              )}
             </div>
           </div>
 
-          {/* Tabla de Capacidad y Progreso estilo Google AI Studio Light */}
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs border-collapse font-sans">
-              <thead>
-                <tr className="border-b border-[#dadce0] text-[#5f6368] font-medium text-[11px] uppercase tracking-wider">
-                  <th className="pb-3 pr-4">Métrica</th>
-                  <th className="pb-3 px-4">Categoría</th>
-                  <th className="pb-3 px-4">Progreso / Volumen</th>
-                  <th className="pb-3 px-4 text-right">Ratio / Impacto</th>
-                  <th className="pb-3 pl-4 text-right">Estado</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#f1f3f4] text-[#202124] font-normal text-[13px]">
-                {/* Fila 1: Visualizaciones de Artículos */}
-                <tr className="hover:bg-[#f8f9fa] transition">
-                  <td className="py-3.5 pr-4 font-semibold text-[#202124]">
-                    <div className="flex items-center gap-2">
-                      <Eye className="w-3.5 h-3.5 text-[#1a73e8]" />
-                      <span>Visualizaciones Totales</span>
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 text-[#5f6368]">Audiencia</td>
-                  <td className="py-3.5 px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-32 h-1.5 bg-[#f1f3f4] rounded-full overflow-hidden">
-                        <div 
-                          style={{ width: `${Math.min(100, Math.max(10, (metrics.total_views / Math.max(1, (metrics.total_publications * 50))) * 100))}%` }} 
-                          className="h-full bg-[#1a73e8] rounded-full"
-                        />
-                      </div>
-                      <span className="text-xs text-[#5f6368] font-mono">
-                        {metrics.total_views.toLocaleString('es-AR')}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 text-right font-medium text-[#202124]">
-                    {metrics.total_publications > 0 ? (metrics.total_views / metrics.total_publications).toFixed(1) : 0} vistas/art.
-                  </td>
-                  <td className="py-3.5 pl-4 text-right">
-                    <span className="px-2 py-0.5 rounded-[6px] text-[10px] font-medium bg-[#e6f4ea] text-[#137333] border border-[#ceead6]">
-                      Activo
-                    </span>
-                  </td>
-                </tr>
+          {/* 2. Barra con Badges tipo Botones */}
+          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+            {/* Badge 1: Visualizaciones Totales */}
+            <button
+              type="button"
+              onClick={() => setMetricaActiva('views')}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition border cursor-pointer ${
+                metricaActiva === 'views'
+                  ? 'bg-[#1a73e8] text-white border-[#1a73e8] shadow-xs ring-2 ring-[#1a73e8]/20'
+                  : 'bg-white text-[#5f6368] hover:text-[#202124] hover:bg-[#f8f9fa] border-[#dadce0]'
+              }`}
+            >
+              <Eye className={`w-4 h-4 ${metricaActiva === 'views' ? 'text-white' : 'text-[#1a73e8]'}`} />
+              <span>Visualizaciones Totales</span>
+              <span className={`px-2 py-0.5 rounded-md text-xs font-bold font-mono ${
+                metricaActiva === 'views' ? 'bg-white/25 text-white' : 'bg-[#f1f3f4] text-[#202124]'
+              }`}>
+                {metrics.total_views.toLocaleString('es-AR')}
+              </span>
+            </button>
 
-                {/* Fila 2: Guardados en Favoritos */}
-                <tr className="hover:bg-[#f8f9fa] transition">
-                  <td className="py-3.5 pr-4 font-semibold text-[#202124]">
-                    <div className="flex items-center gap-2">
-                      <Heart className="w-3.5 h-3.5 text-rose-500" />
-                      <span>Artículos en Favoritos</span>
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 text-[#5f6368]">Interés</td>
-                  <td className="py-3.5 px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-32 h-1.5 bg-[#f1f3f4] rounded-full overflow-hidden">
-                        <div 
-                          style={{ width: `${Math.min(100, Math.max(10, (metrics.total_favorites / Math.max(1, metrics.total_views || 1)) * 100 * 2))}%` }} 
-                          className="h-full bg-rose-500 rounded-full"
-                        />
-                      </div>
-                      <span className="text-xs text-[#5f6368] font-mono">
-                        {metrics.total_favorites.toLocaleString('es-AR')}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 text-right font-medium text-[#202124]">
-                    {metrics.total_views > 0 ? ((metrics.total_favorites / metrics.total_views) * 100).toFixed(1) : 0}% ratio fav
-                  </td>
-                  <td className="py-3.5 pl-4 text-right">
-                    <span className="px-2 py-0.5 rounded-[6px] text-[10px] font-medium bg-[#fce8e6] text-[#c5221f] border border-[#fad2cf]">
-                      En demanda
-                    </span>
-                  </td>
-                </tr>
+            {/* Badge 2: Artículos en Favoritos */}
+            <button
+              type="button"
+              onClick={() => setMetricaActiva('favorites')}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition border cursor-pointer ${
+                metricaActiva === 'favorites'
+                  ? 'bg-[#e91e63] text-white border-[#e91e63] shadow-xs ring-2 ring-[#e91e63]/20'
+                  : 'bg-white text-[#5f6368] hover:text-[#202124] hover:bg-[#f8f9fa] border-[#dadce0]'
+              }`}
+            >
+              <Heart className={`w-4 h-4 ${metricaActiva === 'favorites' ? 'text-white' : 'text-rose-500'}`} />
+              <span>Artículos en Favoritos</span>
+              <span className={`px-2 py-0.5 rounded-md text-xs font-bold font-mono ${
+                metricaActiva === 'favorites' ? 'bg-white/25 text-white' : 'bg-[#f1f3f4] text-[#202124]'
+              }`}>
+                {metrics.total_favorites.toLocaleString('es-AR')}
+              </span>
+            </button>
 
-                {/* Fila 3: Ventas Concretadas */}
-                <tr className="hover:bg-[#f8f9fa] transition">
-                  <td className="py-3.5 pr-4 font-semibold text-[#202124]">
-                    <div className="flex items-center gap-2">
-                      <ShoppingBag className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Venta de Artículos</span>
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 text-[#5f6368]">Operaciones</td>
-                  <td className="py-3.5 px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-32 h-1.5 bg-[#f1f3f4] rounded-full overflow-hidden">
-                        <div 
-                          style={{ width: `${Math.min(100, Math.max(10, (metrics.total_sales / Math.max(1, metrics.total_publications || 1)) * 100))}%` }} 
-                          className="h-full bg-emerald-600 rounded-full"
-                        />
-                      </div>
-                      <span className="text-xs text-[#5f6368] font-mono">
-                        {metrics.total_sales.toLocaleString('es-AR')}
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 text-right font-medium text-emerald-700">
-                    {metrics.total_sales > 0 ? `${metrics.total_sales} u. vendidas` : 'Sin ventas'}
-                  </td>
-                  <td className="py-3.5 pl-4 text-right">
-                    <span className="px-2 py-0.5 rounded-[6px] text-[10px] font-medium bg-[#e6f4ea] text-[#137333] border border-[#ceead6]">
-                      Efectivo
-                    </span>
-                  </td>
-                </tr>
-
-                {/* Fila 4: Tasa de Conversión */}
-                <tr className="hover:bg-[#f8f9fa] transition">
-                  <td className="py-3.5 pr-4 font-semibold text-[#202124]">
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="w-3.5 h-3.5 text-amber-600" />
-                      <span>Tasa de Conversión</span>
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 text-[#5f6368]">Rendimiento</td>
-                  <td className="py-3.5 px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-32 h-1.5 bg-[#f1f3f4] rounded-full overflow-hidden">
-                        <div 
-                          style={{ width: `${Math.min(100, Math.max(10, metrics.conversion_rate * 10))}%` }} 
-                          className="h-full bg-amber-500 rounded-full"
-                        />
-                      </div>
-                      <span className="text-xs text-[#5f6368] font-mono">
-                        {metrics.conversion_rate}%
-                      </span>
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4 text-right font-medium text-amber-700">
-                    {metrics.conversion_rate > 0 ? `1 cada ${Math.round(100 / metrics.conversion_rate)} vistas` : '0%'}
-                  </td>
-                  <td className="py-3.5 pl-4 text-right">
-                    <span className="px-2 py-0.5 rounded-[6px] text-[10px] font-medium bg-[#fef7e0] text-[#b06000] border border-[#feefc3]">
-                      Óptimo
-                    </span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            {/* Badge 3: Venta de Artículos */}
+            <button
+              type="button"
+              onClick={() => setMetricaActiva('sales')}
+              className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition border cursor-pointer ${
+                metricaActiva === 'sales'
+                  ? 'bg-[#10b981] text-white border-[#10b981] shadow-xs ring-2 ring-[#10b981]/20'
+                  : 'bg-white text-[#5f6368] hover:text-[#202124] hover:bg-[#f8f9fa] border-[#dadce0]'
+              }`}
+            >
+              <ShoppingBag className={`w-4 h-4 ${metricaActiva === 'sales' ? 'text-white' : 'text-emerald-600'}`} />
+              <span>Venta de Artículos</span>
+              <span className={`px-2 py-0.5 rounded-md text-xs font-bold font-mono ${
+                metricaActiva === 'sales' ? 'bg-white/25 text-white' : 'bg-[#f1f3f4] text-[#202124]'
+              }`}>
+                {metrics.total_sales.toLocaleString('es-AR')}
+              </span>
+            </button>
           </div>
 
-          {/* Gráfico de Evolución de Visitas (30 días) en versión Light */}
-          {mostrarGrafico && metrics.views_timeline && metrics.views_timeline.length > 0 && (
-            <div className="pt-3 border-t border-[#dadce0]">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-[#5f6368]">Tendencia diaria de visualizaciones (últimos 30 días)</span>
-                <span className="text-[10px] text-[#5f6368] font-mono">Total acumulado: {metrics.total_views} vistas</span>
+          {/* 3. Gráfico de los últimos 30 días estilo "Ganancia de la plataforma por mes" (Sin Limit, CSS, Light) */}
+          <div className="bg-[#f8f9fa] border border-[#dadce0] rounded-[16px] p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-[#202124] flex items-center gap-1.5">
+                {metricaActiva === 'views' && <Eye className="w-3.5 h-3.5 text-[#1a73e8]" />}
+                {metricaActiva === 'favorites' && <Heart className="w-3.5 h-3.5 text-rose-500" />}
+                {metricaActiva === 'sales' && <ShoppingBag className="w-3.5 h-3.5 text-emerald-600" />}
+                {metricaActiva === 'views' && "Visualizaciones diarias de artículos (últimos 30 días)"}
+                {metricaActiva === 'favorites' && "Guardados en favoritos diarios (últimos 30 días)"}
+                {metricaActiva === 'sales' && "Ventas diarias concretadas (últimos 30 días)"}
+              </span>
+              <span className="text-[11px] text-[#5f6368] font-mono">
+                Total acumulado: {
+                  (metricaActiva === 'views' ? metrics.total_views :
+                   metricaActiva === 'favorites' ? metrics.total_favorites :
+                   metrics.total_sales).toLocaleString('es-AR')
+                }
+              </span>
+            </div>
+
+            {/* Lienzo del Gráfico CSS con Líneas de Nivel Horizontales (Sin Limit) */}
+            <div className="relative h-48 w-full select-none flex flex-col justify-between pt-2 pb-1">
+              {/* Líneas horizontales de referencia */}
+              <div className="absolute inset-0 pointer-events-none flex flex-col justify-between pr-10">
+                <div className="border-b border-[#dadce0] w-full relative">
+                  <span className="absolute right-0 -top-2.5 text-[10px] text-[#5f6368] font-mono">
+                    {maxActiveVal}
+                  </span>
+                </div>
+                <div className="border-b border-[#dadce0] border-dashed w-full relative">
+                  <span className="absolute right-0 -top-2.5 text-[10px] text-[#5f6368] font-mono">
+                    {Math.round(maxActiveVal * 0.5)}
+                  </span>
+                </div>
+                <div className="border-b border-[#dadce0] w-full relative">
+                  <span className="absolute right-0 -top-2.5 text-[10px] text-[#5f6368] font-mono">
+                    0
+                  </span>
+                </div>
               </div>
-              <div className="h-28 w-full flex items-end gap-1 pt-4 pb-1 overflow-x-auto bg-[#f8f9fa] rounded-xl p-3 border border-[#dadce0]">
-                {metrics.views_timeline.map((item, idx) => {
-                  const maxV = Math.max(...metrics.views_timeline.map(x => x.views), 1);
-                  const hPercent = Math.round((item.views / maxV) * 100);
+
+              {/* Contenedor de Barras CSS */}
+              <div className="relative z-10 flex items-end justify-between h-40 w-full pr-12 pl-1 gap-1">
+                {activeTimelineData.map((d, idx) => {
+                  const val = d.value;
+                  const barH = val > 0 ? Math.max(8, Math.round((val / maxActiveVal) * 100)) : 2;
+
+                  const barColorClass =
+                    val > 0
+                      ? metricaActiva === 'views'
+                        ? 'bg-[#1a73e8] hover:bg-[#1557b0]'
+                        : metricaActiva === 'favorites'
+                        ? 'bg-rose-500 hover:bg-rose-600'
+                        : 'bg-emerald-500 hover:bg-emerald-600'
+                      : 'bg-[#dadce0] hover:bg-[#bcc1c8]';
+
                   return (
-                    <div key={idx} className="flex-1 min-w-[14px] flex flex-col items-center group relative h-full justify-end">
-                      <div className="absolute -top-7 hidden group-hover:flex bg-[#202124] text-white text-[10px] px-1.5 py-0.5 rounded shadow whitespace-nowrap z-10">
-                        {item.label}: {item.views} vistas
+                    <div
+                      key={idx}
+                      className="flex-1 flex flex-col items-center justify-end h-full group relative cursor-pointer"
+                    >
+                      {/* Tooltip dinámico al pasar el cursor */}
+                      <div className="absolute -top-8 hidden group-hover:flex bg-[#202124] text-white text-[10px] px-2 py-0.5 rounded-md shadow-md z-20 whitespace-nowrap">
+                        {d.label}: {val} {metricaActiva === 'views' ? 'vistas' : metricaActiva === 'favorites' ? 'favoritos' : 'ventas'}
                       </div>
+
+                      {/* Barra CSS con redondeo superior tipo gráfico de comisiones */}
                       <div
-                        style={{ height: `${Math.max(hPercent, 6)}%` }}
-                        className={`w-full rounded-t transition-all ${
-                          item.views > 0 ? 'bg-[#1a73e8] group-hover:bg-[#1557b0]' : 'bg-[#dadce0]'
-                        }`}
+                        style={{ height: `${barH}%` }}
+                        className={`w-full max-w-[22px] rounded-t-[4px] transition-all ${barColorClass}`}
                       />
-                      {idx % 5 === 0 && (
-                        <span className="text-[9px] text-[#5f6368] mt-1 font-mono">{item.label}</span>
-                      )}
                     </div>
                   );
                 })}
               </div>
+
+              {/* Etiquetas de fechas en el eje X */}
+              <div className="relative z-10 flex items-center justify-between text-[10px] text-[#5f6368] font-mono pt-2 pr-12 pl-1 border-t border-[#dadce0]">
+                {activeTimelineData.map((d, idx) => (
+                  <span key={idx} className={idx % 5 === 0 ? "block" : "hidden sm:inline-block opacity-0 select-none"}>
+                    {idx % 5 === 0 ? d.label : d.label}
+                  </span>
+                ))}
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* 4. Abajo del Gráfico: Tasa de Conversión */}
+          <div className="bg-[#f8f9fa] border border-[#dadce0] rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-600 border border-amber-500/20 flex-shrink-0">
+                <TrendingUp className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-[#202124] uppercase tracking-wider">
+                    Tasa de Conversión Global
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-[#fef7e0] text-[#b06000] border border-[#feefc3]">
+                    {metrics.conversion_rate > 2 ? 'Óptimo' : 'En seguimiento'}
+                  </span>
+                </div>
+                <p className="text-[11px] text-[#5f6368] mt-0.5">
+                  Porcentaje de visitantes únicos a tus publicaciones que terminaron en una compra concretada.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-baseline gap-2 self-start sm:self-center">
+              <span className="text-2xl sm:text-3xl font-bold text-[#202124] font-mono">
+                {metrics.conversion_rate}%
+              </span>
+              <span className="text-xs text-[#5f6368]">
+                ({metrics.total_sales} ventas / {metrics.total_views} visitas)
+              </span>
+            </div>
+          </div>
         </div>
       )}
 
