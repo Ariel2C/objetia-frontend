@@ -15,7 +15,9 @@ import {
   PlusCircle,
   Sparkles,
   Shield,
-  ShieldCheck
+  ShieldCheck,
+  Phone,
+  MapPin
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '../lib/config';
@@ -71,6 +73,17 @@ export default function Navbar({ logoUrl }: NavbarProps) {
   const [favoritosCount, setFavoritosCount] = useState(0);
   const [unreadChatsCount, setUnreadChatsCount] = useState(0);
   const [cartCount, setCartCount] = useState(0);
+
+  interface Notificacion {
+    id: string | number;
+    tipo: 'telefono' | 'direccion' | 'moderacion' | 'general';
+    texto: string;
+    leida: boolean;
+    fecha: string;
+    link?: string;
+  }
+  const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
+  const unreadNotifsCount = notificaciones.filter(n => !n.leida).length;
   const [logoUrlState, setLogoUrlState] = useState(logoUrl || "");
   const [brandNameState, setBrandNameState] = useState("OBJETIA");
   const [brandFontSizeState, setBrandFontSizeState] = useState("1.5rem");
@@ -163,64 +176,139 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     }
   };
 
-  const fetchAdminModerationCount = async () => {
-    if (usuario?.role !== 'ADMIN') return;
+  const fetchUserNotifications = async () => {
+    const authToken = getStoredToken();
+    if (!usuario || !usuario.id || !authToken) {
+      setNotificaciones([]);
+      return;
+    }
+
+    const readIdsKey = `vamaar_read_notifs_${usuario.id}`;
+    let readIds: (string | number)[] = [];
     try {
-      const authToken = localStorage.getItem("vamaar_token") || token;
-      if (!authToken) return;
-      const res = await fetch(`${getApiUrl()}/products/admin/moderation/`, {
-        headers: { Authorization: `Bearer ${authToken}` }
-      });
-      if (res.ok) {
-        const data = await res.json();
-        const pendientesORechazados = data.filter((p: any) => p.moderation_status === 'rejected' || p.moderation_status === 'pending');
-        if (pendientesORechazados.length > 0) {
-          setNotificaciones([
-            {
-              id: 999,
+      const raw = localStorage.getItem(readIdsKey);
+      if (raw) readIds = JSON.parse(raw);
+    } catch {}
+
+    const notifs: Notificacion[] = [];
+
+    // 1. Notificación de Moderación (Admin)
+    if (usuario.role === 'ADMIN') {
+      try {
+        const res = await fetch(`${getApiUrl()}/products/admin/moderation/`, {
+          headers: { Authorization: `Bearer ${authToken}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const pendientesORechazados = data.filter((p: any) => p.moderation_status === 'rejected' || p.moderation_status === 'pending');
+          if (pendientesORechazados.length > 0) {
+            notifs.push({
+              id: 'admin_moderation',
+              tipo: 'moderacion',
               texto: `⚠️ Atención Administrador: Hay ${pendientesORechazados.length} producto(s) en revisión o rechazado(s) por la IA.`,
-              leida: false,
+              leida: readIds.includes('admin_moderation') || readIds.includes(999),
               fecha: "Reciente",
               link: "/mi-objetia?tab=moderation"
-            }
-          ]);
+            });
+          }
+        }
+      } catch (err) {
+        console.error("Error al obtener moderación admin:", err);
+      }
+    }
+
+    // 2. Verificar Teléfono de contacto
+    const userPhone = (usuario as any).phone;
+    if (!userPhone || !String(userPhone).trim()) {
+      notifs.push({
+        id: 'missing_phone',
+        tipo: 'telefono',
+        texto: 'Te falta completar tu número de teléfono. Agregalo para la gestión de tus compras y ventas.',
+        leida: readIds.includes('missing_phone'),
+        fecha: "Pendiente",
+        link: "/mi-objetia?tab=perfil"
+      });
+    }
+
+    // 3. Verificar Dirección de entrega
+    try {
+      const resAddresses = await fetch(`${getApiUrl()}/auth/addresses`, {
+        headers: { Authorization: `Bearer ${authToken}` }
+      });
+      if (resAddresses.ok) {
+        const addressesData = await resAddresses.json();
+        const hasAddresses = Array.isArray(addressesData) && addressesData.length > 0;
+        if (!hasAddresses && !((usuario as any).street && (usuario as any).city)) {
+          notifs.push({
+            id: 'missing_address',
+            tipo: 'direccion',
+            texto: 'Te falta agregar tu dirección de entrega. Registrá tu domicilio para recibir envíos.',
+            leida: readIds.includes('missing_address'),
+            fecha: "Pendiente",
+            link: "/mi-objetia?tab=perfil"
+          });
+        }
+      } else {
+        if (!((usuario as any).street && (usuario as any).city)) {
+          notifs.push({
+            id: 'missing_address',
+            tipo: 'direccion',
+            texto: 'Te falta agregar tu dirección de entrega. Registrá tu domicilio para recibir envíos.',
+            leida: readIds.includes('missing_address'),
+            fecha: "Pendiente",
+            link: "/mi-objetia?tab=perfil"
+          });
         }
       }
-    } catch (err) {
-      console.error("Error al obtener moderación admin:", err);
+    } catch {
+      if (!((usuario as any).street && (usuario as any).city)) {
+        notifs.push({
+          id: 'missing_address',
+          tipo: 'direccion',
+          texto: 'Te falta agregar tu dirección de entrega. Registrá tu domicilio para recibir envíos.',
+          leida: readIds.includes('missing_address'),
+          fecha: "Pendiente",
+          link: "/mi-objetia?tab=perfil"
+        });
+      }
     }
+
+    setNotificaciones(notifs);
   };
 
   useEffect(() => {
     if (!cargando) {
       fetchUnreadChatsCount();
       fetchCartCount();
-      fetchAdminModerationCount();
+      fetchUserNotifications();
       
       const interval = setInterval(() => {
         if (document.visibilityState !== 'visible') return;
         fetchUnreadChatsCount();
         fetchCartCount();
-        fetchAdminModerationCount();
+        fetchUserNotifications();
       }, 15000);
 
       const handleRefresh = () => fetchUnreadChatsCount();
       const handleCartRefresh = () => fetchCartCount();
+      const handleProfileUpdated = () => fetchUserNotifications();
       const handleVisibility = () => {
         if (document.visibilityState === 'visible') {
           fetchUnreadChatsCount();
           fetchCartCount();
-          fetchAdminModerationCount();
+          fetchUserNotifications();
         }
       };
       window.addEventListener('chat_messages_read', handleRefresh);
       window.addEventListener('cart_updated', handleCartRefresh);
+      window.addEventListener('profile_updated', handleProfileUpdated);
       document.addEventListener('visibilitychange', handleVisibility);
 
       return () => {
         clearInterval(interval);
         window.removeEventListener('chat_messages_read', handleRefresh);
         window.removeEventListener('cart_updated', handleCartRefresh);
+        window.removeEventListener('profile_updated', handleProfileUpdated);
         document.removeEventListener('visibilitychange', handleVisibility);
       };
     }
@@ -241,10 +329,6 @@ export default function Navbar({ logoUrl }: NavbarProps) {
       window.removeEventListener("actualizar-logo-navbar" as any, handleActualizarLogo);
     };
   }, []);
-
-  interface Notificacion { id: number; texto: string; leida: boolean; fecha: string; link?: string; }
-  const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
-  const unreadNotifsCount = notificaciones.filter(n => !n.leida).length;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -273,8 +357,29 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     }
   }, []);
 
+  const marcarComoLeida = (id: string | number) => {
+    setNotificaciones(prev => prev.map(n => n.id === id ? { ...n, leida: true } : n));
+    if (usuario) {
+      try {
+        const key = `vamaar_read_notifs_${usuario.id}`;
+        const raw = localStorage.getItem(key);
+        const current: (string | number)[] = raw ? JSON.parse(raw) : [];
+        if (!current.includes(id)) {
+          localStorage.setItem(key, JSON.stringify([...current, id]));
+        }
+      } catch {}
+    }
+  };
+
   const marcarTodasComoLeidas = () => {
     setNotificaciones(prev => prev.map(n => ({ ...n, leida: true })));
+    if (usuario) {
+      try {
+        const key = `vamaar_read_notifs_${usuario.id}`;
+        const allIds = notificaciones.map(n => n.id);
+        localStorage.setItem(key, JSON.stringify(allIds));
+      } catch {}
+    }
   };
 
   const handleNavbarSearch = (e: React.FormEvent) => {
@@ -426,37 +531,58 @@ export default function Navbar({ logoUrl }: NavbarProps) {
 
                     {/* DROPDOWN NOTIFICACIONES */}
                     {notifAbierto && (
-                      <div className="absolute right-0 mt-2 w-72 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-4 space-y-3 animate-scale-in origin-top-right">
-                        <div className="flex justify-between items-center text-xs pb-1 border-b border-gray-50">
+                      <div className="absolute right-0 mt-2 w-80 sm:w-88 bg-white border border-gray-100 rounded-2xl shadow-xl z-50 p-4 space-y-3 animate-scale-in origin-top-right">
+                        <div className="flex justify-between items-center text-xs pb-1.5 border-b border-gray-100">
                           <span className="font-extrabold text-gray-800">Notificaciones</span>
                           {unreadNotifsCount > 0 && (
                             <button 
                               onClick={marcarTodasComoLeidas}
-                              className="text-[10px] text-[#4D5E4F] hover:underline font-bold"
+                              className="text-[10px] text-[#1a73e8] hover:underline font-bold cursor-pointer"
                             >
                               Leer todas
                             </button>
                           )}
                         </div>
-                        <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+                        <div className="space-y-2 max-h-[280px] overflow-y-auto pr-1">
                           {notificaciones.length === 0 ? (
-                            <p className="text-[11px] text-gray-400 text-center py-4">No tienes notificaciones.</p>
+                            <p className="text-[11px] text-gray-400 text-center py-4">No tienes notificaciones pendientes.</p>
                           ) : (
                             notificaciones.map(n => (
                               <div 
                                 key={n.id} 
                                 onClick={() => {
+                                  marcarComoLeida(n.id);
                                   if (n.link) {
                                     setNotifAbierto(false);
                                     router.push(n.link);
                                   }
                                 }}
-                                className={`p-2.5 rounded-xl text-[11px] leading-tight transition cursor-pointer ${
-                                  n.leida ? 'bg-white text-gray-500' : 'bg-amber-50/90 text-amber-950 font-bold border-l-4 border-amber-500'
+                                className={`p-3 rounded-xl text-[11px] leading-snug transition cursor-pointer flex items-start gap-2.5 ${
+                                  n.leida 
+                                    ? 'bg-gray-50/80 text-gray-500 hover:bg-gray-100/80' 
+                                    : 'bg-amber-50/90 text-amber-950 font-medium border-l-4 border-amber-500 hover:bg-amber-100/80 shadow-2xs'
                                 }`}
                               >
-                                <p>{n.texto}</p>
-                                <span className="text-[9px] text-amber-700/80 mt-1 block font-normal">{n.fecha}</span>
+                                {n.tipo === 'telefono' ? (
+                                  <Phone className="w-4 h-4 text-[#1a73e8] shrink-0 mt-0.5" />
+                                ) : n.tipo === 'direccion' ? (
+                                  <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                                ) : n.tipo === 'moderacion' ? (
+                                  <Shield className="w-4 h-4 text-purple-600 shrink-0 mt-0.5" />
+                                ) : (
+                                  <Bell className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" />
+                                )}
+                                <div className="flex-1 min-w-0">
+                                  <p>{n.texto}</p>
+                                  <div className="flex items-center justify-between mt-1.5 pt-1 border-t border-black/5">
+                                    <span className="text-[9px] text-amber-800/70 font-normal">{n.fecha}</span>
+                                    {n.link && (
+                                      <span className="text-[9px] text-[#1a73e8] font-bold hover:underline">
+                                        Completar en mi perfil &rarr;
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
                               </div>
                             ))
                           )}

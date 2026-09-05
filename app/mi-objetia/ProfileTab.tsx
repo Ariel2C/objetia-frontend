@@ -462,6 +462,9 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
       setInitialFullName(fullName.trim());
       setInitialPhone(phone.trim());
       toast.success("Información personal guardada con éxito");
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('profile_updated'));
+      }
     } catch (err: any) {
       toast.error(err.message || "Error al actualizar datos");
     } finally {
@@ -607,6 +610,9 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
       setShowAddressForm(false);
       setEditingAddressId(null);
       toast.success(editingAddressId ? "Dirección actualizada correctamente" : "Dirección agregada con éxito");
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('profile_updated'));
+      }
     } catch (err: any) {
       setAddressError(err.message || "Error al guardar la dirección");
     } finally {
@@ -636,6 +642,9 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
 
       await fetchAddresses();
       toast.success("Dirección eliminada correctamente");
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('profile_updated'));
+      }
     } catch (err: any) {
       toast.error(err.message || "Error al eliminar dirección");
     }
@@ -668,6 +677,9 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
         login(authToken, updatedUser);
       }
       toast.success("Dirección seleccionada como activa para envíos");
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new Event('profile_updated'));
+      }
     } catch (err: any) {
       toast.error(err.message || "Error al establecer dirección predeterminada");
     }
