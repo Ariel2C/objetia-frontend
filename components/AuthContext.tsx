@@ -6,6 +6,7 @@ interface Usuario {
   id: number;
   email: string;
   full_name: string;
+  phone?: string;
   avatar_url?: string;
   role: string;
   permissions?: string[];

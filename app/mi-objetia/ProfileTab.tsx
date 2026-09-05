@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../components/AuthContext';
 import { getApiUrl, getGoogleMapsApiKey } from '../../lib/config';
-import { ShieldCheck, MapPin, Loader2, Save, Pencil, X, Trash2, Plus, Check, Navigation, AlertCircle, ArrowRight, ArrowLeft, Tag } from 'lucide-react';
+import { ShieldCheck, MapPin, Loader2, Save, Pencil, X, Trash2, Plus, Check, Navigation, AlertCircle, ArrowRight, ArrowLeft, Tag, Phone, User, Mail, RotateCcw } from 'lucide-react';
 
 const PROVINCIAS_ARGENTINA = [
   "Buenos Aires",
@@ -68,12 +68,16 @@ export interface UserAddress {
 
 interface ProfileTabProps {
   onSavingChange?: (saving: boolean) => void;
+  onHasChangesChange?: (hasChanges: boolean) => void;
 }
 
-export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
+export default function ProfileTab({ onSavingChange, onHasChangesChange }: ProfileTabProps) {
   const { usuario, token, login } = useAuth();
   
   const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [initialFullName, setInitialFullName] = useState("");
+  const [initialPhone, setInitialPhone] = useState("");
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -142,9 +146,27 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
   // Cargar datos actuales del usuario al montar o al cambiar usuario
   useEffect(() => {
     if (usuario) {
-      setFullName(usuario.full_name || "");
+      const fn = usuario.full_name || "";
+      const ph = usuario.phone || "";
+      setFullName(fn);
+      setInitialFullName(fn);
+      setPhone(ph);
+      setInitialPhone(ph);
     }
   }, [usuario]);
+
+  // Detección reactiva de cambios en el perfil
+  const hasProfileChanges = fullName !== initialFullName || phone !== initialPhone;
+
+  useEffect(() => {
+    onHasChangesChange?.(hasProfileChanges);
+  }, [hasProfileChanges, onHasChangesChange]);
+
+  const handleDiscardProfileChanges = () => {
+    setFullName(initialFullName);
+    setPhone(initialPhone);
+    setErrorMsg("");
+  };
 
   // Cargar direcciones desde la API
   const fetchAddresses = useCallback(async () => {
@@ -428,7 +450,8 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
           'Authorization': `Bearer ${authToken}`
         },
         body: JSON.stringify({
-          full_name: fullName
+          full_name: fullName.trim(),
+          phone: phone.trim() || null
         })
       });
 
@@ -439,6 +462,8 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
 
       const updatedUser = await res.json();
       login(authToken, updatedUser);
+      setInitialFullName(fullName.trim());
+      setInitialPhone(phone.trim());
       setSuccessMsg("Información personal guardada con éxito");
       setTimeout(() => setSuccessMsg(""), 4000);
     } catch (err: any) {
@@ -674,30 +699,115 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
       {/* Formulario de Información Personal */}
       <form id="perfil-form" onSubmit={handleSubmitProfile} className="space-y-6 w-full">
         {/* Información Personal */}
-        <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs w-full">
-          <h4 className="text-sm font-semibold text-[#202124] border-b border-[#f1f3f4] pb-3">
-            Información Personal
-          </h4>
+        <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs w-full">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#f1f3f4] pb-3.5">
+            <div className="space-y-0.5">
+              <div className="flex items-center gap-2.5">
+                <h4 className="text-sm font-semibold text-[#202124] flex items-center gap-2">
+                  <User className="h-4 w-4 text-[#1a73e8]" /> Información Personal
+                </h4>
+                {hasProfileChanges ? (
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200/80 animate-fade-in">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    Cambios sin guardar
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200/70">
+                    <Check className="w-3 h-3 text-emerald-600" />
+                    Al día
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-[#5f6368]">
+                Gestioná tu nombre, teléfono y datos de contacto de tu cuenta
+              </p>
+            </div>
+
+            {/* Acciones de guardado dinámicas dentro de la tarjeta */}
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              {hasProfileChanges && (
+                <button
+                  type="button"
+                  onClick={handleDiscardProfileChanges}
+                  disabled={loadingProfile}
+                  className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] border border-[#dadce0] transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  title="Descartar cambios no guardados"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Descartar</span>
+                </button>
+              )}
+
+              <button
+                type="submit"
+                disabled={!hasProfileChanges || loadingProfile}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-2xs ${
+                  hasProfileChanges && !loadingProfile
+                    ? 'bg-[#1a73e8] text-white hover:bg-[#1557b0] cursor-pointer active:scale-98 shadow-xs'
+                    : 'bg-[#f1f3f4] text-[#9aa0a6] border border-[#dadce0]/60 cursor-not-allowed'
+                }`}
+              >
+                {loadingProfile ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                    <span>Guardando...</span>
+                  </>
+                ) : (
+                  <>
+                    <Save className={`w-3.5 h-3.5 ${hasProfileChanges ? 'text-white' : 'text-[#9aa0a6]'}`} />
+                    <span>Guardar cambios</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
             <div>
-              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Nombre Completo *</label>
+              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5 flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-[#5f6368]" /> Nombre Completo *
+              </label>
               <input
                 type="text"
                 required
                 placeholder="Ingresá tu nombre y apellido"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
+                className={`w-full px-3.5 py-2.5 text-sm rounded-xl border transition text-[#202124] placeholder:text-[#9aa0a6] ${
+                  fullName !== initialFullName
+                    ? 'border-[#1a73e8] bg-[#f8faff] ring-2 ring-[#1a73e8]/10'
+                    : 'border-[#dadce0] bg-[#f8f9fa] focus:bg-white focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20'
+                } focus:outline-none`}
               />
             </div>
+
             <div>
-              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Correo Electrónico (No editable)</label>
+              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5 flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-[#5f6368]" /> Teléfono de contacto
+              </label>
+              <input
+                type="tel"
+                placeholder="Ej: +54 9 351 123-4567"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className={`w-full px-3.5 py-2.5 text-sm rounded-xl border transition text-[#202124] placeholder:text-[#9aa0a6] ${
+                  phone !== initialPhone
+                    ? 'border-[#1a73e8] bg-[#f8faff] ring-2 ring-[#1a73e8]/10'
+                    : 'border-[#dadce0] bg-[#f8f9fa] focus:bg-white focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20'
+                } focus:outline-none`}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5 flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-[#5f6368]" /> Correo Electrónico
+              </label>
               <input
                 type="email"
                 disabled
                 value={usuario?.email || ""}
                 className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0]/60 bg-[#f1f3f4] text-[#5f6368] font-medium cursor-not-allowed"
+                title="El correo no puede modificarse"
               />
             </div>
           </div>
