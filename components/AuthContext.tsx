@@ -115,6 +115,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const handleUnauthorized = () => {
       localStorage.removeItem("vamaar_token");
       localStorage.removeItem("vamaar_user");
+      try {
+        Object.keys(sessionStorage).forEach(k => {
+          if (k.startsWith('vamaar_read_notifs_')) sessionStorage.removeItem(k);
+        });
+        Object.keys(localStorage).forEach(k => {
+          if (k.startsWith('vamaar_read_notifs_')) localStorage.removeItem(k);
+        });
+      } catch {}
       setToken(null);
       setUsuario(null);
     };
@@ -131,6 +139,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = (nuevoToken: string, datosUsuario: Usuario) => {
+    // Al reloguear o iniciar sesión, resetear las notificaciones leídas para recordar datos faltantes
+    try {
+      sessionStorage.removeItem(`vamaar_read_notifs_${datosUsuario.id}`);
+      localStorage.removeItem(`vamaar_read_notifs_${datosUsuario.id}`);
+    } catch {}
+
     setToken(nuevoToken);
     setUsuario(datosUsuario);
     localStorage.setItem("vamaar_token", nuevoToken);
@@ -166,6 +180,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    try {
+      if (usuario) {
+        sessionStorage.removeItem(`vamaar_read_notifs_${usuario.id}`);
+        localStorage.removeItem(`vamaar_read_notifs_${usuario.id}`);
+      }
+      Object.keys(sessionStorage).forEach(k => {
+        if (k.startsWith('vamaar_read_notifs_')) sessionStorage.removeItem(k);
+      });
+      Object.keys(localStorage).forEach(k => {
+        if (k.startsWith('vamaar_read_notifs_')) localStorage.removeItem(k);
+      });
+    } catch {}
+
     setToken(null);
     setUsuario(null);
     localStorage.removeItem("vamaar_token");

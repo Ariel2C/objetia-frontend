@@ -184,7 +184,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     const readIdsKey = `vamaar_read_notifs_${usuario.id}`;
     let readIds: (string | number)[] = [];
     try {
-      const raw = localStorage.getItem(readIdsKey);
+      const raw = sessionStorage.getItem(readIdsKey);
       if (raw) readIds = JSON.parse(raw);
     } catch {}
 
@@ -360,10 +360,10 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     if (usuario) {
       try {
         const key = `vamaar_read_notifs_${usuario.id}`;
-        const raw = localStorage.getItem(key);
+        const raw = sessionStorage.getItem(key);
         const current: (string | number)[] = raw ? JSON.parse(raw) : [];
         if (!current.includes(id)) {
-          localStorage.setItem(key, JSON.stringify([...current, id]));
+          sessionStorage.setItem(key, JSON.stringify([...current, id]));
         }
       } catch {}
     }
@@ -375,7 +375,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
       try {
         const key = `vamaar_read_notifs_${usuario.id}`;
         const allIds = notificaciones.map(n => n.id);
-        localStorage.setItem(key, JSON.stringify(allIds));
+        sessionStorage.setItem(key, JSON.stringify(allIds));
       } catch {}
     }
   };
