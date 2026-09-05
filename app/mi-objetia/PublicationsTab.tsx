@@ -483,10 +483,10 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
       {/* TARJETA DE PUBLICACIONES (ESTILO MÉTRICAS DE RENDIMIENTO CON BUSCADOR Y PAGINACIÓN) */}
       {/* ========================================================================= */}
       <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 space-y-4 shadow-xs">
-        {/* Cabecera con Título, Subtítulo, Badges "Agrupa por" y Buscador a la derecha */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-1 border-b border-[#edf0f2]">
-          {/* Lado Izquierdo: Título, Subtítulo y Badges agrupadores */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-wrap">
+        {/* Cabecera con Título, Subtítulo y Buscador al nivel del título */}
+        <div className="space-y-3 pb-1 border-b border-[#edf0f2]">
+          {/* Fila 1: Título/Subtítulo a la izquierda y Buscador a la derecha (al mismo nivel) */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h4 className="text-[14px] font-semibold text-[#202124]">
                 Gestión de publicaciones
@@ -496,126 +496,124 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               </p>
             </div>
 
-            <div className="hidden sm:block h-7 w-[1px] bg-[#edf0f2]" />
-
-            {/* Badges de Agrupación al lado del título */}
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-xs font-medium text-[#5f6368] mr-1">
-                Agrupa por:
-              </span>
-
-              {/* Badge: Todas */}
-              <button
-                type="button"
-                onClick={() => cambiarFiltro('all')}
-                className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
-                  filtroActual === 'all'
-                    ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
-                    : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
-                }`}
-              >
-                <span>Todas</span>
-                <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
-                  filtroActual === 'all' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
-                }`}>
-                  {todasCount}
-                </span>
-              </button>
-
-              {/* Badge: En venta */}
-              <button
-                type="button"
-                onClick={() => cambiarFiltro('published')}
-                className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
-                  filtroActual === 'published'
-                    ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
-                    : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
-                }`}
-              >
-                <span>En venta</span>
-                <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
-                  filtroActual === 'published' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
-                }`}>
-                  {enVentaCount}
-                </span>
-              </button>
-
-              {/* Badge: En revisión */}
-              <button
-                type="button"
-                onClick={() => cambiarFiltro('pending')}
-                className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
-                  filtroActual === 'pending'
-                    ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
-                    : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
-                }`}
-              >
-                <span>En revisión</span>
-                <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
-                  filtroActual === 'pending' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
-                }`}>
-                  {enRevisionCount}
-                </span>
-              </button>
-
-              {/* Badge: Rechazadas */}
-              <button
-                type="button"
-                onClick={() => cambiarFiltro('rejected')}
-                className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
-                  filtroActual === 'rejected'
-                    ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
-                    : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
-                }`}
-              >
-                <span>Rechazadas</span>
-                <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
-                  filtroActual === 'rejected' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
-                }`}>
-                  {rechazadasCount}
-                </span>
-              </button>
-
-              {/* Badge: Vendidas */}
-              <button
-                type="button"
-                onClick={() => cambiarFiltro('sold')}
-                className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
-                  filtroActual === 'sold'
-                    ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
-                    : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
-                }`}
-              >
-                <span>Vendidas</span>
-                <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
-                  filtroActual === 'sold' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
-                }`}>
-                  {vendidasCount}
-                </span>
-              </button>
+            {/* Buscador bien a la derecha, alineado a nivel del título */}
+            <div className="relative w-full sm:w-64 lg:w-72 flex-shrink-0">
+              <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#80868b] pointer-events-none" />
+              <input
+                type="text"
+                value={busqueda}
+                onChange={handleBusquedaChange}
+                placeholder="Buscar por título o ID..."
+                className="w-full pl-9 pr-8 h-[34px] text-xs rounded-xl border border-[#e8eaed] bg-[#f8f9fa] text-[#202124] placeholder-[#80868b] focus:outline-none focus:border-[#202124] focus:bg-white transition"
+              />
+              {busqueda && (
+                <button
+                  type="button"
+                  onClick={() => { setBusqueda(''); setPaginaActual(1); }}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#80868b] hover:text-[#202124] p-0.5 cursor-pointer"
+                  title="Limpiar búsqueda"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              )}
             </div>
           </div>
 
-          {/* Lado Derecho: Buscador bien alineado a la derecha */}
-          <div className="relative w-full sm:w-64 lg:w-72 flex-shrink-0">
-            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#80868b] pointer-events-none" />
-            <input
-              type="text"
-              value={busqueda}
-              onChange={handleBusquedaChange}
-              placeholder="Buscar por título o ID..."
-              className="w-full pl-9 pr-8 h-[34px] text-xs rounded-xl border border-[#e8eaed] bg-[#f8f9fa] text-[#202124] placeholder-[#80868b] focus:outline-none focus:border-[#202124] focus:bg-white transition"
-            />
-            {busqueda && (
-              <button
-                type="button"
-                onClick={() => { setBusqueda(''); setPaginaActual(1); }}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#80868b] hover:text-[#202124] p-0.5 cursor-pointer"
-                title="Limpiar búsqueda"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            )}
+          {/* Fila 2: Badges "Agrupa por" */}
+          <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+            <span className="text-xs font-medium text-[#5f6368] mr-1">
+              Agrupa por:
+            </span>
+
+            {/* Badge: Todas */}
+            <button
+              type="button"
+              onClick={() => cambiarFiltro('all')}
+              className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+                filtroActual === 'all'
+                  ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                  : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+              }`}
+            >
+              <span>Todas</span>
+              <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+                filtroActual === 'all' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+              }`}>
+                {todasCount}
+              </span>
+            </button>
+
+            {/* Badge: En venta */}
+            <button
+              type="button"
+              onClick={() => cambiarFiltro('published')}
+              className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+                filtroActual === 'published'
+                  ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                  : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+              }`}
+            >
+              <span>En venta</span>
+              <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+                filtroActual === 'published' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+              }`}>
+                {enVentaCount}
+              </span>
+            </button>
+
+            {/* Badge: En revisión */}
+            <button
+              type="button"
+              onClick={() => cambiarFiltro('pending')}
+              className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+                filtroActual === 'pending'
+                  ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                  : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+              }`}
+            >
+              <span>En revisión</span>
+              <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+                filtroActual === 'pending' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+              }`}>
+                {enRevisionCount}
+              </span>
+            </button>
+
+            {/* Badge: Rechazadas */}
+            <button
+              type="button"
+              onClick={() => cambiarFiltro('rejected')}
+              className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+                filtroActual === 'rejected'
+                  ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                  : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+              }`}
+            >
+              <span>Rechazadas</span>
+              <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+                filtroActual === 'rejected' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+              }`}>
+                {rechazadasCount}
+              </span>
+            </button>
+
+            {/* Badge: Vendidas */}
+            <button
+              type="button"
+              onClick={() => cambiarFiltro('sold')}
+              className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+                filtroActual === 'sold'
+                  ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                  : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+              }`}
+            >
+              <span>Vendidas</span>
+              <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+                filtroActual === 'sold' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+              }`}>
+                {vendidasCount}
+              </span>
+            </button>
           </div>
         </div>
 
