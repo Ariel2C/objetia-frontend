@@ -282,21 +282,23 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             </div>
           </div>
 
-          {/* 2. Barra con Badges tipo Botones (Sobrio, sin iconos, estilo minimalista) */}
+          {/* 2. Barra con Botones estilo Actualizar de Objetia Studio */}
           <div className="flex flex-wrap items-center gap-2 pt-1">
-            {/* Botón 1: Visualizaciones Totales */}
+            {/* Botón 1: Visualizaciones */}
             <button
               type="button"
               onClick={() => setMetricaActiva('views')}
-              className={`inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer border ${
+              className={`px-3 h-[32px] rounded-[10px] text-[12px] font-medium transition flex items-center gap-2 cursor-pointer border ${
                 metricaActiva === 'views'
-                  ? 'bg-[#202124] text-white border-[#202124]'
-                  : 'bg-white text-[#5f6368] hover:text-[#202124] hover:bg-[#f8f9fa] border-[#e0e0e0]'
+                  ? 'bg-[#151515] text-white border-[#87a9ff] shadow-xs'
+                  : 'bg-[#252525] border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white'
               }`}
             >
               <span>Visualizaciones</span>
-              <span className={`px-1.5 py-0.2 rounded text-[11px] font-mono ${
-                metricaActiva === 'views' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#202124]'
+              <span className={`px-1.5 py-0.5 rounded-[6px] text-[11px] font-mono ${
+                metricaActiva === 'views'
+                  ? 'bg-[#87a9ff]/20 text-[#87a9ff] font-semibold'
+                  : 'bg-[#1e1e1e] text-[#a0a0a0]'
               }`}>
                 {metrics.total_views.toLocaleString('es-AR')}
               </span>
@@ -306,15 +308,17 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             <button
               type="button"
               onClick={() => setMetricaActiva('favorites')}
-              className={`inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer border ${
+              className={`px-3 h-[32px] rounded-[10px] text-[12px] font-medium transition flex items-center gap-2 cursor-pointer border ${
                 metricaActiva === 'favorites'
-                  ? 'bg-[#202124] text-white border-[#202124]'
-                  : 'bg-white text-[#5f6368] hover:text-[#202124] hover:bg-[#f8f9fa] border-[#e0e0e0]'
+                  ? 'bg-[#151515] text-white border-[#87a9ff] shadow-xs'
+                  : 'bg-[#252525] border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white'
               }`}
             >
               <span>Favoritos</span>
-              <span className={`px-1.5 py-0.2 rounded text-[11px] font-mono ${
-                metricaActiva === 'favorites' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#202124]'
+              <span className={`px-1.5 py-0.5 rounded-[6px] text-[11px] font-mono ${
+                metricaActiva === 'favorites'
+                  ? 'bg-[#87a9ff]/20 text-[#87a9ff] font-semibold'
+                  : 'bg-[#1e1e1e] text-[#a0a0a0]'
               }`}>
                 {metrics.total_favorites.toLocaleString('es-AR')}
               </span>
@@ -324,15 +328,17 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             <button
               type="button"
               onClick={() => setMetricaActiva('sales')}
-              className={`inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer border ${
+              className={`px-3 h-[32px] rounded-[10px] text-[12px] font-medium transition flex items-center gap-2 cursor-pointer border ${
                 metricaActiva === 'sales'
-                  ? 'bg-[#202124] text-white border-[#202124]'
-                  : 'bg-white text-[#5f6368] hover:text-[#202124] hover:bg-[#f8f9fa] border-[#e0e0e0]'
+                  ? 'bg-[#151515] text-white border-[#87a9ff] shadow-xs'
+                  : 'bg-[#252525] border-[#333333] text-[#d4d4d4] hover:bg-[#323232] hover:text-white'
               }`}
             >
               <span>Ventas</span>
-              <span className={`px-1.5 py-0.2 rounded text-[11px] font-mono ${
-                metricaActiva === 'sales' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#202124]'
+              <span className={`px-1.5 py-0.5 rounded-[6px] text-[11px] font-mono ${
+                metricaActiva === 'sales'
+                  ? 'bg-[#87a9ff]/20 text-[#87a9ff] font-semibold'
+                  : 'bg-[#1e1e1e] text-[#a0a0a0]'
               }`}>
                 {metrics.total_sales.toLocaleString('es-AR')}
               </span>
