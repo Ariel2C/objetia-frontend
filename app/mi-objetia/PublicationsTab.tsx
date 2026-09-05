@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useMemo } from 'react';
-import { Eye, Copy, Trash2, Check, Edit2, X, Loader2, Heart, TrendingUp, ShoppingBag, BarChart3, ChevronDown, ChevronUp, Sparkles, Info } from 'lucide-react';
+import { Eye, Copy, Trash2, Check, Edit2, X, Loader2, Heart, TrendingUp, ShoppingBag, BarChart3, ChevronDown, ChevronUp, Sparkles, Info, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { getApiUrl } from '../../lib/config';
 import { useToast } from '../../components/ToastContext';
@@ -64,8 +64,11 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
     return Math.ceil(max * 1.2);
   }, [activeTimelineData]);
 
-  // Filtro de pestaña actual
-  const [filtroActual, setFiltroActual] = useState<'published' | 'pending' | 'rejected' | 'sold'>('published');
+  // Filtro de estado: 'all' | 'published' | 'pending' | 'rejected' | 'sold'
+  const [filtroActual, setFiltroActual] = useState<'all' | 'published' | 'pending' | 'rejected' | 'sold'>('all');
+  const [busqueda, setBusqueda] = useState("");
+  const [paginaActual, setPaginaActual] = useState(1);
+  const elementosPorPagina = 8;
 
   // --- ESTADOS DE EDICIÓN ---
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
@@ -117,6 +120,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
   const handleCopiarEnlace = (id: number) => {
     const url = `${window.location.origin}/products/${id}`;
     navigator.clipboard.writeText(url);
+    toast.success("Enlace copiado al portapapeles");
     setCopiandoId(id);
     setTimeout(() => setCopiandoId(null), 2000);
   };
@@ -225,19 +229,50 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
   };
 
   // Clasificación para los contadores
-  const publicadas = products.filter(p => p.moderation_status === 'approved' && p.stock > 0);
-  const enRevision = products.filter(p => p.moderation_status === 'pending');
-  const rechazadas = products.filter(p => p.moderation_status === 'rejected');
-  const vendidas = products.filter(p => p.moderation_status === 'approved' && p.stock < 1);
+  const todasCount = products.length;
+  const enVentaCount = products.filter(p => p.moderation_status === 'approved' && p.stock > 0).length;
+  const enRevisionCount = products.filter(p => p.moderation_status === 'pending').length;
+  const rechazadasCount = products.filter(p => p.moderation_status === 'rejected').length;
+  const vendidasCount = products.filter(p => p.moderation_status === 'approved' && p.stock < 1).length;
 
-  // Determinar qué lista renderizar
-  const getFilteredList = () => {
-    switch (filtroActual) {
-      case 'published': return publicadas;
-      case 'pending': return enRevision;
-      case 'rejected': return rechazadas;
-      case 'sold': return vendidas;
-    }
+  // Filtrado y búsqueda
+  const productosFiltrados = useMemo(() => {
+    return products.filter(p => {
+      // Filtro por estado
+      if (filtroActual === 'published' && !(p.moderation_status === 'approved' && p.stock > 0)) return false;
+      if (filtroActual === 'pending' && p.moderation_status !== 'pending') return false;
+      if (filtroActual === 'rejected' && p.moderation_status !== 'rejected') return false;
+      if (filtroActual === 'sold' && !(p.moderation_status === 'approved' && p.stock < 1)) return false;
+
+      // Filtro por búsqueda
+      if (busqueda.trim()) {
+        const q = busqueda.toLowerCase().trim();
+        const matchesTitle = (p.title || "").toLowerCase().includes(q);
+        const matchesCategory = (p.category || "").toLowerCase().includes(q);
+        const matchesId = p.id.toString().includes(q);
+        if (!matchesTitle && !matchesCategory && !matchesId) return false;
+      }
+
+      return true;
+    });
+  }, [products, filtroActual, busqueda]);
+
+  // Paginación
+  const totalPaginas = Math.max(1, Math.ceil(productosFiltrados.length / elementosPorPagina));
+  const productosPaginados = useMemo(() => {
+    const inicio = (paginaActual - 1) * elementosPorPagina;
+    return productosFiltrados.slice(inicio, inicio + elementosPorPagina);
+  }, [productosFiltrados, paginaActual]);
+
+  // Reset de página al cambiar filtro o búsqueda
+  const cambiarFiltro = (nuevoFiltro: 'all' | 'published' | 'pending' | 'rejected' | 'sold') => {
+    setFiltroActual(nuevoFiltro);
+    setPaginaActual(1);
+  };
+
+  const handleBusquedaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBusqueda(e.target.value);
+    setPaginaActual(1);
   };
 
   const formatearMonedaLocal = (valor: number) => {
@@ -444,195 +479,343 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
         </div>
       )}
 
-      {/* Tabs superiores Google AI Studio Light */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
-        <div className="flex flex-wrap gap-2">
-          <button 
-            onClick={() => setFiltroActual('published')}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition border cursor-pointer ${
-              filtroActual === 'published' 
-                ? 'bg-[#1a73e8] text-white border-[#1a73e8] shadow-2xs' 
-                : 'bg-white text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] border-[#dadce0]'
-            }`}
-          >
-            Publicadas ({publicadas.length})
-          </button>
-          <button 
-            onClick={() => setFiltroActual('pending')}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition border cursor-pointer ${
-              filtroActual === 'pending' 
-                ? 'bg-[#1a73e8] text-white border-[#1a73e8] shadow-2xs' 
-                : 'bg-white text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] border-[#dadce0]'
-            }`}
-          >
-            En revisión ({enRevision.length})
-          </button>
-          <button 
-            onClick={() => setFiltroActual('rejected')}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition border cursor-pointer ${
-              filtroActual === 'rejected' 
-                ? 'bg-[#1a73e8] text-white border-[#1a73e8] shadow-2xs' 
-                : 'bg-white text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] border-[#dadce0]'
-            }`}
-          >
-            Rechazadas ({rechazadas.length})
-          </button>
-          <button 
-            onClick={() => setFiltroActual('sold')}
-            className={`px-3.5 py-1.5 text-xs font-semibold rounded-xl transition border cursor-pointer ${
-              filtroActual === 'sold' 
-                ? 'bg-[#1a73e8] text-white border-[#1a73e8] shadow-2xs' 
-                : 'bg-white text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] border-[#dadce0]'
-            }`}
-          >
-            Vendidas ({vendidas.length})
-          </button>
+      {/* ========================================================================= */}
+      {/* TARJETA DE PUBLICACIONES (ESTILO MÉTRICAS DE RENDIMIENTO CON BUSCADOR Y PAGINACIÓN) */}
+      {/* ========================================================================= */}
+      <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 space-y-4 shadow-xs">
+        {/* Cabecera con Título, Subtítulo, Badges "Agrupa por" y Buscador a la derecha */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-1 border-b border-[#edf0f2]">
+          {/* Lado Izquierdo: Título, Subtítulo y Badges agrupadores */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 flex-wrap">
+            <div>
+              <h4 className="text-[14px] font-semibold text-[#202124]">
+                Gestión de publicaciones
+              </h4>
+              <p className="text-[11px] text-[#5f6368]">
+                Monitorea, edita y gestiona el inventario de tus artículos
+              </p>
+            </div>
+
+            <div className="hidden sm:block h-7 w-[1px] bg-[#edf0f2]" />
+
+            {/* Badges de Agrupación al lado del título */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-xs font-medium text-[#5f6368] mr-1">
+                Agrupa por:
+              </span>
+
+              {/* Badge: Todas */}
+              <button
+                type="button"
+                onClick={() => cambiarFiltro('all')}
+                className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+                  filtroActual === 'all'
+                    ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                    : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+                }`}
+              >
+                <span>Todas</span>
+                <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+                  filtroActual === 'all' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+                }`}>
+                  {todasCount}
+                </span>
+              </button>
+
+              {/* Badge: En venta */}
+              <button
+                type="button"
+                onClick={() => cambiarFiltro('published')}
+                className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+                  filtroActual === 'published'
+                    ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                    : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+                }`}
+              >
+                <span>En venta</span>
+                <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+                  filtroActual === 'published' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+                }`}>
+                  {enVentaCount}
+                </span>
+              </button>
+
+              {/* Badge: En revisión */}
+              <button
+                type="button"
+                onClick={() => cambiarFiltro('pending')}
+                className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+                  filtroActual === 'pending'
+                    ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                    : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+                }`}
+              >
+                <span>En revisión</span>
+                <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+                  filtroActual === 'pending' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+                }`}>
+                  {enRevisionCount}
+                </span>
+              </button>
+
+              {/* Badge: Rechazadas */}
+              <button
+                type="button"
+                onClick={() => cambiarFiltro('rejected')}
+                className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+                  filtroActual === 'rejected'
+                    ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                    : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+                }`}
+              >
+                <span>Rechazadas</span>
+                <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+                  filtroActual === 'rejected' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+                }`}>
+                  {rechazadasCount}
+                </span>
+              </button>
+
+              {/* Badge: Vendidas */}
+              <button
+                type="button"
+                onClick={() => cambiarFiltro('sold')}
+                className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+                  filtroActual === 'sold'
+                    ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                    : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+                }`}
+              >
+                <span>Vendidas</span>
+                <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+                  filtroActual === 'sold' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+                }`}>
+                  {vendidasCount}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Lado Derecho: Buscador bien alineado a la derecha */}
+          <div className="relative w-full sm:w-64 lg:w-72 flex-shrink-0">
+            <Search className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-[#80868b] pointer-events-none" />
+            <input
+              type="text"
+              value={busqueda}
+              onChange={handleBusquedaChange}
+              placeholder="Buscar por título o ID..."
+              className="w-full pl-9 pr-8 h-[34px] text-xs rounded-xl border border-[#e8eaed] bg-[#f8f9fa] text-[#202124] placeholder-[#80868b] focus:outline-none focus:border-[#202124] focus:bg-white transition"
+            />
+            {busqueda && (
+              <button
+                type="button"
+                onClick={() => { setBusqueda(''); setPaginaActual(1); }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#80868b] hover:text-[#202124] p-0.5 cursor-pointer"
+                title="Limpiar búsqueda"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Tabla de Publicaciones Google AI Studio Light */}
-      <div className="bg-white border border-[#dadce0] rounded-2xl shadow-xs overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-[#dadce0] bg-[#f8f9fa] text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider">
-                <th className="py-3 px-5">Producto</th>
-                <th className="py-3 px-5">Estado</th>
-                <th className="py-3 px-5 text-center">Interacciones</th>
-                <th className="py-3 px-5">Precio</th>
-                <th className="py-3 px-5">Actualizado</th>
-                <th className="py-3 px-5 text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#f1f3f4]">
-              {getFilteredList().length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="py-12 text-center text-xs text-[#5f6368]">
-                    No hay publicaciones en esta sección.
-                  </td>
+        {/* Tabla de Publicaciones estilizada con bordes suaves */}
+        <div className="border border-[#edf0f2] rounded-xl overflow-hidden bg-white">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-[#edf0f2] bg-[#f8f9fa] text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider">
+                  <th className="py-3 px-5">Producto</th>
+                  <th className="py-3 px-5">Estado</th>
+                  <th className="py-3 px-5 text-center">Interacciones</th>
+                  <th className="py-3 px-5">Precio</th>
+                  <th className="py-3 px-5">Actualizado</th>
+                  <th className="py-3 px-5 text-right">Acciones</th>
                 </tr>
-              ) : (
-                getFilteredList().map((item) => (
-                  <tr key={item.id} className="hover:bg-[#f8f9fa] transition">
-                    <td className="py-4 px-5">
-                      <div className="flex items-center gap-3">
-                        {item.image_url ? (
-                          <img 
-                            src={item.image_url} 
-                            alt={formatearTituloProducto(item.title)} 
-                            className="h-10 w-10 rounded-xl object-cover border border-[#dadce0] flex-shrink-0"
-                          />
-                        ) : (
-                          <div className="h-10 w-10 bg-[#f8f9fa] border border-[#dadce0] rounded-xl flex items-center justify-center text-base flex-shrink-0">
-                            🛋️
-                          </div>
-                        )}
-                        <span className="font-bold text-[#202124] text-xs truncate max-w-[200px]">
-                          {formatearTituloProducto(item.title)}
-                        </span>
-                      </div>
-                    </td>
-
-                    <td className="py-4 px-5">
-                      {item.moderation_status === 'rejected' ? (
-                        <span
-                          className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200"
-                          title={item.ai_moderation_notes || "La publicación fue rechazada por la moderación."}
-                        >
-                          Rechazada
-                        </span>
-                      ) : item.stock < 1 ? (
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#f1f3f4] text-[#5f6368] border border-[#dadce0]">
-                          Vendido
-                        </span>
-                      ) : item.moderation_status === 'approved' ? (
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#e6f4ea] text-[#137333] border border-[#ceead6]">
-                          Publicado
-                        </span>
-                      ) : (
-                        <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#fef7e0] text-[#b06000] border border-[#feefc3]">
-                          En revisión
-                        </span>
-                      )}
-                    </td>
-
-                    <td className="py-4 px-5">
-                      <div className="flex items-center justify-center gap-3 text-xs text-[#5f6368] font-mono">
-                        <span title="Visualizaciones">
-                          {item.views || 0} vistas
-                        </span>
-                        <span className="text-[#dadce0]">·</span>
-                        <span title="Favoritos">
-                          {item.favorites || 0} favs
-                        </span>
-                        {(item.sales ?? 0) > 0 && (
-                          <>
-                            <span className="text-[#dadce0]">·</span>
-                            <span className="font-semibold text-[#202124]" title="Ventas">
-                              {item.sales} ventas
-                            </span>
-                          </>
-                        )}
-                      </div>
-                    </td>
-
-                    <td className="py-4 px-5 font-bold text-[#202124] text-xs">
-                      {formatearMonedaLocal(item.price)}
-                    </td>
-
-                    <td className="py-4 px-5 text-[#5f6368] text-xs">
-                      {new Date(item.updated_at).toLocaleDateString()}
-                    </td>
-
-                    <td className="py-4 px-5 text-right">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <Link 
-                          href={`/products/${item.id}`}
-                          title="Ver publicación"
-                          className="p-1.5 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#e8f0fe] rounded-lg transition"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Link>
-                        
-                        {item.stock > 0 && (
-                          <button
-                            onClick={() => handleOpenEdit(item)}
-                            title="Editar publicación"
-                            className="p-1.5 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#e8f0fe] rounded-lg transition cursor-pointer"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </button>
-                        )}
-
-                        {item.moderation_status === 'approved' && item.stock > 0 && (
-                          <button
-                            onClick={() => handleCopiarEnlace(item.id)}
-                            title="Copiar enlace"
-                            className="p-1.5 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#e8f0fe] rounded-lg transition cursor-pointer"
-                          >
-                            {copiandoId === item.id ? (
-                              <Check className="h-4 w-4 text-[#137333]" />
-                            ) : (
-                              <Copy className="h-4 w-4" />
-                            )}
-                          </button>
-                        )}
-                        
-                        <button
-                          onClick={() => handleEliminarProducto(item.id)}
-                          title="Eliminar publicación"
-                          className="p-1.5 text-[#5f6368] hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </button>
-                      </div>
+              </thead>
+              <tbody className="divide-y divide-[#f1f3f4]">
+                {productosPaginados.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="py-12 text-center text-xs text-[#5f6368]">
+                      {busqueda ? "No se encontraron publicaciones que coincidan con la búsqueda." : "No hay publicaciones en esta sección."}
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : (
+                  productosPaginados.map((item) => (
+                    <tr key={item.id} className="hover:bg-[#f8f9fa] transition">
+                      <td className="py-4 px-5">
+                        <div className="flex items-center gap-3">
+                          {item.image_url ? (
+                            <img 
+                              src={item.image_url} 
+                              alt={formatearTituloProducto(item.title)} 
+                              className="h-10 w-10 rounded-xl object-cover border border-[#edf0f2] flex-shrink-0"
+                            />
+                          ) : (
+                            <div className="h-10 w-10 bg-[#f8f9fa] border border-[#edf0f2] rounded-xl flex items-center justify-center text-base flex-shrink-0">
+                              🛋️
+                            </div>
+                          )}
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-semibold text-[#202124] text-xs truncate max-w-[200px] sm:max-w-[280px]">
+                              {formatearTituloProducto(item.title)}
+                            </span>
+                            <span className="text-[10px] text-[#80868b] font-mono">
+                              ID: #{item.id}
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="py-4 px-5">
+                        {item.moderation_status === 'rejected' ? (
+                          <span
+                            className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200"
+                            title={item.ai_moderation_notes || "La publicación fue rechazada por la moderación."}
+                          >
+                            Rechazada
+                          </span>
+                        ) : item.stock < 1 ? (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#f1f3f4] text-[#5f6368] border border-[#edf0f2]">
+                            Vendido
+                          </span>
+                        ) : item.moderation_status === 'approved' ? (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#e6f4ea] text-[#137333] border border-[#ceead6]">
+                            Publicado
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#fef7e0] text-[#b06000] border border-[#feefc3]">
+                            En revisión
+                          </span>
+                        )}
+                      </td>
+
+                      <td className="py-4 px-5">
+                        <div className="flex items-center justify-center gap-2.5 text-xs text-[#5f6368] font-mono">
+                          <span title="Visualizaciones">
+                            {item.views || 0} vistas
+                          </span>
+                          <span className="text-[#dadce0]">·</span>
+                          <span title="Favoritos">
+                            {item.favorites || 0} favs
+                          </span>
+                          {(item.sales ?? 0) > 0 && (
+                            <>
+                              <span className="text-[#dadce0]">·</span>
+                              <span className="font-semibold text-[#202124]" title="Ventas">
+                                {item.sales} ventas
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </td>
+
+                      <td className="py-4 px-5 font-semibold text-[#202124] text-xs">
+                        {formatearMonedaLocal(item.price)}
+                      </td>
+
+                      <td className="py-4 px-5 text-[#5f6368] text-xs">
+                        {new Date(item.updated_at).toLocaleDateString()}
+                      </td>
+
+                      <td className="py-4 px-5 text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Link 
+                            href={`/products/${item.id}`}
+                            title="Ver publicación"
+                            className="p-1.5 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#e8f0fe] rounded-lg transition"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                          
+                          {item.stock > 0 && (
+                            <button
+                              onClick={() => handleOpenEdit(item)}
+                              title="Editar publicación"
+                              className="p-1.5 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#e8f0fe] rounded-lg transition cursor-pointer"
+                            >
+                              <Edit2 className="h-4 w-4" />
+                            </button>
+                          )}
+
+                          {item.moderation_status === 'approved' && item.stock > 0 && (
+                            <button
+                              onClick={() => handleCopiarEnlace(item.id)}
+                              title="Copiar enlace"
+                              className="p-1.5 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#e8f0fe] rounded-lg transition cursor-pointer"
+                            >
+                              {copiandoId === item.id ? (
+                                <Check className="h-4 w-4 text-[#137333]" />
+                              ) : (
+                                <Copy className="h-4 w-4" />
+                              )}
+                            </button>
+                          )}
+                          
+                          <button
+                            onClick={() => handleEliminarProducto(item.id)}
+                            title="Eliminar publicación"
+                            className="p-1.5 text-[#5f6368] hover:text-red-600 hover:bg-red-50 rounded-lg transition cursor-pointer"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
+
+        {/* Paginación estilo Google AI Studio */}
+        {totalPaginas > 1 && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-2">
+            <span className="text-xs text-[#5f6368]">
+              Mostrando {Math.min((paginaActual - 1) * elementosPorPagina + 1, productosFiltrados.length)} a {Math.min(paginaActual * elementosPorPagina, productosFiltrados.length)} de {productosFiltrados.length} publicaciones
+            </span>
+
+            <div className="flex items-center gap-1 self-center sm:self-auto">
+              <button
+                type="button"
+                onClick={() => setPaginaActual(prev => Math.max(1, prev - 1))}
+                disabled={paginaActual === 1}
+                className="p-1.5 rounded-lg border border-[#e8eaed] text-[#5f6368] hover:bg-[#f8f9fa] hover:text-[#202124] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
+                title="Página anterior"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+
+              <div className="flex items-center gap-1 px-1">
+                {Array.from({ length: totalPaginas }, (_, i) => i + 1).map((num) => (
+                  <button
+                    key={num}
+                    type="button"
+                    onClick={() => setPaginaActual(num)}
+                    className={`w-7 h-7 rounded-lg text-xs font-medium font-mono transition cursor-pointer ${
+                      paginaActual === num
+                        ? 'bg-[#202124] text-white'
+                        : 'text-[#5f6368] hover:bg-[#f8f9fa] hover:text-[#202124]'
+                    }`}
+                  >
+                    {num}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setPaginaActual(prev => Math.min(totalPaginas, prev + 1))}
+                disabled={paginaActual === totalPaginas}
+                className="p-1.5 rounded-lg border border-[#e8eaed] text-[#5f6368] hover:bg-[#f8f9fa] hover:text-[#202124] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer transition"
+                title="Página siguiente"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* --- MODAL DE EDICIÓN GOOGLE AI STUDIO LIGHT --- */}
