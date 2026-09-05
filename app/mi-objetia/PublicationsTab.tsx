@@ -263,7 +263,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
       {/* MÉTRICAS DE RENDIMIENTO (DISEÑO INTERACTIVO CON BADGES, GRÁFICO CSS Y CONVERSIÓN) */}
       {/* ========================================================================= */}
       {metrics && (
-        <div className="bg-white border border-[#e0e0e0] rounded-2xl p-5 space-y-4">
+        <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 space-y-4 shadow-xs">
           {/* 1. Título y Subtítulo */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
@@ -276,13 +276,13 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             </div>
 
             <div className="flex items-center">
-              <span className="px-2 py-0.5 rounded text-[11px] font-mono text-[#5f6368] bg-[#f1f3f4]">
+              <span className="px-2 py-0.5 rounded text-[11px] font-mono text-[#5f6368] bg-[#f8f9fa] border border-[#edf0f2]">
                 Actualizado en tiempo real
               </span>
             </div>
           </div>
 
-          {/* 2. Barra con Botones estilo Actualizar de Objetia Studio (Light con activo carbón Google AI Studio) */}
+          {/* 2. Barra con Botones estilo Actualizar de Objetia Studio (Bordes suaves y limpios) */}
           <div className="flex flex-wrap items-center gap-2.5 pt-1">
             {/* Botón 1: Visualizaciones */}
             <button
@@ -291,7 +291,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               className={`px-3.5 h-[34px] sm:h-[36px] rounded-[10px] sm:rounded-[12px] text-[12px] sm:text-[13px] font-medium transition flex items-center gap-2 cursor-pointer border whitespace-nowrap ${
                 metricaActiva === 'views'
                   ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
-                  : 'bg-white border-[#dadce0] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124]'
+                  : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
               }`}
             >
               <span>Visualizaciones</span>
@@ -311,7 +311,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               className={`px-3.5 h-[34px] sm:h-[36px] rounded-[10px] sm:rounded-[12px] text-[12px] sm:text-[13px] font-medium transition flex items-center gap-2 cursor-pointer border whitespace-nowrap ${
                 metricaActiva === 'favorites'
                   ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
-                  : 'bg-white border-[#dadce0] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124]'
+                  : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
               }`}
             >
               <span>Favoritos</span>
@@ -331,7 +331,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               className={`px-3.5 h-[34px] sm:h-[36px] rounded-[10px] sm:rounded-[12px] text-[12px] sm:text-[13px] font-medium transition flex items-center gap-2 cursor-pointer border whitespace-nowrap ${
                 metricaActiva === 'sales'
                   ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
-                  : 'bg-white border-[#dadce0] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124]'
+                  : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
               }`}
             >
               <span>Ventas</span>
@@ -345,8 +345,8 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             </button>
           </div>
 
-          {/* 3. Gráfico de los últimos 30 días estilo "Ganancia de la plataforma por mes" (Sin Limit, CSS, Light con barras carbón) */}
-          <div className="bg-[#f8f9fa] border border-[#dadce0] rounded-xl p-4 sm:p-5 space-y-3">
+          {/* 3. Gráfico de los últimos 30 días estilo "Ganancia de la plataforma por mes" (Líneas y bordes gris más claro) */}
+          <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-xl p-4 sm:p-5 space-y-3">
             <div className="flex items-center justify-between text-xs text-[#5f6368]">
               <span className="font-medium text-[#202124]">
                 {metricaActiva === 'views' && "Visualizaciones por día (últimos 30 días)"}
@@ -362,28 +362,28 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               </span>
             </div>
 
-            {/* Lienzo del Gráfico con Líneas Horizontales */}
+            {/* Lienzo del Gráfico con Líneas Horizontales en Gris Claro */}
             <div className="relative h-48 w-full select-none flex flex-col justify-between pt-2 pb-1">
-              {/* Líneas horizontales de referencia */}
+              {/* Líneas horizontales de referencia en gris suave */}
               <div className="absolute inset-0 pointer-events-none flex flex-col justify-between pr-10">
-                <div className="border-b border-[#dadce0] w-full relative">
-                  <span className="absolute right-0 -top-2.5 text-[10px] text-[#5f6368] font-mono">
+                <div className="border-b border-[#edf0f2] w-full relative">
+                  <span className="absolute right-0 -top-2.5 text-[10px] text-[#80868b] font-mono">
                     {maxActiveVal}
                   </span>
                 </div>
-                <div className="border-b border-[#dadce0] border-dashed w-full relative">
-                  <span className="absolute right-0 -top-2.5 text-[10px] text-[#5f6368] font-mono">
+                <div className="border-b border-[#edf0f2] border-dashed w-full relative">
+                  <span className="absolute right-0 -top-2.5 text-[10px] text-[#80868b] font-mono">
                     {Math.round(maxActiveVal * 0.5)}
                   </span>
                 </div>
-                <div className="border-b border-[#dadce0] w-full relative">
-                  <span className="absolute right-0 -top-2.5 text-[10px] text-[#5f6368] font-mono">
+                <div className="border-b border-[#edf0f2] w-full relative">
+                  <span className="absolute right-0 -top-2.5 text-[10px] text-[#80868b] font-mono">
                     0
                   </span>
                 </div>
               </div>
 
-              {/* Barras CSS en carbón Google AI Studio (#3c4043 -> #202124) para todas las métricas */}
+              {/* Barras CSS en carbón Google AI Studio */}
               <div className="relative z-10 flex items-end justify-between h-40 w-full pr-12 pl-1 gap-1">
                 {activeTimelineData.map((d, idx) => {
                   const val = d.value;
@@ -403,7 +403,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                       <div
                         style={{ height: `${barH}%` }}
                         className={`w-full max-w-[22px] rounded-t-[4px] transition-all ${
-                          val > 0 ? 'bg-[#3c4043] group-hover:bg-[#202124]' : 'bg-[#dadce0] hover:bg-[#bcc1c8]'
+                          val > 0 ? 'bg-[#3c4043] group-hover:bg-[#202124]' : 'bg-[#e8eaed] hover:bg-[#dadce0]'
                         }`}
                       />
                     </div>
@@ -411,8 +411,8 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                 })}
               </div>
 
-              {/* Eje X de fechas */}
-              <div className="relative z-10 flex items-center justify-between text-[10px] text-[#5f6368] font-mono pt-2 pr-12 pl-1 border-t border-[#dadce0]">
+              {/* Eje X de fechas con borde sutil */}
+              <div className="relative z-10 flex items-center justify-between text-[10px] text-[#80868b] font-mono pt-2 pr-12 pl-1 border-t border-[#edf0f2]">
                 {activeTimelineData.map((d, idx) => (
                   <span key={idx} className={idx % 5 === 0 ? "block" : "hidden sm:inline-block opacity-0 select-none"}>
                     {idx % 5 === 0 ? d.label : d.label}
@@ -422,8 +422,8 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             </div>
           </div>
 
-          {/* 4. Abajo del Gráfico: Tasa de Conversión (Sobrio, sin colores estridentes) */}
-          <div className="bg-[#fafafa] border border-[#e0e0e0] rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          {/* 4. Abajo del Gráfico: Tasa de Conversión (Bordes sutiles) */}
+          <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-xl px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold text-[#202124]">
