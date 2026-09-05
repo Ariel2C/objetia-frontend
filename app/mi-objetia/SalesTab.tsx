@@ -368,11 +368,11 @@ export default function SalesTab({ token }: SalesTabProps) {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#f1f3f4] pb-4">
           <div className="space-y-0.5 min-w-0">
             <h4 className="text-sm sm:text-base font-bold text-[#202124] flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-[#1a73e8]" />
-              <span>Mis Ventas</span>
+              <Package className="h-4 w-4 text-[#1a73e8]" />
+              <span>Órdenes y Despachos</span>
             </h4>
             <p className="text-xs text-[#5f6368]">
-              Historial de órdenes vendidas, seguimiento de envíos e impresión de etiquetas de despacho
+              Seguimiento de pedidos cobrados, estado de envíos e impresión de etiquetas de Correo
             </p>
           </div>
 
