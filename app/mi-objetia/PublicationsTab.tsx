@@ -392,20 +392,23 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                   return (
                     <div
                       key={idx}
-                      className="flex-1 flex flex-col items-center justify-end h-full group relative cursor-pointer"
+                      className="flex-1 flex flex-col items-center justify-end h-full group cursor-pointer"
                     >
-                      {/* Tooltip dinámico al pasar el cursor */}
-                      <div className="absolute -top-8 hidden group-hover:flex bg-[#202124] text-white text-[10px] px-2 py-0.5 rounded-md shadow-md z-20 whitespace-nowrap">
-                        {d.label}: {val} {metricaActiva === 'views' ? 'vistas' : metricaActiva === 'favorites' ? 'favoritos' : 'ventas'}
-                      </div>
-
-                      {/* Barra CSS con tono carbón Google AI Studio */}
+                      {/* Barra CSS con contenedor relativo para el tooltip */}
                       <div
                         style={{ height: `${barH}%` }}
-                        className={`w-full max-w-[22px] rounded-t-[4px] transition-all ${
+                        className={`w-full max-w-[22px] rounded-t-[4px] transition-all relative flex justify-center ${
                           val > 0 ? 'bg-[#3c4043] group-hover:bg-[#202124]' : 'bg-[#e8eaed] hover:bg-[#dadce0]'
                         }`}
-                      />
+                      >
+                        {/* Tooltip dinámico ubicado exactamente sobre la cima de la barra */}
+                        <div className="absolute -top-7 hidden group-hover:flex items-center flex-col z-30 pointer-events-none">
+                          <span className="bg-[#202124] text-white text-[10px] px-2 py-0.5 rounded shadow-md whitespace-nowrap">
+                            {d.label}: {val}
+                          </span>
+                          <span className="w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-[#202124]" />
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
