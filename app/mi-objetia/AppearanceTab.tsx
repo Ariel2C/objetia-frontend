@@ -73,26 +73,65 @@ export default function AppearanceTab({
     }
   };
 
-  const handleDescargarLogo = async (url: string, filename: string = "logotipo.png") => {
-    try {
-      const response = await fetch(url);
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
-    } catch {
+  const handleDescargarLogo = async (url: string, rawFilename: string = "logotipo.png") => {
+    let filename = rawFilename.trim() || "logotipo.png";
+    if (!/\.(png|jpe?g|svg|webp)$/i.test(filename)) {
+      filename += '.png';
+    }
+
+    // 1. Si es blob o data URL generado localmente
+    if (url.startsWith('blob:') || url.startsWith('data:')) {
       const link = document.createElement('a');
       link.href = url;
       link.download = filename;
-      link.target = '_blank';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+      return;
+    }
+
+    // 2. Intentar fetch directo o a través de nuestra API interna de descarga (elimina restricciones CORS y conserva fondo transparente)
+    try {
+      let blob: Blob | null = null;
+      try {
+        const directRes = await fetch(url);
+        if (directRes.ok) {
+          blob = await directRes.blob();
+        }
+      } catch {
+        // Fallback a la API proxy interna
+      }
+
+      if (!blob) {
+        const proxyUrl = `/api/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
+        const proxyRes = await fetch(proxyUrl);
+        if (proxyRes.ok) {
+          blob = await proxyRes.blob();
+        }
+      }
+
+      if (blob) {
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => window.URL.revokeObjectURL(blobUrl), 1000);
+        return;
+      }
+
+      // 3. Respaldo final: invocación directa al endpoint que envía Content-Disposition: attachment (no abre pestaña nueva)
+      const proxyUrl = `/api/download?url=${encodeURIComponent(url)}&filename=${encodeURIComponent(filename)}`;
+      const link = document.createElement('a');
+      link.href = proxyUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error("Error al descargar logotipo:", error);
     }
   };
 
