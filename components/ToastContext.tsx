@@ -82,10 +82,10 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={api}>
       {children}
-      {/* Contenedor de notificaciones: debajo del navbar (h-16), centrado en móvil y a la derecha en desktop */}
+      {/* Contenedor de notificaciones: abajo centrado */}
       <div
         aria-live="polite"
-        className="fixed z-[100] top-20 inset-x-4 sm:inset-x-auto sm:right-5 sm:top-20 flex flex-col gap-2.5 items-stretch sm:items-end pointer-events-none"
+        className="fixed z-[100] bottom-6 left-0 right-0 flex flex-col gap-2.5 items-center pointer-events-none px-4"
       >
         {toasts.map((toast) => {
           const estilo = ESTILOS[toast.type];
@@ -95,7 +95,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               key={toast.id}
               role="status"
               style={{ animation: toast.saliendo ? 'va-toast-out 0.22s ease forwards' : 'va-toast-in 0.3s var(--ease-spring) both' }}
-              className="pointer-events-auto relative overflow-hidden w-full sm:w-[360px] bg-gray-900 border border-gray-700/60 rounded-2xl shadow-xl shadow-black/30"
+              className="pointer-events-auto relative overflow-hidden w-full sm:w-[380px] max-w-md bg-gray-900 border border-gray-700/60 rounded-2xl shadow-2xl shadow-black/40"
             >
               <div className="flex items-start gap-3 p-4 pr-10">
                 <Icono className={`h-5 w-5 flex-shrink-0 mt-0.5 ${estilo.iconClass}`} />

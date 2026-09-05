@@ -1,8 +1,9 @@
 "use client";
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../../components/AuthContext';
+import { useToast } from '../../components/ToastContext';
 import { getApiUrl, getGoogleMapsApiKey } from '../../lib/config';
-import { ShieldCheck, MapPin, Loader2, Save, Pencil, X, Trash2, Plus, Check, Navigation, AlertCircle, ArrowRight, ArrowLeft, Tag, Phone, User, Mail, RotateCcw } from 'lucide-react';
+import { MapPin, Loader2, Save, Pencil, X, Trash2, Plus, Check, Navigation, AlertCircle, ArrowRight, ArrowLeft, Tag, Phone, User, Mail, RotateCcw } from 'lucide-react';
 
 const PROVINCIAS_ARGENTINA = [
   "Buenos Aires",
@@ -73,14 +74,13 @@ interface ProfileTabProps {
 
 export default function ProfileTab({ onSavingChange, onHasChangesChange }: ProfileTabProps) {
   const { usuario, token, login } = useAuth();
+  const toast = useToast();
   
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [initialFullName, setInitialFullName] = useState("");
   const [initialPhone, setInitialPhone] = useState("");
   const [loadingProfile, setLoadingProfile] = useState(false);
-  const [successMsg, setSuccessMsg] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
 
   // Lista de direcciones del usuario
   const [addresses, setAddresses] = useState<UserAddress[]>([]);
@@ -165,7 +165,6 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
   const handleDiscardProfileChanges = () => {
     setFullName(initialFullName);
     setPhone(initialPhone);
-    setErrorMsg("");
   };
 
   // Cargar direcciones desde la API
@@ -439,8 +438,6 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
 
     setLoadingProfile(true);
     onSavingChange?.(true);
-    setSuccessMsg("");
-    setErrorMsg("");
 
     try {
       const res = await fetch(`${getApiUrl()}/auth/profile`, {
@@ -464,10 +461,9 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
       login(authToken, updatedUser);
       setInitialFullName(fullName.trim());
       setInitialPhone(phone.trim());
-      setSuccessMsg("Información personal guardada con éxito");
-      setTimeout(() => setSuccessMsg(""), 4000);
+      toast.success("Información personal guardada con éxito");
     } catch (err: any) {
-      setErrorMsg(err.message || "Error al actualizar datos");
+      toast.error(err.message || "Error al actualizar datos");
     } finally {
       setLoadingProfile(false);
       onSavingChange?.(false);
@@ -610,8 +606,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
 
       setShowAddressForm(false);
       setEditingAddressId(null);
-      setSuccessMsg(editingAddressId ? "Dirección actualizada correctamente" : "Dirección agregada con éxito");
-      setTimeout(() => setSuccessMsg(""), 4000);
+      toast.success(editingAddressId ? "Dirección actualizada correctamente" : "Dirección agregada con éxito");
     } catch (err: any) {
       setAddressError(err.message || "Error al guardar la dirección");
     } finally {
@@ -640,11 +635,9 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
       }
 
       await fetchAddresses();
-      setSuccessMsg("Dirección eliminada correctamente");
-      setTimeout(() => setSuccessMsg(""), 4000);
+      toast.success("Dirección eliminada correctamente");
     } catch (err: any) {
-      setErrorMsg(err.message || "Error al eliminar dirección");
-      setTimeout(() => setErrorMsg(""), 4000);
+      toast.error(err.message || "Error al eliminar dirección");
     }
   };
 
@@ -674,27 +667,14 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
         const updatedUser = await profileRes.json();
         login(authToken, updatedUser);
       }
-      setSuccessMsg("Dirección seleccionada como activa para envíos");
-      setTimeout(() => setSuccessMsg(""), 3000);
+      toast.success("Dirección seleccionada como activa para envíos");
     } catch (err: any) {
-      setErrorMsg(err.message || "Error al establecer dirección predeterminada");
-      setTimeout(() => setErrorMsg(""), 4000);
+      toast.error(err.message || "Error al establecer dirección predeterminada");
     }
   };
 
   return (
     <div className="space-y-6 animate-fade-in select-none w-full">
-      {successMsg && (
-        <div className="p-3.5 bg-[#e6f4ea] border border-[#ceead6] text-[#137333] rounded-xl text-xs font-semibold flex items-center gap-2">
-          <ShieldCheck className="h-4 w-4 text-[#137333]" /> {successMsg}
-        </div>
-      )}
-
-      {errorMsg && (
-        <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs font-semibold">
-          ⚠️ {errorMsg}
-        </div>
-      )}
 
       {/* Formulario de Información Personal */}
       <form id="perfil-form" onSubmit={handleSubmitProfile} className="space-y-6 w-full">
