@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   Truck,
@@ -82,6 +83,11 @@ export default function TrackingModal({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [trackingData, setTrackingData] = useState<TrackingData | null>(null);
   const [copiado, setCopiado] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const fetchTracking = useCallback(async (num: string) => {
     if (!num.trim()) return;
@@ -140,13 +146,16 @@ export default function TrackingModal({
     setTimeout(() => setCopiado(false), 2000);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   const esEntregado = trackingData?.status === 'Entregado' || trackingData?.timeline?.some(t => t.code === 'DELIVERED' && t.done);
   const esEnCamino = trackingData?.status === 'En camino' || trackingData?.timeline?.some(t => ['IN_TRANSIT', 'OUT_FOR_DELIVERY', 'DISPATCHED'].includes(t.code) && t.done);
 
-  return (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-3 sm:p-4 animate-fade-in select-none">
+  return createPortal(
+    <div 
+      className="fixed inset-0 bg-black/50 backdrop-blur-xs z-[99999] flex items-center justify-center p-3 sm:p-4 animate-fade-in select-none"
+      onClick={onClose}
+    >
       <div 
         className="bg-white rounded-2xl border border-[#dadce0] shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-scale-in"
         onClick={(e) => e.stopPropagation()}
@@ -427,6 +436,7 @@ export default function TrackingModal({
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { 
   Loader2, 
   Landmark, 
@@ -73,6 +74,11 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
   const [transacciones, setTransacciones] = useState<WalletTransaction[]>([]);
   const [cargandoTx, setCargandoTx] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Cuentas de retiro (CBU / CVU / Alias) guardadas en BD y localStorage
   const [cuentasRecientes, setCuentasRecientes] = useState<string[]>([]);
@@ -528,9 +534,15 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
       {/* ========================================================================= */}
       {/* MODAL DE DETALLE DE TRANSACCIÓN */}
       {/* ========================================================================= */}
-      {detalleTx && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl relative border border-[#edf0f2]">
+      {detalleTx && mounted && createPortal(
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-xs z-[99999] flex items-center justify-center p-4 animate-fade-in"
+          onClick={() => setDetalleTx(null)}
+        >
+          <div 
+            className="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl relative border border-[#edf0f2]"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Cabecera modal detalle */}
             <div className="flex items-center justify-between pb-2 border-b border-[#edf0f2]">
               <div className="flex items-center gap-2">
@@ -631,15 +643,22 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
               Cerrar
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* ========================================================================= */}
       {/* MODAL DE RETIRO DE FONDOS (ESTILO GOOGLE AI STUDIO CARBÓN) */}
       {/* ========================================================================= */}
-      {modalRetiroAbierto && (
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl relative border border-[#edf0f2]">
+      {modalRetiroAbierto && mounted && createPortal(
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-xs z-[99999] flex items-center justify-center p-4 animate-fade-in"
+          onClick={cerrarModalRetiro}
+        >
+          <div 
+            className="bg-white rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl relative border border-[#edf0f2]"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Cabecera del modal */}
             <div className="flex items-center justify-between pb-2 border-b border-[#edf0f2]">
               <div className="flex items-center gap-2.5">
@@ -794,7 +813,8 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
               </div>
             </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
