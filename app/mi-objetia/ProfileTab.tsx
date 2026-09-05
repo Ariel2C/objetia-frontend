@@ -100,11 +100,18 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
 
   // Google Maps refs & script
   const streetInputRef = useRef<HTMLInputElement>(null);
-  const autocompleteRef = useRef<any>(null);
+  const streetWrapperRef = useRef<HTMLDivElement>(null);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
   const markerRef = useRef<any>(null);
   const [googleMapsLoaded, setGoogleMapsLoaded] = useState(false);
+
+  // Estado del autocompletado interactivo
+  const [predictions, setPredictions] = useState<any[]>([]);
+  const [loadingPredictions, setLoadingPredictions] = useState(false);
+  const [showPredictionsDropdown, setShowPredictionsDropdown] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
 
   // Cargar Google Places API si hay API key configurada
   useEffect(() => {
@@ -121,7 +128,7 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
     if (!script) {
       script = document.createElement('script');
       script.id = scriptId;
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=es&region=AR`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&language=es&region=AR&loading=async`;
       script.async = true;
       script.defer = true;
       script.onload = () => setGoogleMapsLoaded(true);
@@ -234,133 +241,115 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
       .catch(() => {});
   };
 
-  // Inicializar Autocomplete en el input de Calle cuando se edita la dirección
+  // Cerrar el menú desplegable de sugerencias al hacer clic afuera
   useEffect(() => {
-    if (!showAddressForm || !googleMapsLoaded || !streetInputRef.current) return;
-
-    const google = (window as any).google;
-    if (!google?.maps?.places?.Autocomplete) return;
-
-    try {
-      const autocomplete = new google.maps.places.Autocomplete(streetInputRef.current, {
-        componentRestrictions: { country: 'ar' },
-        fields: ['address_components', 'name', 'formatted_address', 'place_id', 'geometry'],
-        types: ['address']
-      });
-
-      autocomplete.addListener('place_changed', () => {
-        const place = autocomplete.getPlace();
-        if (!place || !place.address_components) return;
-
-        let parsedStreet = '';
-        let parsedNumber = '';
-        let parsedCity = '';
-        let parsedProvince = '';
-        let parsedPostalCode = '';
-
-        for (const comp of place.address_components) {
-          const types: string[] = comp.types || [];
-          if (types.includes('route')) {
-            parsedStreet = comp.long_name;
-          } else if (types.includes('street_number')) {
-            parsedNumber = comp.long_name;
-          } else if (types.includes('locality')) {
-            parsedCity = comp.long_name;
-          } else if (types.includes('sublocality') || types.includes('sublocality_level_1')) {
-            if (!parsedCity) parsedCity = comp.long_name;
-          } else if (types.includes('administrative_area_level_2')) {
-            if (!parsedCity) parsedCity = comp.long_name;
-          } else if (types.includes('administrative_area_level_1')) {
-            parsedProvince = comp.long_name;
-          } else if (types.includes('postal_code') || types.includes('postal_code_prefix')) {
-            parsedPostalCode = comp.long_name;
-          }
-        }
-
-        if (parsedStreet) setFormStreet(parsedStreet);
-        if (parsedNumber) setFormNumber(parsedNumber);
-        if (parsedCity) setFormCity(parsedCity);
-
-        // Extraer CP de formatted_address si no vino directo
-        if (!parsedPostalCode && place.formatted_address) {
-          const matches = place.formatted_address.match(/\b([A-Z]?\d{4}[A-Z]{0,3})\b/g);
-          if (matches) {
-            for (const m of matches) {
-              if (m !== parsedNumber && m !== '0000') {
-                parsedPostalCode = m;
-                break;
-              }
-            }
-          }
-        }
-
-        if (parsedPostalCode) {
-          setFormPostalCode(parsedPostalCode);
-        }
-
-        // Coordenadas para el mapa
-        const lat = place.geometry?.location
-          ? typeof place.geometry.location.lat === 'function'
-            ? place.geometry.location.lat()
-            : place.geometry.location.lat
-          : null;
-        const lng = place.geometry?.location
-          ? typeof place.geometry.location.lng === 'function'
-            ? place.geometry.location.lng()
-            : place.geometry.location.lng
-          : null;
-
-        if (lat && lng) {
-          setFormLat(lat);
-          setFormLng(lng);
-
-          if (mapInstanceRef.current && markerRef.current) {
-            mapInstanceRef.current.setCenter({ lat, lng });
-            mapInstanceRef.current.setZoom(17);
-            markerRef.current.setPosition({ lat, lng });
-          }
-        }
-
-        // Fallback de código postal si no vino
-        if (!parsedPostalCode && lat && lng) {
-          if (google?.maps?.Geocoder) {
-            const geocoder = new google.maps.Geocoder();
-            geocoder.geocode({ location: { lat, lng } }, (results: any, status: string) => {
-              if (status === 'OK' && results && results[0]?.address_components) {
-                for (const c of results[0].address_components) {
-                  if (c.types.includes('postal_code') || c.types.includes('postal_code_prefix')) {
-                    setFormPostalCode(c.long_name);
-                    return;
-                  }
-                }
-              }
-              fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
-                .then((r) => r.json())
-                .then((data) => {
-                  if (data?.address?.postcode) setFormPostalCode(data.address.postcode.trim());
-                })
-                .catch(() => {});
-            });
-          }
-        }
-
-        if (parsedProvince) {
-          const matched = matchProvince(parsedProvince);
-          setFormProvince(matched);
-        }
-      });
-
-      autocompleteRef.current = autocomplete;
-    } catch (err) {
-      console.warn("Error inicializando Autocomplete:", err);
-    }
-
-    return () => {
-      if (autocompleteRef.current && (window as any).google?.maps?.event?.clearInstanceListeners) {
-        (window as any).google.maps.event.clearInstanceListeners(autocompleteRef.current);
+    const handleClickOutside = (e: MouseEvent) => {
+      if (streetWrapperRef.current && !streetWrapperRef.current.contains(e.target as Node)) {
+        setShowPredictionsDropdown(false);
       }
     };
-  }, [showAddressForm, googleMapsLoaded]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Manejar cambios en el campo Calle y buscar sugerencias
+  const handleStreetChange = (text: string) => {
+    setFormStreet(text);
+    setHighlightedIndex(-1);
+
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+
+    if (text.trim().length < 2) {
+      setPredictions([]);
+      setShowPredictionsDropdown(false);
+      return;
+    }
+
+    setLoadingPredictions(true);
+    debounceTimerRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/places/autocomplete?input=${encodeURIComponent(text.trim())}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data.predictions) && data.predictions.length > 0) {
+            setPredictions(data.predictions);
+            setShowPredictionsDropdown(true);
+          } else {
+            setPredictions([]);
+            setShowPredictionsDropdown(false);
+          }
+        }
+      } catch (err) {
+        console.warn("Error consultando sugerencias de dirección:", err);
+      } finally {
+        setLoadingPredictions(false);
+      }
+    }, 200);
+  };
+
+  // Al seleccionar una sugerencia del autocompletado
+  const handleSelectPrediction = async (prediction: any) => {
+    setShowPredictionsDropdown(false);
+    setPredictions([]);
+
+    if (prediction.source === 'google' && prediction.id && !prediction.id.startsWith('nom_')) {
+      try {
+        const res = await fetch(`/api/places/details?place_id=${encodeURIComponent(prediction.id)}`);
+        if (res.ok) {
+          const details = await res.json();
+          if (details.street) setFormStreet(details.street);
+          else if (prediction.main_text) setFormStreet(prediction.main_text);
+
+          if (details.number) setFormNumber(details.number);
+          if (details.city) setFormCity(details.city);
+          if (details.province) {
+            const matched = matchProvince(details.province);
+            if (matched) setFormProvince(matched);
+          }
+          if (details.postal_code) setFormPostalCode(details.postal_code);
+
+          if (details.lat && details.lng) {
+            setFormLat(details.lat);
+            setFormLng(details.lng);
+            if (mapInstanceRef.current && markerRef.current) {
+              mapInstanceRef.current.setCenter({ lat: details.lat, lng: details.lng });
+              mapInstanceRef.current.setZoom(17);
+              markerRef.current.setPosition({ lat: details.lat, lng: details.lng });
+            }
+          }
+          return;
+        }
+      } catch (err) {
+        console.warn("Error obteniendo detalles del lugar:", err);
+      }
+    }
+
+    // Respaldo Nominatim o genérico
+    if (prediction.address) {
+      const a = prediction.address;
+      const road = a.road || prediction.main_text || "";
+      if (road) setFormStreet(road);
+      if (a.house_number) setFormNumber(a.house_number);
+      if (a.city || a.town || a.village) setFormCity(a.city || a.town || a.village);
+      if (a.state) {
+        const matched = matchProvince(a.state);
+        if (matched) setFormProvince(matched);
+      }
+      if (a.postcode) setFormPostalCode(a.postcode.trim());
+    } else {
+      if (prediction.main_text) setFormStreet(prediction.main_text);
+    }
+
+    if (prediction.lat && prediction.lng) {
+      setFormLat(prediction.lat);
+      setFormLng(prediction.lng);
+      if (mapInstanceRef.current && markerRef.current) {
+        mapInstanceRef.current.setCenter({ lat: prediction.lat, lng: prediction.lng });
+        mapInstanceRef.current.setZoom(17);
+        markerRef.current.setPosition({ lat: prediction.lat, lng: prediction.lng });
+      }
+    }
+  };
 
   // Inicializar Google Map cuando se abre el formulario de dirección
   useEffect(() => {
@@ -771,22 +760,71 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="sm:col-span-2">
+                  <div className="sm:col-span-2 relative" ref={streetWrapperRef}>
                     <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
                       Calle *
                     </label>
-                    <input
-                      ref={streetInputRef}
-                      type="text"
-                      required
-                      placeholder="Ej: Av. San Martín 1240"
-                      value={formStreet}
-                      onChange={(e) => setFormStreet(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') e.preventDefault();
-                      }}
-                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
-                    />
+                    <div className="relative">
+                      <input
+                        ref={streetInputRef}
+                        type="text"
+                        required
+                        placeholder="Ej: Av. San Martín o buscá tu calle"
+                        value={formStreet}
+                        onChange={(e) => handleStreetChange(e.target.value)}
+                        onFocus={() => {
+                          if (predictions.length > 0) setShowPredictionsDropdown(true);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            setHighlightedIndex((prev) => Math.min(prev + 1, predictions.length - 1));
+                          } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+                          } else if (e.key === 'Enter') {
+                            if (showPredictionsDropdown && highlightedIndex >= 0 && predictions[highlightedIndex]) {
+                              e.preventDefault();
+                              handleSelectPrediction(predictions[highlightedIndex]);
+                            }
+                          } else if (e.key === 'Escape') {
+                            setShowPredictionsDropdown(false);
+                          }
+                        }}
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
+                        autoComplete="off"
+                      />
+                      {loadingPredictions && (
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                          <Loader2 className="w-4 h-4 text-[#1a73e8] animate-spin" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Menú desplegable de sugerencias */}
+                    {showPredictionsDropdown && predictions.length > 0 && (
+                      <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#dadce0] rounded-xl shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                        {predictions.map((p, idx) => (
+                          <button
+                            key={p.id || idx}
+                            type="button"
+                            onClick={() => handleSelectPrediction(p)}
+                            onMouseEnter={() => setHighlightedIndex(idx)}
+                            className={`w-full text-left px-3.5 py-2.5 flex items-start gap-2.5 transition border-b border-[#f1f3f4] last:border-0 cursor-pointer ${
+                              highlightedIndex === idx ? "bg-[#e8f0fe] text-[#1a73e8]" : "hover:bg-[#f8f9fa] text-[#202124]"
+                            }`}
+                          >
+                            <MapPin className={`w-4 h-4 mt-0.5 shrink-0 ${highlightedIndex === idx ? "text-[#1a73e8]" : "text-[#5f6368]"}`} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold truncate text-[#202124]">{p.main_text}</p>
+                              {p.secondary_text && (
+                                <p className="text-[11px] text-[#5f6368] truncate">{p.secondary_text}</p>
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                   <div>
                     <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">

@@ -29,6 +29,6 @@ export const getGoogleClientId = (): string => {
 };
 
 export const getGoogleMapsApiKey = (): string => {
-  return process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
+  return process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "AIzaSyBsvyz0gQnpeAxq0WzNHiqkfjSZnWhlfm4";
 };
 
