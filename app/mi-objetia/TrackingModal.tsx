@@ -324,10 +324,10 @@ export default function TrackingModal({
                       key={step.code} 
                       className={`relative rounded-xl border transition-all flex items-stretch overflow-visible ${
                         step.current
-                          ? 'bg-white border-[#202124] shadow-xs ring-2 ring-[#1a73e8]/25'
+                          ? 'bg-white border-[#dadce0] shadow-xs ring-2 ring-[#1a73e8]/20'
                           : step.done
-                            ? 'bg-[#f8f9fa] hover:bg-white border-[#202124]'
-                            : 'bg-[#fafbfc] border-[#202124]/35 opacity-80'
+                            ? 'bg-[#f8f9fa] hover:bg-white border-[#dadce0]'
+                            : 'bg-[#fafbfc] border-[#dadce0]/70 opacity-80'
                       }`}
                     >
                       {/* LADO IZQUIERDO: SOCKET CIRCULAR CON EL CAMINO ABIERTO Y LA LÍNEA VERTICAL CONECTORA (SEGÚN CROQUIS) */}
@@ -336,14 +336,14 @@ export default function TrackingModal({
                         {/* Camino superior (canal abierto que interrumpe el borde de la tarjeta para que no toque la línea) */}
                         {!isFirst && (
                           <div 
-                            className={`absolute left-1/2 -translate-x-1/2 w-[18px] bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
+                            className={`absolute left-1/2 -translate-x-1/2 w-4 bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
                               step.current || step.done
-                                ? 'border-[#202124]'
-                                : 'border-[#202124]/35'
+                                ? 'border-[#dadce0]'
+                                : 'border-[#dadce0]/70'
                             }`}
                             style={{
                               top: '-1px',
-                              bottom: 'calc(50% + 23px)',
+                              bottom: 'calc(50% + 23.5px)',
                             }}
                           />
                         )}
@@ -351,24 +351,24 @@ export default function TrackingModal({
                         {/* Camino inferior (canal abierto que interrumpe el borde de la tarjeta para que no toque la línea) */}
                         {!isLast && (
                           <div 
-                            className={`absolute left-1/2 -translate-x-1/2 w-[18px] bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
+                            className={`absolute left-1/2 -translate-x-1/2 w-4 bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
                               step.current || step.done
-                                ? 'border-[#202124]'
-                                : 'border-[#202124]/35'
+                                ? 'border-[#dadce0]'
+                                : 'border-[#dadce0]/70'
                             }`}
                             style={{
-                              top: 'calc(50% + 23px)',
+                              top: 'calc(50% + 23.5px)',
                               bottom: '-1px',
                             }}
                           />
                         )}
 
-                        {/* Cavidad / Socket circular concéntrico (50px) que sigue la forma del círculo con espacio libre */}
+                        {/* Cavidad / Socket circular concéntrico (50px) con borde gris claro */}
                         <div 
                           className={`absolute w-[50px] h-[50px] rounded-full border-[1.5px] bg-white z-[1] transition-colors ${
                             step.current || step.done
-                              ? 'border-[#202124]'
-                              : 'border-[#202124]/35'
+                              ? 'border-[#dadce0]'
+                              : 'border-[#dadce0]/70'
                           }`}
                           style={{
                             top: '50%',
@@ -378,11 +378,11 @@ export default function TrackingModal({
                         >
                           {/* Abertura superior del socket hacia el camino */}
                           {!isFirst && (
-                            <div className="absolute -top-[1.5px] left-1/2 -translate-x-1/2 w-[17px] h-[3.5px] bg-white z-[2]" />
+                            <div className="absolute -top-[1.5px] left-1/2 -translate-x-1/2 w-[15px] h-[3px] bg-white z-[2]" />
                           )}
                           {/* Abertura inferior del socket hacia el camino */}
                           {!isLast && (
-                            <div className="absolute -bottom-[1.5px] left-1/2 -translate-x-1/2 w-[17px] h-[3.5px] bg-white z-[2]" />
+                            <div className="absolute -bottom-[1.5px] left-1/2 -translate-x-1/2 w-[15px] h-[3px] bg-white z-[2]" />
                           )}
                         </div>
 
@@ -410,9 +410,9 @@ export default function TrackingModal({
                           />
                         )}
 
-                        {/* Ícono redondo interior concéntrico (35px, unido a la línea, sin tocar la cavidad) */}
+                        {/* Ícono redondo interior concéntrico (37px, unido a la línea, sin tocar la cavidad) */}
                         <div 
-                          className={`relative w-[35px] h-[35px] rounded-full flex items-center justify-center border-2 transition-all z-[4] ${
+                          className={`relative w-[37px] h-[37px] rounded-full flex items-center justify-center border-2 transition-all z-[4] ${
                             step.current
                               ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-sm ring-2 ring-[#1a73e8]/20 scale-105'
                               : step.done
