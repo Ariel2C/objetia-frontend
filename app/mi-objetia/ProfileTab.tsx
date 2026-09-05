@@ -1116,46 +1116,28 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
                           : "bg-[#f8f9fa] border-[#dadce0]/80 hover:border-[#bdc1c6]"
                       }`}
                     >
-                      {/* Lado izquierdo: Selector de activa + Datos de la dirección */}
-                      <div className="flex items-start gap-3.5 flex-1">
-                        <button
-                          type="button"
-                          onClick={() => handleSetDefault(addr.id)}
-                          className="mt-0.5 cursor-pointer focus:outline-none shrink-0"
-                          title={isActiva ? "Dirección activa para envíos" : "Hacer clic para activar esta dirección"}
-                        >
-                          <div
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition ${
-                              isActiva
-                                ? "border-[#1a73e8] bg-[#1a73e8]"
-                                : "border-[#9aa0a6] bg-white hover:border-[#1a73e8]"
-                            }`}
-                          >
-                            {isActiva && <div className="w-2 h-2 rounded-full bg-white" />}
-                          </div>
-                        </button>
+                      {/* Datos de la dirección */}
+                      <div className="space-y-1 flex-1">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <span className="text-sm font-semibold text-[#202124]">
+                            {addr.title || "Dirección de Entrega"}
+                          </span>
 
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-sm font-semibold text-[#202124]">
-                              {addr.title || "Dirección de Entrega"}
+                          {isActiva ? (
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                              <Check className="w-3 h-3" />
+                              Activa para envíos
                             </span>
-
-                            {isActiva ? (
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                                <Check className="w-3 h-3" />
-                                Activa para envíos
-                              </span>
-                            ) : (
-                              <button
-                                type="button"
-                                onClick={() => handleSetDefault(addr.id)}
-                                className="text-[11px] font-medium text-[#1a73e8] hover:underline cursor-pointer"
-                              >
-                                Usar como principal
-                              </button>
-                            )}
-                          </div>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => handleSetDefault(addr.id)}
+                              className="text-[11px] font-medium text-[#1a73e8] hover:underline cursor-pointer"
+                            >
+                              Usar para envíos
+                            </button>
+                          )}
+                        </div>
 
                           <p className="text-xs font-medium text-[#3c4043]">
                             {addr.street} {addr.number}{' '}
@@ -1171,7 +1153,6 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
                             )}
                           </p>
                         </div>
-                      </div>
 
                       {/* Lado derecho: Iconos para Editar y Eliminar */}
                       <div className="flex items-center gap-1 self-end sm:self-center border-t sm:border-t-0 pt-2 sm:pt-0 w-full sm:w-auto justify-end">
