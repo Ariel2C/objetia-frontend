@@ -274,12 +274,6 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                 Alcance y conversiones de tus artículos publicados
               </p>
             </div>
-
-            <div className="flex items-center">
-              <span className="px-2 py-0.5 rounded text-[11px] font-mono text-[#5f6368] bg-[#f8f9fa] border border-[#edf0f2]">
-                Actualizado en tiempo real
-              </span>
-            </div>
           </div>
 
           {/* 2. Barra con Botones estilo Actualizar de Objetia Studio (Bordes suaves y limpios) */}
