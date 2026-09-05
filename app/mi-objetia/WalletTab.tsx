@@ -18,7 +18,8 @@ import {
   ArrowRight,
   Receipt,
   CreditCard,
-  Lock
+  Lock,
+  Check
 } from 'lucide-react';
 import { apiFetch } from '../../lib/api';
 import { useToast } from '../../components/ToastContext';
@@ -73,7 +74,10 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
   const [transacciones, setTransacciones] = useState<WalletTransaction[]>([]);
   const [cargandoTx, setCargandoTx] = useState(false);
 
-  // Cargar CBU/Alias guardado previamente en localStorage
+  // Cuentas de retiro (CBU / CVU / Alias) guardadas en BD y localStorage
+  const [cuentasRecientes, setCuentasRecientes] = useState<string[]>([]);
+
+  // 1. Cargar CBU/Alias guardado previamente en localStorage como respaldo inicial
   useEffect(() => {
     try {
       const savedCbu = localStorage.getItem('vamaar_wallet_cbu_alias');
@@ -84,6 +88,22 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
       // Ignorar si localStorage no está disponible
     }
   }, []);
+
+  // 2. Cargar las cuentas de retiro guardadas en la base de datos (sincronizadas entre dispositivos)
+  const cargarCuentasRecientes = async () => {
+    try {
+      const data = await apiFetch<{ accounts: string[] }>(`/wallet/payout-accounts/`);
+      if (data && Array.isArray(data.accounts)) {
+        setCuentasRecientes(data.accounts);
+        // Si no había nada en input o el usuario entra desde otro dispositivo, tomar la más reciente
+        if (data.accounts.length > 0) {
+          setCbuCvu(prev => prev || data.accounts[0]);
+        }
+      }
+    } catch (e) {
+      // Fallback a localStorage si la petición falla
+    }
+  };
 
   const cargarTransacciones = async () => {
     setCargandoTx(true);
@@ -99,6 +119,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
   useEffect(() => {
     cargarTransacciones();
+    cargarCuentasRecientes();
   }, []);
 
   const abrirModalRetiro = () => {
@@ -168,7 +189,12 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
     setRetirando(true);
     try {
-      const data = await apiFetch<{ mensaje: string; balance_available: number; balance_frozen: number }>(
+      const data = await apiFetch<{
+        mensaje: string;
+        balance_available: number;
+        balance_frozen: number;
+        recent_accounts?: string[];
+      }>(
         `/wallet/withdraw/`,
         {
           method: 'POST',
@@ -177,10 +203,17 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
         }
       );
 
-      // Guardar CBU/Alias en localStorage para futuros retiros
+      // Guardar CBU/Alias en localStorage como respaldo local
       try {
         localStorage.setItem('vamaar_wallet_cbu_alias', cbuLimpio);
       } catch (e) {}
+
+      // Actualizar la lista de cuentas recientes
+      if (data.recent_accounts && Array.isArray(data.recent_accounts)) {
+        setCuentasRecientes(data.recent_accounts);
+      } else {
+        setCuentasRecientes(prev => [cbuLimpio, ...prev.filter(c => c !== cbuLimpio)].slice(0, 3));
+      }
 
       toast.success(data.mensaje || "Tu retiro fue procesado con éxito.", "Retiro exitoso");
       onBalanceUpdate?.(data.balance_available, data.balance_frozen);
@@ -518,6 +551,12 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                   <span className="font-mono text-[#202124]">{formatearARS(detalleTx.marketplace_commission)}</span>
                 </div>
               )}
+              {detalleTx.destination_account && (
+                <div className="flex items-center justify-between border-t border-[#edf0f2] pt-2">
+                  <span className="text-[#5f6368]">Cuenta de destino:</span>
+                  <span className="font-mono text-[#202124] font-semibold">{detalleTx.destination_account}</span>
+                </div>
+              )}
             </div>
 
             <p className="text-[11px] text-[#80868b] text-center">
@@ -635,8 +674,43 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                   className="w-full px-3.5 py-2 text-sm rounded-xl border border-[#e8eaed] focus:outline-none focus:border-[#202124] text-[#202124] bg-white font-mono transition"
                   required
                 />
-                <p className="text-[10.5px] text-[#80868b] mt-1">
-                  Se recordará automáticamente para que no tengas que volver a ingresarlo.
+
+                {/* Últimas 3 cuentas utilizadas guardadas en la BD (sincronizadas entre dispositivos) */}
+                {cuentasRecientes.length > 0 && (
+                  <div className="mt-2.5 space-y-1.5">
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#5f6368] font-medium">
+                      <History className="w-3.5 h-3.5 text-[#5f6368]" />
+                      <span>Últimas utilizadas (click para seleccionar):</span>
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {cuentasRecientes.slice(0, 3).map((cuenta) => {
+                        const seleccionada = cbuCvu.trim().toLowerCase() === cuenta.trim().toLowerCase();
+                        return (
+                          <button
+                            key={cuenta}
+                            type="button"
+                            onClick={() => {
+                              setCbuCvu(cuenta);
+                              setErrorRetiro(null);
+                            }}
+                            className={`text-[11px] font-mono px-2.5 py-1 rounded-lg border transition cursor-pointer flex items-center gap-1.5 ${
+                              seleccionada
+                                ? "bg-[#202124] text-white border-[#202124] shadow-xs"
+                                : "bg-[#f8f9fa] text-[#202124] border-[#edf0f2] hover:border-[#dadce0] hover:bg-[#f1f3f4]"
+                            }`}
+                            title="Hacé click para usar esta cuenta"
+                          >
+                            <span>{cuenta}</span>
+                            {seleccionada && <Check className="w-3 h-3 text-emerald-400" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                <p className="text-[10.5px] text-[#80868b] mt-1.5">
+                  Se sincroniza con tu cuenta para que esté disponible en cualquier dispositivo.
                 </p>
               </div>
 

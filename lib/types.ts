@@ -67,4 +67,5 @@ export interface WalletTransaction {
   status: string;
   available_at: string;
   created_at: string;
+  destination_account?: string;
 }
