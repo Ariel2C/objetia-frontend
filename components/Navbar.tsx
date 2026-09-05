@@ -635,7 +635,6 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                             {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
                           </div>
                         )}
-                        <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full bg-emerald-400 border-2 border-[#131314]" title="En línea" />
                       </div>
                       <ChevronDown className={`h-3.5 w-3.5 transition-transform text-[#9aa0a6] ${menuAbierto ? 'rotate-180 text-white' : ''}`} />
                     </button>
