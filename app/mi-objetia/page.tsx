@@ -279,7 +279,17 @@ function MiObjetiaContent() {
 
   // Cargar datos CMS (Admin y Root)
   useEffect(() => {
-    const esAdminORoot = usuario && (usuario.role?.toLowerCase() === "admin" || usuario.role?.toLowerCase() === "root" || usuario.email?.toLowerCase() === "admin@vamaar.com");
+    const esAdminORoot = Boolean(
+      usuario && (
+        usuario.role?.toLowerCase() === "admin" ||
+        usuario.role?.toLowerCase() === "administrador" ||
+        usuario.role?.toLowerCase() === "root" ||
+        usuario.email?.toLowerCase() === "admin@vamaar.com" ||
+        tienePermiso('full_access') ||
+        tienePermiso('admin_section') ||
+        tienePermiso('appearance')
+      )
+    );
     if (esAdminORoot) {
       const fetchCMS = async () => {
         try {
@@ -465,8 +475,9 @@ function MiObjetiaContent() {
           finalLogoUrl = logoData.logo_url || logoUrl;
           setLogoUrl(finalLogoUrl);
         } else {
-          console.error("Fallo al subir archivo de logo borrador.");
-          showToast("Fallo al subir el logotipo a AWS S3.", "error");
+          const errText = await resLogo.text().catch(() => "");
+          console.error("Fallo al subir archivo de logo borrador:", resLogo.status, errText);
+          showToast(`Fallo al subir logotipo (${resLogo.status}): ${errText || "Error en AWS S3"}`, "error");
           setSubiendoLogo(false);
           return;
         }
@@ -512,12 +523,16 @@ function MiObjetiaContent() {
         
         const event = new CustomEvent("actualizar-logo-navbar", { detail: { logoUrl: finalLogoUrl } });
         window.dispatchEvent(event);
+        window.dispatchEvent(new CustomEvent("branding_updated", { detail: { logoUrl: finalLogoUrl } }));
         router.refresh();
       } else {
-        showToast("Error al actualizar la marca.", "error");
+        const errText = await res.text().catch(() => "");
+        console.error("Error al actualizar la marca:", res.status, errText);
+        showToast(`Error al actualizar la marca (${res.status}): ${errText || "Respuesta inválida"}`, "error");
       }
-    } catch (err) {
-      showToast("Error de conexión al guardar cambios de marca.", "error");
+    } catch (err: any) {
+      console.error("Error de conexión al guardar cambios de marca:", err);
+      showToast(`Error de conexión: ${err?.message || "No se pudo conectar con el backend"}`, "error");
     }
   };
 
