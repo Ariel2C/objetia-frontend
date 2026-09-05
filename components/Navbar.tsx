@@ -519,7 +519,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                       <Bell className="h-5.5 w-5.5" />
                       {unreadNotifsCount > 0 && (
                         <span 
-                          className="absolute -top-1 -right-1 h-4 min-w-[16px] px-1 rounded-full text-[9px] font-bold text-white flex items-center justify-center bg-[#1a73e8] border border-white shadow-2xs"
+                          className="absolute -top-1 -right-1 h-4 min-w-[16px] px-1 rounded-full text-[9px] font-semibold text-white flex items-center justify-center bg-[#1f1f1f] border-[1.5px] border-white shadow-2xs leading-none"
                         >
                           {unreadNotifsCount}
                         </span>
@@ -534,7 +534,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                           <div className="flex items-center gap-2">
                             <span className="text-xs font-semibold text-[#202124]">Notificaciones</span>
                             {unreadNotifsCount > 0 && (
-                              <span className="text-[10px] font-semibold bg-[#e8f0fe] text-[#1a73e8] px-1.5 py-0.5 rounded-full">
+                              <span className="text-[10px] font-medium bg-[#f1f3f4] text-[#3c4043] px-1.5 py-0.5 rounded-full border border-[#dadce0]/70">
                                 {unreadNotifsCount}
                               </span>
                             )}
@@ -569,13 +569,13 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                                 className={`p-3 rounded-xl transition cursor-pointer text-left border ${
                                   n.leida 
                                     ? 'bg-white hover:bg-[#f8f9fa] border-transparent' 
-                                    : 'bg-[#f8faff] hover:bg-[#f1f6fd] border-[#e8f0fe]'
+                                    : 'bg-[#fafafa] hover:bg-[#f5f5f5] border-[#e8eaed]'
                                 }`}
                               >
                                 <div className="flex items-start justify-between gap-2">
                                   <div className="flex items-center gap-1.5">
                                     {!n.leida && (
-                                      <span className="w-1.5 h-1.5 rounded-full bg-[#1a73e8] shrink-0" />
+                                      <span className="w-1.5 h-1.5 rounded-full bg-[#1f1f1f] shrink-0" />
                                     )}
                                     <span className="text-[11px] font-semibold text-[#202124]">
                                       {n.tipo === 'telefono' 
