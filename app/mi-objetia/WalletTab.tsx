@@ -15,7 +15,10 @@ import {
   TrendingUp,
   Wallet,
   X,
-  ArrowRight
+  ArrowRight,
+  Receipt,
+  CreditCard,
+  Lock
 } from 'lucide-react';
 import { apiFetch } from '../../lib/api';
 import { useToast } from '../../components/ToastContext';
@@ -35,9 +38,9 @@ const LABEL_TIPO: Record<string, string> = {
 };
 
 const LABEL_ESTADO: Record<string, string> = {
-  frozen: "En garantía",
-  available: "Disponible",
-  completed: "Completado",
+  frozen: "En garantía (7 días)",
+  available: "Acreditado en disponible",
+  completed: "Transferencia completada",
 };
 
 const parsearFechaUTC = (fecha: string) => {
@@ -63,6 +66,9 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
   const [cbuCvu, setCbuCvu] = useState("");
   const [retirando, setRetirando] = useState(false);
   const [errorRetiro, setErrorRetiro] = useState<string | null>(null);
+
+  // Estado para el modal de detalle de movimiento
+  const [detalleTx, setDetalleTx] = useState<WalletTransaction | null>(null);
 
   const [transacciones, setTransacciones] = useState<WalletTransaction[]>([]);
   const [cargandoTx, setCargandoTx] = useState(false);
@@ -114,6 +120,25 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
     }
   };
 
+  // Manejo de cambio de monto con tope automático al máximo disponible
+  const handleMontoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const valStr = e.target.value;
+    setErrorRetiro(null);
+    if (!valStr) {
+      setMontoRetiro("");
+      return;
+    }
+    const valNum = parseFloat(valStr);
+    if (!isNaN(valNum)) {
+      if (valNum > balance.available) {
+        // Pone automáticamente el número máximo que dispone
+        setMontoRetiro(balance.available.toString());
+        return;
+      }
+    }
+    setMontoRetiro(valStr);
+  };
+
   const handleRetirar = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorRetiro(null);
@@ -130,7 +155,8 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
     }
 
     if (monto > balance.available) {
-      setErrorRetiro(`El monto supera tu saldo retirable disponible (${formatearARS(balance.available)}).`);
+      setMontoRetiro(balance.available.toString());
+      setErrorRetiro(`El monto supera tu saldo retirable disponible. Se ajustó a ${formatearARS(balance.available)}.`);
       return;
     }
 
@@ -170,6 +196,23 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
   const saldoParaCompras = balance.available + balance.frozen;
   const ventasEnEspera = transacciones.filter(t => t.status === 'frozen' && t.amount > 0);
+
+  // Obtener ícono específico según el tipo y estado de la transacción
+  const getTransactionIcon = (tx: WalletTransaction) => {
+    if (tx.status === 'frozen') {
+      return Lock; // Candado para ventas retenidas en garantía
+    }
+    if (tx.type === 'sale_revenue') {
+      return ArrowDownLeft; // Ingreso acreditado
+    }
+    if (tx.type === 'withdrawal') {
+      return Landmark; // Retiro bancario
+    }
+    if (tx.type === 'purchase') {
+      return ShoppingBag; // Compra con saldo
+    }
+    return Receipt;
+  };
 
   return (
     <div className="space-y-6 animate-fade-in select-none">
@@ -275,7 +318,11 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
           </div>
           <div className="divide-y divide-[#f1f3f4]">
             {ventasEnEspera.map((tx) => (
-              <div key={tx.id} className="py-3 flex items-center justify-between gap-3 first:pt-1 last:pb-1">
+              <div 
+                key={tx.id} 
+                onClick={() => setDetalleTx(tx)}
+                className="py-3 flex items-center justify-between gap-3 first:pt-1 last:pb-1 cursor-pointer hover:bg-[#f8f9fa] -mx-2 px-2 rounded-xl transition"
+              >
                 <div>
                   <p className="text-xs font-semibold text-[#202124]">
                     Venta del {parsearFechaUTC(tx.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })}
@@ -284,14 +331,21 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                     {tiempoRestanteLiberacion(tx.available_at)} · se libera el {parsearFechaUTC(tx.available_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })}
                   </p>
                 </div>
-                <span className="text-sm font-semibold text-[#202124] font-mono">{formatearARS(tx.amount)}</span>
+                <div className="text-right">
+                  <span className="text-sm font-semibold text-[#5f6368] font-mono">
+                    {formatearARS(tx.amount)}
+                  </span>
+                  <span className="block text-[10px] text-[#80868b]">
+                    En garantía
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* Historial de Movimientos (Botones y Colores Carbón Google AI Studio) */}
+      {/* Historial de Movimientos */}
       <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <h4 className="text-sm font-semibold text-[#202124] flex items-center gap-2">
@@ -312,41 +366,176 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
           <div className="divide-y divide-[#f1f3f4]">
             {transacciones.map((tx) => {
               const esIngreso = tx.amount > 0;
-              const IconoTx = tx.type === 'sale_revenue' 
-                ? ArrowDownLeft 
-                : tx.type === 'withdrawal' 
-                  ? ArrowUpRight 
-                  : ShoppingBag;
+              const estaEnGarantia = tx.status === 'frozen';
+              const estaAcreditado = tx.status === 'available' && esIngreso;
+              const IconoTx = getTransactionIcon(tx);
+
+              // Tono verde MercadoPago (#00a650) si es dinero efectivamente sumado y disponible
+              const colorMonto = estaEnGarantia
+                ? 'text-[#5f6368]' // En garantía no es ingreso todavía
+                : esIngreso
+                ? 'text-[#00a650]' // Verde MercadoPago para sumas acreditadas
+                : 'text-[#202124]'; // Retiro o gasto en carbón
 
               return (
-                <div key={tx.id} className="py-3.5 flex items-center justify-between gap-3 hover:bg-[#f8f9fa] -mx-2 px-2 rounded-xl transition">
+                <div 
+                  key={tx.id} 
+                  onClick={() => setDetalleTx(tx)}
+                  className="py-3.5 flex items-center justify-between gap-3 hover:bg-[#f8f9fa] -mx-2 px-2 rounded-xl transition cursor-pointer group"
+                >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 bg-[#f1f3f4] text-[#202124] border border-[#e8eaed]">
+                    <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 border transition ${
+                      estaEnGarantia
+                        ? 'bg-[#f1f3f4] text-[#80868b] border-[#e8eaed]'
+                        : estaAcreditado
+                        ? 'bg-[#e8f8ef] text-[#00a650] border-[#bfe8cf]'
+                        : 'bg-[#f1f3f4] text-[#202124] border-[#e8eaed]'
+                    }`}>
                       <IconoTx className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-[#202124] truncate">{LABEL_TIPO[tx.type] || tx.type}</p>
-                      <p className="text-[11px] text-[#5f6368] mt-0.5">
-                        {parsearFechaUTC(tx.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                        {' · '}
-                        <span className="font-semibold text-[#202124]">
+                      <p className="text-xs font-semibold text-[#202124] truncate group-hover:text-[#000000]">
+                        {LABEL_TIPO[tx.type] || tx.type}
+                      </p>
+                      <p className="text-[11px] mt-0.5 flex items-center gap-1.5 flex-wrap">
+                        {/* Estado */}
+                        <span className={`font-semibold ${
+                          estaEnGarantia
+                            ? 'text-[#80868b] bg-[#f1f3f4] px-1.5 py-0.2 rounded text-[10px]'
+                            : estaAcreditado
+                            ? 'text-[#00a650] bg-[#e8f8ef] px-1.5 py-0.2 rounded text-[10px]'
+                            : 'text-[#202124]'
+                        }`}>
                           {LABEL_ESTADO[tx.status] || tx.status}
                         </span>
-                        {tx.status === 'frozen' && tx.amount > 0 && (
-                          <span className="text-[#5f6368]"> · {tiempoRestanteLiberacion(tx.available_at)}</span>
+
+                        {estaEnGarantia && tx.amount > 0 && (
+                          <span className="text-[#80868b] text-[10.5px]">
+                            · {tiempoRestanteLiberacion(tx.available_at)}
+                          </span>
                         )}
                       </p>
                     </div>
                   </div>
-                  <span className="text-sm font-semibold flex-shrink-0 text-[#202124] font-mono">
-                    {esIngreso ? '+' : ''}{formatearARS(tx.amount)}
-                  </span>
+
+                  {/* Lado Derecho: Monto con Fecha abajo */}
+                  <div className="text-right flex-shrink-0">
+                    <span className={`text-sm font-bold font-mono ${colorMonto}`}>
+                      {esIngreso ? '+' : ''}{formatearARS(tx.amount)}
+                    </span>
+                    <span className="block text-[10.5px] text-[#80868b] font-mono mt-0.5">
+                      {parsearFechaUTC(tx.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    </span>
+                  </div>
                 </div>
               );
             })}
           </div>
         )}
       </div>
+
+      {/* ========================================================================= */}
+      {/* MODAL DE DETALLE DE TRANSACCIÓN */}
+      {/* ========================================================================= */}
+      {detalleTx && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl relative border border-[#edf0f2]">
+            {/* Cabecera modal detalle */}
+            <div className="flex items-center justify-between pb-2 border-b border-[#edf0f2]">
+              <div className="flex items-center gap-2">
+                <Receipt className="w-4 h-4 text-[#202124]" />
+                <h3 className="text-sm font-semibold text-[#202124]">
+                  Comprobante de movimiento
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDetalleTx(null)}
+                className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Monto destacado */}
+            <div className="text-center py-2">
+              <span className="text-[11px] text-[#5f6368] uppercase font-semibold block tracking-wider">
+                {LABEL_TIPO[detalleTx.type] || detalleTx.type}
+              </span>
+              <h4 className={`text-2xl font-bold font-mono mt-1 ${
+                detalleTx.status === 'frozen'
+                  ? 'text-[#5f6368]'
+                  : detalleTx.amount > 0
+                  ? 'text-[#00a650]'
+                  : 'text-[#202124]'
+              }`}>
+                {detalleTx.amount > 0 ? '+' : ''}{formatearARS(detalleTx.amount)}
+              </h4>
+              <span className={`inline-block mt-2 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
+                detalleTx.status === 'frozen'
+                  ? 'bg-[#f1f3f4] text-[#5f6368]'
+                  : detalleTx.amount > 0
+                  ? 'bg-[#e8f8ef] text-[#00a650]'
+                  : 'bg-[#f1f3f4] text-[#202124]'
+              }`}>
+                {LABEL_ESTADO[detalleTx.status] || detalleTx.status}
+              </span>
+            </div>
+
+            {/* Datos detallados */}
+            <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-xl p-3.5 space-y-2.5 text-xs">
+              <div className="flex items-center justify-between">
+                <span className="text-[#5f6368]">Nº de Operación:</span>
+                <span className="font-mono text-[#202124] font-semibold">#{detalleTx.id}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-[#5f6368]">Fecha y hora:</span>
+                <span className="font-mono text-[#202124]">
+                  {parsearFechaUTC(detalleTx.created_at).toLocaleDateString('es-AR', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                </span>
+              </div>
+              {detalleTx.status === 'frozen' && (
+                <div className="flex items-center justify-between border-t border-[#edf0f2] pt-2">
+                  <span className="text-[#5f6368]">Acreditación estimada:</span>
+                  <span className="font-mono text-[#202124] font-semibold">
+                    {parsearFechaUTC(detalleTx.available_at).toLocaleDateString('es-AR', {
+                      day: '2-digit',
+                      month: 'short',
+                      year: 'numeric'
+                    })}
+                  </span>
+                </div>
+              )}
+              {detalleTx.marketplace_commission > 0 && (
+                <div className="flex items-center justify-between border-t border-[#edf0f2] pt-2">
+                  <span className="text-[#5f6368]">Comisión de plataforma:</span>
+                  <span className="font-mono text-[#202124]">{formatearARS(detalleTx.marketplace_commission)}</span>
+                </div>
+              )}
+            </div>
+
+            <p className="text-[11px] text-[#80868b] text-center">
+              {detalleTx.status === 'frozen'
+                ? "El dinero de tus ventas se retiene temporalmente durante el período de garantía de 7 días para proteger a comprador y vendedor."
+                : "Operación procesada y registrada en tu billetera Objetia."}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setDetalleTx(null)}
+              className="w-full py-2 bg-[#202124] hover:bg-[#000000] text-white rounded-xl text-xs font-semibold transition cursor-pointer"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* ========================================================================= */}
       {/* MODAL DE RETIRO DE FONDOS (ESTILO GOOGLE AI STUDIO CARBÓN) */}
@@ -398,7 +587,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                 </span>
               </div>
 
-              {/* Campo Monto */}
+              {/* Campo Monto con ajuste automático al máximo */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <label className="text-xs font-semibold text-[#202124]">
@@ -422,10 +611,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                     max={balance.available}
                     step="0.01"
                     value={montoRetiro}
-                    onChange={(e) => {
-                      setMontoRetiro(e.target.value);
-                      setErrorRetiro(null);
-                    }}
+                    onChange={handleMontoChange}
                     placeholder="Mínimo $1.000"
                     className="w-full pl-7 pr-3.5 py-2 text-sm rounded-xl border border-[#e8eaed] focus:outline-none focus:border-[#202124] text-[#202124] bg-white font-mono transition"
                     required
