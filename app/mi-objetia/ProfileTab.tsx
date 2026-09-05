@@ -127,21 +127,64 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
         if (parsedNumber) setNumber(parsedNumber);
         if (parsedCity) setCity(parsedCity);
 
-        if (parsedPostalCode) {
-          setPostalCode(parsedPostalCode);
-        } else if (place.place_id && google.maps?.Geocoder) {
-          // Respaldo: si Google Places no devolvió el CP directo, consultar Geocoder por el placeId
-          const geocoder = new google.maps.Geocoder();
-          geocoder.geocode({ placeId: place.place_id }, (results: any, status: string) => {
-            if (status === 'OK' && results && results[0]?.address_components) {
-              for (const c of results[0].address_components) {
-                if (c.types.includes('postal_code') || c.types.includes('postal_code_prefix')) {
-                  setPostalCode(c.long_name);
-                  break;
-                }
+        // 1. Intentar extraer CP de formatted_address si no vino en address_components
+        if (!parsedPostalCode && place.formatted_address) {
+          const matches = place.formatted_address.match(/\b([A-Z]?\d{4}[A-Z]{0,3})\b/g);
+          if (matches) {
+            for (const m of matches) {
+              if (m !== parsedNumber && m !== '0000') {
+                parsedPostalCode = m;
+                break;
               }
             }
-          });
+          }
+        }
+
+        if (parsedPostalCode) {
+          setPostalCode(parsedPostalCode);
+        }
+
+        // 2. Si todavía no tenemos CP, extraer coordenadas para resolución exacta
+        const lat = place.geometry?.location ? (typeof place.geometry.location.lat === 'function' ? place.geometry.location.lat() : place.geometry.location.lat) : null;
+        const lng = place.geometry?.location ? (typeof place.geometry.location.lng === 'function' ? place.geometry.location.lng() : place.geometry.location.lng) : null;
+
+        if (!parsedPostalCode) {
+          // A) Intentar con Google Geocoder si está disponible
+          if (google?.maps?.Geocoder && (place.place_id || (lat && lng))) {
+            const geocoder = new google.maps.Geocoder();
+            const req = place.place_id ? { placeId: place.place_id } : { location: { lat, lng } };
+            geocoder.geocode(req, (results: any, status: string) => {
+              if (status === 'OK' && results && results[0]?.address_components) {
+                for (const c of results[0].address_components) {
+                  if (c.types.includes('postal_code') || c.types.includes('postal_code_prefix')) {
+                    setPostalCode(c.long_name);
+                    return;
+                  }
+                }
+              }
+              // B) Si Google Geocoder no devolvió el CP, consultar Nominatim por coordenadas
+              if (lat && lng) {
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+                  .then((r) => r.json())
+                  .then((data) => {
+                    if (data?.address?.postcode) {
+                      setPostalCode(data.address.postcode.trim());
+                    }
+                  })
+                  .catch(() => {});
+              }
+            });
+          } else if (lat && lng) {
+            // Consulta directa a Nominatim reverse geocoding si no hay Google Geocoder
+            fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
+              .then((r) => r.json())
+              .then((data) => {
+                if (data?.address?.postcode) {
+                  setPostalCode(data.address.postcode.trim());
+                }
+              })
+              .catch(() => {});
+          }
         }
 
         if (parsedProvince) {
@@ -393,7 +436,7 @@ export default function ProfileTab({ onSavingChange }: ProfileTabProps) {
                   <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">Código Postal</label>
                   <input
                     type="text"
-                    placeholder="Ej: 5000"
+                    placeholder="Código postal"
                     value={postalCode}
                     onChange={handlePostalCodeChange}
                     className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition font-mono font-semibold"
