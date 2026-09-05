@@ -365,14 +365,13 @@ export default function SalesTab({ token }: SalesTabProps) {
       {/* Tarjeta Contenedora Principal (Estilo Direcciones de Entrega en Mi Perfil) */}
       <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs w-full">
         {/* Cabecera con Título, Subtítulo y Buscador a Nivel del Título */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#f1f3f4] pb-4">
-          <div className="space-y-0.5 min-w-0">
-            <h4 className="text-sm sm:text-base font-bold text-[#202124] flex items-center gap-2">
-              <Package className="h-4 w-4 text-[#1a73e8]" />
-              <span>Órdenes y Despachos</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#edf0f2] pb-3">
+          <div>
+            <h4 className="text-[14px] font-semibold text-[#202124]">
+              Gestión de ventas
             </h4>
-            <p className="text-xs text-[#5f6368]">
-              Seguimiento de pedidos cobrados, estado de envíos e impresión de etiquetas de Correo
+            <p className="text-[11px] text-[#5f6368]">
+              Seguimiento de pedidos cobrados, estado de envíos e impresión de etiquetas
             </p>
           </div>
 
