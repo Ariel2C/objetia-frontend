@@ -313,9 +313,11 @@ export default function TrackingModal({
                   const isFirst = idx === 0;
                   const isLast = idx === trackingData.timeline.length - 1;
                   const isDelivered = trackingData.status === 'Entregado' || step.code === 'DELIVERED';
-                  const isStepCurrent = step.current && !isDelivered && !isLast;
+                  const isDeliveredFinal = isLast && (isDelivered || step.done);
+                  const isStepCurrent = step.current && !isDeliveredFinal;
+                  const shouldHighlightBlue = isStepCurrent || isDeliveredFinal;
 
-                  const bgLineClass = isStepCurrent
+                  const bgLineClass = shouldHighlightBlue
                     ? 'bg-[#1a73e8]'
                     : step.done
                       ? 'bg-[#202124]'
@@ -392,7 +394,7 @@ export default function TrackingModal({
                         {!isFirst && (
                           <div 
                             className={`absolute left-1/2 -translate-x-1/2 w-[3px] z-[3] ${
-                              step.done ? 'bg-[#202124]' : isStepCurrent ? 'bg-[#1a73e8]' : 'bg-[#dadce0]'
+                              shouldHighlightBlue ? 'bg-[#1a73e8]' : step.done ? 'bg-[#202124]' : 'bg-[#dadce0]'
                             }`}
                             style={{
                               top: '-15px',
@@ -415,7 +417,7 @@ export default function TrackingModal({
                         {/* Ícono redondo interior concéntrico (39px, unido a la línea, sin tocar la cavidad) */}
                         <div 
                           className={`relative w-[39px] h-[39px] rounded-full flex items-center justify-center border-2 transition-all z-[4] ${
-                            isStepCurrent
+                            shouldHighlightBlue
                               ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-sm ring-2 ring-[#1a73e8]/20 scale-105'
                               : step.done
                                 ? 'bg-[#202124] border-[#202124] text-white'
@@ -431,7 +433,7 @@ export default function TrackingModal({
                         <div className="flex items-center gap-2 flex-wrap">
                           <h6
                             className={`text-xs sm:text-sm font-bold leading-tight ${
-                              isStepCurrent
+                              shouldHighlightBlue
                                 ? 'text-[#1a73e8]'
                                 : step.done
                                   ? 'text-[#202124]'
