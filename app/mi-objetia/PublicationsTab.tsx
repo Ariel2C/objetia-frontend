@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { Eye, Copy, Trash2, Check, Edit2, X, Loader2 } from 'lucide-react';
+import { Eye, Copy, Trash2, Check, Edit2, X, Loader2, Heart, TrendingUp, ShoppingBag, BarChart3, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { getApiUrl } from '../../lib/config';
 import { useToast } from '../../components/ToastContext';
@@ -17,6 +17,20 @@ interface ProductItem {
   stock: number;
   image_url: string;
   updated_at: string;
+  views?: number;
+  favorites?: number;
+  sales?: number;
+  relevance_score?: number;
+}
+
+interface SellerMetrics {
+  total_publications: number;
+  total_views: number;
+  total_favorites: number;
+  total_sales: number;
+  conversion_rate: number;
+  views_timeline: { date: string; label: string; views: number }[];
+  top_products: any[];
 }
 
 interface PublicationsTabProps {
@@ -26,6 +40,8 @@ interface PublicationsTabProps {
 export default function PublicationsTab({ token }: PublicationsTabProps) {
   const toast = useToast();
   const [products, setProducts] = useState<ProductItem[]>([]);
+  const [metrics, setMetrics] = useState<SellerMetrics | null>(null);
+  const [mostrarGrafico, setMostrarGrafico] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [copiandoId, setCopiandoId] = useState<number | null>(null);
@@ -51,14 +67,24 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`${getApiUrl()}/products/my-publications/`, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('vamaar_token') || token}`
-        }
-      });
-      if (!res.ok) throw new Error("No se pudo obtener tus publicaciones.");
-      const data = await res.json();
-      setProducts(data);
+      const authToken = localStorage.getItem('vamaar_token') || token;
+      const [resProd, resMetrics] = await Promise.all([
+        fetch(`${getApiUrl()}/products/my-publications/`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        }),
+        fetch(`${getApiUrl()}/analytics/seller/metrics`, {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        }).catch(() => null)
+      ]);
+
+      if (!resProd.ok) throw new Error("No se pudo obtener tus publicaciones.");
+      const dataProd = await resProd.json();
+      setProducts(dataProd);
+
+      if (resMetrics && resMetrics.ok) {
+        const dataMetrics = await resMetrics.json();
+        setMetrics(dataMetrics);
+      }
     } catch (err: any) {
       setError(err.message || "Error de red.");
     } finally {
@@ -215,6 +241,95 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
 
   return (
     <div className="space-y-6 animate-fade-in relative select-none">
+      {/* Resumen de Analítica del Vendedor */}
+      {metrics && (
+        <div className="bg-white border border-[#dadce0] rounded-2xl p-5 shadow-xs space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-bold text-[#202124] flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-[#1a73e8]" />
+                Métricas de Rendimiento de tus Publicaciones
+              </h2>
+              <p className="text-xs text-[#5f6368] mt-0.5">
+                Impacto en tiempo real de tus artículos en el catálogo de Objetia.
+              </p>
+            </div>
+            {metrics.views_timeline && metrics.views_timeline.length > 0 && (
+              <button
+                onClick={() => setMostrarGrafico(!mostrarGrafico)}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold text-[#1a73e8] bg-[#e8f0fe] hover:bg-[#d2e3fc] transition border border-[#d2e3fc] cursor-pointer"
+              >
+                {mostrarGrafico ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                {mostrarGrafico ? "Ocultar evolución" : "Ver evolución (30 días)"}
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="bg-[#f8f9fa] border border-[#dadce0] rounded-xl p-3.5">
+              <span className="text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider block">Visualizaciones</span>
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-xl font-bold text-[#202124]">{metrics.total_views.toLocaleString('es-AR')}</span>
+                <Eye className="w-4 h-4 text-[#1a73e8]" />
+              </div>
+            </div>
+
+            <div className="bg-[#f8f9fa] border border-[#dadce0] rounded-xl p-3.5">
+              <span className="text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider block">Favoritos</span>
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-xl font-bold text-[#202124]">{metrics.total_favorites.toLocaleString('es-AR')}</span>
+                <Heart className="w-4 h-4 text-rose-500" />
+              </div>
+            </div>
+
+            <div className="bg-[#f8f9fa] border border-[#dadce0] rounded-xl p-3.5">
+              <span className="text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider block">Ventas</span>
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-xl font-bold text-[#202124]">{metrics.total_sales.toLocaleString('es-AR')}</span>
+                <ShoppingBag className="w-4 h-4 text-emerald-600" />
+              </div>
+            </div>
+
+            <div className="bg-[#f8f9fa] border border-[#dadce0] rounded-xl p-3.5">
+              <span className="text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider block">Conversión</span>
+              <div className="flex items-center justify-between mt-1">
+                <span className="text-xl font-bold text-[#202124]">{metrics.conversion_rate}%</span>
+                <TrendingUp className="w-4 h-4 text-amber-600" />
+              </div>
+            </div>
+          </div>
+
+          {/* Gráfico de Evolución de Visitas Últimos 30 días */}
+          {mostrarGrafico && metrics.views_timeline && metrics.views_timeline.length > 0 && (
+            <div className="pt-2 border-t border-[#dadce0]">
+              <span className="text-xs font-semibold text-[#5f6368] block mb-2">Visitas diarias (últimos 30 días)</span>
+              <div className="h-28 w-full flex items-end gap-1 pt-4 pb-1 overflow-x-auto">
+                {metrics.views_timeline.map((item, idx) => {
+                  const maxV = Math.max(...metrics.views_timeline.map(x => x.views), 1);
+                  const hPercent = Math.round((item.views / maxV) * 100);
+                  return (
+                    <div key={idx} className="flex-1 min-w-[14px] flex flex-col items-center group relative h-full justify-end">
+                      <div className="absolute -top-7 hidden group-hover:flex bg-[#202124] text-white text-[10px] px-1.5 py-0.5 rounded shadow whitespace-nowrap z-10">
+                        {item.label}: {item.views} vistas
+                      </div>
+                      <div
+                        style={{ height: `${Math.max(hPercent, 6)}%` }}
+                        className={`w-full rounded-t transition-all ${
+                          item.views > 0 ? 'bg-[#1a73e8] group-hover:bg-[#1557b0]' : 'bg-[#e8eaed]'
+                        }`}
+                      />
+                      {idx % 5 === 0 && (
+                        <span className="text-[9px] text-[#80868b] mt-1">{item.label}</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Tabs superiores Google AI Studio Light */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
         <div className="flex flex-wrap gap-2">
@@ -269,6 +384,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               <tr className="border-b border-[#dadce0] bg-[#f8f9fa] text-[11px] font-semibold text-[#5f6368] uppercase tracking-wider">
                 <th className="py-3 px-5">Producto</th>
                 <th className="py-3 px-5">Estado</th>
+                <th className="py-3 px-5 text-center">Interacciones</th>
                 <th className="py-3 px-5">Precio</th>
                 <th className="py-3 px-5">Actualizado</th>
                 <th className="py-3 px-5 text-right">Acciones</th>
@@ -277,7 +393,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
             <tbody className="divide-y divide-[#f1f3f4]">
               {getFilteredList().length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-xs text-[#5f6368]">
+                  <td colSpan={6} className="py-12 text-center text-xs text-[#5f6368]">
                     No hay publicaciones en esta sección.
                   </td>
                 </tr>
@@ -324,6 +440,25 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                           En revisión
                         </span>
                       )}
+                    </td>
+
+                    <td className="py-4 px-5">
+                      <div className="flex items-center justify-center gap-3">
+                        <span className="inline-flex items-center gap-1 text-xs text-[#5f6368]" title="Visualizaciones">
+                          <Eye className="w-3.5 h-3.5 text-[#1a73e8]" />
+                          {item.views || 0}
+                        </span>
+                        <span className="inline-flex items-center gap-1 text-xs text-[#5f6368]" title="Favoritos">
+                          <Heart className="w-3.5 h-3.5 text-rose-500" />
+                          {item.favorites || 0}
+                        </span>
+                        {(item.sales ?? 0) > 0 && (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200" title="Ventas">
+                            <ShoppingBag className="w-3 h-3 text-emerald-600" />
+                            {item.sales}
+                          </span>
+                        )}
+                      </div>
                     </td>
 
                     <td className="py-4 px-5 font-bold text-[#202124] text-xs">

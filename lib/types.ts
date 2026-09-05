@@ -13,6 +13,10 @@ export interface Producto {
   seller_id?: number;
   seller_name?: string;
   is_new?: boolean;
+  views?: number;
+  favorites?: number;
+  sales?: number;
+  relevance_score?: number;
 }
 
 export interface Banner {

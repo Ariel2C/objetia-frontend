@@ -10,6 +10,7 @@ import { ShoppingCart, MessageSquare, Heart, Calendar, ChevronLeft, Lock } from 
 import Link from 'next/link';
 import FormattedPrice from '../../../components/FormattedPrice';
 import { formatearTituloProducto } from '../../../lib/format';
+import { trackProductView, trackProductEvent } from '../../../lib/analytics';
 
 interface ProductDetail {
   id: number;
@@ -48,6 +49,7 @@ export default function ProductDetailPage() {
         const data = await res.json();
         setProducto(data);
         setImagenActiva(data.image_url);
+        trackProductView(data.id);
       } catch (err: any) {
         setError(err.message || "Error al obtener detalles.");
       } finally {
@@ -75,6 +77,7 @@ export default function ProductDetailPage() {
         setTimeout(() => window.location.reload(), 1200);
       } else if (res.ok) {
         toast.success("Reservado y agregado a tu carrito.");
+        trackProductEvent(producto.id, 'cart_add');
         window.dispatchEvent(new Event('cart_updated'));
         router.push("/cart");
       } else {

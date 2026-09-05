@@ -6,6 +6,7 @@ import ProductCard from '../../components/ProductCard';
 import SkeletonCard from '../../components/SkeletonCard';
 import { Search, Filter, RefreshCw, ChevronDown } from 'lucide-react';
 import type { Producto } from '../../lib/types';
+import { trackSearchQuery } from '../../lib/analytics';
 
 const BASE_CATEGORIES = ["Todos", "Sillones", "Iluminación", "Mesas", "Adornos", "Otros"];
 
@@ -38,14 +39,25 @@ function CatalogContent() {
     setLoading(true);
     setError(null);
     try {
-      // 1. Petición completa del resultado de búsqueda (sin filtro de categoría) para calcular las categorías dinámicas
+      // 1. Petición completa del resultado con ordenamiento según relevancia en backend
       const querySearch = new URLSearchParams();
       if (search.trim() !== '') querySearch.append('search', search.trim());
+
+      let sortBy = 'relevance';
+      if (orden === 'menor-precio') sortBy = 'price_asc';
+      else if (orden === 'mayor-precio') sortBy = 'price_desc';
+      else if (orden === 'recientes') sortBy = 'newest';
+      querySearch.append('sort_by', sortBy);
 
       const resBase = await fetch(`${getApiUrl()}/products/?${querySearch.toString()}`);
       if (!resBase.ok) throw new Error("Error al cargar los productos del servidor.");
       const baseData: Producto[] = await resBase.json();
       setAllSearchProducts(baseData);
+
+      // Registrar analítica de la búsqueda de forma no intrusiva
+      if (search.trim().length >= 2) {
+        trackSearchQuery(search.trim(), baseData.length);
+      }
 
       // 2. Filtrar por categoría seleccionada
       let filteredData = baseData;
@@ -53,11 +65,13 @@ function CatalogContent() {
         filteredData = baseData.filter(p => p.category?.toLowerCase() === category.toLowerCase());
       }
 
-      // 3. Ordenamiento local
+      // 3. Ordenamiento (asegura orden exacto en cliente y backend)
       if (orden === 'menor-precio') {
         filteredData = [...filteredData].sort((a, b) => a.price - b.price);
       } else if (orden === 'mayor-precio') {
         filteredData = [...filteredData].sort((a, b) => b.price - a.price);
+      } else if (orden === 'relevantes') {
+        filteredData = [...filteredData].sort((a, b) => (b.relevance_score ?? 0) - (a.relevance_score ?? 0));
       }
 
       setProductos(filteredData);

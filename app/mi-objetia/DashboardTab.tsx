@@ -3,10 +3,48 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Loader2, Users, TrendingUp, AlertTriangle, Truck, Percent, Lock, Wallet, 
   ShieldCheck, ChevronDown, ShoppingBag, Receipt, BarChart3, ArrowUpRight, 
-  Sliders, Calendar, Filter, Zap, Activity, Info
+  Sliders, Calendar, Filter, Zap, Activity, Info, Eye, Search, Sparkles, Heart
 } from 'lucide-react';
 import FormattedPrice from '../../components/FormattedPrice';
 import { apiFetch } from '../../lib/api';
+
+interface AdminAnalyticsData {
+  traffic: {
+    views_today: number;
+    views_7d: number;
+    views_30d: number;
+    views_all_time: number;
+    daily_traffic: { date: string; label: string; views: number }[];
+  };
+  searches: {
+    total: number;
+    top_keywords: { query: string; count: number }[];
+  };
+  funnel: {
+    views: number;
+    favorites: number;
+    cart_additions: number;
+    purchases: number;
+    views_to_purchase_rate: number;
+  };
+  categories: {
+    category: string;
+    products: number;
+    views: number;
+    favorites: number;
+    sales: number;
+  }[];
+  top_products: {
+    id: number;
+    title: string;
+    category: string;
+    price: number;
+    views: number;
+    favorites: number;
+    sales: number;
+    relevance_score: number;
+  }[];
+}
 
 interface ResumenPeriodo {
   orders_count: number;
@@ -123,6 +161,27 @@ export default function DashboardTab({
     fetchStats();
     return () => { cancelado = true; };
   }, [anioSeleccionado]);
+
+  // --- Analítica Global de Plataforma (Audiencia, Búsquedas y Relevancia) ---
+  const [adminAnalytics, setAdminAnalytics] = useState<AdminAnalyticsData | null>(null);
+  const [cargandoAnalytics, setCargandoAnalytics] = useState(false);
+
+  useEffect(() => {
+    let cancelado = false;
+    const fetchAdminAnalytics = async () => {
+      setCargandoAnalytics(true);
+      try {
+        const data = await apiFetch<AdminAnalyticsData>('/analytics/admin/overview');
+        if (!cancelado) setAdminAnalytics(data);
+      } catch (err) {
+        console.error("Error al obtener analítica de administración:", err);
+      } finally {
+        if (!cancelado) setCargandoAnalytics(false);
+      }
+    };
+    fetchAdminAnalytics();
+    return () => { cancelado = true; };
+  }, []);
 
   const resumen = stats?.totals_year;
   const monthlyData = useMemo(() => stats?.monthly || [], [stats]);
@@ -714,6 +773,226 @@ export default function DashboardTab({
               </div>
             </div>
           </div>
+
+          {/* ========================================================================= */}
+          {/* ANALÍTICA GLOBAL DE AUDIENCIA, BÚSQUEDAS Y RELEVANCIA */}
+          {/* ========================================================================= */}
+          {adminAnalytics && (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-[14px] font-semibold text-white tracking-tight flex items-center gap-2">
+                    <Activity className="h-4 w-4 text-[#87a9ff]" />
+                    Audiencia, Búsquedas y Relevancia del Catálogo
+                  </h4>
+                  <p className="text-xs text-[#8c8c8c]">
+                    Métricas de tráfico, comportamiento de búsqueda y motor de relevancia de Objetia.
+                  </p>
+                </div>
+              </div>
+
+              {/* Tarjetas KPI de Audiencia */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div className="bg-[#1f1f1f] border border-[#2b2b2b] rounded-xl p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-medium text-[#8c8c8c] uppercase tracking-wider">Visitas Hoy</span>
+                    <Eye className="h-4 w-4 text-[#87a9ff]" />
+                  </div>
+                  <p className="text-xl font-bold text-white mt-1">
+                    {adminAnalytics.traffic.views_today.toLocaleString('es-AR')}
+                  </p>
+                  <span className="text-[10px] text-[#8c8c8c]">
+                    {adminAnalytics.traffic.views_7d.toLocaleString('es-AR')} en los últimos 7 días
+                  </span>
+                </div>
+
+                <div className="bg-[#1f1f1f] border border-[#2b2b2b] rounded-xl p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-medium text-[#8c8c8c] uppercase tracking-wider">Búsquedas Realizadas</span>
+                    <Search className="h-4 w-4 text-amber-400" />
+                  </div>
+                  <p className="text-xl font-bold text-white mt-1">
+                    {adminAnalytics.searches.total.toLocaleString('es-AR')}
+                  </p>
+                  <span className="text-[10px] text-[#8c8c8c]">
+                    Consultas en el buscador
+                  </span>
+                </div>
+
+                <div className="bg-[#1f1f1f] border border-[#2b2b2b] rounded-xl p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-medium text-[#8c8c8c] uppercase tracking-wider">Total Favoritos</span>
+                    <Heart className="h-4 w-4 text-rose-500" />
+                  </div>
+                  <p className="text-xl font-bold text-white mt-1">
+                    {adminAnalytics.funnel.favorites.toLocaleString('es-AR')}
+                  </p>
+                  <span className="text-[10px] text-[#8c8c8c]">
+                    Artículos guardados por usuarios
+                  </span>
+                </div>
+
+                <div className="bg-[#1f1f1f] border border-[#2b2b2b] rounded-xl p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-medium text-[#8c8c8c] uppercase tracking-wider">Conversión Visita → Venta</span>
+                    <TrendingUp className="h-4 w-4 text-emerald-400" />
+                  </div>
+                  <p className="text-xl font-bold text-white mt-1">
+                    {adminAnalytics.funnel.views_to_purchase_rate}%
+                  </p>
+                  <span className="text-[10px] text-[#8c8c8c]">
+                    {adminAnalytics.funnel.purchases.toLocaleString('es-AR')} ventas de {adminAnalytics.traffic.views_all_time.toLocaleString('es-AR')} visitas
+                  </span>
+                </div>
+              </div>
+
+              {/* Grid de 2 Columnas: Búsquedas Populares y Embudo (Funnel) */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Columna 1: Palabras clave más buscadas */}
+                <div className="bg-[#1f1f1f] border border-[#2b2b2b] rounded-[16px] p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-white flex items-center gap-1.5">
+                      <Search className="h-3.5 w-3.5 text-[#87a9ff]" />
+                      Términos Más Buscados en Objetia
+                    </span>
+                    <span className="text-[10px] text-[#8c8c8c]">Tendencias de compradores</span>
+                  </div>
+
+                  {adminAnalytics.searches.top_keywords.length === 0 ? (
+                    <div className="py-8 text-center text-xs text-[#8c8c8c]">
+                      Aún no hay suficientes términos de búsqueda registrados.
+                    </div>
+                  ) : (
+                    <div className="space-y-2 pt-1">
+                      {adminAnalytics.searches.top_keywords.map((kw, i) => {
+                        const maxCount = Math.max(...adminAnalytics.searches.top_keywords.map(k => k.count), 1);
+                        const pct = Math.round((kw.count / maxCount) * 100);
+                        return (
+                          <div key={i} className="flex items-center justify-between gap-3 text-xs">
+                            <span className="text-white font-medium capitalize truncate max-w-[200px]">
+                              {i + 1}. {kw.query}
+                            </span>
+                            <div className="flex items-center gap-2 flex-grow max-w-[140px]">
+                              <div className="w-full bg-[#2b2b2b] h-1.5 rounded-full overflow-hidden">
+                                <div
+                                  style={{ width: `${pct}%` }}
+                                  className="bg-[#87a9ff] h-full rounded-full"
+                                />
+                              </div>
+                              <span className="text-[11px] text-[#8c8c8c] tabular-nums font-mono min-w-[28px] text-right">
+                                {kw.count}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Columna 2: Embudo de Conversión (Funnel) */}
+                <div className="bg-[#1f1f1f] border border-[#2b2b2b] rounded-[16px] p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-white flex items-center gap-1.5">
+                      <Zap className="h-3.5 w-3.5 text-amber-400" />
+                      Embudo de Conversión (Marketplace Funnel)
+                    </span>
+                    <span className="text-[10px] text-[#8c8c8c]">Ciclo del comprador</span>
+                  </div>
+
+                  <div className="space-y-2.5 pt-1">
+                    {/* Paso 1: Visitas */}
+                    <div className="bg-[#18181a] border border-[#2b2b2b] p-2.5 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs">
+                        <Eye className="w-3.5 h-3.5 text-[#87a9ff]" />
+                        <span className="text-white">1. Vistas de Producto</span>
+                      </div>
+                      <span className="text-xs font-bold text-white tabular-nums">
+                        {adminAnalytics.funnel.views.toLocaleString('es-AR')}
+                      </span>
+                    </div>
+
+                    {/* Paso 2: Favoritos */}
+                    <div className="bg-[#18181a] border border-[#2b2b2b] p-2.5 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs">
+                        <Heart className="w-3.5 h-3.5 text-rose-500" />
+                        <span className="text-white">2. Agregados a Favoritos</span>
+                      </div>
+                      <span className="text-xs font-bold text-white tabular-nums">
+                        {adminAnalytics.funnel.favorites.toLocaleString('es-AR')}
+                      </span>
+                    </div>
+
+                    {/* Paso 3: Carrito */}
+                    <div className="bg-[#18181a] border border-[#2b2b2b] p-2.5 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs">
+                        <ShoppingBag className="w-3.5 h-3.5 text-amber-400" />
+                        <span className="text-white">3. Reservas / Carrito</span>
+                      </div>
+                      <span className="text-xs font-bold text-white tabular-nums">
+                        {adminAnalytics.funnel.cart_additions.toLocaleString('es-AR')}
+                      </span>
+                    </div>
+
+                    {/* Paso 4: Compras */}
+                    <div className="bg-[#18181a] border border-[#2b2b2b] p-2.5 rounded-xl flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-xs">
+                        <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-white">4. Compras Concretadas</span>
+                      </div>
+                      <span className="text-xs font-bold text-emerald-400 tabular-nums">
+                        {adminAnalytics.funnel.purchases.toLocaleString('es-AR')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Top 5 Productos Más Relevantes del Catálogo */}
+              {adminAnalytics.top_products.length > 0 && (
+                <div className="bg-[#1f1f1f] border border-[#2b2b2b] rounded-[16px] p-5 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-semibold text-white flex items-center gap-1.5">
+                      <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+                      Productos con Mayor Relevancia en el Catálogo
+                    </span>
+                    <span className="text-[10px] text-[#8c8c8c]">Ordenados según el algoritmo de relevancia</span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b border-[#2b2b2b] text-[10px] font-semibold text-[#8c8c8c] uppercase tracking-wider">
+                          <th className="py-2.5 px-3">Producto</th>
+                          <th className="py-2.5 px-3">Categoría</th>
+                          <th className="py-2.5 px-3 text-right">Vistas</th>
+                          <th className="py-2.5 px-3 text-right">Favoritos</th>
+                          <th className="py-2.5 px-3 text-right">Ventas</th>
+                          <th className="py-2.5 px-3 text-right">Score Relevancia</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-[#262626]">
+                        {adminAnalytics.top_products.slice(0, 5).map((p, i) => (
+                          <tr key={p.id} className="hover:bg-[#252525] transition">
+                            <td className="py-2.5 px-3 font-semibold text-white truncate max-w-[200px]">
+                              {i + 1}. {p.title}
+                            </td>
+                            <td className="py-2.5 px-3 text-[#8c8c8c]">{p.category}</td>
+                            <td className="py-2.5 px-3 text-right text-white tabular-nums">{p.views}</td>
+                            <td className="py-2.5 px-3 text-right text-rose-400 tabular-nums">{p.favorites}</td>
+                            <td className="py-2.5 px-3 text-right text-emerald-400 tabular-nums">{p.sales}</td>
+                            <td className="py-2.5 px-3 text-right font-bold text-[#87a9ff] tabular-nums">
+                              {p.relevance_score.toFixed(1)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* ========================================================================= */}
           {/* 5. REGISTRO DE VENTAS EN VIVO */}
