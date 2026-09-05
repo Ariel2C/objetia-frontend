@@ -5,17 +5,10 @@ import Link from 'next/link';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { 
   ShoppingCart, 
-  MessageSquare, 
   Heart, 
-  LogOut, 
-  User, 
   Bell, 
   ChevronDown,
-  Search,
-  PlusCircle,
-  Sparkles,
-  Shield,
-  ShieldCheck
+  Search
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '../lib/config';
@@ -203,7 +196,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
             notifs.push({
               id: 'admin_moderation',
               tipo: 'moderacion',
-              texto: `⚠️ Atención Administrador: Hay ${pendientesORechazados.length} producto(s) en revisión o rechazado(s) por la IA.`,
+              texto: `Atención Administrador: Hay ${pendientesORechazados.length} producto(s) en revisión o rechazado(s) por la IA.`,
               leida: readIds.includes('admin_moderation') || readIds.includes(999),
               fecha: "Reciente",
               link: "/mi-objetia?tab=moderation"
@@ -572,20 +565,15 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                                 }`}
                               >
                                 <div className="flex items-start justify-between gap-2">
-                                  <div className="flex items-center gap-1.5">
-                                    {!n.leida && (
-                                      <span className="w-1.5 h-1.5 rounded-full bg-[#87a9ff] shrink-0" />
-                                    )}
-                                    <span className={`text-[11px] font-semibold ${n.leida ? 'text-[#c4c7c5]' : 'text-white'}`}>
-                                      {n.tipo === 'telefono' 
-                                        ? 'Teléfono de contacto' 
-                                        : n.tipo === 'direccion' 
-                                        ? 'Dirección de entrega' 
-                                        : n.tipo === 'moderacion'
-                                        ? 'Moderación'
-                                        : 'Aviso'}
-                                    </span>
-                                  </div>
+                                  <span className={`text-[11px] font-semibold ${n.leida ? 'text-[#c4c7c5]' : 'text-white'}`}>
+                                    {n.tipo === 'telefono' 
+                                      ? 'Teléfono de contacto' 
+                                      : n.tipo === 'direccion' 
+                                      ? 'Dirección de entrega' 
+                                      : n.tipo === 'moderacion'
+                                      ? 'Moderación'
+                                      : 'Aviso'}
+                                  </span>
                                   <span className="text-[10px] text-[#8e918f] font-normal shrink-0">
                                     {n.fecha}
                                   </span>
@@ -597,8 +585,8 @@ export default function Navbar({ logoUrl }: NavbarProps) {
 
                                 {n.link && (
                                   <div className="mt-2 pt-2 border-t border-[#333538] flex justify-end">
-                                    <span className="text-[11px] font-semibold text-[#87a9ff] hover:text-[#a8c7fa] transition">
-                                      Completar en mi perfil &rarr;
+                                    <span className="text-[11px] font-medium text-[#87a9ff] hover:text-[#a8c7fa] transition">
+                                      Completar en mi perfil
                                     </span>
                                   </div>
                                 )}
@@ -639,10 +627,10 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                       <ChevronDown className={`h-3.5 w-3.5 transition-transform text-[#9aa0a6] ${menuAbierto ? 'rotate-180 text-white' : ''}`} />
                     </button>
 
-                    {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN - GOOGLE AI STUDIO DARK */}
+                    {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN - GOOGLE AI STUDIO DARK LIMPIO */}
                     {menuAbierto && (
-                      <div className="absolute right-0 mt-2 w-56 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1 animate-scale-in origin-top-right">
-                        <div className="px-3 py-2 border-b border-[#282a2c]">
+                      <div className="absolute right-0 mt-2 w-52 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-1.5 space-y-0.5 animate-scale-in origin-top-right">
+                        <div className="px-3 py-2 border-b border-[#282a2c] mb-1">
                           <p className="text-xs font-semibold text-[#e3e3e3] truncate">{usuario.full_name}</p>
                           <p className="text-[10px] text-[#8e918f] truncate">{usuario.email}</p>
                           {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'administrador') && (
@@ -660,16 +648,16 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                          className="block px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                         >
-                          <User className="h-4 w-4 text-[#87a9ff]" /> Mi OBJETIA
+                          Mi OBJETIA
                         </Link>
 
                         <button 
                           onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}
-                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition cursor-pointer text-left"
+                          className="w-full block px-3 py-2 rounded-xl text-xs font-medium text-rose-400 hover:bg-rose-500/10 transition cursor-pointer text-left"
                         >
-                          <LogOut className="h-4 w-4 text-rose-400" /> Cerrar Sesión
+                          Cerrar Sesión
                         </button>
                       </div>
                     )}
@@ -725,30 +713,30 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                 </button>
 
                 {descubrirAbierto && (
-                  <div className="absolute left-0 top-full w-64 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1 animate-scale-in origin-top-left">
+                  <div className="absolute left-0 top-full w-56 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-1.5 space-y-0.5 animate-scale-in origin-top-left">
                     <Link
                       href="/catalog?filter=selected"
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
-                      ⭐ Seleccionados de Objetia
+                      Seleccionados de Objetia
                     </Link>
                     <Link
                       href="/catalog?max_price=50000"
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
-                      🏷️ Hallazgos por menos de $50.000
+                      Hallazgos por menos de $50.000
                     </Link>
                     <Link
                       href="/catalog?condition=used"
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
-                      📜 Vintage & Usados Selección
+                      Vintage & Usados Selección
                     </Link>
                     <Link
                       href="/catalog?sort=popular"
-                      className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
-                      🔥 Tendencias
+                      Tendencias
                     </Link>
                   </div>
                 )}
