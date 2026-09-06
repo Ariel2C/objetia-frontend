@@ -205,14 +205,23 @@ function CatalogContent() {
   const hayFiltrosActivos = conteoFiltrosActivos > 0;
 
   const handleSeleccionarCategoria = (cat: string) => {
-    setCategory(cat);
-    setSubcategory('Todas');
-    actualizarURL({ category: cat, subcategory: 'Todas' });
+    if (category === cat && cat !== 'Todos') {
+      // Al volver a hacer click en la misma categoría activa, se repliega y se cierra
+      setCategory('Todos');
+      setSubcategory('Todas');
+      actualizarURL({ category: 'Todos', subcategory: 'Todas' });
+    } else {
+      // Al hacer click se despliega y se activa
+      setCategory(cat);
+      setSubcategory('Todas');
+      actualizarURL({ category: cat, subcategory: 'Todas' });
+    }
   };
 
   const handleSeleccionarSubcategoria = (sub: string) => {
-    setSubcategory(sub);
-    actualizarURL({ subcategory: sub });
+    const nuevaSub = subcategory === sub ? 'Todas' : sub;
+    setSubcategory(nuevaSub);
+    actualizarURL({ subcategory: nuevaSub });
   };
 
   const handleSeleccionarMaterial = (mat: string) => {
@@ -283,8 +292,11 @@ function CatalogContent() {
         </div>
       </div>
 
-      {/* Contenido scrolleable de Filtros con diseño Google AI Studio */}
-      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-5 select-none">
+      {/* Contenido scrolleable de Filtros con barra de scroll visible y estilizada */}
+      <div 
+        className="flex-1 overflow-y-auto light-scrollbar p-4 space-y-5 select-none"
+        style={{ scrollbarWidth: 'thin', scrollbarColor: '#dadce0 transparent' }}
+      >
         
         {/* 1. Categorías & Subcategorías */}
         <div>
@@ -392,7 +404,7 @@ function CatalogContent() {
               </button>
             )}
           </div>
-          <div className="flex flex-wrap gap-1.5 max-h-[170px] overflow-y-auto pr-1 px-1 custom-scrollbar">
+          <div className="flex flex-wrap gap-1.5 px-1">
             {COLORES_OBJETIA.map((col) => {
               const bg = COLOR_MAP[col] || '#ccc';
               const isGradient = bg.startsWith('linear');
@@ -500,7 +512,7 @@ function CatalogContent() {
 
         {/* SIDEBAR ESCRITORIO (Deslizamiento físico a la izquierda idéntico a Mi Objetia) */}
         <aside 
-          className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-72 min-h-[calc(100vh-60px)] overflow-hidden ${
+          className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-72 h-[calc(100vh-60px)] sticky top-[60px] overflow-hidden ${
             sidebarOculto ? '-ml-72 pointer-events-none' : 'ml-0'
           }`}
         >

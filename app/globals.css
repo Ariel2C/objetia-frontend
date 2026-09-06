@@ -121,6 +121,22 @@ input, select, textarea {
   background: #555555;
 }
 
+/* Light Custom Scrollbar para Workspace Light / Sidebar de Catálogo */
+.light-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.light-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.light-scrollbar::-webkit-scrollbar-thumb {
+  background: #dadce0;
+  border-radius: 4px;
+}
+.light-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #bdc1c6;
+}
+
 /* Respeto por usuarios con movimiento reducido */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
