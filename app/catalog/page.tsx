@@ -4,7 +4,16 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { getApiUrl } from '../../lib/config';
 import ProductCard from '../../components/ProductCard';
 import SkeletonCard from '../../components/SkeletonCard';
-import { Search, Filter, RefreshCw, ChevronDown, SlidersHorizontal, X, ChevronRight } from 'lucide-react';
+import { 
+  Search, 
+  Filter, 
+  ChevronDown, 
+  SlidersHorizontal, 
+  X, 
+  Menu as MenuIcon,
+  AlertTriangle,
+  RotateCcw
+} from 'lucide-react';
 import type { Producto } from '../../lib/types';
 import { trackSearchQuery } from '../../lib/analytics';
 
@@ -55,7 +64,8 @@ function CatalogContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [orden, setOrden] = useState(sortParam === 'newest' ? 'recientes' : 'relevantes');
-  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [sidebarOculto, setSidebarOculto] = useState(false);
+  const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
 
   // Sincronizar parámetros de la URL si cambian externamente
   useEffect(() => {
@@ -235,544 +245,456 @@ function CatalogContent() {
     router.push('/catalog');
   };
 
-  return (
-    <div className="w-full bg-gray-50/60 min-h-screen py-6 sm:py-8 animate-fade-in">
-      <div className="max-w-[1560px] mx-auto px-4 sm:px-6 lg:px-8">
+  // Contenido interno del Sidebar de Filtros (diseño idéntico a Mi Objetia)
+  const renderSidebarContent = () => (
+    <div className="flex flex-col h-full justify-between overflow-hidden">
+      {/* Cabecera del Sidebar alineada a 60px exactos como Mi Objetia */}
+      <div className="h-[60px] min-h-[60px] flex items-center justify-between px-4 border-b border-[#dadce0] flex-shrink-0">
+        <div className="flex items-center gap-2 px-1">
+          <SlidersHorizontal className="h-4 w-4 text-[#1a73e8]" />
+          <span className="font-bold text-[15px] tracking-tight text-[#202124]">
+            Filtros
+          </span>
+          {hayFiltrosActivos && (
+            <span className="text-[11px] font-bold px-1.5 py-0.5 rounded-full bg-[#e8f0fe] text-[#1a73e8]">
+              {conteoFiltrosActivos}
+            </span>
+          )}
+        </div>
 
-        {/* Filtros Móviles: Barra Superior */}
-        <div className="lg:hidden mb-5 space-y-2.5">
-          <form onSubmit={manejarBusqueda} className="relative">
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Buscar productos..."
-              className="w-full bg-white border border-gray-200 rounded-none pl-10 pr-4 py-2.5 text-xs text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-900 transition"
-            />
-            <Search className="absolute left-3.5 top-3 h-4 w-4 text-gray-400" />
-          </form>
-
-          <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          {hayFiltrosActivos && (
             <button
               type="button"
-              onClick={() => setMobileFiltersOpen(true)}
-              className={`flex items-center gap-1.5 px-3 py-2 text-xs font-bold border transition cursor-pointer flex-shrink-0 ${
-                hayFiltrosActivos
-                  ? "bg-gray-900 text-white border-gray-900"
-                  : "bg-white text-gray-800 border-gray-200 hover:border-gray-400"
-              }`}
+              onClick={limpiarFiltros}
+              className="text-xs text-[#1a73e8] hover:underline font-medium px-2 py-1 cursor-pointer"
             >
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              <span>Filtros {conteoFiltrosActivos > 0 ? `(${conteoFiltrosActivos})` : ''}</span>
+              Limpiar
             </button>
+          )}
+          {/* Botón cerrar en móvil */}
+          <button 
+            type="button"
+            onClick={() => setMenuMovilAbierto(false)} 
+            className="lg:hidden text-[#5f6368] hover:text-[#202124] p-1 rounded-lg cursor-pointer"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+      </div>
 
-            <div className="flex gap-1.5 overflow-x-auto pb-1 -mr-4 pr-4">
-              {categoriasDinamicas.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => handleSeleccionarCategoria(cat)}
-                  className={`flex-shrink-0 px-3 py-1.5 rounded-none text-xs font-bold transition cursor-pointer border uppercase tracking-wider ${
-                    category === cat
-                      ? "bg-gray-900 text-white border-gray-900"
-                      : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
+      {/* Contenido scrolleable de Filtros con diseño Google AI Studio */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar p-4 space-y-5 select-none">
+        
+        {/* 1. Categorías & Subcategorías */}
+        <div>
+          <span className="text-[11px] font-bold text-[#5f6368] uppercase tracking-wider px-2 block mb-2">
+            Categorías
+          </span>
+          <div className="space-y-1">
+            {categoriasDinamicas.map((cat) => {
+              const isCatActive = category === cat;
+              return (
+                <div key={cat} className="flex flex-col">
+                  <button
+                    type="button"
+                    onClick={() => handleSeleccionarCategoria(cat)}
+                    className={`w-full flex items-center justify-between px-3.5 h-[38px] rounded-xl text-[13px] font-medium transition-all text-left cursor-pointer group ${
+                      isCatActive
+                        ? 'bg-[#e8f0fe] text-[#1a73e8] shadow-2xs font-semibold'
+                        : 'text-[#3c4043] hover:bg-[#f1f3f4] hover:text-[#1f1f1f]'
+                    }`}
+                  >
+                    <span className="truncate">{cat}</span>
+                    {isCatActive && cat !== 'Todos' ? (
+                      <ChevronDown className="h-3.5 w-3.5 text-[#1a73e8] flex-shrink-0" />
+                    ) : isCatActive ? (
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#1a73e8]" />
+                    ) : null}
+                  </button>
+
+                  {/* Subcategorías anidadas con diseño pulido */}
+                  {isCatActive && cat !== 'Todos' && subcategoriasDisponibles.length > 0 && (
+                    <div className="pl-3 pr-1 py-1 mt-1 mb-1.5 space-y-1 border-l-2 border-[#1a73e8]/30 ml-4">
+                      <button
+                        type="button"
+                        onClick={() => handleSeleccionarSubcategoria('Todas')}
+                        className={`w-full text-left text-xs py-1.5 px-2.5 rounded-lg transition-colors cursor-pointer truncate ${
+                          subcategory === 'Todas'
+                            ? "bg-[#e8f0fe] text-[#1a73e8] font-semibold"
+                            : "text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4]"
+                        }`}
+                      >
+                        • Todas en {cat}
+                      </button>
+                      {subcategoriasDisponibles.map((sub) => {
+                        const isSubActive = subcategory === sub;
+                        return (
+                          <button
+                            key={sub}
+                            type="button"
+                            onClick={() => handleSeleccionarSubcategoria(sub)}
+                            className={`w-full text-left text-xs py-1.5 px-2.5 rounded-lg transition-colors cursor-pointer truncate ${
+                              isSubActive
+                                ? "bg-[#e8f0fe] text-[#1a73e8] font-semibold"
+                                : "text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4]"
+                            }`}
+                            title={sub}
+                          >
+                            {sub}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Modal / Drawer Móvil de Filtros */}
-        {mobileFiltersOpen && (
-          <div className="fixed inset-0 z-50 flex lg:hidden">
-            <div
-              className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
-              onClick={() => setMobileFiltersOpen(false)}
+        {/* 2. Condición */}
+        <div className="pt-4 border-t border-[#dadce0]">
+          <span className="text-[11px] font-bold text-[#5f6368] uppercase tracking-wider px-2 block mb-2">
+            Condición
+          </span>
+          <div className="grid grid-cols-3 gap-1.5 px-1">
+            {["Todas", "Nuevo", "Usado"].map((cond) => (
+              <button
+                key={cond}
+                type="button"
+                onClick={() => handleSeleccionarCondicion(cond)}
+                className={`py-1.5 px-2 text-xs rounded-xl text-center transition cursor-pointer border ${
+                  condition === cond
+                    ? "bg-[#e8f0fe] text-[#1a73e8] border-[#d2e3fc] font-bold shadow-2xs"
+                    : "bg-white text-[#3c4043] border-[#dadce0] hover:bg-[#f1f3f4]"
+                }`}
+              >
+                {cond}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* 3. Color */}
+        <div className="pt-4 border-t border-[#dadce0]">
+          <div className="flex items-center justify-between px-2 mb-2">
+            <span className="text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">
+              Color
+            </span>
+            {color !== 'Todos' && (
+              <button
+                type="button"
+                onClick={() => handleSeleccionarColor('Todos')}
+                className="text-[11px] text-[#1a73e8] hover:underline cursor-pointer"
+              >
+                Todos
+              </button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1.5 max-h-[170px] overflow-y-auto pr-1 px-1 custom-scrollbar">
+            {COLORES_OBJETIA.map((col) => {
+              const bg = COLOR_MAP[col] || '#ccc';
+              const isGradient = bg.startsWith('linear');
+              const isWhite = col === 'Blanco';
+              const isSelected = color === col;
+              return (
+                <button
+                  key={col}
+                  type="button"
+                  onClick={() => handleSeleccionarColor(isSelected ? 'Todos' : col)}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-xl border transition cursor-pointer ${
+                    isSelected
+                      ? "bg-[#e8f0fe] text-[#1a73e8] border-[#d2e3fc] font-semibold shadow-2xs"
+                      : "bg-white text-[#3c4043] border-[#dadce0] hover:bg-[#f1f3f4]"
+                  }`}
+                  title={col}
+                >
+                  <span
+                    className={`w-2.5 h-2.5 rounded-full inline-block flex-shrink-0 ${isWhite ? 'border border-gray-300' : ''}`}
+                    style={isGradient ? { background: bg } : { backgroundColor: bg }}
+                  />
+                  <span className="truncate max-w-[95px]">{col}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 4. Material */}
+        <div className="pt-4 border-t border-[#dadce0]">
+          <div className="flex items-center justify-between px-2 mb-2">
+            <span className="text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">
+              Material
+            </span>
+            {material !== 'Todos' && (
+              <button
+                type="button"
+                onClick={() => handleSeleccionarMaterial('Todos')}
+                className="text-[11px] text-[#1a73e8] hover:underline cursor-pointer"
+              >
+                Todos
+              </button>
+            )}
+          </div>
+          <div className="relative px-1">
+            <select
+              value={material}
+              onChange={(e) => handleSeleccionarMaterial(e.target.value)}
+              className="w-full bg-white border border-[#dadce0] hover:border-[#9aa0a6] rounded-xl pl-3 pr-8 py-2 text-xs font-medium text-[#202124] focus:outline-none focus:border-[#1a73e8] cursor-pointer appearance-none shadow-2xs transition"
+            >
+              <option value="Todos">Todos los materiales</option>
+              {MATERIALES_OBJETIA.map((mat) => (
+                <option key={mat} value={mat}>
+                  {mat}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3.5 top-2.5 h-4 w-4 text-[#5f6368] pointer-events-none" />
+          </div>
+        </div>
+
+      </div>
+
+      {/* Footer del Drawer en móvil */}
+      <div className="p-4 border-t border-[#dadce0] bg-[#f8f9fa] flex gap-2 lg:hidden">
+        <button
+          type="button"
+          onClick={() => {
+            limpiarFiltros();
+            setMenuMovilAbierto(false);
+          }}
+          className="flex-1 py-2 px-3 border border-[#dadce0] text-xs font-semibold text-[#3c4043] bg-white rounded-xl hover:bg-[#f1f3f4] transition text-center cursor-pointer"
+        >
+          Limpiar
+        </button>
+        <button
+          type="button"
+          onClick={() => setMenuMovilAbierto(false)}
+          className="flex-1 py-2 px-3 bg-[#1a73e8] text-white text-xs font-bold rounded-xl transition hover:bg-[#1557b0] text-center cursor-pointer shadow-xs"
+        >
+          Ver {productos.length} items
+        </button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-sans text-[#202124] antialiased">
+      
+      {/* Workspace Shell Google AI Studio Light (Igual a Mi Objetia) */}
+      <div className="flex flex-1 overflow-hidden min-h-[calc(100vh-60px)]">
+
+        {/* DRAWER MÓVIL (Off-canvas en Light Mode) */}
+        {menuMovilAbierto && (
+          <div className="fixed inset-0 z-[100] lg:hidden animate-fade-in">
+            <div 
+              className="fixed inset-0 bg-black/30 backdrop-blur-xs transition-opacity" 
+              onClick={() => setMenuMovilAbierto(false)} 
             />
-            <div className="relative ml-auto w-full max-w-xs bg-white h-full shadow-2xl flex flex-col z-10 animate-fade-in">
-              <div className="flex items-center justify-between p-4 border-b border-gray-200">
-                <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="w-4 h-4 text-gray-900" />
-                  <h2 className="text-xs font-bold text-gray-900 uppercase tracking-wider">Filtros</h2>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setMobileFiltersOpen(false)}
-                  className="p-1 text-gray-500 hover:text-gray-900 cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="p-4 overflow-y-auto flex-1 space-y-5">
-                {/* Categoría */}
-                <div>
-                  <label className="text-xs font-bold text-gray-900 uppercase tracking-wider block mb-1.5">
-                    Categoría
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => handleSeleccionarCategoria(e.target.value)}
-                    className="w-full bg-white border border-gray-200 rounded-none p-2 text-xs font-medium text-gray-800 focus:outline-none focus:border-gray-900 cursor-pointer"
-                  >
-                    {categoriasDinamicas.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Subcategoría */}
-                {category !== 'Todos' && subcategoriasDisponibles.length > 0 && (
-                  <div>
-                    <label className="text-xs font-bold text-gray-900 uppercase tracking-wider block mb-1.5">
-                      Subcategoría
-                    </label>
-                    <select
-                      value={subcategory}
-                      onChange={(e) => handleSeleccionarSubcategoria(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-none p-2 text-xs font-medium text-gray-800 focus:outline-none focus:border-gray-900 cursor-pointer"
-                    >
-                      <option value="Todas">Todas las subcategorías</option>
-                      {subcategoriasDisponibles.map((sub) => (
-                        <option key={sub} value={sub}>
-                          {sub}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                {/* Condición */}
-                <div>
-                  <label className="text-xs font-bold text-gray-900 uppercase tracking-wider block mb-1.5">
-                    Condición
-                  </label>
-                  <div className="grid grid-cols-3 gap-1.5">
-                    {["Todas", "Nuevo", "Usado"].map((cond) => (
-                      <button
-                        key={cond}
-                        type="button"
-                        onClick={() => handleSeleccionarCondicion(cond)}
-                        className={`py-1.5 px-1 text-xs border text-center transition cursor-pointer ${
-                          condition === cond
-                            ? "bg-gray-900 text-white border-gray-900 font-semibold"
-                            : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
-                        }`}
-                      >
-                        {cond}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Color */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-bold text-gray-900 uppercase tracking-wider block">
-                      Color
-                    </label>
-                    {color !== 'Todos' && (
-                      <button
-                        type="button"
-                        onClick={() => handleSeleccionarColor('Todos')}
-                        className="text-[11px] text-gray-400 hover:text-gray-700 cursor-pointer"
-                      >
-                        Todos
-                      </button>
-                    )}
-                  </div>
-                  <div className="flex flex-wrap gap-1.5 max-h-[160px] overflow-y-auto pr-1">
-                    {COLORES_OBJETIA.map((col) => {
-                      const bg = COLOR_MAP[col] || '#ccc';
-                      const isGradient = bg.startsWith('linear');
-                      const isWhite = col === 'Blanco';
-                      const isSelected = color === col;
-                      return (
-                        <button
-                          key={col}
-                          type="button"
-                          onClick={() => handleSeleccionarColor(isSelected ? 'Todos' : col)}
-                          className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs border transition cursor-pointer ${
-                            isSelected
-                              ? "bg-gray-900 text-white border-gray-900 font-medium shadow-xs"
-                              : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
-                          }`}
-                        >
-                          <span
-                            className={`w-2.5 h-2.5 rounded-full inline-block flex-shrink-0 ${isWhite ? 'border border-gray-300' : ''}`}
-                            style={isGradient ? { background: bg } : { backgroundColor: bg }}
-                          />
-                          <span className="truncate max-w-[100px]">{col}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Material */}
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-bold text-gray-900 uppercase tracking-wider block">
-                      Material
-                    </label>
-                    {material !== 'Todos' && (
-                      <button
-                        type="button"
-                        onClick={() => handleSeleccionarMaterial('Todos')}
-                        className="text-[11px] text-gray-400 hover:text-gray-700 cursor-pointer"
-                      >
-                        Todos
-                      </button>
-                    )}
-                  </div>
-                  <div className="relative">
-                    <select
-                      value={material}
-                      onChange={(e) => handleSeleccionarMaterial(e.target.value)}
-                      className="w-full bg-white border border-gray-200 rounded-none pl-3 pr-8 py-2 text-xs font-medium text-gray-800 focus:outline-none focus:border-gray-900 cursor-pointer appearance-none shadow-xs"
-                    >
-                      <option value="Todos">Todos los materiales</option>
-                      {MATERIALES_OBJETIA.map((mat) => (
-                        <option key={mat} value={mat}>
-                          {mat}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-2.5 top-2.5 h-3.5 w-3.5 text-gray-500 pointer-events-none" />
-                  </div>
-                </div>
-              </div>
-
-              {/* Footer Drawer */}
-              <div className="p-4 border-t border-gray-200 bg-gray-50 flex gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    limpiarFiltros();
-                    setMobileFiltersOpen(false);
-                  }}
-                  className="flex-1 py-2 px-3 border border-gray-300 text-xs font-semibold text-gray-700 bg-white hover:bg-gray-100 transition text-center cursor-pointer"
-                >
-                  Limpiar
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMobileFiltersOpen(false)}
-                  className="flex-1 py-2 px-3 bg-gray-900 text-white text-xs font-bold tracking-wider uppercase transition hover:bg-black text-center cursor-pointer"
-                >
-                  Ver {productos.length} items
-                </button>
-              </div>
+            <div className="fixed inset-y-0 left-0 w-[290px] bg-white border-r border-[#dadce0] shadow-2xl flex flex-col z-10 animate-slide-right overflow-hidden">
+              {renderSidebarContent()}
             </div>
           </div>
         )}
 
-        {/* CONTENEDOR FLEX: FILTROS A LA IZQUIERDA + CONTENIDO A LA DERECHA */}
-        <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+        {/* SIDEBAR ESCRITORIO (Deslizamiento físico a la izquierda idéntico a Mi Objetia) */}
+        <aside 
+          className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-72 min-h-[calc(100vh-60px)] overflow-hidden ${
+            sidebarOculto ? '-ml-72 pointer-events-none' : 'ml-0'
+          }`}
+        >
+          {renderSidebarContent()}
+        </aside>
+
+        {/* ÁREA PRINCIPAL DE CONTENIDO A LA DERECHA */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
           
-          {/* PANEL LATERAL DE FILTROS DESKTOP */}
-          <aside className="hidden lg:block w-[230px] flex-shrink-0 space-y-5 sticky top-24 select-none pt-2">
-            {/* Cabecera Sidebar Filtros */}
-            <div className="flex items-center justify-between pb-3 border-b border-gray-200">
-              <div className="flex items-center gap-2">
-                <SlidersHorizontal className="w-3.5 h-3.5 text-gray-800" />
-                <h2 className="text-xs font-bold text-gray-900 tracking-wider uppercase">Filtros</h2>
-              </div>
-              {hayFiltrosActivos && (
-                <button
-                  type="button"
-                  onClick={limpiarFiltros}
-                  className="text-[11px] text-gray-500 hover:text-gray-900 cursor-pointer font-medium underline"
+          {/* TOP BAR / PANEL SUPERIOR GOOGLE AI STUDIO LIGHT (IDÉNTICO A MI OBJETIA) */}
+          <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xs border-b border-[#dadce0] px-4 sm:px-6 h-[60px] min-h-[60px] flex items-center justify-between flex-shrink-0 gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              {/* Botón menú móvil para abrir filtros */}
+              <button
+                type="button"
+                onClick={() => setMenuMovilAbierto(true)}
+                className="lg:hidden p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer flex-shrink-0"
+                title="Abrir filtros"
+              >
+                <MenuIcon className="h-5 w-5" />
+              </button>
+
+              {/* Botón animado colapsar/expandir sidebar */}
+              <button
+                type="button"
+                onClick={() => setSidebarOculto(!sidebarOculto)}
+                className="hidden lg:flex items-center justify-center w-10 h-10 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#f1f3f4] active:bg-[#e8f0fe] active:scale-95 rounded-xl transition-all cursor-pointer flex-shrink-0 group"
+                title={sidebarOculto ? "Mostrar filtros" : "Ocultar filtros"}
+                aria-label={sidebarOculto ? "Mostrar filtros" : "Ocultar filtros"}
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  className="w-5 h-5 transition-transform duration-300 group-hover:scale-105"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  Limpiar todo
-                </button>
-              )}
-            </div>
-
-            {/* 1. Categorías Dinámicas & Subcategorías */}
-            <div>
-              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2">
-                Categoría
-              </h3>
-              <div className="flex flex-col space-y-0.5">
-                {categoriasDinamicas.map((cat) => {
-                  const isCatActive = category === cat;
-                  return (
-                    <div key={cat} className="flex flex-col">
-                      <button
-                        type="button"
-                        onClick={() => handleSeleccionarCategoria(cat)}
-                        className={`text-left text-xs transition-colors cursor-pointer py-1 px-1.5 flex items-center justify-between rounded-none ${
-                          isCatActive
-                            ? "font-bold text-gray-900 bg-gray-100"
-                            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-normal"
-                        }`}
-                      >
-                        <span className="truncate">{cat}</span>
-                        {isCatActive && cat !== 'Todos' && (
-                          <ChevronDown className="w-3.5 h-3.5 text-gray-700 flex-shrink-0" />
-                        )}
-                      </button>
-
-                      {/* Subcategorías dependientes cuando la categoría está activa */}
-                      {isCatActive && cat !== 'Todos' && subcategoriasDisponibles.length > 0 && (
-                        <div className="pl-2.5 pr-1 py-1 mt-0.5 mb-1 space-y-0.5 border-l-2 border-gray-900 ml-1.5">
-                          <button
-                            type="button"
-                            onClick={() => handleSeleccionarSubcategoria('Todas')}
-                            className={`text-left text-[11px] transition-colors cursor-pointer py-0.5 px-1 block w-full truncate ${
-                              subcategory === 'Todas'
-                                ? "font-bold text-gray-900 bg-gray-100"
-                                : "text-gray-500 hover:text-gray-900 hover:bg-gray-50 font-medium"
-                            }`}
-                          >
-                            • Todas en {cat}
-                          </button>
-                          {subcategoriasDisponibles.map((sub) => {
-                            const isSubActive = subcategory === sub;
-                            return (
-                              <button
-                                key={sub}
-                                type="button"
-                                onClick={() => handleSeleccionarSubcategoria(sub)}
-                                className={`text-left text-[11px] transition-colors cursor-pointer py-0.5 px-1 block w-full truncate ${
-                                  isSubActive
-                                    ? "font-bold text-gray-900 bg-gray-100"
-                                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                                }`}
-                                title={sub}
-                              >
-                                {sub}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 2. Condición */}
-            <div className="pt-3.5 border-t border-gray-200">
-              <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider mb-2">
-                Condición
-              </h3>
-              <div className="grid grid-cols-3 gap-1">
-                {["Todas", "Nuevo", "Usado"].map((cond) => (
-                  <button
-                    key={cond}
-                    type="button"
-                    onClick={() => handleSeleccionarCondicion(cond)}
-                    className={`py-1.5 px-1 text-xs border text-center transition cursor-pointer ${
-                      condition === cond
-                        ? "bg-gray-900 text-white border-gray-900 font-semibold"
-                        : "bg-white text-gray-700 border-gray-200 hover:border-gray-400 font-normal"
+                  <line
+                    x1="3"
+                    y1="6"
+                    x2={sidebarOculto ? "21" : "12"}
+                    y2="6"
+                    className="transition-all duration-300 ease-in-out"
+                  />
+                  <line
+                    x1="3"
+                    y1="12"
+                    x2={sidebarOculto ? "21" : "9"}
+                    y2="12"
+                    className="transition-all duration-300 ease-in-out"
+                  />
+                  <line
+                    x1="3"
+                    y1="18"
+                    x2={sidebarOculto ? "21" : "12"}
+                    y2="18"
+                    className="transition-all duration-300 ease-in-out"
+                  />
+                  <path
+                    d="M 19 7 L 14 12 L 19 17"
+                    className={`transition-all duration-300 ease-in-out ${
+                      sidebarOculto
+                        ? 'opacity-0 translate-x-2 pointer-events-none'
+                        : 'opacity-100 translate-x-0'
                     }`}
-                  >
-                    {cond}
-                  </button>
-                ))}
-              </div>
-            </div>
+                  />
+                </svg>
+              </button>
 
-            {/* 3. Color */}
-            <div className="pt-3.5 border-t border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
-                  Color
-                </h3>
-                {color !== 'Todos' && (
-                  <button
-                    type="button"
-                    onClick={() => handleSeleccionarColor('Todos')}
-                    className="text-[11px] text-gray-400 hover:text-gray-700 cursor-pointer"
-                  >
-                    Todos
-                  </button>
-                )}
-              </div>
-              <div className="flex flex-wrap gap-1 max-h-[160px] overflow-y-auto pr-1">
-                {COLORES_OBJETIA.map((col) => {
-                  const bg = COLOR_MAP[col] || '#ccc';
-                  const isGradient = bg.startsWith('linear');
-                  const isWhite = col === 'Blanco';
-                  const isSelected = color === col;
-                  return (
-                    <button
-                      key={col}
-                      type="button"
-                      onClick={() => handleSeleccionarColor(isSelected ? 'Todos' : col)}
-                      className={`inline-flex items-center gap-1.5 px-2 py-1 text-xs border transition cursor-pointer ${
-                        isSelected
-                          ? "bg-gray-900 text-white border-gray-900 font-semibold shadow-xs"
-                          : "bg-white text-gray-700 border-gray-200 hover:border-gray-400"
-                      }`}
-                      title={col}
-                    >
-                      <span
-                        className={`w-2 h-2 rounded-full inline-block flex-shrink-0 ${isWhite ? 'border border-gray-300' : ''}`}
-                        style={isGradient ? { background: bg } : { backgroundColor: bg }}
-                      />
-                      <span className="truncate max-w-[85px]">{col}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* 4. Material */}
-            <div className="pt-3.5 border-t border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs font-bold text-gray-900 uppercase tracking-wider">
-                  Material
-                </h3>
-                {material !== 'Todos' && (
-                  <button
-                    type="button"
-                    onClick={() => handleSeleccionarMaterial('Todos')}
-                    className="text-[11px] text-gray-400 hover:text-gray-700 cursor-pointer"
-                  >
-                    Todos
-                  </button>
-                )}
-              </div>
-              <div className="relative">
-                <select
-                  value={material}
-                  onChange={(e) => handleSeleccionarMaterial(e.target.value)}
-                  className="w-full bg-white border border-gray-200 rounded-none pl-2.5 pr-7 py-1.5 text-xs font-medium text-gray-800 focus:outline-none focus:border-gray-900 cursor-pointer appearance-none shadow-xs"
-                >
-                  <option value="Todos">Todos los materiales</option>
-                  {MATERIALES_OBJETIA.map((mat) => (
-                    <option key={mat} value={mat}>
-                      {mat}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-2 top-2 h-3.5 w-3.5 text-gray-500 pointer-events-none" />
-              </div>
-            </div>
-          </aside>
-
-          {/* CONTENIDO PRINCIPAL: CABECERA CON CONTEO Y ORDENAMIENTO + GRILLA DE PRODUCTOS */}
-          <main className="flex-1 w-full min-w-0">
-            
-            {/* Cabecera Superior */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3 pb-3 border-b border-gray-200/80">
-              <div>
-                <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight uppercase" style={{ fontFamily: 'var(--font-family-brand, Outfit)' }}>
-                  {search ? `Resultados para "${search}"` : (
-                    category === "Todos"
-                      ? "Catálogo Exclusivo"
-                      : (subcategory !== 'Todas' ? `${category} · ${subcategory}` : category)
-                  )}
-                </h1>
-                <span className="text-xs text-gray-500 font-medium">
-                  {loading ? "Cargando..." : `${productos.length} resultados`}
+              {/* TÍTULO Y DESCRIPCIÓN DEL PANEL: CATÁLOGO DE PRODUCTOS */}
+              <div className="flex flex-col min-w-0">
+                <span className="text-sm sm:text-base font-bold text-[#202124] leading-tight truncate">
+                  Catálogo de Productos
+                </span>
+                <span className="hidden sm:inline text-[11px] text-[#5f6368] truncate leading-tight mt-0.5">
+                  {loading 
+                    ? "Cargando catálogo..." 
+                    : `${productos.length} productos disponibles${category !== 'Todos' ? ` · ${category}` : ''}${subcategory !== 'Todas' ? ` · ${subcategory}` : ''}`}
                 </span>
               </div>
-
-              {/* Selector de Ordenamiento */}
-              <div className="flex items-center gap-2 self-end sm:self-auto">
-                <span className="text-xs text-gray-500 font-medium">Ordenar por</span>
-                <div className="relative">
-                  <select
-                    value={orden}
-                    onChange={(e) => setOrden(e.target.value)}
-                    className="bg-white border border-gray-200 rounded-none pl-3 pr-8 py-1.5 text-xs font-semibold text-gray-800 focus:outline-none focus:border-gray-400 cursor-pointer appearance-none shadow-xs"
-                  >
-                    <option value="relevantes">Más relevantes</option>
-                    <option value="menor-precio">Menor precio</option>
-                    <option value="mayor-precio">Mayor precio</option>
-                  </select>
-                  <ChevronDown className="absolute right-2.5 top-2.5 h-3.5 w-3.5 text-gray-500 pointer-events-none" />
-                </div>
-              </div>
             </div>
 
+            {/* LADO DERECHO DEL HEADER: BÚSQUEDA Y ORDENAMIENTO */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              {/* Buscador Integrado */}
+              <form onSubmit={manejarBusqueda} className="relative w-36 sm:w-56 md:w-64">
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar productos..."
+                  className="w-full bg-[#f1f3f4] focus:bg-white border border-transparent focus:border-[#dadce0] rounded-xl pl-8 sm:pl-9 pr-3 py-1.5 text-xs text-[#202124] placeholder-[#5f6368] focus:outline-none transition shadow-2xs"
+                />
+                <Search className="absolute left-2.5 sm:left-3 top-2 h-3.5 w-3.5 text-[#5f6368]" />
+              </form>
+
+              {/* Selector de Orden */}
+              <div className="relative flex-shrink-0">
+                <select
+                  value={orden}
+                  onChange={(e) => setOrden(e.target.value)}
+                  className="bg-white border border-[#dadce0] hover:border-[#9aa0a6] rounded-xl pl-2.5 sm:pl-3 pr-7 py-1.5 text-xs font-semibold text-[#202124] focus:outline-none focus:border-[#1a73e8] cursor-pointer appearance-none shadow-2xs transition"
+                >
+                  <option value="relevantes">Más relevantes</option>
+                  <option value="menor-precio">Menor precio</option>
+                  <option value="mayor-precio">Mayor precio</option>
+                  <option value="recientes">Más recientes</option>
+                </select>
+                <ChevronDown className="absolute right-2 top-2 h-3.5 w-3.5 text-[#5f6368] pointer-events-none" />
+              </div>
+            </div>
+          </header>
+
+          {/* CUERPO DE CONTENIDO CON PADDING Y PRODUCTOS DENTRO DE DIV BLANCO */}
+          <main className="flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-4">
+            
             {/* Chips de Filtros Activos */}
             {hayFiltrosActivos && (
-              <div className="flex flex-wrap items-center gap-1.5 mb-4">
-                <span className="text-xs font-semibold text-gray-500 mr-1">Filtros:</span>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <span className="text-xs font-semibold text-[#5f6368] mr-1">Filtros:</span>
                 {category !== 'Todos' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs bg-white text-gray-800 border border-gray-200 shadow-xs">
-                    <span>Cat: <strong className="font-semibold">{category}</strong></span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs bg-white text-[#202124] border border-[#dadce0] rounded-xl shadow-2xs">
+                    <span>Cat: <strong>{category}</strong></span>
                     <button
                       type="button"
                       onClick={() => handleSeleccionarCategoria('Todos')}
-                      className="hover:text-red-600 ml-0.5 cursor-pointer text-gray-400"
-                      title="Quitar filtro categoría"
+                      className="hover:text-red-600 text-[#5f6368] cursor-pointer"
+                      title="Quitar categoría"
                     >
                       <X className="w-3 h-3" />
                     </button>
                   </span>
                 )}
                 {subcategory !== 'Todas' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs bg-white text-gray-800 border border-gray-200 shadow-xs">
-                    <span>Subcat: <strong className="font-semibold">{subcategory}</strong></span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs bg-white text-[#202124] border border-[#dadce0] rounded-xl shadow-2xs">
+                    <span>Subcat: <strong>{subcategory}</strong></span>
                     <button
                       type="button"
                       onClick={() => handleSeleccionarSubcategoria('Todas')}
-                      className="hover:text-red-600 ml-0.5 cursor-pointer text-gray-400"
-                      title="Quitar filtro subcategoría"
+                      className="hover:text-red-600 text-[#5f6368] cursor-pointer"
+                      title="Quitar subcategoría"
                     >
                       <X className="w-3 h-3" />
                     </button>
                   </span>
                 )}
                 {condition !== 'Todas' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs bg-white text-gray-800 border border-gray-200 shadow-xs">
-                    <span>Condición: <strong className="font-semibold">{condition}</strong></span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs bg-white text-[#202124] border border-[#dadce0] rounded-xl shadow-2xs">
+                    <span>Condición: <strong>{condition}</strong></span>
                     <button
                       type="button"
                       onClick={() => handleSeleccionarCondicion('Todas')}
-                      className="hover:text-red-600 ml-0.5 cursor-pointer text-gray-400"
-                      title="Quitar filtro condición"
+                      className="hover:text-red-600 text-[#5f6368] cursor-pointer"
+                      title="Quitar condición"
                     >
                       <X className="w-3 h-3" />
                     </button>
                   </span>
                 )}
                 {color !== 'Todos' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs bg-white text-gray-800 border border-gray-200 shadow-xs">
-                    <span>Color: <strong className="font-semibold">{color}</strong></span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs bg-white text-[#202124] border border-[#dadce0] rounded-xl shadow-2xs">
+                    <span>Color: <strong>{color}</strong></span>
                     <button
                       type="button"
                       onClick={() => handleSeleccionarColor('Todos')}
-                      className="hover:text-red-600 ml-0.5 cursor-pointer text-gray-400"
-                      title="Quitar filtro color"
+                      className="hover:text-red-600 text-[#5f6368] cursor-pointer"
+                      title="Quitar color"
                     >
                       <X className="w-3 h-3" />
                     </button>
                   </span>
                 )}
                 {material !== 'Todos' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs bg-white text-gray-800 border border-gray-200 shadow-xs">
-                    <span>Material: <strong className="font-semibold">{material}</strong></span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs bg-white text-[#202124] border border-[#dadce0] rounded-xl shadow-2xs">
+                    <span>Material: <strong>{material}</strong></span>
                     <button
                       type="button"
                       onClick={() => handleSeleccionarMaterial('Todos')}
-                      className="hover:text-red-600 ml-0.5 cursor-pointer text-gray-400"
-                      title="Quitar filtro material"
+                      className="hover:text-red-600 text-[#5f6368] cursor-pointer"
+                      title="Quitar material"
                     >
                       <X className="w-3 h-3" />
                     </button>
                   </span>
                 )}
                 {search.trim() !== '' && (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs bg-white text-gray-800 border border-gray-200 shadow-xs">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs bg-white text-[#202124] border border-[#dadce0] rounded-xl shadow-2xs">
                     <span>&ldquo;{search}&rdquo;</span>
                     <button
                       type="button"
                       onClick={() => { setSearch(''); actualizarURL({ search: '' }); }}
-                      className="hover:text-red-600 ml-0.5 cursor-pointer text-gray-400"
+                      className="hover:text-red-600 text-[#5f6368] cursor-pointer"
                       title="Quitar búsqueda"
                     >
                       <X className="w-3 h-3" />
@@ -782,43 +704,61 @@ function CatalogContent() {
                 <button
                   type="button"
                   onClick={limpiarFiltros}
-                  className="text-xs text-gray-500 hover:text-gray-900 underline ml-2 cursor-pointer font-medium"
+                  className="text-xs text-[#1a73e8] hover:underline ml-1 cursor-pointer font-semibold"
                 >
-                  Limpiar todos
+                  Limpiar todo
                 </button>
               </div>
             )}
 
-            {/* Grilla de Productos */}
-            {error && (
-              <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-none text-xs mb-6 font-semibold">
-                ⚠️ Error: {error}
-              </div>
-            )}
+            {/* CONTENEDOR DIV BLANCO DE PRODUCTOS (ESTILO MI OBJETIA) */}
+            <div className="bg-white border border-[#dadce0] rounded-2xl p-4 sm:p-6 shadow-2xs min-h-[450px]">
+              
+              {/* Mensaje de Error */}
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-200 text-red-700 rounded-xl text-xs mb-6 font-semibold flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
 
-            {loading ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-4 gap-2.5 sm:gap-3 animate-pulse">
-                {[...Array(8)].map((_, i) => (
-                  <SkeletonCard key={i} />
-                ))}
-              </div>
-            ) : productos.length === 0 ? (
-              <div className="text-center py-20 bg-white border border-gray-200 rounded-none shadow-xs">
-                <Filter className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-                <h3 className="text-base font-bold text-gray-700">No se encontraron productos</h3>
-                <p className="text-xs text-gray-400 mt-1">
-                  {search ? `No encontramos coincidencias para "${search}".` : 'Intentá ajustando los filtros de búsqueda.'}
-                </p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-4 gap-2.5 sm:gap-3">
-                {productos.map((prod) => (
-                  <div key={prod.id} className="transform hover:-translate-y-1 transition duration-300">
-                    <ProductCard producto={prod} />
+              {/* Grilla o Estado Vacío */}
+              {loading ? (
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4.5 animate-pulse">
+                  {[...Array(10)].map((_, i) => (
+                    <SkeletonCard key={i} />
+                  ))}
+                </div>
+              ) : productos.length === 0 ? (
+                <div className="text-center py-24 px-4">
+                  <div className="w-16 h-16 rounded-full bg-[#f1f3f4] flex items-center justify-center mx-auto mb-4 text-[#5f6368]">
+                    <Filter className="h-8 w-8 text-[#5f6368]" />
                   </div>
-                ))}
-              </div>
-            )}
+                  <h3 className="text-base font-bold text-[#202124]">No se encontraron productos</h3>
+                  <p className="text-xs text-[#5f6368] mt-1 max-w-sm mx-auto">
+                    {search ? `No encontramos coincidencias para "${search}".` : 'Probá ajustando o limpiando los filtros seleccionados.'}
+                  </p>
+                  {hayFiltrosActivos && (
+                    <button
+                      type="button"
+                      onClick={limpiarFiltros}
+                      className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 bg-[#1a73e8] text-white text-xs font-semibold rounded-xl hover:bg-[#1557b0] transition shadow-xs cursor-pointer"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      Restablecer filtros
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3 sm:gap-4.5">
+                  {productos.map((prod) => (
+                    <div key={prod.id} className="transform hover:-translate-y-1 transition duration-300">
+                      <ProductCard producto={prod} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
           </main>
 
