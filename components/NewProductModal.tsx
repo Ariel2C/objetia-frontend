@@ -493,15 +493,7 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
       if (onSuccess) {
         onSuccess();
       } else {
-        // Si ya estamos en /mi-objetia con la pestaña publications, solo hacemos scroll directo
-        if (typeof window !== 'undefined' && window.location.pathname === '/mi-objetia' && window.location.search.includes('tab=publications')) {
-          setTimeout(() => {
-            const el = document.getElementById('lista-publicaciones');
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }, 200);
-        } else {
-          router.push("/mi-objetia?tab=publications&scroll=lista-publicaciones");
-        }
+        router.push("/mi-objetia?tab=publications&scroll=lista-publicaciones");
       }
 
     } catch (err: any) {

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Eye, Copy, Trash2, Check, Edit2, X, Loader2, Heart, TrendingUp, ShoppingBag, BarChart3, ChevronDown, ChevronUp, Sparkles, Info, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -86,8 +86,39 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
   const [editLargo, setEditLargo] = useState(0);
   const [guardandoEdit, setGuardandoEdit] = useState(false);
 
-  const fetchProducts = async () => {
-    setLoading(true);
+  const pendingScrollRef = useRef(false);
+
+  useEffect(() => {
+    const scrollTarget = searchParams?.get('scroll');
+    if (scrollTarget === 'lista-publicaciones') {
+      pendingScrollRef.current = true;
+    }
+  }, [searchParams]);
+
+  const ejecutarScrollSuave = useCallback(() => {
+    const el = document.getElementById('lista-publicaciones');
+    if (!el) return false;
+
+    // En mi-objetia el contenedor con scroll es el div padre con overflow-y-auto
+    const scrollContainer = el.closest('.overflow-y-auto') as HTMLElement | null;
+    if (scrollContainer && scrollContainer.scrollHeight > scrollContainer.clientHeight) {
+      const rect = el.getBoundingClientRect();
+      const containerRect = scrollContainer.getBoundingClientRect();
+      const targetScrollTop = scrollContainer.scrollTop + (rect.top - containerRect.top) - 75;
+      scrollContainer.scrollTo({
+        top: Math.max(0, targetScrollTop),
+        behavior: 'smooth'
+      });
+    } else {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    return true;
+  }, []);
+
+  const fetchProducts = async (isBackground = false) => {
+    if (!isBackground) {
+      setLoading(true);
+    }
     setError(null);
     try {
       const authToken = localStorage.getItem('vamaar_token') || token;
@@ -122,30 +153,40 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
   // Escuchar refresco disparado tras crear producto
   useEffect(() => {
     const handleRefresh = () => {
-      fetchProducts();
+      pendingScrollRef.current = true;
+      fetchProducts(true);
     };
     window.addEventListener('vamaar:refresh-publications', handleRefresh);
     return () => window.removeEventListener('vamaar:refresh-publications', handleRefresh);
   }, []);
 
-  // Auto-scroll suave hacia la tarjeta de publicaciones si viene con ?scroll=lista-publicaciones
+  // Auto-scroll suave en cuanto termina la carga y el DOM está listo
   useEffect(() => {
-    const scrollTarget = searchParams?.get('scroll');
-    if (scrollTarget === 'lista-publicaciones' && !loading) {
-      const timer = setTimeout(() => {
-        const el = document.getElementById('lista-publicaciones');
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+    if (!loading && pendingScrollRef.current) {
+      pendingScrollRef.current = false;
+      
+      const timer1 = setTimeout(() => {
+        ejecutarScrollSuave();
         if (typeof window !== 'undefined') {
           const url = new URL(window.location.href);
-          url.searchParams.delete('scroll');
-          window.history.replaceState({}, '', url.toString());
+          if (url.searchParams.has('scroll')) {
+            url.searchParams.delete('scroll');
+            window.history.replaceState({}, '', url.toString());
+          }
         }
-      }, 250);
-      return () => clearTimeout(timer);
+      }, 100);
+
+      // Reasegurar scroll si el layout calculó alturas de imágenes
+      const timer2 = setTimeout(() => {
+        ejecutarScrollSuave();
+      }, 350);
+
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
     }
-  }, [searchParams, loading]);
+  }, [loading, ejecutarScrollSuave]);
 
   const handleCopiarEnlace = (id: number) => {
     const url = `${window.location.origin}/products/${id}`;
