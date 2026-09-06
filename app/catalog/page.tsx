@@ -449,20 +449,25 @@ function CatalogContent() {
               </button>
             )}
           </div>
-          <div className="relative px-1">
-            <select
-              value={material}
-              onChange={(e) => handleSeleccionarMaterial(e.target.value)}
-              className="w-full bg-white border border-[#dadce0] hover:border-[#9aa0a6] rounded-xl pl-3 pr-8 py-2 text-xs font-medium text-[#202124] focus:outline-none focus:border-[#1a73e8] cursor-pointer appearance-none shadow-2xs transition"
-            >
-              <option value="Todos">Todos los materiales</option>
-              {MATERIALES_OBJETIA.map((mat) => (
-                <option key={mat} value={mat}>
-                  {mat}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3.5 top-2.5 h-4 w-4 text-[#5f6368] pointer-events-none" />
+          <div className="flex flex-wrap gap-1.5 px-1">
+            {MATERIALES_OBJETIA.map((mat) => {
+              const isSelected = material === mat;
+              return (
+                <button
+                  key={mat}
+                  type="button"
+                  onClick={() => handleSeleccionarMaterial(isSelected ? 'Todos' : mat)}
+                  className={`inline-flex items-center px-2.5 py-1 text-xs rounded-xl border transition cursor-pointer ${
+                    isSelected
+                      ? "bg-[#e8f0fe] text-[#1a73e8] border-[#d2e3fc] font-semibold shadow-2xs"
+                      : "bg-white text-[#3c4043] border-[#dadce0] hover:bg-[#f1f3f4]"
+                  }`}
+                  title={mat}
+                >
+                  <span className="truncate">{mat}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
 
@@ -637,7 +642,7 @@ function CatalogContent() {
                 <span className="text-xs font-semibold text-[#5f6368] mr-1">Filtros:</span>
                 {category !== 'Todos' && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs bg-white text-[#202124] border border-[#dadce0] rounded-xl shadow-2xs">
-                    <span>Cat: <strong>{category}</strong></span>
+                    <span className="font-semibold">{category}</span>
                     <button
                       type="button"
                       onClick={() => handleSeleccionarCategoria('Todos')}
@@ -650,7 +655,7 @@ function CatalogContent() {
                 )}
                 {subcategory !== 'Todas' && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs bg-white text-[#202124] border border-[#dadce0] rounded-xl shadow-2xs">
-                    <span>Subcat: <strong>{subcategory}</strong></span>
+                    <span className="font-semibold">{subcategory}</span>
                     <button
                       type="button"
                       onClick={() => handleSeleccionarSubcategoria('Todas')}
@@ -663,7 +668,7 @@ function CatalogContent() {
                 )}
                 {condition !== 'Todas' && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs bg-white text-[#202124] border border-[#dadce0] rounded-xl shadow-2xs">
-                    <span>Condición: <strong>{condition}</strong></span>
+                    <span className="font-semibold">{condition}</span>
                     <button
                       type="button"
                       onClick={() => handleSeleccionarCondicion('Todas')}
@@ -676,7 +681,13 @@ function CatalogContent() {
                 )}
                 {color !== 'Todos' && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs bg-white text-[#202124] border border-[#dadce0] rounded-xl shadow-2xs">
-                    <span>Color: <strong>{color}</strong></span>
+                    {COLOR_MAP[color] && (
+                      <span
+                        className={`w-2.5 h-2.5 rounded-full inline-block flex-shrink-0 ${color === 'Blanco' ? 'border border-gray-300' : ''}`}
+                        style={COLOR_MAP[color].startsWith('linear') ? { background: COLOR_MAP[color] } : { backgroundColor: COLOR_MAP[color] }}
+                      />
+                    )}
+                    <span className="font-semibold">{color}</span>
                     <button
                       type="button"
                       onClick={() => handleSeleccionarColor('Todos')}
@@ -689,7 +700,7 @@ function CatalogContent() {
                 )}
                 {material !== 'Todos' && (
                   <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs bg-white text-[#202124] border border-[#dadce0] rounded-xl shadow-2xs">
-                    <span>Material: <strong>{material}</strong></span>
+                    <span className="font-semibold">{material}</span>
                     <button
                       type="button"
                       onClick={() => handleSeleccionarMaterial('Todos')}
