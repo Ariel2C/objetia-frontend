@@ -125,8 +125,6 @@ export default function ProductCard({
     return () => window.removeEventListener('objetia_campaign_changed', handleCampaignChanged);
   }, []);
 
-  const cuotasVal = campanaActiva?.cuotasSinInteres || 3;
-
   return (
     <Link
       href={`/products/${producto.id}`}
@@ -201,13 +199,9 @@ export default function ProductCard({
           {formatearTituloProducto(producto.title)}
         </h3>
 
-        {/* PRECIO + CUOTAS EN VERDE #00A650 */}
+        {/* PRECIO */}
         <div className="flex flex-col text-left space-y-0.5 pt-0.5">
           <FormattedPrice price={producto.price} showCents={false} className="text-base sm:text-lg font-semibold text-gray-900 text-left tracking-tight leading-none" />
-          
-          <span className="text-[10px] sm:text-[11px] font-medium text-[#00A650] text-left leading-tight block">
-            {cuotasVal} cuotas sin interés
-          </span>
         </div>
       </div>
     </Link>
