@@ -1,5 +1,5 @@
 "use client";
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { getApiUrl } from '../lib/config';
 
 interface Usuario {
@@ -167,19 +167,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     .catch(() => {});
   };
 
-  const tienePermiso = (codigoPermiso: string): boolean => {
+  const tienePermiso = useCallback((codigoPermiso: string): boolean => {
     if (!usuario) return false;
     const userRoleClean = (usuario.role || '').toLowerCase();
-    if (userRoleClean === 'root') return true;
+    if (userRoleClean === 'root' || userRoleClean === 'admin') return true;
 
     const perms = (usuario.permissions || []).map(p => p.toLowerCase());
     if (perms.includes('full_access')) return true;
 
     const target = codigoPermiso.toLowerCase();
-    return perms.includes(target);
-  };
+    if (target === 'sell_products' || target === 'vender') {
+      return perms.includes('publications') || perms.includes('sales') || perms.includes('sell_products') || ['cliente', 'client', 'seller'].includes(userRoleClean);
+    }
 
-  const logout = () => {
+    return perms.includes(target);
+  }, [usuario]);
+
+  const logout = useCallback(() => {
     try {
       if (usuario) {
         sessionStorage.removeItem(`vamaar_read_notifs_${usuario.id}`);
@@ -198,10 +202,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.removeItem("vamaar_token");
     localStorage.removeItem("vamaar_user");
     window.location.href = "/";
-  };
+  }, [usuario]);
+
+  const authValue = useMemo(() => ({
+    usuario,
+    token,
+    login,
+    logout,
+    cargando,
+    tienePermiso
+  }), [usuario, token, cargando, tienePermiso, logout]);
 
   return (
-    <AuthContext.Provider value={{ usuario, token, login, logout, cargando, tienePermiso }}>
+    <AuthContext.Provider value={authValue}>
       {children}
     </AuthContext.Provider>
   );

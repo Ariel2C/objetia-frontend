@@ -475,7 +475,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
           <div className="flex items-center space-x-2 sm:space-x-3">
             
             {/* BOTÓN VENDER (ESTILO GOOGLE AI STUDIO ACCENT) */}
-            {(!usuario || tienePermiso('sell_products') || tienePermiso('full_access') || usuario?.role === 'root') && (
+            {(!usuario || tienePermiso('sell_products') || tienePermiso('publications') || tienePermiso('sales') || tienePermiso('full_access') || ['root', 'admin', 'seller', 'cliente', 'client'].includes(usuario?.role?.toLowerCase() || '')) && (
               <button 
                 onClick={handleBotonVender}
                 className="inline-flex items-center justify-center bg-[#87a9ff] hover:bg-[#a8c7fa] text-[#131314] text-xs font-bold px-3.5 py-1.5 rounded-lg transition shadow-xs active:scale-98 cursor-pointer"

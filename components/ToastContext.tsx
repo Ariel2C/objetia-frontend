@@ -70,14 +70,19 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     setConfirmState(null);
   };
 
-  const api: ToastContextType = {
+  const success = useCallback((m: string, t?: string) => notify('success', m, t), [notify]);
+  const error = useCallback((m: string, t?: string) => notify('error', m, t), [notify]);
+  const info = useCallback((m: string, t?: string) => notify('info', m, t), [notify]);
+  const warning = useCallback((m: string, t?: string) => notify('warning', m, t), [notify]);
+
+  const api: ToastContextType = React.useMemo(() => ({
     notify,
-    success: useCallback((m: string, t?: string) => notify('success', m, t), [notify]),
-    error: useCallback((m: string, t?: string) => notify('error', m, t), [notify]),
-    info: useCallback((m: string, t?: string) => notify('info', m, t), [notify]),
-    warning: useCallback((m: string, t?: string) => notify('warning', m, t), [notify]),
+    success,
+    error,
+    info,
+    warning,
     confirm,
-  };
+  }), [notify, success, error, info, warning, confirm]);
 
   return (
     <ToastContext.Provider value={api}>

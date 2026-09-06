@@ -83,17 +83,31 @@ export default function NewProductPage() {
   const [errorSubmit, setErrorSubmit] = useState<string | null>(null);
   const [publicando, setPublicando] = useState(false);
 
+  const hasRedirected = useRef(false);
+
   // Escudo de autenticación y permisos
   useEffect(() => {
-    if (!cargando) {
-      if (!usuario) {
-        router.push("/auth");
-      } else if (!tienePermiso('sell_products') && !tienePermiso('full_access') && usuario.role?.toLowerCase() !== 'root') {
-        toast.error("No tienes permiso para publicar o vender productos.");
-        router.push("/mi-objetia");
-      }
+    if (cargando || hasRedirected.current) return;
+
+    if (!usuario) {
+      hasRedirected.current = true;
+      router.push("/auth?redirect=/products/new");
+      return;
     }
-  }, [usuario, cargando, router, tienePermiso, toast]);
+
+    const canSell = 
+      tienePermiso('sell_products') || 
+      tienePermiso('publications') || 
+      tienePermiso('sales') || 
+      tienePermiso('full_access') || 
+      ['root', 'admin', 'seller', 'cliente', 'client'].includes(usuario.role?.toLowerCase() || '');
+
+    if (!canSell) {
+      hasRedirected.current = true;
+      toast.error("No tienes permiso para publicar o vender productos.");
+      router.push("/mi-objetia");
+    }
+  }, [cargando, usuario, tienePermiso, router]);
 
   if (cargando || !usuario) {
     return (
