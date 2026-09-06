@@ -173,7 +173,9 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
       sessionStorage.setItem("vamaar_ia_scans_count", String(newCount));
     }
 
-    await analizarFotoPrincipal(file);
+    // Comprimir en cliente para que la subida y el análisis sean ultra-rápidos
+    const fileOptim = await comprimirImagenCliente(file);
+    await analizarFotoPrincipal(fileOptim);
   };
 
   const analizarFotoPrincipal = async (file: File) => {
@@ -192,26 +194,31 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.detail || "Error al analizar la foto principal.");
+        const errorData = await res.json().catch(() => ({ detail: "El servicio de escaneo por IA no está disponible temporalmente." }));
+        toast.info(errorData.detail || "No se pudo autocompletar con IA. Podés ingresar los datos manualmente.");
+        setPrincipalAnalizada(true);
+        return;
       }
 
       const data = await res.json();
-      if (data.title) setTitle(data.title);
-      if (data.category) setCategory(data.category);
-      if (data.description) setDescription(data.description);
-      if (data.tags) setTags(data.tags);
-      if (data.weight_kg) setWeight(String(data.weight_kg));
-      if (data.height_cm) setHeight(String(data.height_cm));
-      if (data.width_cm) setWidth(String(data.width_cm));
-      if (data.length_cm) setLength(String(data.length_cm));
+      if (data.ai_analyzed === false) {
+        toast.info("No se pudo autocompletar con IA, pero podés ingresar los datos manualmente en el siguiente paso.");
+      } else {
+        if (data.title) setTitle(data.title);
+        if (data.category) setCategory(data.category);
+        if (data.description) setDescription(data.description);
+        if (data.tags) setTags(data.tags);
+        if (data.weight_kg) setWeight(String(data.weight_kg));
+        if (data.height_cm) setHeight(String(data.height_cm));
+        if (data.width_cm) setWidth(String(data.width_cm));
+        if (data.length_cm) setLength(String(data.length_cm));
+        toast.success("¡Foto analizada con IA! Datos auto-completados exitosamente.");
+      }
 
       setPrincipalAnalizada(true);
-      toast.success("¡Foto analizada con IA! Datos auto-completados exitosamente.");
     } catch (err: any) {
-      console.error(err);
-      setErrorSubmit(err.message || "No se pudo realizar el análisis de la foto principal.");
-      toast.error(err.message || "Error al escanear la foto principal.");
+      console.warn("Aviso al analizar foto principal:", err);
+      toast.info("No se pudo autocompletar la foto con IA. Podés ingresar los datos manualmente en el siguiente paso.");
       setPrincipalAnalizada(true);
     } finally {
       setAnalizandoPrincipal(false);
