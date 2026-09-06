@@ -482,18 +482,27 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
 
       toast.success("Tu publicación fue recibida y está activa en el catálogo.", "¡Producto publicado!");
       
-      // Cerrar modal y limpiar
-      onClose();
+      // Limpiar formulario y cerrar modal
       resetFormulario();
-      onSuccess?.();
+      onClose();
 
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('vamaar:refresh-publications'));
       }
 
-      // Redirigir a Mis Publicaciones con scroll automático hacia la lista
-      router.push("/mi-objetia?tab=publications&scroll=lista-publicaciones");
-      router.refresh();
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        // Si ya estamos en /mi-objetia con la pestaña publications, solo hacemos scroll directo
+        if (typeof window !== 'undefined' && window.location.pathname === '/mi-objetia' && window.location.search.includes('tab=publications')) {
+          setTimeout(() => {
+            const el = document.getElementById('lista-publicaciones');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 200);
+        } else {
+          router.push("/mi-objetia?tab=publications&scroll=lista-publicaciones");
+        }
+      }
 
     } catch (err: any) {
       setPublicando(false);

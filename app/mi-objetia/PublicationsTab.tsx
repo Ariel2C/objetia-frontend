@@ -131,7 +131,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
   // Auto-scroll suave hacia la tarjeta de publicaciones si viene con ?scroll=lista-publicaciones
   useEffect(() => {
     const scrollTarget = searchParams?.get('scroll');
-    if (scrollTarget === 'lista-publicaciones') {
+    if (scrollTarget === 'lista-publicaciones' && !loading) {
       const timer = setTimeout(() => {
         const el = document.getElementById('lista-publicaciones');
         if (el) {
@@ -142,7 +142,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
           url.searchParams.delete('scroll');
           window.history.replaceState({}, '', url.toString());
         }
-      }, 400);
+      }, 250);
       return () => clearTimeout(timer);
     }
   }, [searchParams, loading]);

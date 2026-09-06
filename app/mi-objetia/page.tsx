@@ -21,19 +21,22 @@ import { useAuth } from '../../components/AuthContext';
 import { useToast } from '../../components/ToastContext';
 import { getApiUrl } from '../../lib/config';
 
+import dynamic from 'next/dynamic';
 import Sidebar from './Sidebar';
-import DashboardTab from './DashboardTab';
-import AppearanceTab from './AppearanceTab';
-import BannersTab from './BannersTab';
-import CustomizationsTab from './CustomizationsTab';
 import WalletTab from './WalletTab';
 import ProfileTab from './ProfileTab';
 import PurchasesTab from './PurchasesTab';
 import SalesTab from './SalesTab';
 import PublicationsTab from './PublicationsTab';
-import CampaignsTab from './CampaignsTab';
-import ModerationTab from './ModerationTab';
-import RootTab from './RootTab';
+
+// Carga bajo demanda (lazy-loading) de módulos administrativos pesados
+const RootTab = dynamic(() => import('./RootTab'), { ssr: false });
+const DashboardTab = dynamic(() => import('./DashboardTab'), { ssr: false });
+const AppearanceTab = dynamic(() => import('./AppearanceTab'), { ssr: false });
+const BannersTab = dynamic(() => import('./BannersTab'), { ssr: false });
+const CustomizationsTab = dynamic(() => import('./CustomizationsTab'), { ssr: false });
+const CampaignsTab = dynamic(() => import('./CampaignsTab'), { ssr: false });
+const ModerationTab = dynamic(() => import('./ModerationTab'), { ssr: false });
 
 const TABS_VALIDOS = new Set([
   "billetera", "perfil", "purchases", "sales", "publications",

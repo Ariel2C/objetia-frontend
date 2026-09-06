@@ -52,9 +52,6 @@ export default function NewProductPage() {
         onClose={() => {
           router.push("/mi-objetia?tab=publications");
         }}
-        onSuccess={() => {
-          router.push("/mi-objetia?tab=publications&scroll=lista-publicaciones");
-        }}
       />
     </div>
   );
