@@ -328,7 +328,7 @@ function CatalogContent() {
 
                   {/* Subcategorías anidadas con diseño pulido */}
                   {isCatActive && cat !== 'Todos' && subcategoriasDisponibles.length > 0 && (
-                    <div className="pl-3 pr-1 py-1 mt-1 mb-1.5 space-y-1 border-l-2 border-[#1a73e8]/30 ml-4">
+                    <div className="pl-2 pr-1 py-1 mt-0.5 mb-1.5 space-y-1 ml-3">
                       <button
                         type="button"
                         onClick={() => handleSeleccionarSubcategoria('Todas')}
