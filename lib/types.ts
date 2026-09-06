@@ -6,6 +6,10 @@ export interface Producto {
   id: number;
   title: string;
   category: string;
+  subcategory?: string | null;
+  material?: string | null;
+  color?: string | null;
+  tags?: string | null;
   price: number;
   condition: 'USED' | 'NEW';
   image_url: string;
