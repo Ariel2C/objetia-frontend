@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useAuth } from '../../../components/AuthContext';
 import { useFavorites } from '../../../components/FavoritesContext';
@@ -12,6 +12,7 @@ import {
   Heart, 
   Calendar, 
   ChevronLeft, 
+  ChevronRight,
   Lock,
   Truck,
   ShieldCheck,
@@ -20,6 +21,8 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import FormattedPrice from '../../../components/FormattedPrice';
+import ProductCard from '../../../components/ProductCard';
+import type { Producto } from '../../../lib/types';
 import { formatearTituloProducto } from '../../../lib/format';
 import { trackProductView, trackProductEvent } from '../../../lib/analytics';
 
@@ -76,6 +79,12 @@ export default function ProductDetailPage() {
   const [cargandoAccion, setCargandoAccion] = useState(false);
   const esFavorito = producto ? esFavoritoGlobal(producto.id) : false;
 
+  // Carrusel de publicaciones destacadas del vendedor
+  const [productosVendedor, setProductosVendedor] = useState<Producto[]>([]);
+  const [productosRelacionados, setProductosRelacionados] = useState<Producto[]>([]);
+  const [cargandoVendedor, setCargandoVendedor] = useState(false);
+  const carouselRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (!id) return;
     const fetchDetalle = async () => {
@@ -94,6 +103,47 @@ export default function ProductDetailPage() {
     };
     fetchDetalle();
   }, [id]);
+
+  useEffect(() => {
+    if (!producto) return;
+    const fetchSugerencias = async () => {
+      setCargandoVendedor(true);
+      try {
+        // 1. Obtener otras publicaciones activas del mismo vendedor
+        const resVendedor = await fetch(
+          `${getApiUrl()}/products/seller/${producto.seller_id}?exclude_product_id=${producto.id}&limit=12`
+        );
+        if (resVendedor.ok) {
+          const dataVendedor: Producto[] = await resVendedor.json();
+          if (dataVendedor.length > 0) {
+            setProductosVendedor(dataVendedor);
+            return;
+          }
+        }
+        // 2. Si el vendedor solo tiene este producto, cargar objetos destacados de la misma categoría
+        const resCat = await fetch(
+          `${getApiUrl()}/products/?category=${encodeURIComponent(producto.category)}`
+        );
+        if (resCat.ok) {
+          const dataCat: Producto[] = await resCat.json();
+          const filtrados = dataCat.filter((p: Producto) => p.id !== producto.id).slice(0, 12);
+          setProductosRelacionados(filtrados);
+        }
+      } catch (err) {
+        console.error("Error al cargar carrusel de productos:", err);
+      } finally {
+        setCargandoVendedor(false);
+      }
+    };
+    fetchSugerencias();
+  }, [producto?.seller_id, producto?.id, producto?.category]);
+
+  const handleScrollCarousel = (direction: 'left' | 'right') => {
+    if (carouselRef.current) {
+      const scrollAmount = direction === 'left' ? -340 : 340;
+      carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   const handleAgregarAlCarrito = async () => {
     if (!producto || producto.status !== 'AVAILABLE') return;
@@ -496,6 +546,61 @@ export default function ProductDetailPage() {
           </div>
 
         </div>
+
+        {/* CARRUSEL DE PUBLICACIONES DESTACADAS */}
+        {(productosVendedor.length > 0 || productosRelacionados.length > 0) && (
+          <div className="pt-6 border-t border-[#dadce0] space-y-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-lg sm:text-xl font-bold text-[#202124] tracking-tight">
+                  {productosVendedor.length > 0
+                    ? `Más publicaciones de ${producto.seller_name || 'este vendedor'}`
+                    : `Objetos destacados en ${producto.category}`}
+                </h2>
+                <p className="text-xs text-[#5f6368] mt-0.5">
+                  {productosVendedor.length > 0
+                    ? "Piezas seleccionadas y objetos únicos publicados por el mismo usuario"
+                    : "Descubrí otros objetos de diseño similares"}
+                </p>
+              </div>
+
+              {/* Botones de navegación del carrusel */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => handleScrollCarousel('left')}
+                  className="w-8 h-8 rounded-full border border-[#dadce0] bg-white hover:bg-[#f1f3f4] text-[#5f6368] hover:text-[#202124] flex items-center justify-center transition shadow-2xs cursor-pointer"
+                  title="Anterior"
+                  aria-label="Anterior"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleScrollCarousel('right')}
+                  className="w-8 h-8 rounded-full border border-[#dadce0] bg-white hover:bg-[#f1f3f4] text-[#5f6368] hover:text-[#202124] flex items-center justify-center transition shadow-2xs cursor-pointer"
+                  title="Siguiente"
+                  aria-label="Siguiente"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Carrusel deslizable con tarjetas de producto */}
+            <div 
+              ref={carouselRef}
+              className="flex gap-4 overflow-x-auto scroll-smooth light-scrollbar pb-3 pt-1 select-none"
+              style={{ scrollbarWidth: 'thin', scrollbarColor: '#dadce0 transparent' }}
+            >
+              {(productosVendedor.length > 0 ? productosVendedor : productosRelacionados).map((item) => (
+                <div key={item.id} className="w-[200px] sm:w-[220px] flex-shrink-0 flex flex-col">
+                  <ProductCard producto={item} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
     </div>
