@@ -101,7 +101,11 @@ export default function Footer() {
             <div className="pt-2">
               <Link 
                 href="/products/new"
-                className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white rounded-xl text-xs font-bold transition shadow-md"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.dispatchEvent(new CustomEvent('vamaar:open-vender-modal'));
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#202124] hover:bg-[#000000] text-white rounded-xl text-xs font-bold transition shadow-md cursor-pointer"
               >
                 <PlusCircle className="h-4 w-4" />
                 Vender un Producto

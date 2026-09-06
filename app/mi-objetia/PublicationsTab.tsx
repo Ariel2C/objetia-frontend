@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Eye, Copy, Trash2, Check, Edit2, X, Loader2, Heart, TrendingUp, ShoppingBag, BarChart3, ChevronDown, ChevronUp, Sparkles, Info, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { getApiUrl } from '../../lib/config';
 import { useToast } from '../../components/ToastContext';
 import { formatearTituloProducto } from '../../lib/format';
@@ -39,6 +40,7 @@ interface PublicationsTabProps {
 
 export default function PublicationsTab({ token }: PublicationsTabProps) {
   const toast = useToast();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<ProductItem[]>([]);
   const [metrics, setMetrics] = useState<SellerMetrics | null>(null);
   const [metricaActiva, setMetricaActiva] = useState<'views' | 'favorites' | 'sales'>('views');
@@ -116,6 +118,34 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
   useEffect(() => {
     fetchProducts();
   }, [token]);
+
+  // Escuchar refresco disparado tras crear producto
+  useEffect(() => {
+    const handleRefresh = () => {
+      fetchProducts();
+    };
+    window.addEventListener('vamaar:refresh-publications', handleRefresh);
+    return () => window.removeEventListener('vamaar:refresh-publications', handleRefresh);
+  }, []);
+
+  // Auto-scroll suave hacia la tarjeta de publicaciones si viene con ?scroll=lista-publicaciones
+  useEffect(() => {
+    const scrollTarget = searchParams?.get('scroll');
+    if (scrollTarget === 'lista-publicaciones') {
+      const timer = setTimeout(() => {
+        const el = document.getElementById('lista-publicaciones');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        if (typeof window !== 'undefined') {
+          const url = new URL(window.location.href);
+          url.searchParams.delete('scroll');
+          window.history.replaceState({}, '', url.toString());
+        }
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, loading]);
 
   const handleCopiarEnlace = (id: number) => {
     const url = `${window.location.origin}/products/${id}`;
@@ -482,7 +512,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
       {/* ========================================================================= */}
       {/* TARJETA DE PUBLICACIONES (ESTILO MÉTRICAS DE RENDIMIENTO CON BUSCADOR Y PAGINACIÓN) */}
       {/* ========================================================================= */}
-      <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 space-y-4 shadow-xs">
+      <div id="lista-publicaciones" className="scroll-mt-24 bg-white border border-[#edf0f2] rounded-2xl p-5 space-y-4 shadow-xs">
         {/* Cabecera con Título, Subtítulo y Buscador al nivel del título */}
         <div className="space-y-3 pb-1 border-b border-[#edf0f2]">
           {/* Fila 1: Título/Subtítulo a la izquierda y Buscador a la derecha (al mismo nivel) */}

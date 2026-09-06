@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '../lib/config';
+import NewProductModal from './NewProductModal';
 
 interface NavbarProps {
   logoUrl?: string;
@@ -82,6 +83,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
   const [navBgColorState, setNavBgColorState] = useState("#FFFFFF");
   const [navbarSearch, setNavbarSearch] = useState('');
   const [mounted, setMounted] = useState(false);
+  const [modalVenderAbierto, setModalVenderAbierto] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -380,14 +382,26 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     }
   };
 
-  // Manejo del botón VENDER (Directo a /products/new si logueado, o /auth si offline)
+  // Manejo del botón VENDER (Abre NewProductModal si logueado, o /auth si offline)
   const handleBotonVender = () => {
     if (usuario) {
-      router.push("/products/new");
+      setModalVenderAbierto(true);
     } else {
       router.push("/auth?redirect=/products/new");
     }
   };
+
+  useEffect(() => {
+    const handleAbrirVender = () => {
+      if (usuario) {
+        setModalVenderAbierto(true);
+      } else {
+        router.push("/auth?redirect=/products/new");
+      }
+    };
+    window.addEventListener('vamaar:open-vender-modal', handleAbrirVender);
+    return () => window.removeEventListener('vamaar:open-vender-modal', handleAbrirVender);
+  }, [usuario, router]);
 
   const esNavOscuro = useMemo(() => {
     if (!navBgColorState) return false;
@@ -777,6 +791,14 @@ export default function Navbar({ logoUrl }: NavbarProps) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* MODAL GLOBAL PARA VENDER PRODUCTO (ESTILO GOOGLE AI STUDIO LIGHT) */}
+      {modalVenderAbierto && (
+        <NewProductModal
+          isOpen={modalVenderAbierto}
+          onClose={() => setModalVenderAbierto(false)}
+        />
       )}
     </nav>
   );

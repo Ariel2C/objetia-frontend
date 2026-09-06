@@ -82,12 +82,19 @@ export default function Sidebar({
     { id: "purchases", label: "Mis Compras", icon: ShoppingBag },
     { id: "sales", label: "Mis Ventas", icon: TrendingUp },
     { id: "perfil", label: "Mi Perfil", icon: UserCheck },
-    { id: "vender", label: "Publicar Producto", icon: PlusCircle, isExternalLink: true, href: "/products/new" }
+    { id: "vender", label: "Publicar Producto", icon: PlusCircle }
   ];
 
   const itemsVisibles = itemsNavegacion.filter(item => tieneAccesoItem(item.id));
 
   const cambiarTab = (item: TabItem) => {
+    if (item.id === 'vender') {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('vamaar:open-vender-modal'));
+      }
+      if (setMenuMovilAbierto) setMenuMovilAbierto(false);
+      return;
+    }
     if (item.isExternalLink && item.href) {
       window.location.href = item.href;
       return;

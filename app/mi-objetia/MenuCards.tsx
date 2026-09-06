@@ -125,6 +125,10 @@ export default function MenuCards({ tabActual, setTabActual, esAdmin, esRoot, on
   })).filter(g => g.items.length > 0);
 
   const handleClick = (item: CardItem) => {
+    if (item.id === 'vender') {
+      window.dispatchEvent(new CustomEvent('vamaar:open-vender-modal'));
+      return;
+    }
     if (item.isExternalLink && item.href) {
       router.push(item.href);
       return;

@@ -515,12 +515,13 @@ export default function SalesTab({ token }: SalesTabProps) {
                 Cuando publiques tus productos y los compradores concreten compras, acá vas a gestionar los despachos, imprimir etiquetas y seguir el envío.
               </p>
             </div>
-            <Link
-              href="/products/new"
+            <button
+              type="button"
+              onClick={() => window.dispatchEvent(new CustomEvent('vamaar:open-vender-modal'))}
               className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#202124] hover:bg-[#000000] text-white rounded-xl text-xs font-semibold shadow-2xs transition cursor-pointer"
             >
               Publicar un Producto
-            </Link>
+            </button>
           </div>
         ) : ventasFiltradas.length === 0 ? (
           /* Estado sin resultados para la búsqueda actual */
