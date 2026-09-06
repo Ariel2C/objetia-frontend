@@ -294,7 +294,7 @@ function CatalogContent() {
 
       {/* Contenido scrolleable de Filtros con barra de scroll visible y estilizada */}
       <div 
-        className="flex-1 overflow-y-auto light-scrollbar p-4 space-y-5 select-none"
+        className="flex-1 overflow-y-auto light-scrollbar p-4 pb-28 sm:pb-32 space-y-5 select-none"
         style={{ scrollbarWidth: 'thin', scrollbarColor: '#dadce0 transparent' }}
       >
         
@@ -495,7 +495,7 @@ function CatalogContent() {
     <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-sans text-[#202124] antialiased">
       
       {/* Workspace Shell Google AI Studio Light (Igual a Mi Objetia) */}
-      <div className="flex flex-1 overflow-hidden min-h-[calc(100vh-60px)]">
+      <div className="flex flex-1 overflow-hidden min-h-[calc(100vh-4rem)]">
 
         {/* DRAWER MÓVIL (Off-canvas en Light Mode) */}
         {menuMovilAbierto && (
@@ -512,7 +512,7 @@ function CatalogContent() {
 
         {/* SIDEBAR ESCRITORIO (Deslizamiento físico a la izquierda idéntico a Mi Objetia) */}
         <aside 
-          className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-72 h-[calc(100vh-60px)] sticky top-[60px] overflow-hidden ${
+          className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-72 h-[calc(100dvh-4rem)] max-h-[calc(100dvh-4rem)] sticky top-16 overflow-hidden ${
             sidebarOculto ? '-ml-72 pointer-events-none' : 'ml-0'
           }`}
         >
