@@ -180,11 +180,16 @@ export default function ProductCard({
           <Heart className={`h-3.5 w-3.5 transition-colors ${esFavorito ? "fill-red-500 text-red-500" : ""}`} />
         </button>
 
-        {/* INDICADOR DE STOCK RESERVADO */}
+        {/* INDICADOR DE STOCK RESERVADO O VENDIDO */}
         {estadoStock === 'RESERVED' && (
           <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px] flex flex-col items-center justify-center text-white font-bold gap-2 z-20 animate-fade-in">
             <Lock className="h-4 w-4 text-amber-400" />
             <span className="text-[9px] font-black uppercase tracking-widest bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-400/40">Reservado</span>
+          </div>
+        )}
+        {estadoStock === 'SOLD' && (
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px] flex flex-col items-center justify-center text-white font-bold gap-2 z-20 animate-fade-in">
+            <span className="text-[10px] font-black uppercase tracking-widest bg-white/20 px-3 py-1 rounded-full border border-white/40">Vendido</span>
           </div>
         )}
       </div>

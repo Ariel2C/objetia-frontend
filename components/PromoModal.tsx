@@ -11,11 +11,23 @@ export default function PromoModal() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // El cartel de bienvenida SOLO debe aparecer en la página de inicio (Home '/')
+    // El cartel de bienvenida SOLO debe aparecer en la página de inicio (Home '/') y si no hay usuario
     if (pathname !== '/' || usuario) {
       setAbierto(false);
       return;
     }
+
+    // Verificar si el usuario ya lo cerró previamente en este navegador
+    try {
+      const yaDescartado = localStorage.getItem('objetia_welcome_promo_dismissed');
+      if (yaDescartado) {
+        setAbierto(false);
+        return;
+      }
+    } catch {
+      // Ignorar error si localStorage no está disponible
+    }
+
     const timer = setTimeout(() => {
       setAbierto(true);
     }, 1200);
@@ -24,6 +36,11 @@ export default function PromoModal() {
 
   const cerrarModal = () => {
     setAbierto(false);
+    try {
+      localStorage.setItem('objetia_welcome_promo_dismissed', 'true');
+    } catch {
+      // Ignorar error si localStorage no está disponible
+    }
   };
 
   if (!abierto || usuario || pathname !== '/') return null;
@@ -66,19 +83,10 @@ export default function PromoModal() {
           </p>
         </div>
 
-        {/* CÓDIGO DESTACADO */}
-        <div className="bg-gradient-to-r from-purple-50 via-indigo-50 to-purple-50 p-3.5 rounded-2xl border border-purple-100 flex items-center justify-center gap-2">
-          <Tag className="h-4 w-4 text-purple-600" />
-          <span className="text-xs font-bold text-gray-700">Cupón de regalo:</span>
-          <span className="font-mono font-black text-sm text-purple-800 tracking-wider uppercase bg-white px-2 py-0.5 rounded-md border border-purple-200 shadow-xs">
-            BIENVENIDA5K
-          </span>
-        </div>
-
         {/* BOTÓN ACTIVAR MI REGALO */}
         <div className="space-y-2 pt-1">
           <Link
-            href="/auth"
+            href="/auth?mode=register&promo=bienvenida5k"
             onClick={cerrarModal}
             className="w-full py-3.5 bg-gradient-to-r from-purple-600 via-purple-700 to-indigo-700 hover:from-purple-500 hover:to-indigo-600 text-white rounded-2xl text-xs font-extrabold uppercase tracking-wider transition shadow-lg shadow-purple-600/25 flex items-center justify-center gap-2 group cursor-pointer"
           >
@@ -88,7 +96,7 @@ export default function PromoModal() {
 
           <button
             onClick={cerrarModal}
-            className="text-[11px] font-semibold text-gray-400 hover:text-gray-600 transition"
+            className="text-[11px] font-semibold text-gray-400 hover:text-gray-600 transition cursor-pointer"
           >
             Continuar sin regalo
           </button>

@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
-import { Eye, Copy, Trash2, Check, Edit2, X, Loader2, Heart, TrendingUp, ShoppingBag, BarChart3, ChevronDown, ChevronUp, Sparkles, Info, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Eye, Copy, Trash2, Check, Edit2, X, Loader2, Heart, TrendingUp, ShoppingBag, BarChart3, ChevronDown, ChevronUp, Info, Search, ChevronLeft, ChevronRight, Pause, Play, AlertTriangle } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { getApiUrl } from '../../lib/config';
@@ -66,8 +66,8 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
     return Math.ceil(max * 1.2);
   }, [activeTimelineData]);
 
-  // Filtro de estado: 'all' | 'published' | 'pending' | 'rejected' | 'sold'
-  const [filtroActual, setFiltroActual] = useState<'all' | 'published' | 'pending' | 'rejected' | 'sold'>('all');
+  // Filtro de estado: 'all' | 'published' | 'pending' | 'rejected' | 'paused' | 'sold'
+  const [filtroActual, setFiltroActual] = useState<'all' | 'published' | 'pending' | 'rejected' | 'paused' | 'sold'>('all');
   const [busqueda, setBusqueda] = useState("");
   const [paginaActual, setPaginaActual] = useState(1);
   const elementosPorPagina = 8;
@@ -226,6 +226,36 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
     }
   };
 
+  const handleTogglePausa = async (id: number, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    try {
+      const res = await fetch(`${getApiUrl()}/products/${id}/toggle-pause`, {
+        method: "PATCH",
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('vamaar_token') || token}`
+        }
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setProducts(prev => prev.map(p => {
+          if (p.id === id) {
+            return {
+              ...p,
+              moderation_status: data.moderation_status,
+              updated_at: new Date().toISOString()
+            };
+          }
+          return p;
+        }));
+        toast.success(data.mensaje || "Estado de la publicación actualizado.");
+      } else {
+        toast.error(data.detail || "No se pudo cambiar el estado de la publicación.");
+      }
+    } catch (err) {
+      toast.error("Error de conexión al cambiar el estado.");
+    }
+  };
+
   const handleOpenEdit = async (item: ProductItem) => {
     try {
       const res = await fetch(`${getApiUrl()}/products/${item.id}`);
@@ -275,6 +305,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
         })
       });
       if (res.ok) {
+        const dataEdit = await res.json();
         // Actualizar local
         setProducts(prev => prev.map(p => {
           if (p.id === editingProduct.id) {
@@ -285,15 +316,22 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               category: editCategoria,
               condition: editCondicion,
               stock: editStock,
+              moderation_status: dataEdit.moderation_status || p.moderation_status,
+              ai_moderation_notes: dataEdit.moderation_status === 'pending' ? null : p.ai_moderation_notes,
               updated_at: new Date().toISOString()
             };
           }
           return p;
         }));
         setEditingProduct(null);
-        toast.success("Los cambios de tu publicación fueron guardados.");
+        toast.success(
+          dataEdit.moderation_status === 'pending'
+            ? "Publicación modificada y enviada a revisión."
+            : "Los cambios de tu publicación fueron guardados."
+        );
       } else {
-        toast.error("Error al guardar modificaciones.");
+        const errData = await res.json().catch(() => null);
+        toast.error(errData?.detail || "Error al guardar modificaciones.");
       }
     } catch (err) {
       toast.error("Error de conexión con el servidor.");
@@ -306,8 +344,9 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
   const todasCount = products.length;
   const enVentaCount = products.filter(p => p.moderation_status === 'approved' && p.stock > 0).length;
   const enRevisionCount = products.filter(p => p.moderation_status === 'pending').length;
+  const pausadasCount = products.filter(p => p.moderation_status === 'paused').length;
   const rechazadasCount = products.filter(p => p.moderation_status === 'rejected').length;
-  const vendidasCount = products.filter(p => p.moderation_status === 'approved' && p.stock < 1).length;
+  const vendidasCount = products.filter(p => p.stock < 1).length;
 
   // Filtrado y búsqueda
   const productosFiltrados = useMemo(() => {
@@ -315,8 +354,9 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
       // Filtro por estado
       if (filtroActual === 'published' && !(p.moderation_status === 'approved' && p.stock > 0)) return false;
       if (filtroActual === 'pending' && p.moderation_status !== 'pending') return false;
+      if (filtroActual === 'paused' && p.moderation_status !== 'paused') return false;
       if (filtroActual === 'rejected' && p.moderation_status !== 'rejected') return false;
-      if (filtroActual === 'sold' && !(p.moderation_status === 'approved' && p.stock < 1)) return false;
+      if (filtroActual === 'sold' && p.stock >= 1) return false;
 
       // Filtro por búsqueda
       if (busqueda.trim()) {
@@ -339,7 +379,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
   }, [productosFiltrados, paginaActual]);
 
   // Reset de página al cambiar filtro o búsqueda
-  const cambiarFiltro = (nuevoFiltro: 'all' | 'published' | 'pending' | 'rejected' | 'sold') => {
+  const cambiarFiltro = (nuevoFiltro: 'all' | 'published' | 'pending' | 'rejected' | 'paused' | 'sold') => {
     setFiltroActual(nuevoFiltro);
     setPaginaActual(1);
   };
@@ -653,6 +693,24 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               </span>
             </button>
 
+            {/* Badge: Pausadas */}
+            <button
+              type="button"
+              onClick={() => cambiarFiltro('paused')}
+              className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
+                filtroActual === 'paused'
+                  ? 'bg-[#202124] border-[#202124] text-white shadow-xs'
+                  : 'bg-white border-[#e8eaed] text-[#3c4043] hover:bg-[#f8f9fa] hover:text-[#202124] hover:border-[#dadce0]'
+              }`}
+            >
+              <span>Pausadas</span>
+              <span className={`px-1.5 py-0.2 rounded text-[10.5px] font-mono font-semibold ${
+                filtroActual === 'paused' ? 'bg-white/20 text-white' : 'bg-[#f1f3f4] text-[#5f6368]'
+              }`}>
+                {pausadasCount}
+              </span>
+            </button>
+
             {/* Badge: Rechazadas */}
             <button
               type="button"
@@ -741,11 +799,31 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
 
                       <td className="py-4 px-5">
                         {item.moderation_status === 'rejected' ? (
-                          <span
-                            className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200"
-                            title={item.ai_moderation_notes || "La publicación fue rechazada por la moderación."}
-                          >
-                            Rechazada
+                          <div className="space-y-1">
+                            <span
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200"
+                              title={item.ai_moderation_notes || "La publicación fue rechazada por la moderación."}
+                            >
+                              <AlertTriangle className="h-3 w-3" />
+                              Rechazada
+                            </span>
+                            {item.ai_moderation_notes && (
+                              <p className="text-[10px] text-red-600 max-w-[180px] truncate" title={item.ai_moderation_notes}>
+                                Motivo: {item.ai_moderation_notes}
+                              </p>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleOpenEdit(item)}
+                              className="text-[10px] text-[#1a73e8] hover:underline font-semibold block"
+                            >
+                              Editar para corregir →
+                            </button>
+                          </div>
+                        ) : item.moderation_status === 'paused' ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#fef7e0] text-[#b06000] border border-[#feefc3]">
+                            <Pause className="h-2.5 w-2.5" />
+                            Pausada
                           </span>
                         ) : item.stock < 1 ? (
                           <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#f1f3f4] text-[#5f6368] border border-[#edf0f2]">
@@ -800,15 +878,34 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                             <Eye className="h-4 w-4" />
                           </Link>
                           
-                          {item.stock > 0 && (
+                          {/* Botón Pausar / Reactivar */}
+                          {(item.moderation_status === 'approved' || item.moderation_status === 'paused') && item.stock > 0 && (
                             <button
-                              onClick={() => handleOpenEdit(item)}
-                              title="Editar publicación"
-                              className="p-1.5 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#e8f0fe] rounded-lg transition cursor-pointer"
+                              type="button"
+                              onClick={(e) => handleTogglePausa(item.id, e)}
+                              title={item.moderation_status === 'approved' ? "Pausar publicación" : "Reactivar publicación"}
+                              className={`p-1.5 rounded-lg transition cursor-pointer ${
+                                item.moderation_status === 'paused'
+                                  ? "text-[#137333] hover:text-[#0d5924] hover:bg-[#e6f4ea]"
+                                  : "text-[#b06000] hover:text-[#8a4b00] hover:bg-[#fef7e0]"
+                              }`}
                             >
-                              <Edit2 className="h-4 w-4" />
+                              {item.moderation_status === 'paused' ? (
+                                <Play className="h-4 w-4" />
+                              ) : (
+                                <Pause className="h-4 w-4" />
+                              )}
                             </button>
                           )}
+
+                          {/* Botón Editar */}
+                          <button
+                            onClick={() => handleOpenEdit(item)}
+                            title={item.moderation_status === 'rejected' ? "Editar para corregir rechazo" : "Editar publicación"}
+                            className="p-1.5 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#e8f0fe] rounded-lg transition cursor-pointer"
+                          >
+                            <Edit2 className="h-4 w-4" />
+                          </button>
 
                           {item.moderation_status === 'approved' && item.stock > 0 && (
                             <button

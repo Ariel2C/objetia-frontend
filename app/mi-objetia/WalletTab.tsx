@@ -20,8 +20,10 @@ import {
   Receipt,
   CreditCard,
   Lock,
-  Check
+  Check,
+  Gift
 } from 'lucide-react';
+import Link from 'next/link';
 import { apiFetch } from '../../lib/api';
 import { useToast } from '../../components/ToastContext';
 import type { WalletTransaction } from '../../lib/types';
@@ -257,6 +259,33 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
   return (
     <div className="space-y-6 animate-fade-in select-none">
+      {/* SECCIÓN TARJETA DE REGALO - PRIMERA COMPRA $5.000 */}
+      <div className="bg-gradient-to-r from-purple-50 via-indigo-50/40 to-white border border-purple-100 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-500/20">
+            <Gift className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h4 className="text-sm font-bold text-gray-900">$5.000 de regalo — Primera compra</h4>
+              <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 uppercase tracking-wider">
+                Disponible
+              </span>
+            </div>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Disponible · Compra mínima $50.000 (descuento automático en el checkout)
+            </p>
+          </div>
+        </div>
+
+        <Link
+          href="/catalog"
+          className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold rounded-xl transition shadow-xs whitespace-nowrap cursor-pointer"
+        >
+          Usar en el catálogo
+        </Link>
+      </div>
+
       {/* Tarjetas Métricas Google AI Studio Light con Estética Carbón */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Card 1: Saldo total para compras */}

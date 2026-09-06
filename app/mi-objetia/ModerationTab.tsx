@@ -4,7 +4,7 @@
 import React, { useState, useEffect } from "react";
 import { 
   ShieldAlert, CheckCircle2, XCircle, AlertTriangle, Loader2, RefreshCw, 
-  User, Mail, Search, Sparkles, Filter, Eye, ShieldCheck, ArrowUpRight, Clock
+  User, Mail, Search, Filter, Eye, ShieldCheck, ArrowUpRight, Clock
 } from "lucide-react";
 import { getApiUrl } from "../../lib/config";
 import { useToast } from "../../components/ToastContext";
@@ -118,9 +118,9 @@ export default function ModerationTab({ token }: ModerationTabProps) {
         <div className="flex items-center gap-2">
           {/* Badge de Proyecto */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#252525] border border-[#333333] text-xs font-medium text-[#d4d4d4]">
-            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+            <ShieldCheck className="h-3.5 w-3.5 text-[#87a9ff]" />
             <span className="text-[#8c8c8c]">Motor</span>
-            <span className="text-white font-semibold">Moderación IA Automática</span>
+            <span className="text-white font-semibold">Moderación Automática</span>
           </div>
 
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#252525] border border-[#333333] text-xs text-[#8c8c8c]">

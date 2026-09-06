@@ -8,7 +8,19 @@ import { Search, Filter, RefreshCw, ChevronDown } from 'lucide-react';
 import type { Producto } from '../../lib/types';
 import { trackSearchQuery } from '../../lib/analytics';
 
-const BASE_CATEGORIES = ["Todos", "Sillones", "Iluminación", "Mesas", "Adornos", "Otros"];
+const BASE_CATEGORIES = [
+  "Todos",
+  "Decoración",
+  "Iluminación",
+  "Alfombras",
+  "Exterior",
+  "Muebles",
+  "Arte",
+  "Espejos",
+  "Textiles",
+  "Organización",
+  "Otros"
+];
 
 function CatalogContent() {
   const searchParams = useSearchParams();
@@ -16,6 +28,9 @@ function CatalogContent() {
 
   const categoryParam = searchParams.get('category');
   const searchParam = searchParams.get('search');
+  const maxPriceParam = searchParams.get('max_price');
+  const styleParam = searchParams.get('style');
+  const sortParam = searchParams.get('sort');
 
   const [search, setSearch] = useState(searchParam || '');
   const [category, setCategory] = useState(categoryParam || 'Todos');
@@ -23,7 +38,7 @@ function CatalogContent() {
   const [allSearchProducts, setAllSearchProducts] = useState<Producto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [orden, setOrden] = useState('relevantes');
+  const [orden, setOrden] = useState(sortParam === 'newest' ? 'recientes' : 'relevantes');
 
   // Sincronizar parámetros de la URL si cambian externamente (ej: desde el buscador del Navbar)
   useEffect(() => {
@@ -33,7 +48,10 @@ function CatalogContent() {
     if (categoryParam !== null && categoryParam !== category) {
       setCategory(categoryParam);
     }
-  }, [searchParam, categoryParam]);
+    if (sortParam === 'newest') {
+      setOrden('recientes');
+    }
+  }, [searchParam, categoryParam, sortParam]);
 
   const fetchProductos = async () => {
     setLoading(true);
@@ -44,9 +62,9 @@ function CatalogContent() {
       if (search.trim() !== '') querySearch.append('search', search.trim());
 
       let sortBy = 'relevance';
-      if (orden === 'menor-precio') sortBy = 'price_asc';
+      if (sortParam === 'newest' || orden === 'recientes') sortBy = 'newest';
+      else if (orden === 'menor-precio') sortBy = 'price_asc';
       else if (orden === 'mayor-precio') sortBy = 'price_desc';
-      else if (orden === 'recientes') sortBy = 'newest';
       querySearch.append('sort_by', sortBy);
 
       const resBase = await fetch(`${getApiUrl()}/products/?${querySearch.toString()}`);
@@ -59,10 +77,38 @@ function CatalogContent() {
         trackSearchQuery(search.trim(), baseData.length);
       }
 
-      // 2. Filtrar por categoría seleccionada
+      // 2. Filtrar por categoría seleccionada y alias compatibles
       let filteredData = baseData;
       if (category !== 'Todos') {
-        filteredData = baseData.filter(p => p.category?.toLowerCase() === category.toLowerCase());
+        const catNorm = category.toLowerCase().trim();
+        filteredData = baseData.filter(p => {
+          const pCat = (p.category || '').toLowerCase().trim();
+          if (catNorm === 'decoración' || catNorm === 'decoracion') {
+            return pCat === 'decoración' || pCat === 'decoracion' || pCat.includes('adorno') || pCat.includes('cuadro');
+          }
+          if (catNorm === 'exterior') {
+            return pCat === 'exterior' || pCat.includes('jardín') || pCat.includes('jardin');
+          }
+          return pCat === catNorm;
+        });
+      }
+
+      // Filtro por precio máximo (ej: hallazgos < $50.000)
+      if (maxPriceParam) {
+        const maxP = Number(maxPriceParam);
+        if (!isNaN(maxP)) {
+          filteredData = filteredData.filter(p => p.price <= maxP);
+        }
+      }
+
+      // Filtro por estilo (ej: Vintage)
+      if (styleParam) {
+        const sNorm = styleParam.toLowerCase();
+        filteredData = filteredData.filter(p => 
+          (p as any).style?.toLowerCase() === sNorm ||
+          p.title?.toLowerCase().includes(sNorm) ||
+          p.category?.toLowerCase().includes(sNorm)
+        );
       }
 
       // 3. Ordenamiento (asegura orden exacto en cliente y backend)
@@ -70,6 +116,8 @@ function CatalogContent() {
         filteredData = [...filteredData].sort((a, b) => a.price - b.price);
       } else if (orden === 'mayor-precio') {
         filteredData = [...filteredData].sort((a, b) => b.price - a.price);
+      } else if (orden === 'recientes') {
+        filteredData = [...filteredData].sort((a, b) => b.id - a.id);
       } else if (orden === 'relevantes') {
         filteredData = [...filteredData].sort((a, b) => (b.relevance_score ?? 0) - (a.relevance_score ?? 0));
       }
@@ -84,7 +132,7 @@ function CatalogContent() {
 
   useEffect(() => {
     fetchProductos();
-  }, [search, category, orden]);
+  }, [search, category, orden, maxPriceParam, styleParam, sortParam]);
 
   // CATEGORÍAS DINÁMICAS: solo muestra las categorías que existen en los resultados de la búsqueda
   const categoriasDinamicas = useMemo(() => {

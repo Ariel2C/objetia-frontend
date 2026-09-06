@@ -22,7 +22,7 @@ interface ProductDetail {
   seller_id: number;
   image_url: string;
   images: string[];
-  status: 'AVAILABLE' | 'RESERVED' | 'SOLD';
+  status: 'AVAILABLE' | 'RESERVED' | 'SOLD' | 'PAUSED';
   created_at: string;
 }
 
@@ -234,7 +234,7 @@ export default function ProductDetailPage() {
                   <ShoppingCart className="h-4 w-4" />
                   {producto.status === 'AVAILABLE' 
                     ? "Reservar y Agregar al Carrito" 
-                    : (producto.status === 'RESERVED' ? "Producto Reservado" : "Agotado")}
+                    : (producto.status === 'PAUSED' ? "Publicación Pausada" : (producto.status === 'RESERVED' ? "Producto Reservado" : "Agotado"))}
                 </button>
 
                 <div className="flex gap-2.5">

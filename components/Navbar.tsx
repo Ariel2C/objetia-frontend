@@ -716,30 +716,36 @@ export default function Navbar({ logoUrl }: NavbarProps) {
         </div>
       </div>
 
-      {/* SUB-BARRA DE MENÚ DE NAVEGACIÓN - GOOGLE AI STUDIO DARK */}
+      {/* SUB-BARRA DE MENÚ DE NAVEGACIÓN - RESPONSIVE HORIZONTAL DESLIZABLE */}
       {!pathname?.startsWith('/mi-objetia') && !pathname?.startsWith('/mi-espacio') && !pathname?.startsWith('/root') && (
-        <div className="border-t border-[#282a2c] bg-[#18181a] hidden md:block">
+        <div className="border-t border-[#282a2c] bg-[#18181a]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center space-x-2 py-1.5 text-xs font-medium text-[#9aa0a6]">
+            <div className="flex items-center space-x-1 sm:space-x-2 py-1.5 text-xs font-medium text-[#9aa0a6] overflow-x-auto no-scrollbar scrollbar-none whitespace-nowrap">
               
               {/* 1. Nuevos ingresos */}
-              <Link href="/catalog?sort=newest" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition flex items-center gap-1">
+              <Link href="/catalog?sort=newest" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0">
                 Nuevos ingresos
               </Link>
 
               {/* 2. Descubrir (Dropdown) */}
               <div 
-                className="relative" 
+                className="relative shrink-0" 
                 onMouseEnter={() => setDescubrirAbierto(true)} 
                 onMouseLeave={() => setDescubrirAbierto(false)}
               >
-                <button className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer">
+                <button 
+                  onClick={() => setDescubrirAbierto(prev => !prev)}
+                  className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer"
+                >
                   <span>Descubrir</span>
                   <ChevronDown className={`h-3.5 w-3.5 transition-transform ${descubrirAbierto ? 'rotate-180 text-[#87a9ff]' : ''}`} />
                 </button>
 
                 {descubrirAbierto && (
-                  <div className="absolute left-0 top-full w-56 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-1.5 space-y-0.5 animate-scale-in origin-top-left">
+                  <div 
+                    onClick={() => setDescubrirAbierto(false)}
+                    className="absolute left-0 top-full w-56 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-1.5 space-y-0.5 animate-scale-in origin-top-left"
+                  >
                     <Link
                       href="/catalog?filter=selected"
                       className="block px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
@@ -753,10 +759,10 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                       Hallazgos por menos de $50.000
                     </Link>
                     <Link
-                      href="/catalog?condition=used"
+                      href="/catalog?style=Vintage"
                       className="block px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
-                      Vintage & Usados Selección
+                      Vintage
                     </Link>
                     <Link
                       href="/catalog?sort=popular"
@@ -769,22 +775,22 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               </div>
 
               {/* 3. Decoración */}
-              <Link href="/catalog?category=Adornos+y+Cuadros" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition">
+              <Link href="/catalog?category=Decoración" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0">
                 Decoración
               </Link>
 
               {/* 4. Iluminación */}
-              <Link href="/catalog?category=Iluminación" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition">
+              <Link href="/catalog?category=Iluminación" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0">
                 Iluminación
               </Link>
 
               {/* 5. Alfombras */}
-              <Link href="/catalog?category=Alfombras" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition">
+              <Link href="/catalog?category=Alfombras" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0">
                 Alfombras
               </Link>
 
               {/* 6. Exterior */}
-              <Link href="/catalog?category=Jardín+y+Exterior" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition">
+              <Link href="/catalog?category=Exterior" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0">
                 Exterior
               </Link>
 

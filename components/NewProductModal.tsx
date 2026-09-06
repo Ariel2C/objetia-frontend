@@ -10,7 +10,6 @@ import { formatearTituloProducto } from '../lib/format';
 import {
   X,
   Upload,
-  Sparkles,
   Loader2,
   AlertTriangle,
   ArrowRight,
@@ -35,7 +34,108 @@ interface SecondaryPhotoState {
   reason?: string;
 }
 
-const MAX_IA_SCANS_PER_SESSION = 3;
+export const TAXONOMIA_OBJETIA: Record<string, string[]> = {
+  "Iluminación": [
+    "Lámparas de techo y colgantes",
+    "Veladores y lámparas de mesa",
+    "Lámparas de pie",
+    "Apliques de pared",
+    "Iluminación de exterior",
+    "Otras luces"
+  ],
+  "Sillones": [
+    "Sillones de 2 o más cuerpos",
+    "Sillones individuales y poltronas",
+    "Chaiselongues y esquineros",
+    "Futones y sofá camas",
+    "Puffs y banquetas tapizadas"
+  ],
+  "Mesas": [
+    "Mesas de comedor",
+    "Mesas ratonas y de centro",
+    "Mesas auxiliares y laterales",
+    "Escritorios y mesas de trabajo",
+    "Mesas de luz",
+    "Barras y mesas altas"
+  ],
+  "Sillas": [
+    "Sillas de comedor",
+    "Sillas de oficina y ergonómicas",
+    "Banquetas y taburetes",
+    "Sillas mecedoras",
+    "Sillas plegables y apilables"
+  ],
+  "Placards y Armarios": [
+    "Placards y roperos",
+    "Cómodas y cajoneras",
+    "Zapateros",
+    "Armarios auxiliares"
+  ],
+  "Camas y Respaldos": [
+    "Respaldos de cama",
+    "Camas y sommiers",
+    "Mesas de noche integradas",
+    "Cunas y camas infantiles"
+  ],
+  "Estanterías": [
+    "Bibliotecas y estanterías altas",
+    "Estantes flotantes y de pared",
+    "Modulares y divisores de ambiente"
+  ],
+  "Espejos": [
+    "Espejos de pared",
+    "Espejos de pie y cuerpo entero",
+    "Espejos con marco de madera / diseño",
+    "Espejos circulares y orgánicos"
+  ],
+  "Vajilleros y Racks": [
+    "Racks de TV y centros de entretenimiento",
+    "Vajilleros y aparadores",
+    "Bahiuts y consolas de entrada",
+    "Vitrinas"
+  ],
+  "Jardín y Exterior": [
+    "Juegos de living exterior",
+    "Mesas y sillas de jardín",
+    "Reposeras y camastros",
+    "Macetas y pedestales"
+  ],
+  "Adornos y Cuadros": [
+    "Cuadros y marcos",
+    "Esculturas y objetos de diseño",
+    "Jarrones y floreros",
+    "Relojes de pared",
+    "Candelabros y porta velas"
+  ]
+};
+
+export const MATERIALES_OBJETIA = [
+  "Madera maciza",
+  "Hierro / Metal",
+  "Vidrio / Cristal",
+  "Cerámica / Mármol",
+  "Cuero natural / Cuero ecológico",
+  "Tela / Tapizado / Lino",
+  "Fibras naturales / Ratán / Mimbre",
+  "Melamina / Enchapado",
+  "Bronce / Cobre",
+  "Plástico / Acrílico",
+  "Otro material"
+];
+
+export const COLORES_OBJETIA = [
+  "Madera natural",
+  "Negro",
+  "Blanco",
+  "Dorado / Bronce",
+  "Gris",
+  "Beige / Arena",
+  "Marrón / Chocolate",
+  "Verde",
+  "Azul / Petróleo",
+  "Terracota / Óxido",
+  "Multicolor / Otro"
+];
 
 interface NewProductModalProps {
   isOpen: boolean;
@@ -51,15 +151,7 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
 
   // --- PASOS DEL WIZARD (1: Fotos, 2: Info, 3: Medidas & Precio, 4: Revisión) ---
   const [pasoActual, setPasoActual] = useState(1);
-
-  // --- CONTADOR DE ESCANEOS CON IA ---
-  const [scanCount, setScanCount] = useState<number>(() => {
-    if (typeof window !== "undefined") {
-      const saved = sessionStorage.getItem("vamaar_ia_scans_count");
-      return saved ? parseInt(saved, 10) : 0;
-    }
-    return 0;
-  });
+  const [mostrarRecomendaciones, setMostrarRecomendaciones] = useState(false);
 
   // --- FOTO PRINCIPAL (Paso 1) ---
   const [primaryFile, setPrimaryFile] = useState<File | null>(null);
@@ -68,19 +160,32 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
   const [principalAnalizada, setPrincipalAnalizada] = useState(false);
   const primaryInputRef = useRef<HTMLInputElement>(null);
 
-  // --- FOTOS SECUNDARIAS (Paso 1b - Máx. 5 fotos en total contando la principal) ---
+  // --- FOTOS SECUNDARIAS (Paso 1b - Máx. 10 fotos en total contando la principal) ---
   const [secundarias, setSecundarias] = useState<SecondaryPhotoState[]>([]);
   const secondaryInputRef = useRef<HTMLInputElement>(null);
 
   // --- FORMULARIO PRODUCTO ---
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Iluminación");
+  const [subcategory, setSubcategory] = useState("Lámparas de techo y colgantes");
+  const [material, setMaterial] = useState("Madera maciza");
+  const [color, setColor] = useState("Madera natural");
   const [condition, setCondition] = useState("USED"); // USED or NEW
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
   const [price, setPrice] = useState("");
   const [priceDisplay, setPriceDisplay] = useState("");
   const [stock, setStock] = useState("1");
+
+  const handleCategoryChange = (nuevaCat: string) => {
+    setCategory(nuevaCat);
+    const subcats = TAXONOMIA_OBJETIA[nuevaCat] || [];
+    if (subcats.length > 0) {
+      setSubcategory(subcats[0]);
+    } else {
+      setSubcategory("");
+    }
+  };
 
   // --- EMBALAJE Y ENVÍO (Correo Argentino) ---
   const [weight, setWeight] = useState("2.5");
@@ -116,7 +221,7 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
   // Reset del formulario cuando se cierra
   const resetFormulario = () => {
     setPasoActual(1);
-    if (primaryPreview) URL.revokeObjectURL(primaryPreview);
+    if (primaryPreview && primaryPreview.startsWith("blob:")) URL.revokeObjectURL(primaryPreview);
     secundarias.forEach(s => URL.revokeObjectURL(s.preview));
     setPrimaryFile(null);
     setPrimaryPreview(null);
@@ -125,6 +230,9 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
     setAnalizandoPrincipal(false);
     setTitle("");
     setCategory("Iluminación");
+    setSubcategory("Lámparas de techo y colgantes");
+    setMaterial("Madera maciza");
+    setColor("Madera natural");
     setCondition("USED");
     setDescription("");
     setTags("");
@@ -153,29 +261,22 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
       return;
     }
 
-    if (primaryPreview) URL.revokeObjectURL(primaryPreview);
+    if (primaryPreview && primaryPreview.startsWith("blob:")) URL.revokeObjectURL(primaryPreview);
     const newPreview = URL.createObjectURL(file);
     setPrimaryFile(file);
     setPrimaryPreview(newPreview);
     setPrincipalAnalizada(false);
+    setAnalizandoPrincipal(true);
     setErrorSubmit(null);
 
-    // Límite de escaneos automáticos por sesión
-    if (scanCount >= MAX_IA_SCANS_PER_SESSION) {
-      toast.info("Alcanzaste el límite de 3 análisis automáticos por sesión. Ingresá los datos manualmente.");
-      setPrincipalAnalizada(true);
-      return;
+    // Comprimir en cliente para que la subida sea ultra-rápida y ligera
+    try {
+      const fileOptim = await comprimirImagenCliente(file);
+      await analizarFotoPrincipal(fileOptim);
+    } catch (optErr) {
+      console.warn("Aviso en compresión de imagen previa:", optErr);
+      await analizarFotoPrincipal(file);
     }
-
-    const newCount = scanCount + 1;
-    setScanCount(newCount);
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("vamaar_ia_scans_count", String(newCount));
-    }
-
-    // Comprimir en cliente para que la subida y el análisis sean ultra-rápidos
-    const fileOptim = await comprimirImagenCliente(file);
-    await analizarFotoPrincipal(fileOptim);
   };
 
   const analizarFotoPrincipal = async (file: File) => {
@@ -185,40 +286,54 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
       const formData = new FormData();
       formData.append("file", file);
 
+      const headers: Record<string, string> = {};
+      const tokenSesion = localStorage.getItem("vamaar_token") || token;
+      if (tokenSesion) {
+        headers["Authorization"] = `Bearer ${tokenSesion}`;
+      }
+
       const res = await fetch(`${getApiUrl()}/products/analyze-primary-photo`, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("vamaar_token") || token}`
-        },
+        headers,
         body: formData
       });
 
       if (!res.ok) {
-        const errorData = await res.json().catch(() => ({ detail: "El servicio de escaneo por IA no está disponible temporalmente." }));
-        toast.info(errorData.detail || "No se pudo autocompletar con IA. Podés ingresar los datos manualmente.");
+        toast.info("Foto cargada con éxito. Podés ingresar los datos a continuación.");
         setPrincipalAnalizada(true);
         return;
       }
 
       const data = await res.json();
-      if (data.ai_analyzed === false) {
-        toast.info("No se pudo autocompletar con IA, pero podés ingresar los datos manualmente en el siguiente paso.");
-      } else {
+
+      if (data.ai_analyzed) {
         if (data.title) setTitle(data.title);
-        if (data.category) setCategory(data.category);
+        if (data.category && TAXONOMIA_OBJETIA[data.category]) {
+          setCategory(data.category);
+          const subcats = TAXONOMIA_OBJETIA[data.category];
+          if (data.subcategory && subcats.includes(data.subcategory)) {
+            setSubcategory(data.subcategory);
+          } else if (subcats.length > 0) {
+            setSubcategory(subcats[0]);
+          }
+        }
+        if (data.material) setMaterial(data.material);
+        if (data.color) setColor(data.color);
         if (data.description) setDescription(data.description);
         if (data.tags) setTags(data.tags);
         if (data.weight_kg) setWeight(String(data.weight_kg));
         if (data.height_cm) setHeight(String(data.height_cm));
         if (data.width_cm) setWidth(String(data.width_cm));
         if (data.length_cm) setLength(String(data.length_cm));
-        toast.success("¡Foto analizada con IA! Datos auto-completados exitosamente.");
+        toast.success("Foto cargada y datos iniciales listos.");
+      } else {
+        toast.info("Foto cargada con éxito.");
       }
 
       setPrincipalAnalizada(true);
     } catch (err: any) {
       console.warn("Aviso al analizar foto principal:", err);
-      toast.info("No se pudo autocompletar la foto con IA. Podés ingresar los datos manualmente en el siguiente paso.");
+      toast.info("Foto cargada. Podés ingresar los datos de tu objeto en el siguiente paso.");
       setPrincipalAnalizada(true);
     } finally {
       setAnalizandoPrincipal(false);
@@ -226,20 +341,21 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
   };
 
   const eliminarFotoPrincipal = () => {
-    if (primaryPreview) URL.revokeObjectURL(primaryPreview);
+    if (primaryPreview && primaryPreview.startsWith("blob:")) URL.revokeObjectURL(primaryPreview);
     setPrimaryFile(null);
     setPrimaryPreview(null);
     setPrincipalAnalizada(false);
+    setAnalizandoPrincipal(false);
   };
 
-  // --- 2. PROCESAR FOTOS SECUNDARIAS Y OCR EN TIEMPO REAL ---
-  const handleSecondaryFilesSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files) return;
-    const nuevosArchivos = Array.from(e.target.files).filter(f => f.type.startsWith("image/"));
+  // --- 2. PROCESAR FOTOS SECUNDARIAS (HASTA 10 FOTOS EN TOTAL) ---
+  const handleSecondaryFilesSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    const nuevosArchivos = Array.from(e.target.files);
     
-    const espacioDisponible = 5 - (1 + secundarias.length);
+    const espacioDisponible = 10 - (1 + secundarias.length);
     if (espacioDisponible <= 0) {
-      toast.warning("Se permite un máximo de 5 fotografías por publicación.");
+      toast.warning("Se permite un máximo de 10 fotografías por publicación.");
       return;
     }
 
@@ -440,6 +556,10 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
       dataForm.append("title", formatearTituloProducto(title));
       dataForm.append("price", price);
       dataForm.append("category", category);
+      if (subcategory) dataForm.append("subcategory", subcategory);
+      if (material) dataForm.append("material", material);
+      if (color) dataForm.append("color", color);
+      if (tags) dataForm.append("tags", tags);
       dataForm.append("condition", condition.toLowerCase());
 
       const descripcionFinal = tags.trim()
@@ -647,21 +767,35 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
           {pasoActual === 1 && (
             <div className="space-y-5 animate-fade-in">
               
-              {/* Foto Principal */}
+              {/* Encabezado Paso 1 */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#dadce0]">
+                <div>
+                  <h3 className="text-base font-bold text-[#202124]">Mostranos tu objeto</h3>
+                  <p className="text-xs text-[#5f6368] mt-0.5 leading-relaxed">
+                    Hacé que tu objeto se haga notar. Una buena foto puede hacer la diferencia a la hora de vender. Mirá nuestras recomendaciones antes de subir las tuyas.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMostrarRecomendaciones(true)}
+                  className="self-start sm:self-center px-3.5 py-1.5 rounded-lg border border-[#dadce0] bg-white hover:bg-[#f8f9fa] text-[#1a73e8] hover:text-[#174ea6] text-xs font-semibold tracking-wide transition shadow-2xs cursor-pointer flex-shrink-0"
+                >
+                  Ver recomendaciones
+                </button>
+              </div>
+
+              {/* Foto Principal de Portada */}
               <div className="bg-[#f8f9fa] border-2 border-dashed border-[#dadce0] rounded-xl p-4 sm:p-5 space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-xs sm:text-sm font-bold text-[#202124] flex items-center gap-2">
                       <ImageIcon className="h-4 w-4 text-[#1a73e8]" />
-                      1. Foto Principal (Obligatoria)
+                      Foto de Portada (Obligatoria)
                     </h4>
                     <p className="text-[11px] text-[#5f6368] mt-0.5">
-                      Subí una foto nítida donde el producto se aprecie completo. La IA la analizará automáticamente.
+                      Elegí la foto que mejor represente tu objeto y mostralo completo con buena luz.
                     </p>
                   </div>
-                  <span className="hidden sm:inline-flex items-center gap-1 text-[10.5px] font-semibold text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.5 rounded-full border border-[#d2e3fc]">
-                    <Sparkles className="h-3 w-3" /> Auto-análisis IA
-                  </span>
                 </div>
 
                 {!primaryPreview ? (
@@ -680,7 +814,7 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
                       <Upload className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-[#202124]">Hacé clic para seleccionar la Foto Principal</p>
+                      <p className="text-xs font-bold text-[#202124]">Hacé clic para seleccionar la Foto de Portada</p>
                       <p className="text-[11px] text-[#80868b] mt-0.5">JPG, PNG o WEBP (Máx. 8 MB)</p>
                     </div>
                   </div>
@@ -690,23 +824,23 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
                       <img
                         src={primaryPreview}
                         alt="Foto Principal"
-                        className="h-20 w-20 object-cover rounded-xl border border-[#dadce0] flex-shrink-0"
+                        className="h-20 w-20 object-cover rounded-xl border border-[#dadce0] flex-shrink-0 bg-[#f8f9fa]"
                       />
                       <div className="space-y-1 min-w-0">
                         <p className="text-xs font-bold text-[#202124] flex items-center gap-1.5">
-                          Foto Principal Cargada
+                          Foto de portada cargada
                           {principalAnalizada && <CheckCircle2 className="h-4 w-4 text-[#137333]" />}
                         </p>
                         <p className="text-[11px] text-[#5f6368] truncate max-w-[200px]">{primaryFile?.name}</p>
 
                         {analizandoPrincipal ? (
-                          <div className="flex items-center gap-1.5 text-xs text-[#1a73e8] font-bold mt-1">
+                          <div className="flex items-center gap-1.5 text-xs text-[#1a73e8] font-semibold mt-1">
                             <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                            Escaneando con IA...
+                            Identificando detalles de tu objeto...
                           </div>
                         ) : principalAnalizada ? (
                           <div className="flex items-center gap-1 text-[10.5px] text-[#137333] font-semibold bg-[#e6f4ea] px-2 py-0.5 rounded-md border border-[#ceead6]">
-                            <Sparkles className="h-3 w-3" /> Datos autocompletados
+                            <Check className="h-3 w-3" /> Datos iniciales listos
                           </div>
                         ) : null}
                       </div>
@@ -723,20 +857,20 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
                 )}
               </div>
 
-              {/* Fotos Secundarias */}
+              {/* Fotos Secundarias (hasta 10 en total) */}
               {primaryFile && (
                 <div className="space-y-3 pt-3 border-t border-[#edf0f2]">
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="text-xs sm:text-sm font-bold text-[#202124]">
-                        2. Fotos Secundarias (Máx. 5 fotos en total)
+                        Fotos adicionales (Máximo 10 fotos en total)
                       </h4>
                       <p className="text-[11px] text-[#5f6368] mt-0.5">
-                        Subí fotos adicionales mostrando detalles, ángulos y terminaciones.
+                        Mostrá distintos ángulos, detalles de materiales, terminaciones o marcas de uso.
                       </p>
                     </div>
                     <span className="text-xs font-bold text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-lg border border-[#d2e3fc]">
-                      {1 + secundarias.length} / 5 Fotos
+                      {1 + secundarias.length} / 10 Fotos
                     </span>
                   </div>
 
@@ -792,7 +926,7 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
                     ))}
 
                     {/* Botón añadir más fotos */}
-                    {1 + secundarias.length < 5 && (
+                    {1 + secundarias.length < 10 && (
                       <div
                         onClick={() => secondaryInputRef.current?.click()}
                         className="bg-[#f8f9fa] border-2 border-dashed border-[#dadce0] rounded-xl p-3 text-center cursor-pointer hover:border-[#1a73e8] hover:bg-[#e8f0fe]/20 transition flex flex-col items-center justify-center gap-1.5 h-28"
@@ -806,10 +940,23 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
                           className="hidden"
                         />
                         <Upload className="h-4 w-4 text-[#80868b]" />
-                        <span className="text-[11px] font-bold text-[#5f6368]">Añadir foto</span>
+                        <span className="text-[11px] font-bold text-[#5f6368]">+ Agregar fotos</span>
                       </div>
                     )}
                   </div>
+
+                  {/* Recomendación amigable si hay menos de 4 fotos (no bloqueante) */}
+                  {1 + secundarias.length < 4 && (
+                    <div className="p-3 bg-[#e8f0fe]/50 border border-[#d2e3fc] rounded-xl text-xs text-[#1a73e8] flex items-start gap-2">
+                      <Info className="h-4 w-4 text-[#1a73e8] mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-semibold text-[#174ea6]">Recomendación de Objetia:</p>
+                        <p className="text-[11px] text-[#3c4043] mt-0.5">
+                          Sugerimos subir al menos 4 fotos (mostrando detalles, ángulos y marcas) para generar mayor confianza en los compradores y encontrar interesado más rápido.
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
@@ -832,57 +979,102 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
                 />
               </div>
 
+              {/* Categoría y Subcategoría Dinámica */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-[#202124] block">Categoría *</label>
                   <div className="relative">
                     <select
                       value={category}
-                      onChange={(e) => setCategory(e.target.value)}
-                      className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/15 text-[#202124] bg-white cursor-pointer appearance-none pr-10 transition"
+                      onChange={(e) => handleCategoryChange(e.target.value)}
+                      className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/15 text-[#202124] bg-white cursor-pointer appearance-none pr-10 transition font-medium"
                     >
-                      <option value="Iluminación">Iluminación</option>
-                      <option value="Sillones">Sillones</option>
-                      <option value="Mesas">Mesas</option>
-                      <option value="Sillas">Sillas</option>
-                      <option value="Placards y Armarios">Placards y Armarios</option>
-                      <option value="Camas y Respaldos">Camas y Respaldos</option>
-                      <option value="Estanterías">Estanterías</option>
-                      <option value="Espejos">Espejos</option>
-                      <option value="Vajilleros y Racks">Vajilleros y Racks</option>
-                      <option value="Jardín y Exterior">Jardín y Exterior</option>
-                      <option value="Adornos y Cuadros">Adornos y Cuadros</option>
+                      {Object.keys(TAXONOMIA_OBJETIA).map((cat) => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
                     </select>
                     <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-[#80868b] pointer-events-none" />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-[#202124] block">Condición *</label>
-                  <div className="flex items-center gap-2 pt-0.5">
-                    <button
-                      type="button"
-                      onClick={() => setCondition('USED')}
-                      className={`flex-1 py-2 rounded-xl border text-xs font-bold text-center transition cursor-pointer ${
-                        condition === 'USED' 
-                          ? 'border-[#202124] bg-[#202124] text-white shadow-xs' 
-                          : 'border-[#dadce0] bg-white text-[#5f6368] hover:bg-[#f8f9fa] hover:text-[#202124]'
-                      }`}
+                  <label className="text-xs font-semibold text-[#202124] block">Subcategoría *</label>
+                  <div className="relative">
+                    <select
+                      value={subcategory}
+                      onChange={(e) => setSubcategory(e.target.value)}
+                      className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/15 text-[#202124] bg-white cursor-pointer appearance-none pr-10 transition font-medium"
                     >
-                      Usado
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setCondition('NEW')}
-                      className={`flex-1 py-2 rounded-xl border text-xs font-bold text-center transition cursor-pointer ${
-                        condition === 'NEW' 
-                          ? 'border-[#202124] bg-[#202124] text-white shadow-xs' 
-                          : 'border-[#dadce0] bg-white text-[#5f6368] hover:bg-[#f8f9fa] hover:text-[#202124]'
-                      }`}
-                    >
-                      Nuevo
-                    </button>
+                      {(TAXONOMIA_OBJETIA[category] || []).map((sub) => (
+                        <option key={sub} value={sub}>{sub}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-[#80868b] pointer-events-none" />
                   </div>
+                </div>
+              </div>
+
+              {/* Material Principal y Color Predominante */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#202124] block">Material Principal *</label>
+                  <div className="relative">
+                    <select
+                      value={material}
+                      onChange={(e) => setMaterial(e.target.value)}
+                      className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/15 text-[#202124] bg-white cursor-pointer appearance-none pr-10 transition font-medium"
+                    >
+                      {MATERIALES_OBJETIA.map((mat) => (
+                        <option key={mat} value={mat}>{mat}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-[#80868b] pointer-events-none" />
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-[#202124] block">Color Predominante *</label>
+                  <div className="relative">
+                    <select
+                      value={color}
+                      onChange={(e) => setColor(e.target.value)}
+                      className="w-full px-3 py-2 text-xs sm:text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/15 text-[#202124] bg-white cursor-pointer appearance-none pr-10 transition font-medium"
+                    >
+                      {COLORES_OBJETIA.map((col) => (
+                        <option key={col} value={col}>{col}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="h-4 w-4 absolute right-3 top-1/2 -translate-y-1/2 text-[#80868b] pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Condición */}
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-[#202124] block">Condición del Objeto *</label>
+                <div className="flex items-center gap-2 pt-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setCondition('USED')}
+                    className={`flex-1 py-2 rounded-xl border text-xs font-bold text-center transition cursor-pointer ${
+                      condition === 'USED' 
+                        ? 'border-[#202124] bg-[#202124] text-white shadow-xs' 
+                        : 'border-[#dadce0] bg-white text-[#5f6368] hover:bg-[#f8f9fa] hover:text-[#202124]'
+                    }`}
+                  >
+                    Usado
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCondition('NEW')}
+                    className={`flex-1 py-2 rounded-xl border text-xs font-bold text-center transition cursor-pointer ${
+                      condition === 'NEW' 
+                        ? 'border-[#202124] bg-[#202124] text-white shadow-xs' 
+                        : 'border-[#dadce0] bg-white text-[#5f6368] hover:bg-[#f8f9fa] hover:text-[#202124]'
+                    }`}
+                  >
+                    Nuevo
+                  </button>
                 </div>
               </div>
 
@@ -946,6 +1138,24 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
                 </div>
               </div>
 
+              {/* Desglose Financiero de Ganancia en Vivo */}
+              {(parseFloat(price) || 0) > 0 && (
+                <div className="bg-[#f8f9fa] rounded-xl p-3.5 border border-[#dadce0] space-y-2">
+                  <div className="flex items-center justify-between text-xs text-[#5f6368]">
+                    <span>Precio publicado (al comprador):</span>
+                    <span className="font-semibold text-[#202124]">$ {(parseFloat(price) || 0).toLocaleString("es-AR")}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-[#5f6368]">
+                    <span>Comisión por servicio Objetia (10%):</span>
+                    <span className="text-[#c5221f] font-medium">- $ {Math.round((parseFloat(price) || 0) * 0.10).toLocaleString("es-AR")}</span>
+                  </div>
+                  <div className="pt-2 border-t border-[#dadce0] flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#202124]">Recibís en tu cuenta / billetera:</span>
+                    <span className="text-sm font-extrabold text-[#137333]">$ {Math.max(0, Math.round((parseFloat(price) || 0) * 0.90)).toLocaleString("es-AR")}</span>
+                  </div>
+                </div>
+              )}
+
               {/* Embalaje Correo Argentino */}
               <div className="bg-[#f8f9fa] p-4 rounded-xl border border-[#edf0f2] space-y-3">
                 <div className="flex items-center justify-between">
@@ -1005,30 +1215,181 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
           {/* ------------------------------------------------------------- */}
           {/* PASO 4: REVISIÓN */}
           {/* ------------------------------------------------------------- */}
+          {/* ------------------------------------------------------------- */}
+          {/* PASO 4: REVISIÓN PREVIA Y EDICIÓN MODULAR */}
+          {/* ------------------------------------------------------------- */}
           {pasoActual === 4 && (
             <div className="space-y-4 animate-fade-in">
-              <div className="bg-[#f8f9fa] p-4 rounded-xl border border-[#edf0f2] space-y-3">
-                <h4 className="text-xs font-bold text-[#202124] uppercase tracking-wider">
-                  Resumen de tu Publicación
-                </h4>
+              <div className="flex items-center justify-between pb-1">
+                <div>
+                  <h4 className="text-sm font-bold text-[#202124]">
+                    Revisión de tu publicación
+                  </h4>
+                  <p className="text-xs text-[#5f6368]">
+                    Verificá que todo esté correcto antes de poner el objeto a la venta.
+                  </p>
+                </div>
+                <span className="text-[11px] font-semibold bg-[#e8f0fe] text-[#1a73e8] px-2.5 py-1 rounded-full">
+                  Paso final
+                </span>
+              </div>
 
-                <div className="flex items-start gap-3.5">
+              {/* CARD 1: FOTOS */}
+              <div className="bg-white p-4 rounded-xl border border-[#dadce0] shadow-sm space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="h-6 w-6 rounded-full bg-[#f1f3f4] text-[#202124] text-xs font-bold flex items-center justify-center">1</span>
+                    <h5 className="text-xs font-bold text-[#202124] uppercase tracking-wide">
+                      Fotografías ({1 + secundarias.filter(s => s.status === 'ok').length})
+                    </h5>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPasoActual(1)}
+                    className="text-xs font-semibold text-[#1a73e8] hover:text-[#1557b0] hover:underline flex items-center gap-1"
+                  >
+                    Editar fotos
+                  </button>
+                </div>
+                <div className="flex items-center gap-2 overflow-x-auto pb-1 pt-0.5">
                   {primaryPreview && (
-                    <img src={primaryPreview} alt="Portada" className="h-20 w-20 object-cover rounded-xl border border-[#dadce0] flex-shrink-0" />
+                    <div className="relative flex-shrink-0">
+                      <img
+                        src={primaryPreview}
+                        alt="Portada"
+                        className="h-16 w-16 object-cover rounded-lg border-2 border-[#1a73e8]"
+                      />
+                      <span className="absolute bottom-1 left-1 text-[9px] font-bold bg-[#1a73e8] text-white px-1 py-0.2 rounded">
+                        Portada
+                      </span>
+                    </div>
                   )}
-                  <div className="space-y-1 min-w-0">
-                    <h5 className="text-xs sm:text-sm font-bold text-[#202124] truncate">{title}</h5>
-                    <p className="text-xs text-[#1a73e8] font-bold">$ {parseFloat(price).toLocaleString("es-AR")}</p>
-                    <p className="text-[11px] text-[#5f6368]">{category} · {condition === 'NEW' ? 'Nuevo' : 'Usado'} · {stock} disponible(s)</p>
-                    <p className="text-[10.5px] text-[#80868b]">{1 + secundarias.filter(s => s.status === 'ok').length} fotos adjuntas verificadas</p>
+                  {secundarias.filter(s => s.status === 'ok').map((sec, idx) => (
+                    <img
+                      key={sec.id || idx}
+                      src={sec.preview}
+                      alt={`Foto ${idx + 2}`}
+                      className="h-16 w-16 object-cover rounded-lg border border-[#dadce0] flex-shrink-0"
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* CARD 2: DETALLES Y TAXONOMÍA */}
+              <div className="bg-white p-4 rounded-xl border border-[#dadce0] shadow-sm space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="h-6 w-6 rounded-full bg-[#f1f3f4] text-[#202124] text-xs font-bold flex items-center justify-center">2</span>
+                    <h5 className="text-xs font-bold text-[#202124] uppercase tracking-wide">
+                      Detalles y Atributos
+                    </h5>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPasoActual(2)}
+                    className="text-xs font-semibold text-[#1a73e8] hover:text-[#1557b0] hover:underline flex items-center gap-1"
+                  >
+                    Editar detalles
+                  </button>
+                </div>
+                <div className="space-y-2 text-xs">
+                  <div>
+                    <span className="text-[11px] text-[#5f6368] block">Título</span>
+                    <p className="font-semibold text-[#202124] text-sm">{title}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <div>
+                      <span className="text-[11px] text-[#5f6368] block">Categoría & Subcategoría</span>
+                      <p className="font-medium text-[#202124]">{category}{subcategory ? ` › ${subcategory}` : ''}</p>
+                    </div>
+                    <div>
+                      <span className="text-[11px] text-[#5f6368] block">Condición</span>
+                      <span className={`inline-block text-[11px] font-semibold px-2 py-0.5 rounded-md mt-0.5 ${
+                        condition === 'NEW' ? 'bg-[#e6f4ea] text-[#137333]' : 'bg-[#f1f3f4] text-[#202124]'
+                      }`}>
+                        {condition === 'NEW' ? 'Nuevo' : 'Usado'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <span className="text-[11px] text-[#5f6368] block">Material principal</span>
+                      <p className="font-medium text-[#202124]">{material}</p>
+                    </div>
+                    <div>
+                      <span className="text-[11px] text-[#5f6368] block">Color predominante</span>
+                      <p className="font-medium text-[#202124]">{color}</p>
+                    </div>
+                  </div>
+                  {description && (
+                    <div className="pt-1">
+                      <span className="text-[11px] text-[#5f6368] block">Descripción</span>
+                      <p className="font-normal text-[#3c4043] line-clamp-3 bg-[#f8f9fa] p-2 rounded-lg border border-[#edf0f2] mt-0.5 text-[11.5px] leading-relaxed">
+                        {description}
+                      </p>
+                    </div>
+                  )}
+                  {tags && (
+                    <div>
+                      <span className="text-[11px] text-[#5f6368] block">Etiquetas</span>
+                      <div className="flex flex-wrap gap-1 mt-0.5">
+                        {tags.split(',').map((t, i) => (
+                          <span key={i} className="text-[10.5px] bg-[#f1f3f4] text-[#5f6368] px-2 py-0.5 rounded-full">
+                            #{t.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* CARD 3: PRECIO Y LOGÍSTICA */}
+              <div className="bg-white p-4 rounded-xl border border-[#dadce0] shadow-sm space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="h-6 w-6 rounded-full bg-[#f1f3f4] text-[#202124] text-xs font-bold flex items-center justify-center">3</span>
+                    <h5 className="text-xs font-bold text-[#202124] uppercase tracking-wide">
+                      Precio, Stock y Logística
+                    </h5>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setPasoActual(3)}
+                    className="text-xs font-semibold text-[#1a73e8] hover:text-[#1557b0] hover:underline flex items-center gap-1"
+                  >
+                    Editar precio
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div className="p-2.5 rounded-lg bg-[#f8f9fa] border border-[#edf0f2]">
+                    <span className="text-[11px] text-[#5f6368] block">Precio al comprador</span>
+                    <p className="text-sm font-bold text-[#202124] mt-0.5">
+                      $ {parseFloat(price || '0').toLocaleString("es-AR")}
+                    </p>
+                    <span className="text-[10.5px] text-[#5f6368]">Comisión Objetia (10%): -${Math.round(parseFloat(price || '0') * 0.10).toLocaleString("es-AR")}</span>
+                    <p className="text-xs font-bold text-[#137333] mt-1 pt-1 border-t border-[#dadce0]">
+                      Recibís: ${Math.max(0, Math.round(parseFloat(price || '0') * 0.90)).toLocaleString("es-AR")}
+                    </p>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-[#f8f9fa] border border-[#edf0f2] flex flex-col justify-between">
+                    <div>
+                      <span className="text-[11px] text-[#5f6368] block">Unidades disponibles</span>
+                      <p className="text-sm font-bold text-[#202124] mt-0.5">{stock} unidad(es)</p>
+                    </div>
+                    <div className="pt-1.5 border-t border-[#dadce0]">
+                      <span className="text-[11px] text-[#5f6368] block">Paquetería Correo Argentino</span>
+                      <p className="text-[11px] font-medium text-[#3c4043]">{weight} kg · {height}x{width}x{length} cm</p>
+                    </div>
                   </div>
                 </div>
+              </div>
 
-                <div className="text-xs text-[#5f6368] space-y-1 pt-2 border-t border-[#edf0f2]">
-                  <p><span className="font-semibold text-[#202124]">Descripción:</span> {description}</p>
-                  {tags && <p><span className="font-semibold text-[#202124]">Etiquetas:</span> {tags}</p>}
-                  <p><span className="font-semibold text-[#202124]">Envío Correo Argentino:</span> {weight} kg · {height}x{width}x{length} cm</p>
-                </div>
+              {/* AVISO INFORMATIVO FINAL */}
+              <div className="p-3 bg-[#f8f9fa] rounded-xl border border-[#edf0f2] text-center">
+                <p className="text-xs text-[#5f6368]">
+                  Al presionar <span className="font-bold text-[#202124]">Publicar Objeto Ahora</span>, tu publicación se creará y quedará visible inmediatamente para la comunidad de Objetia.
+                </p>
               </div>
             </div>
           )}
@@ -1072,6 +1433,92 @@ export default function NewProductModal({ isOpen, onClose, onSuccess }: NewProdu
             </button>
           )}
         </div>
+
+        {/* ================================================================= */}
+        {/* MODAL: VER RECOMENDACIONES DE FOTOGRAFÍA (SIN ÍCONOS) */}
+        {/* ================================================================= */}
+        {mostrarRecomendaciones && (
+          <div className="fixed inset-0 z-[100000] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in">
+            <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] flex flex-col shadow-2xl border border-gray-200 overflow-hidden animate-scale-in">
+              <div className="p-5 border-b border-gray-100 flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-base font-bold text-[#202124]">Hacé que tu objeto se luzca</h3>
+                  <p className="text-xs text-[#5f6368] mt-1 leading-relaxed">
+                    Las buenas fotos generan confianza, muestran mejor lo que estás vendiendo y pueden aumentar tus posibilidades de encontrar comprador. Con estos simples tips, ya estás listo para empezar.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setMostrarRecomendaciones(false)}
+                  className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition cursor-pointer flex-shrink-0"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-5 space-y-4 text-xs text-[#3c4043] leading-relaxed">
+                <div className="space-y-0.5">
+                  <h4 className="font-bold text-[#202124] text-xs">Aprovechá la luz natural</h4>
+                  <p className="text-[#5f6368]">Siempre que puedas, sacá las fotos durante el día y en un lugar bien iluminado. Evitá luces muy amarillas, sombras fuertes o fotos oscuras.</p>
+                </div>
+
+                <div className="space-y-0.5">
+                  <h4 className="font-bold text-[#202124] text-xs">Mostralo completo</h4>
+                  <p className="text-[#5f6368]">Asegurate de que el objeto entre entero en la foto y dejá un poco de espacio alrededor. Para la portada, elegí la foto que mejor lo represente. Del fondo nos ocupamos nosotros.</p>
+                </div>
+
+                <div className="space-y-0.5">
+                  <h4 className="font-bold text-[#202124] text-xs">Mostrá distintos ángulos</h4>
+                  <p className="text-[#5f6368]">Una sola foto puede dejar dudas. Sacá fotos de frente, de costado, de atrás y desde cualquier ángulo que ayude a conocer mejor el objeto.</p>
+                </div>
+
+                <div className="space-y-0.5">
+                  <h4 className="font-bold text-[#202124] text-xs">Los detalles también cuentan</h4>
+                  <p className="text-[#5f6368]">Acercate a materiales, texturas, terminaciones, etiquetas, firmas o cualquier característica que haga especial a tu objeto.</p>
+                </div>
+
+                <div className="space-y-0.5">
+                  <h4 className="font-bold text-[#202124] text-xs">Ayudá a imaginarlo</h4>
+                  <p className="text-[#5f6368]">Además de las medidas que vas a completar después, una foto en contexto puede ayudar a entender su tamaño y proporciones.</p>
+                </div>
+
+                <div className="space-y-0.5">
+                  <h4 className="font-bold text-[#202124] text-xs">Mostralo tal cual es</h4>
+                  <p className="text-[#5f6368]">Si tiene una marca, desgaste, rayón o algún detalle, fotografialo. Mostrarlo genera confianza y ayuda a que quien compra sepa exactamente qué va a recibir.</p>
+                </div>
+
+                <div className="p-3.5 bg-[#f8f9fa] border border-[#dadce0] rounded-xl space-y-2 mt-2">
+                  <h5 className="font-bold text-[#202124] text-xs">Para tener en cuenta</h5>
+                  <ul className="space-y-1 text-[#5f6368] text-[11px]">
+                    <li>• Fotos nítidas y con buena luz</li>
+                    <li>• El objeto completo</li>
+                    <li>• Diferentes ángulos</li>
+                    <li>• Fotos de los detalles</li>
+                    <li>• Una foto en contexto</li>
+                    <li>• Marcas o imperfecciones visibles</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="p-4 bg-[#f8f9fa] border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div className="text-center sm:text-left">
+                  <p className="text-xs font-bold text-[#202124]">¿Listo para mostrarlo?</p>
+                  <p className="text-[11px] text-[#5f6368]">Nosotros nos ocupamos de que la portada tenga la estética Objetia.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMostrarRecomendaciones(false);
+                    primaryInputRef.current?.click();
+                  }}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-gray-900 hover:bg-black text-white text-xs font-bold uppercase tracking-wider rounded-xl transition shadow-xs cursor-pointer flex-shrink-0"
+                >
+                  Subir mis fotos
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
       </div>
     </div>,

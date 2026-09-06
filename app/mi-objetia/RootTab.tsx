@@ -9,7 +9,7 @@ import {
   Sliders, Database, Terminal, ChevronDown, ChevronUp, ChevronLeft, Bell, Settings, Copy, 
   ExternalLink, Layers, ArrowUpRight, Lock, Eye, PanelLeftClose, PanelLeftOpen,
   FolderTree, Folder, FolderOpen, Zap, Plus, ChevronRight, Edit3, ShieldCheck,
-  LayoutDashboard, Palette, Calendar, Image as ImageIcon, Layout, UserCheck
+  LayoutDashboard, Palette, Calendar, Image as ImageIcon, Layout, UserCheck, Mail
 } from 'lucide-react';
 
 import DashboardTab from './DashboardTab';
@@ -18,6 +18,7 @@ import BannersTab from './BannersTab';
 import CustomizationsTab from './CustomizationsTab';
 import CampaignsTab from './CampaignsTab';
 import ModerationTab from './ModerationTab';
+import EmailConfigTab from './EmailConfigTab';
 
 interface UserData {
   id: number;
@@ -136,7 +137,7 @@ function CustomSelect({
   );
 }
 
-type ConsoleTabType = 'dashboard' | 'moderation' | 'appearance' | 'campanas' | 'secciones' | 'banners' | 'users' | 'roles' | 'permissions' | 'sections' | 'sessions' | 'logs' | 'keys';
+type ConsoleTabType = 'dashboard' | 'moderation' | 'appearance' | 'campanas' | 'secciones' | 'banners' | 'users' | 'roles' | 'permissions' | 'sections' | 'sessions' | 'logs' | 'keys' | 'email';
 
 interface RootTabProps {
   initialTab?: string;
@@ -1440,6 +1441,8 @@ export default function RootTab({
       rolePermIds.includes(p.id) || userPerms.includes(p.code.toLowerCase())
     );
 
+    if (tab === 'email') return esRoot;
+
     // Revisar si algún permiso tiene en target_section este tab o su categoría
     for (const p of activePerms) {
       if (!p.target_section) continue;
@@ -1758,6 +1761,20 @@ export default function RootTab({
               >
                 <Database className="h-4 w-4 text-current flex-shrink-0" />
                 <span>Registros y Auditoría</span>
+              </button>
+            )}
+
+            {esRoot && (
+              <button
+                onClick={() => { setActiveConsoleTab('email'); setMenuMovilAbierto(false); }}
+                className={`w-full flex items-center gap-2.5 px-3 h-[36px] rounded-[12px] text-[14px] font-medium transition-colors text-left cursor-pointer ${
+                  activeConsoleTab === 'email' 
+                    ? 'bg-[#2a2a2a] text-[#ffffff]' 
+                    : 'text-[#8c8c8c] hover:bg-[#252525] hover:text-[#d4d4d4]'
+                }`}
+              >
+                <Mail className="h-4 w-4 text-[#87a9ff] flex-shrink-0" />
+                <span>Servidor de Emails</span>
               </button>
             )}
           </div>
@@ -2223,6 +2240,13 @@ export default function RootTab({
                 Volver al Panel de Control
               </button>
             </div>
+          )}
+
+          {/* ============================================================================== */}
+          {/* SECCIÓN CONFIGURACIÓN DE EMAILS (ROOT) */}
+          {/* ============================================================================== */}
+          {esRoot && activeConsoleTab === 'email' && (
+            <EmailConfigTab />
           )}
 
           {/* ============================================================================== */}

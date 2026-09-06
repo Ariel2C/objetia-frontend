@@ -2,6 +2,7 @@
 import React from 'react';
 import BannerCarousel from '../components/BannerCarousel';
 import ProductCarousel from '../components/ProductCarousel';
+import WelcomeBanner from '../components/WelcomeBanner';
 import { getApiUrl } from '../lib/config';
 import type { Producto, Banner, SeccionInicio } from '../lib/types';
 
@@ -44,6 +45,9 @@ export default async function HomePage() {
           1. CARRUSEL DE BANNERS (CMS Dinámico)
           ============================================================================== */}
       <BannerCarousel banners={banners} />
+
+      {/* BANNER PROMOCIONAL DE BIENVENIDA (Solo para no logueados) */}
+      <WelcomeBanner />
 
       {/* ==============================================================================
           2. SECCIONES DE PRODUCTOS DINÁMICAS (Carruseles configurables)
