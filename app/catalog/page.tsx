@@ -536,7 +536,7 @@ function CatalogContent() {
 
         {/* SIDEBAR ESCRITORIO (Deslizamiento físico a la izquierda idéntico a Mi Objetia) */}
         <aside 
-          className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-72 h-[calc(100dvh-4rem)] max-h-[calc(100dvh-4rem)] sticky top-16 overflow-hidden ${
+          className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-72 h-[calc(100dvh-4rem)] max-h-[calc(100dvh-4rem)] overflow-hidden ${
             sidebarOculto ? '-ml-72 pointer-events-none' : 'ml-0'
           }`}
         >
