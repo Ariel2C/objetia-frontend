@@ -6,7 +6,18 @@ import { useFavorites } from '../../../components/FavoritesContext';
 import { useToast } from '../../../components/ToastContext';
 import { getApiUrl } from '../../../lib/config';
 import { apiFetch } from '../../../lib/api';
-import { ShoppingCart, MessageSquare, Heart, Calendar, ChevronLeft, Lock } from 'lucide-react';
+import { 
+  ShoppingCart, 
+  MessageSquare, 
+  Heart, 
+  Calendar, 
+  ChevronLeft, 
+  Lock,
+  Truck,
+  ShieldCheck,
+  CheckCircle2,
+  Share2
+} from 'lucide-react';
 import Link from 'next/link';
 import FormattedPrice from '../../../components/FormattedPrice';
 import { formatearTituloProducto } from '../../../lib/format';
@@ -17,14 +28,39 @@ interface ProductDetail {
   title: string;
   description: string;
   price: number;
-  condition: 'USED' | 'NEW';
+  condition: 'USED' | 'NEW' | 'used' | 'new';
   category: string;
+  subcategory?: string;
+  material?: string;
+  color?: string;
+  weight_kg?: number;
+  height_cm?: number;
+  width_cm?: number;
+  length_cm?: number;
   seller_id: number;
+  seller_name?: string;
   image_url: string;
   images: string[];
   status: 'AVAILABLE' | 'RESERVED' | 'SOLD' | 'PAUSED';
   created_at: string;
+  is_new?: boolean;
+  views?: number;
+  favorites?: number;
 }
+
+const COLOR_MAP: Record<string, string> = {
+  "Madera natural": "#c29b61",
+  "Negro": "#1a1a1a",
+  "Blanco": "#ffffff",
+  "Dorado / Bronce": "#c5a059",
+  "Gris": "#808080",
+  "Beige / Arena": "#e3dac9",
+  "Marrón / Chocolate": "#5c3a21",
+  "Verde": "#2e5a36",
+  "Azul / Petróleo": "#1f456e",
+  "Terracota / Óxido": "#b95c3b",
+  "Multicolor / Otro": "linear-gradient(135deg, #e11d48, #eab308, #2563eb)",
+};
 
 export default function ProductDetailPage() {
   const { id } = useParams();
@@ -126,147 +162,341 @@ export default function ProductDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 border-4 border-gray-900 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-[#f8f9fa]">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-9 w-9 border-3 border-[#1a73e8] border-t-transparent rounded-full animate-spin" />
+          <span className="text-xs text-[#5f6368] font-medium">Cargando detalles del objeto...</span>
+        </div>
       </div>
     );
   }
 
   if (error || !producto) {
     return (
-      <div className="max-w-4xl mx-auto px-4 py-20 text-center">
-        <div className="text-red-500 text-5xl mb-4">⚠️</div>
-        <h2 className="text-xl font-bold text-gray-800">Error al cargar el producto</h2>
-        <p className="text-gray-500 mt-1">{error || "El producto no existe."}</p>
-        <Link href="/catalog" className="inline-block mt-6 px-6 py-2 bg-gray-900 text-white rounded-xl font-bold text-sm">
-          Volver al catálogo
-        </Link>
+      <div className="min-h-screen bg-[#f8f9fa] flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white border border-[#dadce0] rounded-2xl p-8 text-center shadow-2xs space-y-4">
+          <div className="text-4xl">⚠️</div>
+          <h2 className="text-lg font-bold text-[#202124]">Error al cargar el producto</h2>
+          <p className="text-xs text-[#5f6368]">{error || "El producto solicitado no existe o fue retirado."}</p>
+          <Link 
+            href="/catalog" 
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1a73e8] text-white rounded-xl font-semibold text-xs hover:bg-[#1557b0] transition shadow-2xs"
+          >
+            <ChevronLeft className="h-4 w-4" /> Volver al catálogo
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-8">
-      <Link href="/catalog" className="inline-flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-gray-900 mb-4 transition">
-        <ChevronLeft className="h-4 w-4" /> Volver al catálogo
-      </Link>
-
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-10 items-start">
-        {/* GALERÍA DE IMÁGENES */}
-        <div className="lg:col-span-3 space-y-3 animate-fade-in">
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-gray-50 border border-gray-100 shadow-sm">
-            <img 
-              src={imagenActiva || "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600"} 
-              alt={formatearTituloProducto(producto.title)} 
-              className={`w-full h-full object-cover object-center transition-all ${producto.status !== 'AVAILABLE' ? 'blur-[2px] grayscale-[20%]' : ''}`}
-            />
-            {producto.status === 'RESERVED' && (
-              <div className="absolute inset-0 bg-black/45 backdrop-blur-[2px] flex flex-col items-center justify-center text-white font-bold gap-2">
-                <Lock className="h-8 w-8 text-amber-400" />
-                <span className="text-sm uppercase tracking-widest bg-amber-500/20 px-4 py-1.5 rounded-lg border border-amber-400/30">Reservado temporalmente</span>
-              </div>
-            )}
-            {producto.status === 'SOLD' && (
-              <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px] flex flex-col items-center justify-center text-white font-bold gap-2">
-                <span className="text-sm uppercase tracking-widest bg-red-600/30 px-4 py-1.5 rounded-lg border border-red-500/30">Vendido</span>
-              </div>
+    <div className="min-h-screen bg-[#f8f9fa] py-6 sm:py-8 font-sans antialiased text-[#202124]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        
+        {/* NAVEGACIÓN BREADCRUMB & VOLVER */}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#5f6368] select-none">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <Link href="/" className="hover:text-[#202124] transition">
+              Inicio
+            </Link>
+            <span className="text-[#9aa0a6]">/</span>
+            <Link href="/catalog" className="hover:text-[#202124] transition">
+              Catálogo
+            </Link>
+            <span className="text-[#9aa0a6]">/</span>
+            <Link 
+              href={`/catalog?category=${encodeURIComponent(producto.category)}`}
+              className="hover:text-[#1a73e8] transition font-medium"
+            >
+              {producto.category}
+            </Link>
+            {producto.subcategory && (
+              <>
+                <span className="text-[#9aa0a6]">/</span>
+                <Link 
+                  href={`/catalog?category=${encodeURIComponent(producto.category)}&subcategory=${encodeURIComponent(producto.subcategory)}`}
+                  className="hover:text-[#1a73e8] transition font-medium"
+                >
+                  {producto.subcategory}
+                </Link>
+              </>
             )}
           </div>
-          {producto.images && producto.images.length > 1 && (
-            <div className="flex gap-2.5 overflow-x-auto pb-1">
-              {producto.images.map((img, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => setImagenActiva(img)}
-                  className={`relative h-16 w-16 sm:h-20 sm:w-20 rounded-xl overflow-hidden border-2 bg-gray-50 flex-shrink-0 cursor-pointer transition ${
-                    imagenActiva === img ? "border-[var(--color-primary)]" : "border-gray-200 opacity-60 hover:opacity-100"
-                  }`}
-                >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
-                </button>
-              ))}
-            </div>
-          )}
+
+          <Link 
+            href="/catalog" 
+            className="inline-flex items-center gap-1 text-xs font-semibold text-[#5f6368] hover:text-[#202124] transition hover:bg-white px-2.5 py-1 rounded-lg border border-transparent hover:border-[#dadce0]"
+          >
+            <ChevronLeft className="h-3.5 w-3.5" /> Volver al catálogo
+          </Link>
         </div>
 
-        {/* PANEL DE COMPRA */}
-        <div className="lg:col-span-2 animate-slide-up lg:sticky lg:top-24">
-          <div className="bg-white border border-gray-100 rounded-2xl shadow-sm p-5 sm:p-6 space-y-5">
-            {/* Meta + título */}
-            <div className="space-y-2">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
-                  producto.condition === 'USED' ? 'bg-amber-50 text-amber-800 border border-amber-200' : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+        {/* CONTENEDOR PRINCIPAL 2 COLUMNAS (PROPORCIONES EQUILIBRADAS) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* COLUMNA IZQUIERDA: GALERÍA DE IMÁGENES CONTROLADA (440px MAX) */}
+          <div className="lg:col-span-6 xl:col-span-5 flex flex-col items-center lg:items-start space-y-4">
+            
+            {/* Marco de Imagen Principal (4:5 vertical con tamaño proporcionado y elegante) */}
+            <div className="relative w-full max-w-[440px] aspect-[4/5] max-h-[480px] bg-white rounded-2xl border border-[#dadce0] overflow-hidden shadow-2xs group flex items-center justify-center">
+              <img 
+                src={imagenActiva || "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600"} 
+                alt={formatearTituloProducto(producto.title)} 
+                className={`w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-103 ${
+                  producto.status !== 'AVAILABLE' ? 'blur-[2px] grayscale-[25%]' : ''
+                }`}
+              />
+
+              {/* Badges superiores flotantes */}
+              <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10 select-none">
+                <span className={`text-[11px] font-bold px-2.5 py-1 rounded-xl shadow-2xs backdrop-blur-md ${
+                  producto.condition?.toLowerCase() === 'used'
+                    ? 'bg-amber-500/90 text-white'
+                    : 'bg-emerald-600/90 text-white'
                 }`}>
-                  {producto.condition === 'USED' ? 'Usado selecto' : 'Nuevo'}
+                  {producto.condition?.toLowerCase() === 'used' ? 'Usado selecto' : 'Nuevo'}
                 </span>
-                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200 uppercase tracking-wider">
-                  {producto.category}
-                </span>
+                {producto.is_new && (
+                  <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-xl bg-white/90 text-[#202124] border border-[#dadce0] shadow-2xs backdrop-blur-md">
+                    Nuevo ingreso
+                  </span>
+                )}
               </div>
-              <h1 className="text-2xl sm:text-[26px] font-black text-gray-900 tracking-tight leading-tight">
-                {formatearTituloProducto(producto.title)}
-              </h1>
-              <span className="text-[11px] text-gray-400 flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" /> Publicado el {new Date(producto.created_at).toLocaleDateString()}
-              </span>
+
+              {/* Botón flotante para compartir */}
+              <button
+                type="button"
+                onClick={() => {
+                  if (typeof navigator !== 'undefined' && navigator.share) {
+                    navigator.share({ title: producto.title, url: window.location.href });
+                  } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                    navigator.clipboard.writeText(window.location.href);
+                    toast.success("Enlace copiado al portapapeles.");
+                  }
+                }}
+                className="absolute top-3 right-3 p-2 bg-white/90 hover:bg-white text-[#5f6368] hover:text-[#202124] rounded-full shadow-2xs border border-[#dadce0] transition cursor-pointer backdrop-blur-md"
+                title="Compartir producto"
+              >
+                <Share2 className="h-4 w-4" />
+              </button>
+
+              {/* Overlays de Estado Bloqueado */}
+              {producto.status === 'RESERVED' && (
+                <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center text-white font-bold gap-2 p-4 text-center">
+                  <Lock className="h-8 w-8 text-amber-400" />
+                  <span className="text-xs font-bold uppercase tracking-wider bg-amber-500/30 px-3 py-1.5 rounded-xl border border-amber-400/40">
+                    Reservado temporalmente
+                  </span>
+                  <p className="text-[11px] text-gray-200 font-normal max-w-xs">
+                    Un comprador lo tiene reservado en su proceso de pago.
+                  </p>
+                </div>
+              )}
+              {producto.status === 'SOLD' && (
+                <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] flex flex-col items-center justify-center text-white font-bold gap-2 p-4 text-center">
+                  <span className="text-xs font-bold uppercase tracking-wider bg-red-600/30 px-4 py-1.5 rounded-xl border border-red-500/40">
+                    Vendido
+                  </span>
+                  <p className="text-[11px] text-gray-200 font-normal max-w-xs">
+                    Este objeto único ya encontró un nuevo hogar.
+                  </p>
+                </div>
+              )}
+              {producto.status === 'PAUSED' && (
+                <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center text-white font-bold gap-2 p-4 text-center">
+                  <span className="text-xs font-bold uppercase tracking-wider bg-gray-600/40 px-4 py-1.5 rounded-xl border border-gray-400/40">
+                    Publicación en Pausa
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* Precio */}
-            <FormattedPrice price={producto.price} className="block text-4xl font-black text-gray-900" />
-
-            {/* Acciones */}
-            {usuario && producto.seller_id === usuario.id ? (
-              <div className="text-center py-3.5 px-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs font-bold leading-relaxed">
-                Este producto es de tu propiedad. No podés comprarlo ni agregarlo a favoritos.
-              </div>
-            ) : (
-              <div className="space-y-2.5">
-                <button
-                  onClick={handleAgregarAlCarrito}
-                  disabled={producto.status !== 'AVAILABLE' || cargandoAccion}
-                  style={{
-                    backgroundColor: producto.status === 'AVAILABLE' ? 'var(--color-primary)' : '#F3F4F6',
-                    color: producto.status === 'AVAILABLE' ? '#ffffff' : '#9CA3AF'
-                  }}
-                  className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-sm uppercase tracking-wider transition active:scale-98 disabled:cursor-not-allowed cursor-pointer shadow-sm"
-                >
-                  <ShoppingCart className="h-4 w-4" />
-                  {producto.status === 'AVAILABLE' 
-                    ? "Reservar y Agregar al Carrito" 
-                    : (producto.status === 'PAUSED' ? "Publicación Pausada" : (producto.status === 'RESERVED' ? "Producto Reservado" : "Agotado"))}
-                </button>
-
-                <div className="flex gap-2.5">
+            {/* Miniaturas de la galería */}
+            {producto.images && producto.images.length > 1 && (
+              <div className="w-full max-w-[440px] flex gap-2.5 overflow-x-auto pb-1 light-scrollbar select-none">
+                {producto.images.map((img, idx) => (
                   <button
-                    onClick={handleIniciarChat}
-                    disabled={cargandoAccion}
-                    className="flex-grow px-4 py-3 rounded-xl border border-gray-200 hover:border-gray-400 text-gray-700 font-semibold text-sm transition flex items-center justify-center gap-2 cursor-pointer bg-white"
-                  >
-                    <MessageSquare className="h-4 w-4" /> Chatear con el vendedor
-                  </button>
-                  <button
-                    onClick={handleFavorito}
-                    aria-label={esFavorito ? "Quitar de favoritos" : "Agregar a favoritos"}
-                    className={`flex-shrink-0 px-4 py-3 rounded-xl border transition flex items-center justify-center cursor-pointer ${
-                      esFavorito ? "border-red-200 bg-red-50 text-red-500" : "border-gray-200 hover:border-gray-400 text-gray-400 bg-white"
+                    key={idx}
+                    type="button"
+                    onClick={() => setImagenActiva(img)}
+                    className={`relative h-16 w-16 sm:h-20 sm:w-20 rounded-xl overflow-hidden border-2 bg-white flex-shrink-0 cursor-pointer transition ${
+                      imagenActiva === img 
+                        ? "border-[#1a73e8] shadow-xs" 
+                        : "border-[#dadce0] opacity-70 hover:opacity-100 hover:border-[#9aa0a6]"
                     }`}
                   >
-                    <Heart className={`h-4.5 w-4.5 ${esFavorito ? "fill-red-500" : ""}`} />
+                    <img src={img} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
                   </button>
-                </div>
+                ))}
               </div>
             )}
-
-            {/* Descripción */}
-            <div className="border-t border-gray-100 pt-4">
-              <h3 className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Descripción</h3>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {producto.description || "Nuestros moderadores están redactando la reseña comercial..."}
-              </p>
-            </div>
           </div>
+
+          {/* COLUMNA DERECHA: PANEL DE COMPRA Y DETALLES */}
+          <div className="lg:col-span-6 xl:col-span-7 space-y-5">
+            
+            <div className="bg-white border border-[#dadce0] rounded-2xl p-6 sm:p-7 shadow-2xs space-y-6">
+              
+              {/* Vendedor y fecha */}
+              <div className="flex items-center justify-between text-xs text-[#5f6368] border-b border-[#dadce0] pb-3.5">
+                <div className="flex items-center gap-1.5 font-medium text-[#202124]">
+                  <CheckCircle2 className="h-4 w-4 text-[#1a73e8] flex-shrink-0" />
+                  <span>Publicado por <strong>{producto.seller_name || 'Vendedor Verificado'}</strong></span>
+                </div>
+                <div className="flex items-center gap-1 text-[#5f6368]">
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span>{new Date(producto.created_at).toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                </div>
+              </div>
+
+              {/* Título y Categorías */}
+              <div className="space-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-[#f1f3f4] text-[#3c4043] border border-[#dadce0]">
+                    {producto.category}
+                  </span>
+                  {producto.subcategory && (
+                    <span className="text-[11px] font-medium px-2.5 py-0.5 rounded-full bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc]">
+                      {producto.subcategory}
+                    </span>
+                  )}
+                </div>
+                
+                <h1 className="text-2xl sm:text-3xl font-bold text-[#202124] tracking-tight leading-snug">
+                  {formatearTituloProducto(producto.title)}
+                </h1>
+              </div>
+
+              {/* Precio destacado */}
+              <div className="pt-1">
+                <FormattedPrice 
+                  price={producto.price} 
+                  className="text-3xl sm:text-4xl font-extrabold text-[#202124] tracking-tight block" 
+                />
+              </div>
+
+              {/* Ficha de Especificaciones Clave (Chips informativos) */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-2 select-none">
+                {producto.material && (
+                  <div className="p-3 bg-[#f8f9fa] border border-[#dadce0] rounded-xl flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#5f6368]">Material</span>
+                    <span className="text-xs font-semibold text-[#202124] mt-0.5 truncate">{producto.material}</span>
+                  </div>
+                )}
+                {producto.color && (
+                  <div className="p-3 bg-[#f8f9fa] border border-[#dadce0] rounded-xl flex flex-col">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#5f6368]">Color</span>
+                    <div className="flex items-center gap-1.5 mt-0.5 min-w-0">
+                      {COLOR_MAP[producto.color] && (
+                        <span 
+                          className={`w-3 h-3 rounded-full inline-block flex-shrink-0 ${producto.color === 'Blanco' ? 'border border-gray-300' : ''}`}
+                          style={COLOR_MAP[producto.color].startsWith('linear') ? { background: COLOR_MAP[producto.color] } : { backgroundColor: COLOR_MAP[producto.color] }}
+                        />
+                      )}
+                      <span className="text-xs font-semibold text-[#202124] truncate">{producto.color}</span>
+                    </div>
+                  </div>
+                )}
+                <div className="p-3 bg-[#f8f9fa] border border-[#dadce0] rounded-xl flex flex-col">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#5f6368]">Condición</span>
+                  <span className="text-xs font-semibold text-[#202124] mt-0.5">
+                    {producto.condition?.toLowerCase() === 'used' ? 'Usado selecto' : 'Nuevo'}
+                  </span>
+                </div>
+              </div>
+
+              {/* ACCIONES DE COMPRA */}
+              {usuario && producto.seller_id === usuario.id ? (
+                <div className="text-center py-3.5 px-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-xs font-bold leading-relaxed">
+                  Esta es una publicación propia. Podés administrarla desde Mi Objetia.
+                </div>
+              ) : (
+                <div className="space-y-3 pt-2">
+                  {/* Botón Principal: Reservar y Agregar al Carrito */}
+                  <button
+                    type="button"
+                    onClick={handleAgregarAlCarrito}
+                    disabled={producto.status !== 'AVAILABLE' || cargandoAccion}
+                    className={`w-full h-12 flex items-center justify-center gap-2.5 rounded-xl font-bold text-sm tracking-wide transition shadow-xs cursor-pointer ${
+                      producto.status === 'AVAILABLE'
+                        ? "bg-[#1a73e8] hover:bg-[#1557b0] text-white active:scale-98"
+                        : "bg-[#f1f3f4] text-[#9aa0a6] cursor-not-allowed border border-[#dadce0]"
+                    }`}
+                  >
+                    <ShoppingCart className="h-4 w-4" />
+                    {producto.status === 'AVAILABLE' 
+                      ? "Reservar y Agregar al Carrito" 
+                      : (producto.status === 'PAUSED' ? "Publicación Pausada" : (producto.status === 'RESERVED' ? "Producto Reservado" : "Agotado"))}
+                  </button>
+
+                  {/* Acciones Secundarias: Chat + Favorito */}
+                  <div className="flex gap-2.5">
+                    <button
+                      type="button"
+                      onClick={handleIniciarChat}
+                      disabled={cargandoAccion}
+                      className="flex-1 h-11 px-4 rounded-xl border border-[#dadce0] hover:bg-[#f8f9fa] hover:border-[#9aa0a6] text-[#202124] font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer bg-white"
+                    >
+                      <MessageSquare className="h-4 w-4 text-[#5f6368]" /> 
+                      <span>Chatear con el vendedor</span>
+                    </button>
+                    
+                    <button
+                      type="button"
+                      onClick={handleFavorito}
+                      aria-label={esFavorito ? "Quitar de favoritos" : "Agregar a favoritos"}
+                      className={`h-11 w-11 flex-shrink-0 rounded-xl border transition flex items-center justify-center cursor-pointer ${
+                        esFavorito 
+                          ? "border-red-200 bg-red-50 text-red-500 shadow-2xs" 
+                          : "border-[#dadce0] hover:bg-[#f8f9fa] hover:border-[#9aa0a6] text-[#5f6368] bg-white"
+                      }`}
+                      title={esFavorito ? "Guardado en favoritos" : "Guardar en favoritos"}
+                    >
+                      <Heart className={`h-4.5 w-4.5 transition-colors ${esFavorito ? "fill-red-500 text-red-500" : ""}`} />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* BENEFICIOS / SEGURIDAD (OBJETIA TRUST) */}
+              <div className="pt-2 border-t border-[#dadce0] grid grid-cols-1 sm:grid-cols-2 gap-3 text-left">
+                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-[#f8f9fa] border border-[#dadce0]">
+                  <Truck className="h-4 w-4 text-[#1a73e8] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-xs font-bold text-[#202124]">Envíos asegurados</h4>
+                    <p className="text-[11px] text-[#5f6368] mt-0.5 leading-snug">
+                      Despachos a todo el país vía Correo Argentino con seguimiento online.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-[#f8f9fa] border border-[#dadce0]">
+                  <ShieldCheck className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="text-xs font-bold text-[#202124]">Compra Protegida</h4>
+                    <p className="text-[11px] text-[#5f6368] mt-0.5 leading-snug">
+                      Tu dinero se custodia hasta que recibís el objeto tal como fue publicado.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* DESCRIPCIÓN */}
+              <div className="pt-4 border-t border-[#dadce0] space-y-2">
+                <h3 className="text-xs font-bold text-[#5f6368] uppercase tracking-wider">
+                  Descripción del objeto
+                </h3>
+                <p className="text-sm text-[#3c4043] leading-relaxed whitespace-pre-line">
+                  {producto.description || "El vendedor no ha incluido una descripción adicional para este objeto."}
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
         </div>
+
       </div>
     </div>
   );
