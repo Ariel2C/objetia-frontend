@@ -66,6 +66,7 @@ function CatalogContent() {
   const [orden, setOrden] = useState(sortParam === 'newest' ? 'recientes' : 'relevantes');
   const [sidebarOculto, setSidebarOculto] = useState(false);
   const [menuMovilAbierto, setMenuMovilAbierto] = useState(false);
+  const [materialAbierto, setMaterialAbierto] = useState(true);
 
   // Sincronizar parámetros de la URL si cambian externamente
   useEffect(() => {
@@ -436,39 +437,57 @@ function CatalogContent() {
         {/* 4. Material */}
         <div className="pt-4 border-t border-[#dadce0]">
           <div className="flex items-center justify-between px-2 mb-2">
-            <span className="text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">
-              Material
-            </span>
+            <button
+              type="button"
+              onClick={() => setMaterialAbierto(!materialAbierto)}
+              className="flex items-center gap-1.5 text-left cursor-pointer group select-none flex-1 py-0.5"
+            >
+              <span className="text-[11px] font-bold text-[#5f6368] uppercase tracking-wider group-hover:text-[#202124] transition-colors">
+                Material
+              </span>
+              <ChevronDown 
+                className={`h-3.5 w-3.5 text-[#5f6368] group-hover:text-[#202124] transition-transform duration-200 ${
+                  materialAbierto ? 'rotate-180' : ''
+                }`}
+              />
+              {!materialAbierto && material !== 'Todos' && (
+                <span className="text-[11px] font-semibold text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.5 rounded-lg truncate max-w-[120px]">
+                  {material}
+                </span>
+              )}
+            </button>
             {material !== 'Todos' && (
               <button
                 type="button"
                 onClick={() => handleSeleccionarMaterial('Todos')}
-                className="text-[11px] text-[#1a73e8] hover:underline cursor-pointer"
+                className="text-[11px] text-[#1a73e8] hover:underline cursor-pointer flex-shrink-0 ml-2"
               >
-                Todos
+                Limpiar
               </button>
             )}
           </div>
-          <div className="flex flex-wrap gap-1.5 px-1">
-            {MATERIALES_OBJETIA.map((mat) => {
-              const isSelected = material === mat;
-              return (
-                <button
-                  key={mat}
-                  type="button"
-                  onClick={() => handleSeleccionarMaterial(isSelected ? 'Todos' : mat)}
-                  className={`inline-flex items-center px-2.5 py-1 text-xs rounded-xl border transition cursor-pointer ${
-                    isSelected
-                      ? "bg-[#e8f0fe] text-[#1a73e8] border-[#d2e3fc] font-semibold shadow-2xs"
-                      : "bg-white text-[#3c4043] border-[#dadce0] hover:bg-[#f1f3f4]"
-                  }`}
-                  title={mat}
-                >
-                  <span className="truncate">{mat}</span>
-                </button>
-              );
-            })}
-          </div>
+          {materialAbierto && (
+            <div className="flex flex-wrap gap-1.5 px-1 animate-fade-in">
+              {MATERIALES_OBJETIA.map((mat) => {
+                const isSelected = material === mat;
+                return (
+                  <button
+                    key={mat}
+                    type="button"
+                    onClick={() => handleSeleccionarMaterial(isSelected ? 'Todos' : mat)}
+                    className={`inline-flex items-center px-2.5 py-1 text-xs rounded-xl border transition cursor-pointer ${
+                      isSelected
+                        ? "bg-[#e8f0fe] text-[#1a73e8] border-[#d2e3fc] font-semibold shadow-2xs"
+                        : "bg-white text-[#3c4043] border-[#dadce0] hover:bg-[#f1f3f4]"
+                    }`}
+                    title={mat}
+                  >
+                    <span className="truncate">{mat}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
       </div>
