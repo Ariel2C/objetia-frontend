@@ -122,26 +122,29 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
     setError(null);
     try {
       const authToken = localStorage.getItem('vamaar_token') || token;
-      const [resProd, resMetrics] = await Promise.all([
-        fetch(`${getApiUrl()}/products/my-publications/`, {
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        }),
-        fetch(`${getApiUrl()}/analytics/seller/metrics`, {
-          headers: { 'Authorization': `Bearer ${authToken}` }
-        }).catch(() => null)
-      ]);
+
+      // 1. Obtener publicaciones inmediatamente para desbloquear la vista y el scroll
+      const resProd = await fetch(`${getApiUrl()}/products/my-publications/`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      });
 
       if (!resProd.ok) throw new Error("No se pudo obtener tus publicaciones.");
       const dataProd = await resProd.json();
       setProducts(dataProd);
+      setLoading(false); // <--- Desbloqueo instantáneo de la interfaz y disparo del scroll
 
-      if (resMetrics && resMetrics.ok) {
-        const dataMetrics = await resMetrics.json();
-        setMetrics(dataMetrics);
-      }
+      // 2. Obtener métricas analíticas en segundo plano sin demorar la carga de la lista
+      fetch(`${getApiUrl()}/analytics/seller/metrics`, {
+        headers: { 'Authorization': `Bearer ${authToken}` }
+      })
+        .then(res => res && res.ok ? res.json() : null)
+        .then(dataMetrics => {
+          if (dataMetrics) setMetrics(dataMetrics);
+        })
+        .catch(() => null);
+
     } catch (err: any) {
       setError(err.message || "Error de red.");
-    } finally {
       setLoading(false);
     }
   };
