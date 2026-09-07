@@ -3,11 +3,25 @@ import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useAuth } from '../../components/AuthContext';
 import { apiFetch, getToken } from '../../lib/api';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Trash2, Clock, ShieldCheck, CreditCard, Lock, ArrowRight, ShoppingBag, Loader2, Truck, AlertTriangle, Wallet, ExternalLink, Gift } from 'lucide-react';
+import { Trash2, Clock, ShieldCheck, CreditCard, Lock, ArrowRight, ShoppingBag, Loader2, Truck, AlertTriangle, Wallet, ExternalLink, Gift, Check, MapPin, Plus, Edit2 } from 'lucide-react';
 import { useToast } from '../../components/ToastContext';
 import Link from 'next/link';
 import FormattedPrice from '../../components/FormattedPrice';
 import { formatearTituloProducto } from '../../lib/format';
+
+export interface UserAddress {
+  id: number;
+  title: string;
+  street: string;
+  number: string;
+  floor_dept?: string | null;
+  postal_code?: string | null;
+  city: string;
+  province: string;
+  is_default: boolean;
+  lat?: number | null;
+  lng?: number | null;
+}
 
 interface CartItem {
   id: number;
@@ -50,6 +64,12 @@ function CartContent() {
   const [shippingCost, setShippingCost] = useState<number | null>(null);
   const [calculandoEnvio, setCalculandoEnvio] = useState(false);
 
+  // Direcciones guardadas del usuario
+  const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | 'manual' | null>(null);
+  const [loadingAddresses, setLoadingAddresses] = useState(false);
+  const [showManualAddressForm, setShowManualAddressForm] = useState(false);
+
   // Saldo de la billetera Vamaar usable para comprar dentro de la app
   const [saldoBilletera, setSaldoBilletera] = useState<number>(0);
   const [pagandoConSaldo, setPagandoConSaldo] = useState(false);
@@ -73,22 +93,16 @@ function CartContent() {
     }
   };
 
-  useEffect(() => {
-    if (usuario) {
-      fetchSaldoBilletera();
-      fetchComprasPrevias();
-    }
-  }, [usuario]);
-
-  const handleCalcularEnvio = async (cp: string) => {
-    if (cp.trim().length < 4 || items.length === 0) {
+  const handleCalcularEnvio = async (cp: string, currentItems?: CartItem[]) => {
+    const activeItems = currentItems ?? items;
+    if (cp.trim().length < 4 || activeItems.length === 0) {
       setShippingCost(null);
       return;
     }
     setCalculandoEnvio(true);
     try {
       const data = await apiFetch<{ shipping_cost: number }>(
-        `/orders/shipping-cost/?product_id=${items[0].id}&postal_code=${cp.toUpperCase().trim()}`,
+        `/orders/shipping-cost/?product_id=${activeItems[0].id}&postal_code=${cp.toUpperCase().trim()}`,
         { auth: false }
       );
       setShippingCost(data.shipping_cost);
@@ -99,25 +113,89 @@ function CartContent() {
     }
   };
 
-  // Pre-completar datos de envío desde el perfil del usuario
+  const applyAddress = (addr: UserAddress) => {
+    setSelectedAddressId(addr.id);
+    setShowManualAddressForm(false);
+    setStreet(addr.street || "");
+    setNumber(addr.number || "");
+    setFloorDept(addr.floor_dept || "");
+    setCity(addr.city || "");
+    setProvince(addr.province || "");
+    if (addr.postal_code) {
+      setPostalCode(addr.postal_code);
+      handleCalcularEnvio(addr.postal_code);
+    } else {
+      setPostalCode("");
+      setShippingCost(null);
+    }
+  };
+
+  const handleSelectManualAddress = () => {
+    setSelectedAddressId('manual');
+    setShowManualAddressForm(true);
+    setStreet("");
+    setNumber("");
+    setFloorDept("");
+    setPostalCode("");
+    setCity("");
+    setProvince("");
+    setShippingCost(null);
+  };
+
+  const fetchAddresses = async () => {
+    if (!getToken() && !token) return;
+    setLoadingAddresses(true);
+    try {
+      const data = await apiFetch<UserAddress[]>('/auth/addresses');
+      const addrs = Array.isArray(data) ? data : [];
+      setSavedAddresses(addrs);
+
+      if (addrs.length > 0) {
+        const def = addrs.find(a => a.is_default) || addrs[0];
+        applyAddress(def);
+      } else {
+        setSelectedAddressId('manual');
+        setShowManualAddressForm(true);
+        const u = usuario as any;
+        if (u) {
+          if (u.street) setStreet(u.street);
+          if (u.number) setNumber(u.number);
+          if (u.floor_dept) setFloorDept(u.floor_dept);
+          if (u.postal_code) {
+            setPostalCode(u.postal_code);
+            handleCalcularEnvio(u.postal_code);
+          }
+          if (u.city) setCity(u.city);
+          if (u.province) setProvince(u.province);
+        }
+      }
+    } catch (err) {
+      console.warn("Error cargando direcciones en carrito:", err);
+      setSelectedAddressId('manual');
+      setShowManualAddressForm(true);
+    } finally {
+      setLoadingAddresses(false);
+    }
+  };
+
   useEffect(() => {
     if (usuario) {
       const u = usuario as any;
-      if (u.full_name) setRecipientName(u.full_name);
-      if (u.street) setStreet(u.street);
-      if (u.number) setNumber(u.number);
-      if (u.floor_dept) setFloorDept(u.floor_dept);
-      if (u.postal_code) {
-        setPostalCode(u.postal_code);
-        // Si hay items cargados en el carrito, cotizar
-        if (items.length > 0) {
-          handleCalcularEnvio(u.postal_code);
-        }
+      if (u.full_name && !recipientName) {
+        setRecipientName(u.full_name);
       }
-      if (u.city) setCity(u.city);
-      if (u.province) setProvince(u.province);
+      fetchSaldoBilletera();
+      fetchComprasPrevias();
+      fetchAddresses();
     }
-  }, [usuario, items.length]);
+  }, [usuario]);
+
+  // Si los items se cargan después que la dirección, recalcular envío con el CP actual
+  useEffect(() => {
+    if (items.length > 0 && postalCode && postalCode.trim().length >= 4 && shippingCost === null && !calculandoEnvio) {
+      handleCalcularEnvio(postalCode, items);
+    }
+  }, [items, postalCode]);
 
   const fetchCart = async () => {
     if (!getToken() && !token) return;
@@ -629,97 +707,214 @@ function CartContent() {
 
             {/* Formulario de Dirección de Envío */}
             <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs space-y-4">
-              <h3 className="text-base font-semibold leading-7 text-gray-900 flex items-center gap-2 border-b border-gray-100 pb-3">
-                <Truck className="h-5 w-5 text-gray-700" /> Dirección de Envío (Correo Argentino)
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
-                  <label className="text-xs font-semibold text-gray-700 block mb-1">Nombre Completo del Destinatario *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Lucia Fernández"
-                    value={recipientName}
-                    onChange={(e) => setRecipientName(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-700 block mb-1">Calle *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Av. Colón"
-                    value={street}
-                    onChange={(e) => setStreet(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div>
-                    <label className="text-xs font-semibold text-gray-700 block mb-1">Número *</label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="1234"
-                      value={number}
-                      onChange={(e) => setNumber(e.target.value)}
-                      className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-gray-700 block mb-1">Piso/Depto</label>
-                    <input
-                      type="text"
-                      placeholder="2° B"
-                      value={floorDept}
-                      onChange={(e) => setFloorDept(e.target.value)}
-                      className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-700 block mb-1">Código Postal *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="X5000"
-                    value={postalCode}
-                    onChange={(e) => {
-                      setPostalCode(e.target.value);
-                      if (e.target.value.trim().length >= 4) {
-                        handleCalcularEnvio(e.target.value);
-                      } else {
-                        setShippingCost(null);
-                      }
-                    }}
-                    onBlur={(e) => handleCalcularEnvio(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition font-mono font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-semibold text-gray-700 block mb-1">Ciudad / Localidad *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Córdoba"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="text-xs font-semibold text-gray-700 block mb-1">Provincia *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Córdoba"
-                    value={province}
-                    onChange={(e) => setProvince(e.target.value)}
-                    className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
-                  />
-                </div>
+              <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+                <h3 className="text-base font-semibold leading-7 text-gray-900 flex items-center gap-2">
+                  <Truck className="h-5 w-5 text-gray-700" /> Dirección de Envío (Correo Argentino)
+                </h3>
+                <Link
+                  href="/mi-objetia"
+                  className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition flex items-center gap-1"
+                >
+                  <span>Mis direcciones</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
               </div>
+
+              {/* Nombre Completo del Destinatario */}
+              <div>
+                <label className="text-xs font-semibold text-gray-700 block mb-1">Nombre Completo del Destinatario *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Ej: Lucia Fernández"
+                  value={recipientName}
+                  onChange={(e) => setRecipientName(e.target.value)}
+                  className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
+                />
+              </div>
+
+              {/* Direcciones guardadas */}
+              {loadingAddresses ? (
+                <div className="flex items-center justify-center py-6 text-gray-400 text-xs gap-2 border border-gray-100 rounded-xl bg-gray-50/50">
+                  <Loader2 className="w-4 h-4 animate-spin text-gray-600" />
+                  <span>Cargando tus direcciones guardadas...</span>
+                </div>
+              ) : savedAddresses.length > 0 ? (
+                <div className="space-y-3 pt-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-indigo-600" />
+                      Elegí una de tus direcciones guardadas:
+                    </label>
+                    {selectedAddressId !== 'manual' && (
+                      <button
+                        type="button"
+                        onClick={() => setShowManualAddressForm(!showManualAddressForm)}
+                        className="text-[11px] font-medium text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer"
+                      >
+                        <Edit2 className="w-3 h-3" />
+                        <span>{showManualAddressForm ? "Ocultar edición" : "Editar o revisar campos"}</span>
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {savedAddresses.map((addr) => {
+                      const isSelected = selectedAddressId === addr.id;
+                      return (
+                        <div
+                          key={addr.id}
+                          onClick={() => applyAddress(addr)}
+                          className={`p-3.5 rounded-xl border-2 transition cursor-pointer flex flex-col justify-between text-left relative ${
+                            isSelected
+                              ? 'border-indigo-600 bg-indigo-50/40 shadow-xs'
+                              : 'border-gray-200 hover:border-gray-300 bg-white'
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-1.5">
+                              <span className="text-xs font-bold text-gray-900 truncate">
+                                {addr.title || "Dirección"}
+                              </span>
+                              <div className="flex items-center gap-1.5 shrink-0">
+                                {addr.is_default && (
+                                  <span className="text-[10px] font-semibold bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                                    Predeterminada
+                                  </span>
+                                )}
+                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
+                                  isSelected ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-300 bg-white'
+                                }`}>
+                                  {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-800 font-medium leading-snug">
+                              {addr.street} {addr.number} {addr.floor_dept ? `(${addr.floor_dept})` : ''}
+                            </p>
+                            <p className="text-[11px] text-gray-500 mt-0.5">
+                              {addr.city}, {addr.province} {addr.postal_code ? `· CP ${addr.postal_code}` : ''}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                    {/* Opción para ingresar otra dirección manualmente */}
+                    <div
+                      onClick={handleSelectManualAddress}
+                      className={`p-3.5 rounded-xl border-2 border-dashed transition cursor-pointer flex flex-col items-center justify-center min-h-[86px] text-center ${
+                        selectedAddressId === 'manual'
+                          ? 'border-indigo-600 bg-indigo-50/30 text-indigo-700'
+                          : 'border-gray-300 hover:border-gray-400 bg-gray-50/50 text-gray-600 hover:text-gray-800'
+                      }`}
+                    >
+                      <Plus className="w-4 h-4 mb-1" />
+                      <span className="text-xs font-semibold">Usar otra dirección</span>
+                      <span className="text-[10px] text-gray-400">Ingresar manualmente</span>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              {/* Formulario de campos de dirección (visible si es manual, si no tiene guardadas o si pidió editar) */}
+              {(showManualAddressForm || selectedAddressId === 'manual' || savedAddresses.length === 0) && (
+                <div className={`space-y-4 pt-2 ${savedAddresses.length > 0 ? 'border-t border-gray-100 mt-3' : ''}`}>
+                  {savedAddresses.length > 0 && selectedAddressId === 'manual' && (
+                    <div className="flex items-center justify-between bg-amber-50/70 border border-amber-200/80 px-3 py-2 rounded-lg text-xs text-amber-800">
+                      <span>Ingresando una dirección alternativa para este envío.</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const def = savedAddresses.find(a => a.is_default) || savedAddresses[0];
+                          if (def) applyAddress(def);
+                        }}
+                        className="font-semibold text-amber-900 underline hover:no-underline ml-2 cursor-pointer"
+                      >
+                        Volver a mis direcciones
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-gray-700 block mb-1">Calle *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Av. Colón"
+                        value={street}
+                        onChange={(e) => setStreet(e.target.value)}
+                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-xs font-semibold text-gray-700 block mb-1">Número *</label>
+                        <input
+                          type="text"
+                          required
+                          placeholder="1234"
+                          value={number}
+                          onChange={(e) => setNumber(e.target.value)}
+                          className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-gray-700 block mb-1">Piso/Depto</label>
+                        <input
+                          type="text"
+                          placeholder="2° B"
+                          value={floorDept}
+                          onChange={(e) => setFloorDept(e.target.value)}
+                          className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-700 block mb-1">Código Postal *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="X5000"
+                        value={postalCode}
+                        onChange={(e) => {
+                          setPostalCode(e.target.value);
+                          if (e.target.value.trim().length >= 4) {
+                            handleCalcularEnvio(e.target.value);
+                          } else {
+                            setShippingCost(null);
+                          }
+                        }}
+                        onBlur={(e) => handleCalcularEnvio(e.target.value)}
+                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition font-mono font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-700 block mb-1">Ciudad / Localidad *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Córdoba"
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label className="text-xs font-semibold text-gray-700 block mb-1">Provincia *</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Córdoba"
+                        value={province}
+                        onChange={(e) => setProvince(e.target.value)}
+                        className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
