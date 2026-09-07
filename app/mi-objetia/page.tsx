@@ -729,7 +729,11 @@ function MiObjetiaContent() {
   const TabIcon = currentTabMeta.icon;
 
   return (
-    <div className={`bg-[#f8f9fa] flex flex-col font-sans text-[#202124] antialiased ${tabActual === "chat" ? "h-screen overflow-hidden" : "min-h-screen"}`}>
+    <div className={`bg-[#f8f9fa] flex flex-col font-sans text-[#202124] antialiased ${
+      tabActual === "chat" 
+        ? "h-[calc(100dvh-64px)] max-h-[calc(100dvh-64px)] -mb-20 md:mb-0 overflow-hidden" 
+        : "min-h-screen"
+    }`}>
       {/* Workspace Shell Google AI Studio Light */}
       <div className="flex flex-1 overflow-hidden h-full">
         {/* Sidebar Lateral Google AI Studio Light */}
@@ -827,7 +831,7 @@ function MiObjetiaContent() {
           </header>
 
           {/* Cuerpo de Contenido (Ocupa todo el ancho de la página) */}
-          <main className={`flex-1 w-full ${tabActual === "chat" ? "p-2 sm:p-3 lg:p-4 flex flex-col min-h-0 overflow-hidden" : "p-4 sm:p-6 lg:p-8 space-y-6"}`}>
+          <main className={`flex-1 w-full ${tabActual === "chat" ? "p-2 sm:p-3 pb-3 sm:pb-4 flex flex-col min-h-0 overflow-hidden" : "p-4 sm:p-6 lg:p-8 space-y-6"}`}>
             {/* TAB: BILLETERA */}
             {tabActual === "billetera" && (
               <div className="animate-fade-in">

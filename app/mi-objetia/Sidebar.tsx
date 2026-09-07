@@ -270,7 +270,7 @@ export default function Sidebar({
 
       {/* SIDEBAR ESCRITORIO (Deslizamiento físico a la izquierda sin deformación) */}
       <aside 
-        className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-64 min-h-[calc(100vh-58px)] overflow-hidden ${
+        className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-64 h-full min-h-[calc(100vh-64px)] overflow-hidden ${
           sidebarOculto ? '-ml-64 pointer-events-none' : 'ml-0'
         }`}
       >

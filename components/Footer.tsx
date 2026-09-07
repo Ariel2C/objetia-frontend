@@ -22,8 +22,9 @@ export default function Footer() {
   const tab = searchParams.get('tab');
 
   const isRootTab = pathname === '/root/dashboard' || ((pathname === '/mi-objetia' || pathname === '/mi-espacio') && tab === 'root');
+  const isChatTab = (pathname === '/mi-objetia' || pathname === '/mi-espacio') && tab === 'chat';
 
-  if (isRootTab) return null;
+  if (isRootTab || isChatTab) return null;
   return (
     <footer className="bg-gray-900 text-gray-300 border-t border-gray-800 pt-12 pb-24 md:pb-12 mt-16">
       {/* SECCIÓN DE BENEFICIOS Y CONFIANZA */}

@@ -9,6 +9,7 @@ export default function AnnouncementBar() {
   const tab = searchParams.get('tab');
 
   const isRootTab = pathname === '/root/dashboard' || ((pathname === '/mi-objetia' || pathname === '/mi-espacio') && tab === 'root');
+  const isChatTab = (pathname === '/mi-objetia' || pathname === '/mi-espacio') && tab === 'chat';
   const [visible, setVisible] = useState(false);
   const [mensajeState, setMensajeState] = useState("");
   const [finISOState, setFinISOState] = useState<string | null>(null);
@@ -85,7 +86,7 @@ export default function AnnouncementBar() {
     return () => clearInterval(interval);
   }, [finISOState, visible]);
 
-  if (isRootTab || !visible) return null;
+  if (isRootTab || isChatTab || !visible) return null;
 
   const pad = (n: number) => n.toString().padStart(2, '0');
 

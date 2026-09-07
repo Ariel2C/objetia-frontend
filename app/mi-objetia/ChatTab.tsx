@@ -550,14 +550,6 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                 ref={messagesContainerRef}
                 className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 custom-scrollbar"
               >
-                {/* Banner de Garantía Objetia */}
-                <div className="p-2.5 rounded-xl bg-white border border-[#dadce0] shadow-2xs flex items-center gap-2 text-xs text-[#3c4043] max-w-xl mx-auto">
-                  <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                  <p className="text-[11px] leading-snug">
-                    <strong>Conversación protegida:</strong> Mantené el contacto dentro de Objetia para conservar la cobertura y garantía oficial en tu operación.
-                  </p>
-                </div>
-
                 {loadingMensajes ? (
                   <div className="flex justify-center py-12">
                     <Loader2 className="w-5 h-5 text-[#1a73e8] animate-spin" />
