@@ -9,7 +9,9 @@ import {
   Bell, 
   ChevronDown,
   Search,
-  MessageSquare
+  MessageSquare,
+  Sparkles,
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '../lib/config';
@@ -657,7 +659,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
 
                     {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN - GOOGLE AI STUDIO DARK */}
                     {menuAbierto && (
-                      <div className="absolute right-0 mt-2 w-64 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1.5 animate-scale-in origin-top-right">
+                      <div className="absolute right-0 mt-2 w-72 sm:w-[310px] bg-[#16120e] border border-[#382b20] rounded-2xl shadow-2xl shadow-black/80 z-50 p-2.5 space-y-2 animate-scale-in origin-top-right">
                         {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'administrador') && (
                           <div className="px-1 pt-0.5">
                             <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#282a2c] text-[#87a9ff] border border-[#3c4043]">
@@ -673,18 +675,110 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                           </div>
                         )}
 
-                        {/* Badge tipo botón: Mi OBJETIA con título y descripción */}
+                        {/* ==================================================================== */}
+                        {/* TARJETA MI OBJETIA: ESTÉTICA CÁLIDA SPATIAL 3D (TENDENCIA 2026)      */}
+                        {/* ==================================================================== */}
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="block p-3 rounded-xl bg-[#282a2c]/60 hover:bg-[#282a2c] border border-[#3c4043] hover:border-[#87a9ff]/40 transition group cursor-pointer text-left"
+                          className="relative block p-3.5 rounded-2xl bg-gradient-to-br from-[#251811] via-[#1d120c] to-[#140d09] border border-amber-500/35 hover:border-amber-400/80 shadow-lg shadow-amber-950/40 hover:shadow-amber-900/50 transition-all duration-500 group cursor-pointer text-left overflow-hidden select-none"
                         >
-                          <div className="text-xs font-semibold text-white group-hover:text-[#87a9ff] transition-colors">
-                            Mi OBJETIA
+                          {/* 1. Resplandores y auras cálidas de fondo */}
+                          <div className="absolute -top-8 -right-8 w-28 h-28 rounded-full bg-radial from-amber-500/25 via-orange-600/10 to-transparent blur-xl pointer-events-none animate-warm-aura" />
+                          <div className="absolute -bottom-8 -left-8 w-24 h-24 rounded-full bg-radial from-orange-600/20 to-transparent blur-lg pointer-events-none" />
+
+                          {/* 2. Haz de luz dinámico (Shimmer Beam 2026) */}
+                          <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
+                            <div className="w-1/2 h-full bg-gradient-to-r from-transparent via-amber-200/10 to-transparent animate-warm-beam" />
                           </div>
-                          <p className="text-[11px] text-[#9aa0a6] leading-relaxed mt-1 group-hover:text-[#c4c7c5] transition-colors">
-                            Gestioná tus compras, ventas, publicaciones y perfil personal.
+
+                          {/* 3. Cabecera con Badge y Escenario 3D Espacial */}
+                          <div className="relative z-10 flex items-start justify-between gap-2">
+                            <div className="min-w-0 flex-1">
+                              {/* Pill cálido de categoría */}
+                              <span className="text-[9px] font-black uppercase tracking-wider text-amber-300 bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-400/30 inline-flex items-center gap-1 shadow-xs">
+                                <Sparkles className="w-2.5 h-2.5 text-amber-300 animate-pulse" />
+                                ESPACIO PERSONAL
+                              </span>
+
+                              {/* Título de Marca con gradiente dorado cálido */}
+                              <h3 className="text-sm font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-amber-100 to-amber-300 group-hover:from-white group-hover:via-amber-200 group-hover:to-amber-400 transition-all font-sans mt-1">
+                                Mi OBJETIA
+                              </h3>
+                            </div>
+
+                            {/* ESCENARIO 3D INTERACTIVO (Cubo Isométrico Levitando + Anillos Orbitales) */}
+                            <div className="w-12 h-12 relative flex items-center justify-center flex-shrink-0 perspective-spatial">
+                              {/* Anillo Orbital Exterior */}
+                              <div className="w-11 h-11 absolute rounded-full border border-dashed border-amber-400/60 pointer-events-none animate-spatial-ring">
+                                <span className="absolute -top-0.5 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-amber-300 shadow-[0_0_6px_#fbbf24] animate-pulse" />
+                              </div>
+
+                              {/* Anillo Orbital Interior Secundario */}
+                              <div className="w-8 h-8 absolute rounded-full border border-orange-400/40 pointer-events-none animate-spatial-ring-reverse" />
+
+                              {/* Cubo 3D Levitante */}
+                              <div className="w-[20px] h-[20px] relative preserve-3d animate-spatial-cube">
+                                {/* Cara Frontal */}
+                                <div 
+                                  className="w-[20px] h-[20px] absolute inset-0 rounded-[3px] bg-gradient-to-br from-amber-300/50 via-amber-500/30 to-orange-600/40 border border-amber-300/90 shadow-[inset_0_0_6px_rgba(251,191,36,0.6)]"
+                                  style={{ transform: 'translateZ(10px)' }}
+                                />
+                                {/* Cara Posterior */}
+                                <div 
+                                  className="w-[20px] h-[20px] absolute inset-0 rounded-[3px] bg-gradient-to-br from-orange-600/40 via-amber-600/25 to-amber-400/30 border border-amber-400/70"
+                                  style={{ transform: 'rotateY(180deg) translateZ(10px)' }}
+                                />
+                                {/* Cara Derecha */}
+                                <div 
+                                  className="w-[20px] h-[20px] absolute inset-0 rounded-[3px] bg-gradient-to-br from-amber-400/45 via-amber-600/30 to-orange-700/40 border border-amber-300/80"
+                                  style={{ transform: 'rotateY(90deg) translateZ(10px)' }}
+                                />
+                                {/* Cara Izquierda */}
+                                <div 
+                                  className="w-[20px] h-[20px] absolute inset-0 rounded-[3px] bg-gradient-to-br from-orange-500/40 via-amber-500/25 to-amber-300/30 border border-amber-400/70"
+                                  style={{ transform: 'rotateY(-90deg) translateZ(10px)' }}
+                                />
+                                {/* Cara Superior (Brillante) */}
+                                <div 
+                                  className="w-[20px] h-[20px] absolute inset-0 rounded-[3px] bg-gradient-to-br from-amber-100/70 to-amber-400/40 border border-amber-200/95 shadow-[0_0_8px_rgba(254,243,199,0.7)]"
+                                  style={{ transform: 'rotateX(90deg) translateZ(10px)' }}
+                                />
+                                {/* Cara Inferior */}
+                                <div 
+                                  className="w-[20px] h-[20px] absolute inset-0 rounded-[3px] bg-gradient-to-br from-orange-950/70 to-amber-900/50 border border-orange-600/60"
+                                  style={{ transform: 'rotateX(-90deg) translateZ(10px)' }}
+                                />
+                              </div>
+
+                              {/* Sombra 3D Dinámica reactiva */}
+                              <div className="w-6 h-1.5 rounded-full bg-radial from-amber-500/60 via-orange-950/40 to-transparent blur-[2px] animate-spatial-shadow absolute -bottom-1" />
+                            </div>
+                          </div>
+
+                          {/* 4. Descripción elegante y cálida */}
+                          <p className="relative z-10 text-[11px] text-amber-200/70 leading-relaxed mt-1.5 group-hover:text-amber-100/90 transition-colors">
+                            Gestioná tus compras, ventas, catálogo y billetera en tu panel central.
                           </p>
+
+                          {/* 5. Barra inferior con micro-tags e indicador de acción */}
+                          <div className="relative z-10 flex items-center justify-between mt-3 pt-2 border-t border-amber-500/20">
+                            <div className="flex items-center gap-1">
+                              <span className="text-[8.5px] font-semibold text-amber-300/80 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                Compras
+                              </span>
+                              <span className="text-[8.5px] font-semibold text-amber-300/80 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                Ventas
+                              </span>
+                              <span className="text-[8.5px] font-semibold text-amber-300/80 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/20">
+                                Billetera
+                              </span>
+                            </div>
+
+                            <span className="text-[10.5px] font-bold text-amber-400 group-hover:text-amber-300 flex items-center gap-0.5 transition-transform group-hover:translate-x-1 duration-200">
+                              Entrar <ChevronRight className="w-3.5 h-3.5" />
+                            </span>
+                          </div>
                         </Link>
 
                         {/* Cerrar Sesión centrado abajo */}

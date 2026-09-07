@@ -215,3 +215,115 @@ textarea.text-white::placeholder,
   font-weight: 700 !important;
 }
 
+/* ==========================================================================
+   2026 SPATIAL 3D & WARM AMBIENT CARD ANIMATIONS
+   ========================================================================== */
+
+.perspective-spatial {
+  perspective: 700px;
+  transform-style: preserve-3d;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* 3D Cube Levitating & Rotating */
+@keyframes spatialCubeFloat {
+  0% {
+    transform: translateY(0px) rotateX(24deg) rotateY(20deg) rotateZ(-6deg);
+  }
+  50% {
+    transform: translateY(-8px) rotateX(32deg) rotateY(65deg) rotateZ(4deg);
+  }
+  100% {
+    transform: translateY(0px) rotateX(24deg) rotateY(20deg) rotateZ(-6deg);
+  }
+}
+
+.animate-spatial-cube {
+  animation: spatialCubeFloat 6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+  transform-style: preserve-3d;
+}
+
+/* Group hover elevates and speeds rotation smoothly */
+.group:hover .animate-spatial-cube {
+  animation-duration: 3s;
+}
+
+/* 3D Orbiting Ring */
+@keyframes spatialRingSpin {
+  0% {
+    transform: rotateX(70deg) rotateZ(0deg);
+  }
+  100% {
+    transform: rotateX(70deg) rotateZ(360deg);
+  }
+}
+
+.animate-spatial-ring {
+  animation: spatialRingSpin 7s linear infinite;
+  transform-style: preserve-3d;
+}
+
+/* Reverse Orbiting Secondary Ring */
+@keyframes spatialRingSpinReverse {
+  0% {
+    transform: rotateX(50deg) rotateY(25deg) rotateZ(360deg);
+  }
+  100% {
+    transform: rotateX(50deg) rotateY(25deg) rotateZ(0deg);
+  }
+}
+
+.animate-spatial-ring-reverse {
+  animation: spatialRingSpinReverse 10s linear infinite;
+  transform-style: preserve-3d;
+}
+
+/* Dynamic Shadow below 3D Object */
+@keyframes spatialShadowPulse {
+  0%, 100% {
+    transform: scale(0.85);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.25;
+  }
+}
+
+.animate-spatial-shadow {
+  animation: spatialShadowPulse 6s ease-in-out infinite;
+}
+
+/* Warm Shimmer Beam */
+@keyframes warmBeamMove {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
+.animate-warm-beam {
+  animation: warmBeamMove 4s ease-in-out infinite;
+}
+
+/* Warm Aura Breathing Glow */
+@keyframes warmAuraGlow {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.18);
+  }
+}
+
+.animate-warm-aura {
+  animation: warmAuraGlow 4s ease-in-out infinite;
+}
+
