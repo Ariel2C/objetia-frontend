@@ -293,7 +293,7 @@ function LoginContent() {
 
   return (
     <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50/50">
-      <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl border border-gray-100 space-y-6 relative overflow-hidden">
+      <div className="max-w-md sm:max-w-lg w-full bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-gray-100 space-y-6 relative overflow-hidden">
         
         {/* ============================================================================== */}
         {/* VISTA 1: INTRODUCCIÓN PARA VENDEDOR NO REGISTRADO */}
@@ -488,7 +488,7 @@ function LoginContent() {
           <div className="space-y-6 animate-fade-in">
             {/* CABECERA DINÁMICA */}
             <div className="text-center space-y-1">
-              <h2 className="text-xl md:text-2xl font-black text-gray-900 tracking-tight">
+              <h2 className="text-sm sm:text-base md:text-lg font-black text-gray-900 tracking-tight sm:whitespace-nowrap">
                 {esLogin ? "Qué bueno verte de nuevo" : "¡Estás a un paso de formar parte de la comunidad Objetia!"}
               </h2>
               <p className="text-xs text-gray-500">
