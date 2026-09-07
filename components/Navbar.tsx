@@ -677,46 +677,52 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         )}
 
                         {/* ==================================================================== */}
-                        {/* TARJETA MI OBJETIA: ESTÉTICA INTEGRAL OBJETIA (GOOGLE AI STUDIO DARK) */}
+                        {/* TARJETA MI OBJETIA: CENTRADA CON ICONO GIRANDO EN 3D CONTINUO       */}
                         {/* ==================================================================== */}
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="group relative block p-3.5 rounded-xl bg-[#282a2c]/60 hover:bg-[#282a2c] border border-[#3c4043] hover:border-[#87a9ff]/40 transition-all duration-200 cursor-pointer text-left overflow-hidden shadow-xs"
+                          className="group relative block p-4 rounded-xl bg-[#282a2c]/60 hover:bg-[#282a2c] border border-[#3c4043] hover:border-[#87a9ff]/40 transition-colors duration-200 cursor-pointer text-center overflow-hidden shadow-xs"
                         >
-                          <div className="flex items-center justify-between gap-2">
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <div className="w-8 h-8 rounded-lg bg-[#1e1f20] border border-[#3c4043] group-hover:border-[#87a9ff]/40 text-[#87a9ff] flex items-center justify-center transition-colors shadow-2xs flex-shrink-0">
-                                <LayoutGrid className="w-4 h-4 transition-transform group-hover:scale-105" />
+                          {/* Aura sutil de fondo en azul Objetia */}
+                          <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-28 h-28 bg-[#87a9ff]/5 rounded-full blur-xl pointer-events-none group-hover:bg-[#87a9ff]/10 transition-colors duration-500" />
+
+                          {/* 1. Icono girando en 3D (Animación continua que no se reinicia al pasar/quitar mouse) */}
+                          <div className="flex flex-col items-center justify-center [perspective:600px] mb-2 relative z-10">
+                            <div className="w-11 h-11 relative [transform-style:preserve-3d] animate-spin-3d-continuous">
+                              {/* Cara Frontal */}
+                              <div 
+                                className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#1e1f20] via-[#282a2c] to-[#3c4043] border border-[#87a9ff]/40 flex items-center justify-center text-[#87a9ff] shadow-[0_0_14px_rgba(135,169,255,0.25)] absolute inset-0 [backface-visibility:hidden]"
+                                style={{ transform: 'translateZ(3px)' }}
+                              >
+                                <Sparkles className="w-5 h-5 text-[#87a9ff] drop-shadow-[0_0_6px_rgba(135,169,255,0.6)]" />
                               </div>
-                              <div className="min-w-0">
-                                <h4 className="text-xs font-bold text-white group-hover:text-[#87a9ff] transition-colors leading-tight truncate">
-                                  Mi OBJETIA
-                                </h4>
-                                <span className="text-[10px] text-[#9aa0a6] block leading-tight mt-0.5">
-                                  Panel de control
-                                </span>
+
+                              {/* Cara Posterior */}
+                              <div 
+                                className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#1e1f20] via-[#282a2c] to-[#3c4043] border border-[#87a9ff]/40 flex items-center justify-center text-[#87a9ff] shadow-[0_0_14px_rgba(135,169,255,0.25)] absolute inset-0 [backface-visibility:hidden]"
+                                style={{ transform: 'rotateY(180deg) translateZ(3px)' }}
+                              >
+                                <Sparkles className="w-5 h-5 text-[#87a9ff] drop-shadow-[0_0_6px_rgba(135,169,255,0.6)]" />
                               </div>
                             </div>
 
-                            <ChevronRight className="w-4 h-4 text-[#9aa0a6] group-hover:text-[#87a9ff] transition-transform group-hover:translate-x-0.5 shrink-0" />
+                            {/* Sombra sutil bajo el icono 3D */}
+                            <div className="w-6 h-1 rounded-full bg-[#87a9ff]/20 blur-[2px] mt-1.5" />
                           </div>
 
-                          <p className="text-[11px] text-[#9aa0a6] leading-relaxed mt-2.5 group-hover:text-[#c4c7c5] transition-colors">
-                            Gestioná tus compras, ventas, publicaciones y perfil personal.
-                          </p>
+                          {/* 2. Mi OBJETIA centrado */}
+                          <div className="relative z-10">
+                            <h4 className="text-sm font-bold text-white group-hover:text-[#87a9ff] transition-colors tracking-wide text-center">
+                              Mi OBJETIA
+                            </h4>
+                          </div>
 
-                          {/* Chips de accesos rápidos estilo Objetia */}
-                          <div className="flex items-center gap-1.5 mt-2.5 pt-2 border-t border-[#333538]/60">
-                            <span className="text-[9px] font-medium text-[#c4c7c5] bg-[#1e1f20] px-2 py-0.5 rounded-md border border-[#333538] group-hover:border-[#87a9ff]/20 transition-colors">
-                              Compras
-                            </span>
-                            <span className="text-[9px] font-medium text-[#c4c7c5] bg-[#1e1f20] px-2 py-0.5 rounded-md border border-[#333538] group-hover:border-[#87a9ff]/20 transition-colors">
-                              Ventas
-                            </span>
-                            <span className="text-[9px] font-medium text-[#c4c7c5] bg-[#1e1f20] px-2 py-0.5 rounded-md border border-[#333538] group-hover:border-[#87a9ff]/20 transition-colors">
-                              Billetera
-                            </span>
+                          {/* 3. Gestioná tus compras... bien abajo */}
+                          <div className="relative z-10 mt-3 pt-2.5 border-t border-[#333538]/60">
+                            <p className="text-[11px] text-[#9aa0a6] leading-relaxed group-hover:text-[#c4c7c5] transition-colors text-center">
+                              Gestioná tus compras, ventas, publicaciones y perfil personal.
+                            </p>
                           </div>
                         </Link>
 

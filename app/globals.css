@@ -215,3 +215,18 @@ textarea.text-white::placeholder,
   font-weight: 700 !important;
 }
 
+/* Animación de giro 3D continuo (sin reinicio en hover/leave) */
+@keyframes spin3dContinuo {
+  0% {
+    transform: rotateX(12deg) rotateY(0deg);
+  }
+  100% {
+    transform: rotateX(12deg) rotateY(360deg);
+  }
+}
+
+.animate-spin-3d-continuous {
+  animation: spin3dContinuo 6s linear infinite;
+  transform-style: preserve-3d;
+}
+
