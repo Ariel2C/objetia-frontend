@@ -690,7 +690,7 @@ export default function SalesTab({ token }: SalesTabProps) {
                         </button>
 
                         <Link
-                          href="/chat"
+                          href="/mi-objetia?tab=chat"
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#202124] hover:bg-[#f1f3f4] border border-[#dadce0] rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
                           title="Abrir mensajes con el comprador"
                         >
@@ -706,7 +706,7 @@ export default function SalesTab({ token }: SalesTabProps) {
                         <span>Pendiente de guía de envío</span>
                       </div>
                       <Link
-                        href="/chat"
+                        href="/mi-objetia?tab=chat"
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#202124] hover:bg-[#f1f3f4] border border-[#dadce0] rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
                         title="Abrir mensajes con el comprador"
                       >

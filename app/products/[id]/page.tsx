@@ -191,7 +191,7 @@ export default function ProductDetailPage() {
         `/chat/rooms/get-or-create/?product_id=${producto.id}&seller_id=${producto.seller_id}`,
         { method: 'POST' }
       );
-      router.push(`/chat?room_id=${data.room_id}`);
+      router.push(`/mi-objetia?tab=chat&room_id=${data.room_id}`);
     } catch (err: any) {
       toast.error(err.message || "Fallo al crear la sala de chat.");
     } finally {

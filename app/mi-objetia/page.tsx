@@ -15,7 +15,8 @@ import {
   Save, 
   Sparkles, 
   ArrowRight, 
-  ExternalLink 
+  ExternalLink,
+  MessageSquare 
 } from 'lucide-react';
 import { useAuth } from '../../components/AuthContext';
 import { useToast } from '../../components/ToastContext';
@@ -28,6 +29,7 @@ import ProfileTab from './ProfileTab';
 import PurchasesTab from './PurchasesTab';
 import SalesTab from './SalesTab';
 import PublicationsTab from './PublicationsTab';
+import ChatTab from './ChatTab';
 
 // Carga bajo demanda (lazy-loading) de módulos administrativos pesados
 const RootTab = dynamic(() => import('./RootTab'), { ssr: false });
@@ -39,7 +41,7 @@ const CampaignsTab = dynamic(() => import('./CampaignsTab'), { ssr: false });
 const ModerationTab = dynamic(() => import('./ModerationTab'), { ssr: false });
 
 const TABS_VALIDOS = new Set([
-  "billetera", "perfil", "purchases", "sales", "publications",
+  "billetera", "perfil", "purchases", "sales", "publications", "chat",
   "dashboard", "appearance", "campanas", "secciones", "banners", "moderation", "root"
 ]);
 
@@ -80,13 +82,9 @@ function MiObjetiaContent() {
 
   // Sincronizar el tab cuando el usuario usa los botones Atrás / Adelante del navegador
   useEffect(() => {
-    if (tabDesdeUrl === "chat") {
-      router.push("/chat");
-      return;
-    }
     const tabValida = tabDesdeUrl && TABS_VALIDOS.has(tabDesdeUrl) ? tabDesdeUrl : "billetera";
     setTabActual(tabValida);
-  }, [tabDesdeUrl, router]);
+  }, [tabDesdeUrl]);
 
   // --- ESTADOS DE BILLETERA (CLIENT) ---
   const [balance, setBalance] = useState({ available: 0, frozen: 0 });
@@ -723,6 +721,7 @@ function MiObjetiaContent() {
     publications: { label: "Mis Publicaciones", description: "Gestiona tu catálogo de productos publicados y stock", icon: Package },
     purchases: { label: "Mis Compras", description: "Seguimiento de pedidos, estados de entrega y comprobantes", icon: ShoppingBag },
     sales: { label: "Mis Ventas", description: "Administra las ventas realizadas y despachos de Correo", icon: TrendingUp },
+    chat: { label: "Mis Mensajes", description: "Comunicate en tiempo real con compradores y vendedores sobre tus operaciones", icon: MessageSquare },
     perfil: { label: "Mi Perfil", description: "Configuración de datos personales y dirección de entrega", icon: UserCheck }
   };
 
@@ -872,6 +871,13 @@ function MiObjetiaContent() {
                 <PublicationsTab 
                   token={token}
                 />
+              </div>
+            )}
+
+            {/* TAB: MIS MENSAJES */}
+            {tabActual === "chat" && (
+              <div className="animate-fade-in">
+                <ChatTab initialRoomId={searchParams.get("room_id")} />
               </div>
             )}
           </main>

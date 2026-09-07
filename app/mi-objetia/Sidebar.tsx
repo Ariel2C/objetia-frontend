@@ -85,7 +85,7 @@ export default function Sidebar({
     { id: "publications", label: "Mis Publicaciones", icon: Package },
     { id: "purchases", label: "Mis Compras", icon: ShoppingBag },
     { id: "sales", label: "Mis Ventas", icon: TrendingUp },
-    { id: "chat", label: "Mis Mensajes", icon: MessageSquare, href: "/chat" },
+    { id: "chat", label: "Mis Mensajes", icon: MessageSquare },
     { id: "perfil", label: "Mi Perfil", icon: UserCheck },
     { id: "vender", label: "Publicar Producto", icon: PlusCircle }
   ];

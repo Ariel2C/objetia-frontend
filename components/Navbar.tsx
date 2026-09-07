@@ -516,7 +516,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   </Link>
 
                   {/* 2. CHATS / MENSAJES */}
-                  <Link href="/chat" className={iconBtnClass} title="Mis Mensajes">
+                  <Link href="/mi-objetia?tab=chat" className={iconBtnClass} title="Mis Mensajes">
                     <MessageSquare className="h-5 w-5" />
                     {unreadChatsCount > 0 && (
                       <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-[#87a9ff] text-[#131314] text-[9px] font-bold flex items-center justify-center border border-[#131314] shadow-xs animate-pulse">
@@ -689,7 +689,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
 
                         {/* Enlace directo a Mis Mensajes */}
                         <Link 
-                          href="/chat" 
+                          href="/mi-objetia?tab=chat" 
                           onClick={() => setMenuAbierto(false)}
                           className="flex items-center justify-between p-2.5 rounded-xl bg-[#282a2c]/30 hover:bg-[#282a2c] border border-[#3c4043] hover:border-[#87a9ff]/40 transition group cursor-pointer text-left"
                         >

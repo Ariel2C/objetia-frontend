@@ -447,7 +447,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                         </button>
 
                         <Link
-                          href="/chat"
+                          href="/mi-objetia?tab=chat"
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#f1f3f4] text-[#202124] rounded-xl text-xs font-semibold border border-[#dadce0] transition shadow-2xs cursor-pointer"
                           title="Abrir mensajes con el vendedor"
                         >
@@ -473,7 +473,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                         <span>Vendedor preparando el paquete</span>
                       </div>
                       <Link
-                        href="/chat"
+                        href="/mi-objetia?tab=chat"
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#f1f3f4] text-[#202124] rounded-xl text-xs font-semibold border border-[#dadce0] transition shadow-2xs cursor-pointer"
                         title="Abrir mensajes con el vendedor"
                       >

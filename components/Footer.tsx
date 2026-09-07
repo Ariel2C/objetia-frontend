@@ -134,7 +134,7 @@ export default function Footer() {
               <li><Link href="/mi-objetia" className="text-gray-400 hover:text-white transition">Panel General</Link></li>
               <li><Link href="/mi-objetia?tab=publications" className="text-gray-400 hover:text-white transition flex items-center gap-1.5"><Package className="h-3 w-3 text-purple-400" /> Mis Publicaciones</Link></li>
               <li><Link href="/mi-objetia?tab=purchases" className="text-gray-400 hover:text-white transition flex items-center gap-1.5"><ShoppingBag className="h-3 w-3 text-emerald-400" /> Mis Compras</Link></li>
-              <li><Link href="/chat" className="text-gray-400 hover:text-white transition flex items-center gap-1.5"><MessageSquare className="h-3 w-3 text-blue-400" /> Mis Mensajes</Link></li>
+              <li><Link href="/mi-objetia?tab=chat" className="text-gray-400 hover:text-white transition flex items-center gap-1.5"><MessageSquare className="h-3 w-3 text-blue-400" /> Mis Mensajes</Link></li>
               <li><Link href="/mi-objetia?tab=billetera" className="text-gray-400 hover:text-white transition">Mi Billetera</Link></li>
             </ul>
           </div>
