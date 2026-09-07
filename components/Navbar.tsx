@@ -746,12 +746,12 @@ export default function Navbar({ logoUrl }: NavbarProps) {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center space-x-1 sm:space-x-2 py-1.5 text-[9.5px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6] overflow-x-auto no-scrollbar scrollbar-none whitespace-nowrap">
               
-              {/* 1. Nuevos ingresos */}
-              <Link href="/catalog?sort=newest" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0">
-                Nuevos ingresos
+              {/* 1. NUEVOS INGRESOS */}
+              <Link href="/catalog?sort=newest" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0 text-[9.5px] font-medium uppercase tracking-[0.2em]">
+                NUEVOS INGRESOS
               </Link>
 
-              {/* 2. Descubrir (Dropdown) */}
+              {/* 2. DESCUBRIR (Dropdown) */}
               <div 
                 className="relative shrink-0" 
                 onMouseEnter={() => setDescubrirAbierto(true)} 
@@ -759,9 +759,9 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               >
                 <button 
                   onClick={() => setDescubrirAbierto(prev => !prev)}
-                  className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer"
+                  className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer text-[9.5px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6]"
                 >
-                  <span>Descubrir</span>
+                  <span>DESCUBRIR</span>
                   <ChevronDown className={`h-3 w-3 transition-transform ${descubrirAbierto ? 'rotate-180 text-[#87a9ff]' : ''}`} />
                 </button>
 
@@ -798,24 +798,24 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                 )}
               </div>
 
-              {/* 3. Decoración */}
-              <Link href="/catalog?category=Decoración" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0">
-                Decoración
+              {/* 3. DECORACIÓN */}
+              <Link href="/catalog?category=Decoración" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0 text-[9.5px] font-medium uppercase tracking-[0.2em]">
+                DECORACIÓN
               </Link>
 
-              {/* 4. Iluminación */}
-              <Link href="/catalog?category=Iluminación" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0">
-                Iluminación
+              {/* 4. ILUMINACIÓN */}
+              <Link href="/catalog?category=Iluminación" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0 text-[9.5px] font-medium uppercase tracking-[0.2em]">
+                ILUMINACIÓN
               </Link>
 
-              {/* 5. Alfombras */}
-              <Link href="/catalog?category=Alfombras" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0">
-                Alfombras
+              {/* 5. ALFOMBRAS */}
+              <Link href="/catalog?category=Alfombras" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0 text-[9.5px] font-medium uppercase tracking-[0.2em]">
+                ALFOMBRAS
               </Link>
 
-              {/* 6. Exterior */}
-              <Link href="/catalog?category=Exterior" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0">
-                Exterior
+              {/* 6. EXTERIOR */}
+              <Link href="/catalog?category=Exterior" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0 text-[9.5px] font-medium uppercase tracking-[0.2em]">
+                EXTERIOR
               </Link>
 
             </div>
