@@ -660,7 +660,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
 
                     {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN - GOOGLE AI STUDIO DARK */}
                     {menuAbierto && (
-                      <div className="absolute right-0 mt-2 w-60 sm:w-64 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1.5 animate-scale-in origin-top-right">
+                      <div className="absolute right-0 mt-2 w-52 sm:w-56 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1.5 animate-scale-in origin-top-right">
                         {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'administrador') && (
                           <div className="px-1 pt-0.5">
                             <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#282a2c] text-[#87a9ff] border border-[#3c4043]">
@@ -677,19 +677,23 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         )}
 
                         {/* ==================================================================== */}
-                        {/* TARJETA MI OBJETIA: COMPACTA CON ANIMACIÓN 2D SIN BLUR              */}
-                        {/* Transformación geométrica de las líneas del texto a 4 cuadrados      */}
+                        {/* TARJETA MI OBJETIA: BORDE DESTACADO, ANCHO COMPACTO Y TEXTO "Entrá a" */}
                         {/* ==================================================================== */}
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="group relative block p-2.5 rounded-xl bg-[#282a2c]/70 hover:bg-[#282a2c] border border-[#3c4043] hover:border-white/40 transition-colors duration-200 cursor-pointer text-center overflow-hidden"
+                          className="group relative block px-2.5 py-2.5 rounded-xl bg-[#282a2c]/80 hover:bg-[#282a2c] border border-[#555a60] hover:border-white/60 shadow-md shadow-black/30 transition-all duration-200 cursor-pointer text-center overflow-hidden"
                         >
+                          {/* Texto superior fino y más chico: "Entrá a" */}
+                          <span className="block text-[11px] font-normal text-[#9aa0a6] tracking-wide mb-0.5 group-hover:text-[#c4c7c5] transition-colors">
+                            Entrá a
+                          </span>
+
                           {/* Transformación 2D fluida en tiempo real (Palabra MI OBJETIA <-> Cuadrado de 4 cuadrados) */}
                           <MiObjetiaMorph />
 
                           {/* 4. Gestioná tus compras... bien abajo */}
-                          <div className="mt-1 pt-1.5 border-t border-[#333538]/60">
+                          <div className="mt-1 pt-1.5 border-t border-[#3c4043]">
                             <p className="text-[10px] text-[#9aa0a6] leading-snug group-hover:text-[#c4c7c5] transition-colors text-center">
                               Gestioná tus compras, ventas, publicaciones y perfil personal.
                             </p>
