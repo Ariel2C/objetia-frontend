@@ -16,6 +16,7 @@ import {
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '../lib/config';
 import NewProductModal from './NewProductModal';
+import MiObjetiaMorph from './MiObjetiaMorph';
 
 interface NavbarProps {
   logoUrl?: string;
@@ -684,48 +685,8 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                           onClick={() => setMenuAbierto(false)}
                           className="group relative block p-2.5 rounded-xl bg-[#282a2c]/70 hover:bg-[#282a2c] border border-[#3c4043] hover:border-[#87a9ff]/40 transition-colors duration-200 cursor-pointer text-center overflow-hidden"
                         >
-                          {/* Contenedor SVG: Transformación 2D exacta (Texto <-> 4 Cuadrados) */}
-                          <div className="flex items-center justify-center py-1">
-                            <svg viewBox="0 0 190 46" className="w-full h-9 select-none overflow-visible">
-                              {/* 1. Líneas vectoriales que conectan las letras con el cuadrado 2D */}
-                              <g className="animate-morph-lines" stroke="#87a9ff" strokeWidth="1.5" strokeLinecap="round">
-                                <line x1="28" y1="15" x2="82.5" y2="15" />
-                                <line x1="46" y1="29" x2="82.5" y2="29" />
-                                <line x1="162" y1="15" x2="107.5" y2="15" />
-                                <line x1="144" y1="29" x2="107.5" y2="29" />
-                              </g>
-
-                              {/* 2. Cuadrado 2D compuesto de 4 cuadrados en rotación/movimiento nítido */}
-                              <g className="animate-morph-squares" style={{ transformOrigin: '95px 23px' }}>
-                                <g className="animate-morph-quad-tl">
-                                  <rect x="82.5" y="10.5" width="11" height="11" rx="2" fill="#87a9ff" />
-                                </g>
-                                <g className="animate-morph-quad-tr">
-                                  <rect x="96.5" y="10.5" width="11" height="11" rx="2" fill="#e3e3e3" />
-                                </g>
-                                <g className="animate-morph-quad-bl">
-                                  <rect x="82.5" y="24.5" width="11" height="11" rx="2" fill="#e3e3e3" />
-                                </g>
-                                <g className="animate-morph-quad-br">
-                                  <rect x="96.5" y="24.5" width="11" height="11" rx="2" fill="#87a9ff" />
-                                </g>
-                              </g>
-
-                              {/* 3. Texto MI OBJETIA centrado */}
-                              <g className="animate-morph-text" style={{ transformOrigin: '95px 23px' }}>
-                                <text 
-                                  x="95" 
-                                  y="27" 
-                                  textAnchor="middle" 
-                                  fill="#ffffff" 
-                                  className="font-black text-[13px] tracking-[0.2em] uppercase font-sans group-hover:fill-[#87a9ff] transition-colors"
-                                  style={{ letterSpacing: '0.22em' }}
-                                >
-                                  MI OBJETIA
-                                </text>
-                              </g>
-                            </svg>
-                          </div>
+                          {/* Transformación 2D fluida en tiempo real (Palabra MI OBJETIA <-> Cuadrado de 4 cuadrados) */}
+                          <MiObjetiaMorph />
 
                           {/* 4. Gestioná tus compras... bien abajo */}
                           <div className="mt-1 pt-1.5 border-t border-[#333538]/60">
