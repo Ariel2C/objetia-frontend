@@ -744,7 +744,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
       {!pathname?.startsWith('/mi-objetia') && !pathname?.startsWith('/mi-espacio') && !pathname?.startsWith('/root') && (
         <div className="border-t border-[#282a2c] bg-[#18181a]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center space-x-1 sm:space-x-2 py-1.5 text-xs font-medium text-[#9aa0a6] overflow-x-auto no-scrollbar scrollbar-none whitespace-nowrap">
+            <div className="flex items-center space-x-1 sm:space-x-2 py-1.5 text-[9.5px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6] overflow-x-auto no-scrollbar scrollbar-none whitespace-nowrap">
               
               {/* 1. Nuevos ingresos */}
               <Link href="/catalog?sort=newest" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0">
@@ -762,7 +762,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer"
                 >
                   <span>Descubrir</span>
-                  <ChevronDown className={`h-3.5 w-3.5 transition-transform ${descubrirAbierto ? 'rotate-180 text-[#87a9ff]' : ''}`} />
+                  <ChevronDown className={`h-3 w-3 transition-transform ${descubrirAbierto ? 'rotate-180 text-[#87a9ff]' : ''}`} />
                 </button>
 
                 {descubrirAbierto && (
@@ -772,25 +772,25 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   >
                     <Link
                       href="/catalog?filter=selected"
-                      className="block px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
                       Seleccionados de Objetia
                     </Link>
                     <Link
                       href="/catalog?max_price=50000"
-                      className="block px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
                       Hallazgos por menos de $50.000
                     </Link>
                     <Link
                       href="/catalog?style=Vintage"
-                      className="block px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
                       Vintage
                     </Link>
                     <Link
                       href="/catalog?sort=popular"
-                      className="block px-3 py-2 rounded-xl text-xs font-medium text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
                     >
                       Tendencias
                     </Link>
