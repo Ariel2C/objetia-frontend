@@ -8,7 +8,8 @@ import {
   Heart, 
   Bell, 
   ChevronDown,
-  Search
+  Search,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '../lib/config';
@@ -514,7 +515,17 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                     )}
                   </Link>
 
-                  {/* 2. CAMPANITA DE NOTIFICACIONES */}
+                  {/* 2. CHATS / MENSAJES */}
+                  <Link href="/chat" className={iconBtnClass} title="Mis Mensajes">
+                    <MessageSquare className="h-5 w-5" />
+                    {unreadChatsCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-[#87a9ff] text-[#131314] text-[9px] font-bold flex items-center justify-center border border-[#131314] shadow-xs animate-pulse">
+                        {unreadChatsCount}
+                      </span>
+                    )}
+                  </Link>
+
+                  {/* 3. CAMPANITA DE NOTIFICACIONES */}
                   <div className="relative" ref={notifRef}>
                     <button 
                       onClick={() => setNotifAbierto(!notifAbierto)}
@@ -674,6 +685,25 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                           <p className="text-[11px] text-[#9aa0a6] leading-relaxed mt-1 group-hover:text-[#c4c7c5] transition-colors">
                             Gestioná tus compras, ventas, publicaciones y perfil personal.
                           </p>
+                        </Link>
+
+                        {/* Enlace directo a Mis Mensajes */}
+                        <Link 
+                          href="/chat" 
+                          onClick={() => setMenuAbierto(false)}
+                          className="flex items-center justify-between p-2.5 rounded-xl bg-[#282a2c]/30 hover:bg-[#282a2c] border border-[#3c4043] hover:border-[#87a9ff]/40 transition group cursor-pointer text-left"
+                        >
+                          <div className="flex items-center gap-2">
+                            <MessageSquare className="w-4 h-4 text-[#87a9ff]" />
+                            <span className="text-xs font-semibold text-white group-hover:text-[#87a9ff] transition-colors">
+                              Mis Mensajes
+                            </span>
+                          </div>
+                          {unreadChatsCount > 0 && (
+                            <span className="text-[10px] font-bold bg-[#87a9ff] text-[#131314] px-1.5 py-0.5 rounded-full">
+                              {unreadChatsCount}
+                            </span>
+                          )}
                         </Link>
 
                         {/* Cerrar Sesión centrado abajo */}

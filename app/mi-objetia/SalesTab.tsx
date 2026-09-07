@@ -13,7 +13,8 @@ import {
   MapPin, 
   Package, 
   Loader2, 
-  ShoppingBag
+  ShoppingBag,
+  MessageSquare
 } from 'lucide-react';
 import { getApiUrl } from '../../lib/config';
 import { getToken } from '../../lib/api';
@@ -687,12 +688,31 @@ export default function SalesTab({ token }: SalesTabProps) {
                           <Package className="h-3.5 w-3.5 text-[#1a73e8]" />
                           <span>Seguir Envío</span>
                         </button>
+
+                        <Link
+                          href="/chat"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#202124] hover:bg-[#f1f3f4] border border-[#dadce0] rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
+                          title="Abrir mensajes con el comprador"
+                        >
+                          <MessageSquare className="h-3.5 w-3.5 text-[#1a73e8]" />
+                          <span>Mensajes</span>
+                        </Link>
                       </div>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1.5 text-xs text-amber-700 font-semibold bg-[#fef7e0] px-3 py-1.5 rounded-xl border border-[#feefc3]">
-                      <AlertCircle className="h-4 w-4 text-amber-600" />
-                      <span>Pendiente de guía de envío</span>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                      <div className="flex items-center gap-1.5 text-xs text-amber-700 font-semibold bg-[#fef7e0] px-3 py-1.5 rounded-xl border border-[#feefc3]">
+                        <AlertCircle className="h-4 w-4 text-amber-600" />
+                        <span>Pendiente de guía de envío</span>
+                      </div>
+                      <Link
+                        href="/chat"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#202124] hover:bg-[#f1f3f4] border border-[#dadce0] rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
+                        title="Abrir mensajes con el comprador"
+                      >
+                        <MessageSquare className="h-3.5 w-3.5 text-[#1a73e8]" />
+                        <span>Mensajes</span>
+                      </Link>
                     </div>
                   )}
                 </div>

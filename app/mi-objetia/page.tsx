@@ -80,9 +80,13 @@ function MiObjetiaContent() {
 
   // Sincronizar el tab cuando el usuario usa los botones Atrás / Adelante del navegador
   useEffect(() => {
+    if (tabDesdeUrl === "chat") {
+      router.push("/chat");
+      return;
+    }
     const tabValida = tabDesdeUrl && TABS_VALIDOS.has(tabDesdeUrl) ? tabDesdeUrl : "billetera";
     setTabActual(tabValida);
-  }, [tabDesdeUrl]);
+  }, [tabDesdeUrl, router]);
 
   // --- ESTADOS DE BILLETERA (CLIENT) ---
   const [balance, setBalance] = useState({ available: 0, frozen: 0 });

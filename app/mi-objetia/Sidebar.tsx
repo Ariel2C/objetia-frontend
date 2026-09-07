@@ -19,8 +19,10 @@ import {
   ChevronRight,
   ExternalLink,
   PlusCircle,
-  ShieldCheck
+  ShieldCheck,
+  MessageSquare
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '../../components/AuthContext';
 
 interface SidebarProps {
@@ -57,6 +59,7 @@ export default function Sidebar({
   setMenuMovilAbierto
 }: SidebarProps) {
   const { usuario, tienePermiso } = useAuth();
+  const router = useRouter();
 
   const tieneAccesoItem = (id: string) => {
     if (esRoot || tienePermiso('full_access')) return true;
@@ -71,6 +74,7 @@ export default function Sidebar({
     if (id === 'publications') return true;
     if (id === 'purchases') return true;
     if (id === 'sales') return true;
+    if (id === 'chat') return true;
     if (id === 'vender') return true;
     if (id === 'perfil') return true;
     return tienePermiso(id);
@@ -81,6 +85,7 @@ export default function Sidebar({
     { id: "publications", label: "Mis Publicaciones", icon: Package },
     { id: "purchases", label: "Mis Compras", icon: ShoppingBag },
     { id: "sales", label: "Mis Ventas", icon: TrendingUp },
+    { id: "chat", label: "Mis Mensajes", icon: MessageSquare, href: "/chat" },
     { id: "perfil", label: "Mi Perfil", icon: UserCheck },
     { id: "vender", label: "Publicar Producto", icon: PlusCircle }
   ];
@@ -95,8 +100,13 @@ export default function Sidebar({
       if (setMenuMovilAbierto) setMenuMovilAbierto(false);
       return;
     }
-    if (item.isExternalLink && item.href) {
-      window.location.href = item.href;
+    if (item.href) {
+      if (item.isExternalLink) {
+        window.location.href = item.href;
+      } else {
+        router.push(item.href);
+      }
+      if (setMenuMovilAbierto) setMenuMovilAbierto(false);
       return;
     }
     setTabActual(item.id);

@@ -14,7 +14,8 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
-  Loader2
+  Loader2,
+  MessageSquare
 } from 'lucide-react';
 import Link from 'next/link';
 import { getApiUrl } from '../../lib/config';
@@ -427,8 +428,8 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                         </div>
                       )}
 
-                      {/* Botón de seguimiento con modal */}
-                      <div className="pt-1">
+                      {/* Botón de seguimiento con modal y botón de mensajes */}
+                      <div className="flex items-center gap-2 pt-1">
                         <button
                           type="button"
                           onClick={() => setTrackingModalData({
@@ -444,6 +445,15 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                           <Package className="h-3.5 w-3.5" />
                           <span>Seguir Envío</span>
                         </button>
+
+                        <Link
+                          href="/chat"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#f1f3f4] text-[#202124] rounded-xl text-xs font-semibold border border-[#dadce0] transition shadow-2xs cursor-pointer"
+                          title="Abrir mensajes con el vendedor"
+                        >
+                          <MessageSquare className="h-3.5 w-3.5 text-[#1a73e8]" />
+                          <span>Mensajes</span>
+                        </Link>
                       </div>
                     </div>
                   ) : compra.status === 'pending_payment' ? (
@@ -457,9 +467,19 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                       <span>Compra cancelada</span>
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1.5 text-xs text-[#5f6368] font-semibold bg-white px-3 py-1.5 rounded-xl border border-[#dadce0]">
-                      <Package className="h-4 w-4 text-[#80868b]" />
-                      <span>Vendedor preparando el paquete</span>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                      <div className="flex items-center gap-1.5 text-xs text-[#5f6368] font-semibold bg-white px-3 py-1.5 rounded-xl border border-[#dadce0]">
+                        <Package className="h-4 w-4 text-[#80868b]" />
+                        <span>Vendedor preparando el paquete</span>
+                      </div>
+                      <Link
+                        href="/chat"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#f1f3f4] text-[#202124] rounded-xl text-xs font-semibold border border-[#dadce0] transition shadow-2xs cursor-pointer"
+                        title="Abrir mensajes con el vendedor"
+                      >
+                        <MessageSquare className="h-3.5 w-3.5 text-[#1a73e8]" />
+                        <span>Mensajes</span>
+                      </Link>
                     </div>
                   )}
                 </div>
