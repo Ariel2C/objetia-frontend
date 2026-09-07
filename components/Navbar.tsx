@@ -10,7 +10,6 @@ import {
   ChevronDown,
   Search,
   MessageSquare,
-  Sparkles,
   ChevronRight,
   LayoutGrid
 } from 'lucide-react';
@@ -660,7 +659,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
 
                     {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN - GOOGLE AI STUDIO DARK */}
                     {menuAbierto && (
-                      <div className="absolute right-0 mt-2 w-64 sm:w-72 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1.5 animate-scale-in origin-top-right">
+                      <div className="absolute right-0 mt-2 w-60 sm:w-64 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1.5 animate-scale-in origin-top-right">
                         {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'administrador') && (
                           <div className="px-1 pt-0.5">
                             <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#282a2c] text-[#87a9ff] border border-[#3c4043]">
@@ -677,50 +676,60 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         )}
 
                         {/* ==================================================================== */}
-                        {/* TARJETA MI OBJETIA: CENTRADA CON ICONO GIRANDO EN 3D CONTINUO       */}
+                        {/* TARJETA MI OBJETIA: COMPACTA CON ANIMACIÓN 2D SIN BLUR              */}
+                        {/* Transformación geométrica de las líneas del texto a 4 cuadrados      */}
                         {/* ==================================================================== */}
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="group relative block p-4 rounded-xl bg-[#282a2c]/60 hover:bg-[#282a2c] border border-[#3c4043] hover:border-[#87a9ff]/40 transition-colors duration-200 cursor-pointer text-center overflow-hidden shadow-xs"
+                          className="group relative block p-2.5 rounded-xl bg-[#282a2c]/70 hover:bg-[#282a2c] border border-[#3c4043] hover:border-[#87a9ff]/40 transition-colors duration-200 cursor-pointer text-center overflow-hidden"
                         >
-                          {/* Aura sutil de fondo en azul Objetia */}
-                          <div className="absolute -top-6 left-1/2 -translate-x-1/2 w-28 h-28 bg-[#87a9ff]/5 rounded-full blur-xl pointer-events-none group-hover:bg-[#87a9ff]/10 transition-colors duration-500" />
+                          {/* Contenedor SVG: Transformación 2D exacta (Texto <-> 4 Cuadrados) */}
+                          <div className="flex items-center justify-center py-1">
+                            <svg viewBox="0 0 190 46" className="w-full h-9 select-none overflow-visible">
+                              {/* 1. Líneas vectoriales que conectan las letras con el cuadrado 2D */}
+                              <g className="animate-morph-lines" stroke="#87a9ff" strokeWidth="1.5" strokeLinecap="round">
+                                <line x1="28" y1="15" x2="82.5" y2="15" />
+                                <line x1="46" y1="29" x2="82.5" y2="29" />
+                                <line x1="162" y1="15" x2="107.5" y2="15" />
+                                <line x1="144" y1="29" x2="107.5" y2="29" />
+                              </g>
 
-                          {/* 1. Icono girando en 3D (Animación continua que no se reinicia al pasar/quitar mouse) */}
-                          <div className="flex flex-col items-center justify-center [perspective:600px] mb-2 relative z-10">
-                            <div className="w-11 h-11 relative [transform-style:preserve-3d] animate-spin-3d-continuous">
-                              {/* Cara Frontal */}
-                              <div 
-                                className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#1e1f20] via-[#282a2c] to-[#3c4043] border border-[#87a9ff]/40 flex items-center justify-center text-[#87a9ff] shadow-[0_0_14px_rgba(135,169,255,0.25)] absolute inset-0 [backface-visibility:hidden]"
-                                style={{ transform: 'translateZ(3px)' }}
-                              >
-                                <Sparkles className="w-5 h-5 text-[#87a9ff] drop-shadow-[0_0_6px_rgba(135,169,255,0.6)]" />
-                              </div>
+                              {/* 2. Cuadrado 2D compuesto de 4 cuadrados en rotación/movimiento nítido */}
+                              <g className="animate-morph-squares" style={{ transformOrigin: '95px 23px' }}>
+                                <g className="animate-morph-quad-tl">
+                                  <rect x="82.5" y="10.5" width="11" height="11" rx="2" fill="#87a9ff" />
+                                </g>
+                                <g className="animate-morph-quad-tr">
+                                  <rect x="96.5" y="10.5" width="11" height="11" rx="2" fill="#e3e3e3" />
+                                </g>
+                                <g className="animate-morph-quad-bl">
+                                  <rect x="82.5" y="24.5" width="11" height="11" rx="2" fill="#e3e3e3" />
+                                </g>
+                                <g className="animate-morph-quad-br">
+                                  <rect x="96.5" y="24.5" width="11" height="11" rx="2" fill="#87a9ff" />
+                                </g>
+                              </g>
 
-                              {/* Cara Posterior */}
-                              <div 
-                                className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-[#1e1f20] via-[#282a2c] to-[#3c4043] border border-[#87a9ff]/40 flex items-center justify-center text-[#87a9ff] shadow-[0_0_14px_rgba(135,169,255,0.25)] absolute inset-0 [backface-visibility:hidden]"
-                                style={{ transform: 'rotateY(180deg) translateZ(3px)' }}
-                              >
-                                <Sparkles className="w-5 h-5 text-[#87a9ff] drop-shadow-[0_0_6px_rgba(135,169,255,0.6)]" />
-                              </div>
-                            </div>
-
-                            {/* Sombra sutil bajo el icono 3D */}
-                            <div className="w-6 h-1 rounded-full bg-[#87a9ff]/20 blur-[2px] mt-1.5" />
+                              {/* 3. Texto MI OBJETIA centrado */}
+                              <g className="animate-morph-text" style={{ transformOrigin: '95px 23px' }}>
+                                <text 
+                                  x="95" 
+                                  y="27" 
+                                  textAnchor="middle" 
+                                  fill="#ffffff" 
+                                  className="font-black text-[13px] tracking-[0.2em] uppercase font-sans group-hover:fill-[#87a9ff] transition-colors"
+                                  style={{ letterSpacing: '0.22em' }}
+                                >
+                                  MI OBJETIA
+                                </text>
+                              </g>
+                            </svg>
                           </div>
 
-                          {/* 2. Mi OBJETIA centrado */}
-                          <div className="relative z-10">
-                            <h4 className="text-sm font-bold text-white group-hover:text-[#87a9ff] transition-colors tracking-wide text-center">
-                              Mi OBJETIA
-                            </h4>
-                          </div>
-
-                          {/* 3. Gestioná tus compras... bien abajo */}
-                          <div className="relative z-10 mt-3 pt-2.5 border-t border-[#333538]/60">
-                            <p className="text-[11px] text-[#9aa0a6] leading-relaxed group-hover:text-[#c4c7c5] transition-colors text-center">
+                          {/* 4. Gestioná tus compras... bien abajo */}
+                          <div className="mt-1 pt-1.5 border-t border-[#333538]/60">
+                            <p className="text-[10px] text-[#9aa0a6] leading-snug group-hover:text-[#c4c7c5] transition-colors text-center">
                               Gestioná tus compras, ventas, publicaciones y perfil personal.
                             </p>
                           </div>
