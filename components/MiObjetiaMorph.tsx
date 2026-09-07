@@ -7,7 +7,7 @@ interface CurveSegment {
   sq: [number, number, number, number, number, number];   // [x1, y1, cx, cy, x2, y2]
 }
 
-const shiftX = 3.5;
+const shiftX = 6.5;
 function p(x1: number, y1: number, cx: number, cy: number, x2: number, y2: number): [number, number, number, number, number, number] {
   return [x1 + shiftX, y1, cx + shiftX, cy, x2 + shiftX, y2];
 }
@@ -15,53 +15,73 @@ function s(x1: number, y1: number, cx: number, cy: number, x2: number, y2: numbe
   return [x1, y1, cx, cy, x2, y2];
 }
 
+// 4 Cuadrados Huecos exteriores (2 arriba, 2 abajo) - Tamaño 30x30 total (13.5x13.5 c/u con 3px de gap)
+const tl_top = s(85, 9, 91.75, 9, 98.5, 9);
+const tl_right = s(98.5, 9, 98.5, 15.75, 98.5, 22.5);
+const tl_bot = s(98.5, 22.5, 91.75, 22.5, 85, 22.5);
+const tl_left = s(85, 22.5, 85, 15.75, 85, 9);
+
+const tr_top = s(101.5, 9, 108.25, 9, 115, 9);
+const tr_right = s(115, 9, 115, 15.75, 115, 22.5);
+const tr_bot = s(115, 22.5, 108.25, 22.5, 101.5, 22.5);
+const tr_left = s(101.5, 22.5, 101.5, 15.75, 101.5, 9);
+
+const bl_top = s(85, 25.5, 91.75, 25.5, 98.5, 25.5);
+const bl_right = s(98.5, 25.5, 98.5, 32.25, 98.5, 39);
+const bl_bot = s(98.5, 39, 91.75, 39, 85, 39);
+const bl_left = s(85, 39, 85, 32.25, 85, 25.5);
+
+const br_top = s(101.5, 25.5, 108.25, 25.5, 115, 25.5);
+const br_right = s(115, 25.5, 115, 32.25, 115, 39);
+const br_bot = s(115, 39, 108.25, 39, 101.5, 39);
+const br_left = s(101.5, 39, 101.5, 32.25, 101.5, 25.5);
+
 // 27 segmentos de curvas bezier cuadráticas (Q)
-// Letras gruesas, con curvas redondeadas orgánicas y todo en blanco puro (#ffffff)
+// Texto un poco más chico, redondeado y grueso, que viaja limpiamente a los bordes de los 4 cuadrados huecos
 const MORPH_SEGMENTS: CurveSegment[] = [
-  // --- LETRA 'M' (Cuadrante Superior Izquierdo) ---
-  { text: p(24, 34, 24, 24, 24, 14), sq: s(85, 22.5, 85, 16.25, 85, 9) },           // M tallo izq -> borde izq TL
-  { text: p(24, 14, 27.5, 20, 31, 26), sq: s(85, 9, 91.75, 9, 98.5, 9) },            // M diagonal 1 -> borde sup TL
-  { text: p(31, 26, 34.5, 20, 38, 14), sq: s(98.5, 9, 98.5, 16.25, 98.5, 22.5) },   // M diagonal 2 -> borde der TL
-  { text: p(38, 14, 38, 24, 38, 34), sq: s(98.5, 22.5, 91.75, 22.5, 85, 22.5) },   // M tallo der -> borde inf TL
+  // --- M (Top-Left) ---
+  { text: p(35, 32, 35, 24, 35, 16), sq: tl_left },
+  { text: p(35, 16, 37.75, 21, 40.5, 26), sq: tl_top },
+  { text: p(40.5, 26, 43.25, 21, 46, 16), sq: tl_right },
+  { text: p(46, 16, 46, 24, 46, 32), sq: tl_bot },
+  // --- I (Top-Left) ---
+  { text: p(52, 16, 52, 24, 52, 32), sq: tl_top },
 
-  // --- LETRA 'I' ---
-  { text: p(46, 14, 46, 24, 46, 34), sq: s(88.5, 15.75, 91.75, 15.75, 95, 15.75) }, // I -> detalle interior TL
+  // --- O (Top-Right - 4 arcos suaves) ---
+  { text: p(66.5, 16, 72, 16, 72, 24), sq: tr_top },
+  { text: p(72, 24, 72, 32, 66.5, 32), sq: tr_right },
+  { text: p(66.5, 32, 61, 32, 61, 24), sq: tr_bot },
+  { text: p(61, 24, 61, 16, 66.5, 16), sq: tr_left },
 
-  // --- LETRA 'O' (Cuadrante Superior Derecho - 4 arcos curvos suaves) ---
-  { text: p(65, 14, 72, 14, 72, 24), sq: s(101.5, 9, 108.25, 9, 115, 9) },           // O curva sup-der -> borde sup TR
-  { text: p(72, 24, 72, 34, 65, 34), sq: s(115, 9, 115, 16.25, 115, 22.5) },         // O curva inf-der -> borde der TR
-  { text: p(65, 34, 58, 34, 58, 24), sq: s(115, 22.5, 108.25, 22.5, 101.5, 22.5) },  // O curva inf-izq -> borde inf TR
-  { text: p(58, 24, 58, 14, 65, 14), sq: s(101.5, 22.5, 101.5, 16.25, 101.5, 9) },  // O curva sup-izq -> borde izq TR
+  // --- B (Top-Right) ---
+  { text: p(77, 16, 77, 24, 77, 32), sq: tr_left },
+  { text: p(77, 16, 86, 16, 86, 20), sq: tr_top },
+  { text: p(86, 20, 86, 24, 77, 24), sq: tr_right },
+  { text: p(77, 24, 87, 24, 87, 28), sq: tr_right },
+  { text: p(87, 28, 87, 32, 77, 32), sq: tr_bot },
 
-  // --- LETRA 'B' (Curvas redondeadas dobles) ---
-  { text: p(78, 14, 78, 24, 78, 34), sq: s(105, 15.75, 108.25, 15.75, 111.5, 15.75) }, // B espina -> detalle interior TR
-  { text: p(78, 14, 88, 14, 88, 19), sq: s(100, 9, 100, 15.75, 100, 22.5) },            // B lóbulo sup arco 1 -> divisor vert sup
-  { text: p(88, 19, 88, 24, 78, 24), sq: s(85, 24, 91.75, 24, 98.5, 24) },              // B lóbulo sup arco 2 -> divisor horiz izq
-  { text: p(78, 24, 89, 24, 89, 29), sq: s(85, 39, 85, 32.25, 85, 25.5) },              // B lóbulo inf arco 1 -> borde izq BL
-  { text: p(89, 29, 89, 34, 78, 34), sq: s(85, 25.5, 91.75, 25.5, 98.5, 25.5) },        // B lóbulo inf arco 2 -> borde sup BL
+  // --- J (Bottom-Left) ---
+  { text: p(101, 16, 101, 21, 101, 26), sq: bl_right },
+  { text: p(101, 26, 101, 32, 96.5, 32), sq: bl_bot },
+  { text: p(96.5, 32, 92, 32, 92, 26), sq: bl_left },
 
-  // --- LETRA 'J' (Curva inferior redondeada) ---
-  { text: p(107, 14, 107, 20, 107, 26), sq: s(98.5, 25.5, 98.5, 32.25, 98.5, 39) },   // J tallo -> borde der BL
-  { text: p(107, 26, 107, 34, 101.5, 34), sq: s(98.5, 39, 91.75, 39, 85, 39) },        // J arco der -> borde inf BL
-  { text: p(101.5, 34, 96, 34, 96, 26), sq: s(88.5, 32.25, 91.75, 32.25, 95, 32.25) },// J arco izq -> detalle interior BL
+  // --- E (Bottom-Left) ---
+  { text: p(106, 16, 106, 24, 106, 32), sq: bl_left },
+  { text: p(106, 16, 110.75, 16, 115.5, 16), sq: bl_top },
+  { text: p(106, 24, 110, 24, 114, 24), sq: bl_bot },
+  { text: p(106, 32, 110.75, 32, 115.5, 32), sq: bl_bot },
 
-  // --- LETRA 'E' ---
-  { text: p(113, 14, 113, 24, 113, 34), sq: s(100, 25.5, 100, 32.25, 100, 39) },       // E espina -> divisor vert inf
-  { text: p(113, 14, 119, 14, 125, 14), sq: s(101.5, 24, 108.25, 24, 115, 24) },        // E sup -> divisor horiz der
-  { text: p(113, 24, 118, 24, 123, 24), sq: s(105, 32.25, 108.25, 32.25, 111.5, 32.25) },// E medio -> detalle interior BR
-  { text: p(113, 34, 119, 34, 125, 34), sq: s(101.5, 25.5, 108.25, 25.5, 115, 25.5) },  // E inf -> borde sup BR
+  // --- T (Bottom-Right) ---
+  { text: p(120.5, 16, 125.75, 16, 131, 16), sq: br_top },
+  { text: p(125.75, 16, 125.75, 24, 125.75, 32), sq: br_left },
 
-  // --- LETRA 'T' ---
-  { text: p(130, 14, 136.5, 14, 143, 14), sq: s(115, 25.5, 115, 32.25, 115, 39) },     // T barra sup -> borde der BR
-  { text: p(136.5, 14, 136.5, 24, 136.5, 34), sq: s(115, 39, 108.25, 39, 101.5, 39) }, // T tallo -> borde inf BR
+  // --- I (Bottom-Right) ---
+  { text: p(136, 16, 136, 24, 136, 32), sq: br_left },
 
-  // --- LETRA 'I' ---
-  { text: p(149, 14, 149, 24, 149, 34), sq: s(101.5, 39, 101.5, 32.25, 101.5, 25.5) },  // I tallo -> borde izq BR
-
-  // --- LETRA 'A' (Cúspide y patas curvadas suaves) ---
-  { text: p(155, 34, 157, 24, 162, 14), sq: s(87.5, 11.5, 91.75, 15.75, 96, 20) },      // A pata izq -> acento TL
-  { text: p(162, 14, 167, 24, 169, 34), sq: s(104, 11.5, 108.25, 15.75, 112.5, 20) },   // A pata der -> acento TR
-  { text: p(157.5, 27, 162, 27, 166.5, 27), sq: s(104, 28, 108.25, 32.25, 112.5, 36.5) },// A travesaño -> acento BR
+  // --- A (Bottom-Right) ---
+  { text: p(141, 32, 142.5, 24, 146.5, 16), sq: br_bot },
+  { text: p(146.5, 16, 150.5, 24, 152, 32), sq: br_right },
+  { text: p(143, 26.5, 146.5, 26.5, 150, 26.5), sq: br_top },
 ];
 
 function easeInOutCubic(x: number): number {
@@ -72,7 +92,7 @@ export default function MiObjetiaMorph() {
   const [frame, setFrame] = useState({
     t: 0,
     rotation: 0,
-    squareFillOpacity: 0,
+    squareOutlineOpacity: 0,
   });
 
   const requestRef = useRef<number | null>(null);
@@ -87,23 +107,23 @@ export default function MiObjetiaMorph() {
 
       let t = 0;
       let rotation = 0;
-      let squareFillOpacity = 0;
+      let squareOutlineOpacity = 0;
 
       if (elapsed < 1800) {
         // Fase 1: Reposo como palabra redondeada MI OBJETIA (1.8s)
         t = 0;
         rotation = 0;
-        squareFillOpacity = 0;
+        squareOutlineOpacity = 0;
       } else if (elapsed < 3000) {
-        // Fase 2: Transformación fluida de trazos hacia el cuadrado grande (1.2s)
+        // Fase 2: Transformación fluida de trazos hacia los 4 cuadrados huecos (1.2s)
         const p = (elapsed - 1800) / 1200;
         t = easeInOutCubic(p);
         rotation = 0;
-        squareFillOpacity = Math.max(0, (p - 0.7) / 0.3);
+        squareOutlineOpacity = Math.max(0, (p - 0.6) / 0.4);
       } else if (elapsed < 4200) {
-        // Fase 3: Cuadrado grande de 4 cuadrados en reposo / rotación 2D pura (1.2s)
+        // Fase 3: Cuadrado grande (4 cuadrados huecos) en reposo / rotación 2D pura (1.2s)
         t = 1;
-        squareFillOpacity = 1;
+        squareOutlineOpacity = 1;
         const p = (elapsed - 3000) / 1200;
         rotation = easeInOutCubic(p) * 90;
       } else if (elapsed < 5400) {
@@ -111,15 +131,15 @@ export default function MiObjetiaMorph() {
         const p = (elapsed - 4200) / 1200;
         t = 1 - easeInOutCubic(p);
         rotation = (1 - easeInOutCubic(Math.min(1, p * 1.3))) * 90;
-        squareFillOpacity = Math.max(0, 1 - p * 3);
+        squareOutlineOpacity = Math.max(0, 1 - p * 2.5);
       } else {
         // Fase 5: Asentamiento final antes de reiniciar ciclo
         t = 0;
         rotation = 0;
-        squareFillOpacity = 0;
+        squareOutlineOpacity = 0;
       }
 
-      setFrame({ t, rotation, squareFillOpacity });
+      setFrame({ t, rotation, squareOutlineOpacity });
       requestRef.current = requestAnimationFrame(animate);
     };
 
@@ -129,7 +149,7 @@ export default function MiObjetiaMorph() {
     };
   }, []);
 
-  const { t, rotation, squareFillOpacity } = frame;
+  const { t, rotation, squareOutlineOpacity } = frame;
 
   return (
     <div className="w-full flex items-center justify-center select-none py-1">
@@ -140,20 +160,18 @@ export default function MiObjetiaMorph() {
       >
         {/* GRUPO PRINCIPAL: Gira 90° en 2D limpio sobre el centro (100, 24) */}
         <g transform={`rotate(${rotation} 100 24)`}>
-          {/* FONDOS BLANCOS 2D DE LOS 4 CUADRADOS (Se revelan con suavidad al ensamblarse) */}
-          <g opacity={squareFillOpacity}>
-            {/* Cuadrante 1: Top-Left */}
-            <rect x="85" y="9" width="13.5" height="13.5" rx="3" fill="#ffffff" />
-            {/* Cuadrante 2: Top-Right */}
-            <rect x="101.5" y="9" width="13.5" height="13.5" rx="3" fill="#ffffff" />
-            {/* Cuadrante 3: Bottom-Left */}
-            <rect x="85" y="25.5" width="13.5" height="13.5" rx="3" fill="#ffffff" />
-            {/* Cuadrante 4: Bottom-Right */}
-            <rect x="101.5" y="25.5" width="13.5" height="13.5" rx="3" fill="#ffffff" />
+          {/* 4 CUADRADOS HUECOS SIN RELLENO (2 ARRIBA, 2 ABAJO - ICONO PANEL DE CONTROL / LAYOUTGRID) */}
+          <g opacity={squareOutlineOpacity} stroke="#ffffff" strokeWidth="2.5" fill="none">
+            {/* 2 Arriba */}
+            <rect x="85" y="9" width="13.5" height="13.5" rx="3" />
+            <rect x="101.5" y="9" width="13.5" height="13.5" rx="3" />
+            {/* 2 Abajo */}
+            <rect x="85" y="25.5" width="13.5" height="13.5" rx="3" />
+            <rect x="101.5" y="25.5" width="13.5" height="13.5" rx="3" />
           </g>
 
-          {/* LÍNEAS VECTORIALES GRUESAS Y REDONDEADAS EN BLANCO PURO (#ffffff) */}
-          <g stroke="#ffffff" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* LÍNEAS VECTORIALES REDONDEADAS EN BLANCO PURO (#ffffff) QUE CONVERGEN EN LOS 4 BORDES */}
+          <g stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none">
             {MORPH_SEGMENTS.map((seg, i) => {
               const x1 = seg.text[0] + (seg.sq[0] - seg.text[0]) * t;
               const y1 = seg.text[1] + (seg.sq[1] - seg.text[1]) * t;
