@@ -496,9 +496,9 @@ export default function Navbar({ logoUrl }: NavbarProps) {
             {(!usuario || tienePermiso('sell_products') || tienePermiso('publications') || tienePermiso('sales') || tienePermiso('full_access') || ['root', 'admin', 'seller', 'cliente', 'client'].includes(usuario?.role?.toLowerCase() || '')) && (
               <button 
                 onClick={handleBotonVender}
-                className="inline-flex items-center justify-center bg-[#87a9ff] hover:bg-[#a8c7fa] text-[#131314] text-xs font-bold px-3.5 py-1.5 rounded-lg transition shadow-xs active:scale-98 cursor-pointer"
+                className="inline-flex items-center justify-center bg-[#87a9ff] hover:bg-[#a8c7fa] text-[#131314] text-[9.5px] font-semibold uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-lg transition shadow-xs active:scale-98 cursor-pointer"
               >
-                Vender
+                VENDER
               </button>
             )}
 
@@ -717,19 +717,19 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                 /* ==================================================================== */
                 /* USUARIO NO LOGUEADO / OFFLINE: MUESTRA CREA TU CUENTA E INGRESA */
                 /* ==================================================================== */
-                <div className="flex items-center space-x-3 text-xs font-medium">
+                <div className="flex items-center space-x-3 text-[9.5px] font-medium uppercase tracking-[0.2em]">
                   <Link 
                     href="/auth?mode=register" 
                     className="text-[#87a9ff] hover:text-[#a8c7fa] transition font-semibold"
                   >
-                    Crea tu cuenta
+                    CREA TU CUENTA
                   </Link>
                   <span className="text-[#3c4043]">|</span>
                   <Link 
                     href="/auth?mode=login" 
                     className="text-[#c4c7c5] hover:text-white transition"
                   >
-                    Ingresa
+                    INGRESA
                   </Link>
                 </div>
               )
