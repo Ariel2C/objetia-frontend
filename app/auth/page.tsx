@@ -488,7 +488,7 @@ function LoginContent() {
           <div className="space-y-6 animate-fade-in">
             {/* CABECERA DINÁMICA */}
             <div className="text-center space-y-1">
-              <h2 className="text-sm sm:text-base md:text-lg font-black text-gray-900 tracking-tight sm:whitespace-nowrap">
+              <h2 className="text-[12px] min-[390px]:text-[13px] sm:text-[15px] md:text-base font-black text-gray-900 tracking-tight whitespace-nowrap">
                 {esLogin ? "Qué bueno verte de nuevo" : "¡Estás a un paso de formar parte de la comunidad Objetia!"}
               </h2>
               <p className="text-xs text-gray-500">
