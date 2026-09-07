@@ -677,33 +677,28 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         )}
 
                         {/* ==================================================================== */}
-                        {/* TARJETA MI OBJETIA: FULL NEGRO CON BLUR PÚRPURA (COLOR BOTÓN USAR)   */}
+                        {/* TARJETA MI OBJETIA: FULL NEGRO CON BLUR PÚRPURA APENAS PERCEPTIBLE   */}
                         {/* ==================================================================== */}
-                        <div className="relative group p-0.5">
-                          {/* Halo blur del color púrpura del botón "Usar en el catálogo" (purple-700 / purple-600) en el borde */}
-                          <div className="absolute inset-0 bg-gradient-to-r from-purple-700 via-purple-600 to-purple-800 rounded-xl blur-[4px] opacity-75 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                        <Link 
+                          href="/mi-objetia" 
+                          onClick={() => setMenuAbierto(false)}
+                          className="group relative block px-2.5 py-2.5 rounded-xl bg-black border border-purple-500/25 hover:border-purple-500/45 shadow-[0_0_7px_rgba(126,34,206,0.2)] hover:shadow-[0_0_11px_rgba(126,34,206,0.38)] transition-all duration-300 cursor-pointer text-center overflow-hidden"
+                        >
+                          {/* Texto superior en mayúsculas: "ENTRÁ A" */}
+                          <span className="block text-[10px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6] mb-0.5 group-hover:text-white transition-colors">
+                            ENTRÁ A
+                          </span>
 
-                          <Link 
-                            href="/mi-objetia" 
-                            onClick={() => setMenuAbierto(false)}
-                            className="relative block px-2.5 py-2.5 rounded-xl bg-black border border-purple-500/50 hover:border-purple-400 transition-all duration-200 cursor-pointer text-center overflow-hidden z-10"
-                          >
-                            {/* Texto superior en mayúsculas: "ENTRÁ A" */}
-                            <span className="block text-[10px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6] mb-0.5 group-hover:text-white transition-colors">
-                              ENTRÁ A
-                            </span>
+                          {/* Transformación 2D fluida en tiempo real (Palabra MI OBJETIA <-> Cuadrado de 4 cuadrados) */}
+                          <MiObjetiaMorph />
 
-                            {/* Transformación 2D fluida en tiempo real (Palabra MI OBJETIA <-> Cuadrado de 4 cuadrados) */}
-                            <MiObjetiaMorph />
-
-                            {/* Sin divisor entre Mi Objetia y gestiona */}
-                            <div className="mt-1">
-                              <p className="text-[10px] text-[#9aa0a6] leading-snug group-hover:text-[#c4c7c5] transition-colors text-center">
-                                Gestioná tus compras, ventas, publicaciones y perfil personal.
-                              </p>
-                            </div>
-                          </Link>
-                        </div>
+                          {/* Sin divisor entre Mi Objetia y gestiona */}
+                          <div className="mt-1">
+                            <p className="text-[10px] text-[#9aa0a6] leading-snug group-hover:text-[#c4c7c5] transition-colors text-center">
+                              Gestioná tus compras, ventas, publicaciones y perfil personal.
+                            </p>
+                          </div>
+                        </Link>
 
                         {/* Cerrar Sesión centrado abajo */}
                         <div className="pt-0.5">
