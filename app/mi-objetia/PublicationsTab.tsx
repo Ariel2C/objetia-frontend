@@ -120,31 +120,33 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
       setLoading(true);
     }
     setError(null);
-    try {
-      const authToken = localStorage.getItem('vamaar_token') || token;
+    const authToken = localStorage.getItem('vamaar_token') || token;
 
-      // 1. Obtener publicaciones inmediatamente para desbloquear la vista y el scroll
+    // 1. Obtener métricas analíticas en paralelo (nunca se bloquea si las publicaciones fallan)
+    fetch(`${getApiUrl()}/analytics/seller/metrics`, {
+      headers: { 'Authorization': `Bearer ${authToken}` }
+    })
+      .then(res => res && res.ok ? res.json() : null)
+      .then(dataMetrics => {
+        if (dataMetrics) setMetrics(dataMetrics);
+      })
+      .catch(() => null);
+
+    // 2. Obtener publicaciones inmediatamente para desbloquear la vista
+    try {
       const resProd = await fetch(`${getApiUrl()}/products/my-publications/`, {
         headers: { 'Authorization': `Bearer ${authToken}` }
       });
 
-      if (!resProd.ok) throw new Error("No se pudo obtener tus publicaciones.");
+      if (!resProd.ok) {
+        const errData = await resProd.json().catch(() => null);
+        throw new Error(errData?.detail || "No se pudo obtener tus publicaciones.");
+      }
       const dataProd = await resProd.json();
-      setProducts(dataProd);
-      setLoading(false); // <--- Desbloqueo instantáneo de la interfaz y disparo del scroll
-
-      // 2. Obtener métricas analíticas en segundo plano sin demorar la carga de la lista
-      fetch(`${getApiUrl()}/analytics/seller/metrics`, {
-        headers: { 'Authorization': `Bearer ${authToken}` }
-      })
-        .then(res => res && res.ok ? res.json() : null)
-        .then(dataMetrics => {
-          if (dataMetrics) setMetrics(dataMetrics);
-        })
-        .catch(() => null);
-
+      setProducts(Array.isArray(dataProd) ? dataProd : []);
     } catch (err: any) {
-      setError(err.message || "Error de red.");
+      setError(err.message || "Error de conexión al cargar publicaciones.");
+    } finally {
       setLoading(false);
     }
   };
@@ -342,20 +344,21 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
 
   // Clasificación para los contadores
   const todasCount = products.length;
-  const enVentaCount = products.filter(p => p.moderation_status === 'approved' && p.stock > 0).length;
-  const enRevisionCount = products.filter(p => p.moderation_status === 'pending').length;
-  const pausadasCount = products.filter(p => p.moderation_status === 'paused').length;
-  const rechazadasCount = products.filter(p => p.moderation_status === 'rejected').length;
+  const enVentaCount = products.filter(p => (p.moderation_status || '').toLowerCase() === 'approved' && p.stock > 0).length;
+  const enRevisionCount = products.filter(p => (p.moderation_status || '').toLowerCase() === 'pending').length;
+  const pausadasCount = products.filter(p => (p.moderation_status || '').toLowerCase() === 'paused').length;
+  const rechazadasCount = products.filter(p => (p.moderation_status || '').toLowerCase() === 'rejected').length;
   const vendidasCount = products.filter(p => p.stock < 1).length;
 
   // Filtrado y búsqueda
   const productosFiltrados = useMemo(() => {
     return products.filter(p => {
+      const status = (p.moderation_status || '').toLowerCase().trim();
       // Filtro por estado
-      if (filtroActual === 'published' && !(p.moderation_status === 'approved' && p.stock > 0)) return false;
-      if (filtroActual === 'pending' && p.moderation_status !== 'pending') return false;
-      if (filtroActual === 'paused' && p.moderation_status !== 'paused') return false;
-      if (filtroActual === 'rejected' && p.moderation_status !== 'rejected') return false;
+      if (filtroActual === 'published' && !(status === 'approved' && p.stock > 0)) return false;
+      if (filtroActual === 'pending' && status !== 'pending') return false;
+      if (filtroActual === 'paused' && status !== 'paused') return false;
+      if (filtroActual === 'rejected' && status !== 'rejected') return false;
       if (filtroActual === 'sold' && p.stock >= 1) return false;
 
       // Filtro por búsqueda
