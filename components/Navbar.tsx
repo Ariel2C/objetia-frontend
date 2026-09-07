@@ -687,25 +687,6 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                           </p>
                         </Link>
 
-                        {/* Enlace directo a Mis Mensajes */}
-                        <Link 
-                          href="/mi-objetia?tab=chat" 
-                          onClick={() => setMenuAbierto(false)}
-                          className="flex items-center justify-between p-2.5 rounded-xl bg-[#282a2c]/30 hover:bg-[#282a2c] border border-[#3c4043] hover:border-[#87a9ff]/40 transition group cursor-pointer text-left"
-                        >
-                          <div className="flex items-center gap-2">
-                            <MessageSquare className="w-4 h-4 text-[#87a9ff]" />
-                            <span className="text-xs font-semibold text-white group-hover:text-[#87a9ff] transition-colors">
-                              Mis Mensajes
-                            </span>
-                          </div>
-                          {unreadChatsCount > 0 && (
-                            <span className="text-[10px] font-bold bg-[#87a9ff] text-[#131314] px-1.5 py-0.5 rounded-full">
-                              {unreadChatsCount}
-                            </span>
-                          )}
-                        </Link>
-
                         {/* Cerrar Sesión centrado abajo */}
                         <div className="pt-0.5">
                           <button 
