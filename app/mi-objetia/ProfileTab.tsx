@@ -102,6 +102,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
   const [formLng, setFormLng] = useState<number | null>(null);
   const [savingAddress, setSavingAddress] = useState(false);
   const [addressError, setAddressError] = useState("");
+  const [loadingPostalCode, setLoadingPostalCode] = useState(false);
 
   // Google Maps refs & script
   const streetInputRef = useRef<HTMLInputElement>(null);
@@ -204,26 +205,38 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
       const geocoder = new google.maps.Geocoder();
       geocoder.geocode({ location: { lat, lng } }, (results: any, status: string) => {
         if (status === 'OK' && results && results[0]) {
-          const compList = results[0].address_components || [];
           let pStreet = '';
           let pNumber = '';
           let pCity = '';
           let pProvince = '';
           let pCp = '';
 
-          for (const c of compList) {
-            const types = c.types || [];
-            if (types.includes('route')) pStreet = c.long_name;
-            else if (types.includes('street_number')) pNumber = c.long_name;
-            else if (types.includes('locality')) pCity = c.long_name;
-            else if (types.includes('sublocality') || types.includes('sublocality_level_1')) {
-              if (!pCity) pCity = c.long_name;
-            } else if (types.includes('administrative_area_level_2')) {
-              if (!pCity) pCity = c.long_name;
-            } else if (types.includes('administrative_area_level_1')) {
-              pProvince = c.long_name;
-            } else if (types.includes('postal_code') || types.includes('postal_code_prefix')) {
-              pCp = c.long_name;
+          // 1. Extraer calle, número, ciudad y provincia de los resultados
+          for (const res of results) {
+            for (const c of (res.address_components || [])) {
+              const types = c.types || [];
+              if (!pStreet && types.includes('route')) pStreet = c.long_name;
+              if (!pNumber && types.includes('street_number')) pNumber = c.long_name;
+              if (!pCity && (types.includes('locality') || types.includes('sublocality') || types.includes('sublocality_level_1') || types.includes('administrative_area_level_2'))) {
+                pCity = c.long_name;
+              }
+              if (!pProvince && types.includes('administrative_area_level_1')) {
+                pProvince = c.long_name;
+              }
+              if (!pCp && (types.includes('postal_code') || types.includes('postal_code_prefix'))) {
+                pCp = c.long_name;
+              }
+            }
+          }
+
+          // Fallback por regex si no vino el componente de CP
+          if (!pCp) {
+            for (const res of results) {
+              const m = (res.formatted_address || '').match(/\b([A-Z]?\d{4}[A-Z]{0,3})\b/);
+              if (m && m[1] !== pNumber && m[1] !== '0000') {
+                pCp = m[1];
+                break;
+              }
             }
           }
 
@@ -231,6 +244,14 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
           if (pNumber) setFormNumber(pNumber);
           if (pCity) setFormCity(pCity);
           if (pCp) setFormPostalCode(pCp);
+          else {
+            // Resolver CP por endpoint interno si Google Geocoder no lo trajo en el primer bloque
+            fetch(`/api/places/postal-code?lat=${lat}&lng=${lng}`)
+              .then(r => r.ok ? r.json() : null)
+              .then(d => { if (d?.postal_code) setFormPostalCode(d.postal_code); })
+              .catch(() => {});
+          }
+
           if (pProvince) {
             const matched = matchProvince(pProvince);
             if (matched) setFormProvince(matched);
@@ -253,7 +274,14 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
           if (a.road) setFormStreet(a.road);
           if (a.house_number) setFormNumber(a.house_number);
           if (a.city || a.town || a.village) setFormCity(a.city || a.town || a.village);
-          if (a.postcode) setFormPostalCode(a.postcode.trim());
+          if (a.postcode) {
+            setFormPostalCode(a.postcode.trim());
+          } else {
+            fetch(`/api/places/postal-code?lat=${lat}&lng=${lng}`)
+              .then(r => r.ok ? r.json() : null)
+              .then(d => { if (d?.postal_code) setFormPostalCode(d.postal_code); })
+              .catch(() => {});
+          }
           if (a.state) {
             const matched = matchProvince(a.state);
             if (matched) setFormProvince(matched);
@@ -328,7 +356,14 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
             const matched = matchProvince(details.province);
             if (matched) setFormProvince(matched);
           }
-          if (details.postal_code) setFormPostalCode(details.postal_code);
+          if (details.postal_code) {
+            setFormPostalCode(details.postal_code);
+          } else if (details.lat && details.lng) {
+            fetch(`/api/places/postal-code?lat=${details.lat}&lng=${details.lng}`)
+              .then(r => r.ok ? r.json() : null)
+              .then(d => { if (d?.postal_code) setFormPostalCode(d.postal_code); })
+              .catch(() => {});
+          }
 
           if (details.lat && details.lng) {
             setFormLat(details.lat);
@@ -357,7 +392,14 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
         const matched = matchProvince(a.state);
         if (matched) setFormProvince(matched);
       }
-      if (a.postcode) setFormPostalCode(a.postcode.trim());
+      if (a.postcode) {
+        setFormPostalCode(a.postcode.trim());
+      } else if (prediction.lat && prediction.lng) {
+        fetch(`/api/places/postal-code?lat=${prediction.lat}&lng=${prediction.lng}`)
+          .then(r => r.ok ? r.json() : null)
+          .then(d => { if (d?.postal_code) setFormPostalCode(d.postal_code); })
+          .catch(() => {});
+      }
     } else {
       if (prediction.main_text) setFormStreet(prediction.main_text);
     }
@@ -507,13 +549,55 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
     setShowAddressForm(true);
   };
 
-  const handleNextStep = (e?: React.FormEvent) => {
+  const autoDetectPostalCode = useCallback(async (overrideLat?: number, overrideLng?: number) => {
+    if (formPostalCode && formPostalCode.trim().length >= 4) return;
+
+    const lat = overrideLat ?? formLat;
+    const lng = overrideLng ?? formLng;
+
+    setLoadingPostalCode(true);
+    try {
+      if (lat && lng) {
+        const res = await fetch(`/api/places/postal-code?lat=${lat}&lng=${lng}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.postal_code) {
+            setFormPostalCode(data.postal_code);
+            return;
+          }
+        }
+      }
+
+      if (formStreet && (formCity || formProvince)) {
+        const query = `${formStreet} ${formNumber || ''}, ${formCity || ''}, ${formProvince || ''}, Argentina`;
+        const res = await fetch(`/api/places/postal-code?address=${encodeURIComponent(query)}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.postal_code) {
+            setFormPostalCode(data.postal_code);
+            return;
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("Error auto-detecting postal code:", err);
+    } finally {
+      setLoadingPostalCode(false);
+    }
+  }, [formPostalCode, formLat, formLng, formStreet, formNumber, formCity, formProvince]);
+
+  const handleNextStep = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!formStreet.trim() || !formNumber.trim() || !formCity.trim() || !formProvince.trim()) {
       setAddressError("Por favor completá los campos obligatorios: Calle, Número, Ciudad y Provincia antes de continuar.");
       return;
     }
     setAddressError("");
+
+    if (!formPostalCode.trim()) {
+      await autoDetectPostalCode();
+    }
+
     setAddressFormStep(2);
   };
 
@@ -922,6 +1006,9 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         placeholder="Ej: 1240"
                         value={formNumber}
                         onChange={(e) => setFormNumber(e.target.value)}
+                        onBlur={() => {
+                          if (!formPostalCode.trim()) autoDetectPostalCode();
+                        }}
                         className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
                       />
                     </div>
@@ -941,16 +1028,45 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                       />
                     </div>
                     <div>
-                      <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
-                        Código Postal
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Código postal"
-                        value={formPostalCode}
-                        onChange={handlePostalCodeChange}
-                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition font-mono font-semibold"
-                      />
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-semibold text-[#3c4043]">
+                          Código Postal
+                        </label>
+                        {!formPostalCode && (formStreet || formLat) && (
+                          <button
+                            type="button"
+                            onClick={() => autoDetectPostalCode()}
+                            disabled={loadingPostalCode}
+                            className="text-[11px] font-medium text-[#1a73e8] hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                          >
+                            {loadingPostalCode ? (
+                              <>
+                                <Loader2 className="w-3 h-3 animate-spin" />
+                                <span>Detectando...</span>
+                              </>
+                            ) : (
+                              <span>Detectar CP</span>
+                            )}
+                          </button>
+                        )}
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Ej: 5000 o C1425"
+                          value={formPostalCode}
+                          onChange={handlePostalCodeChange}
+                          onBlur={() => {
+                            if (!formPostalCode.trim()) autoDetectPostalCode();
+                          }}
+                          className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition font-mono font-semibold"
+                        />
+                        {loadingPostalCode && (
+                          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <Loader2 className="w-4 h-4 text-[#1a73e8] animate-spin" />
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -963,6 +1079,9 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         value={formProvince}
                         required
                         onChange={(e) => setFormProvince(e.target.value)}
+                        onBlur={() => {
+                          if (!formPostalCode.trim()) autoDetectPostalCode();
+                        }}
                         className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition cursor-pointer"
                       >
                         <option value="">Seleccioná tu provincia...</option>
@@ -981,6 +1100,9 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         placeholder="Ej: Córdoba Capital"
                         value={formCity}
                         onChange={(e) => setFormCity(e.target.value)}
+                        onBlur={() => {
+                          if (!formPostalCode.trim()) autoDetectPostalCode();
+                        }}
                         className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
                       />
                     </div>

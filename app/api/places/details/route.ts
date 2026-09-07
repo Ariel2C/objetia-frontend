@@ -54,6 +54,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    const lat = result.geometry?.location?.lat ?? null;
+    const lng = result.geometry?.location?.lng ?? null;
+
     // Fallback de CP por regex si no vino
     if (!postalCode && result.formatted_address) {
       const matches = result.formatted_address.match(/\b([A-Z]?\d{4}[A-Z]{0,3})\b/g);
@@ -67,8 +70,28 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const lat = result.geometry?.location?.lat ?? null;
-    const lng = result.geometry?.location?.lng ?? null;
+    // Fallback de alta precisión con Geocoding si no vino postalCode en el lugar
+    if (!postalCode && lat && lng) {
+      try {
+        const geoUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&language=es&key=${apiKey}`;
+        const geoRes = await fetch(geoUrl, { next: { revalidate: 86400 } });
+        if (geoRes.ok) {
+          const geoData = await geoRes.json();
+          for (const gr of (geoData.results || [])) {
+            for (const c of (gr.address_components || [])) {
+              const types = c.types || [];
+              if (types.includes("postal_code") || types.includes("postal_code_prefix")) {
+                postalCode = c.long_name;
+                break;
+              }
+            }
+            if (postalCode) break;
+          }
+        }
+      } catch (geoErr) {
+        console.warn("Aviso resolviendo CP por lat/lng:", geoErr);
+      }
+    }
 
     return NextResponse.json({
       street,
