@@ -729,9 +729,9 @@ function MiObjetiaContent() {
   const TabIcon = currentTabMeta.icon;
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-sans text-[#202124] antialiased">
+    <div className={`bg-[#f8f9fa] flex flex-col font-sans text-[#202124] antialiased ${tabActual === "chat" ? "h-screen overflow-hidden" : "min-h-screen"}`}>
       {/* Workspace Shell Google AI Studio Light */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden h-full">
         {/* Sidebar Lateral Google AI Studio Light */}
         <Sidebar 
           tabActual={tabActual}
@@ -746,7 +746,7 @@ function MiObjetiaContent() {
         />
 
         {/* Área Principal de Contenido */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+        <div className={`flex-1 flex flex-col min-w-0 ${tabActual === "chat" ? "h-full overflow-hidden" : "overflow-y-auto"}`}>
           {/* Top Bar Google AI Studio Light */}
           <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xs border-b border-[#dadce0] px-4 sm:px-6 h-[60px] min-h-[60px] flex items-center justify-between flex-shrink-0 gap-3">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
@@ -827,7 +827,7 @@ function MiObjetiaContent() {
           </header>
 
           {/* Cuerpo de Contenido (Ocupa todo el ancho de la página) */}
-          <main className="flex-1 w-full p-4 sm:p-6 lg:p-8 space-y-6">
+          <main className={`flex-1 w-full ${tabActual === "chat" ? "p-2 sm:p-3 lg:p-4 flex flex-col min-h-0 overflow-hidden" : "p-4 sm:p-6 lg:p-8 space-y-6"}`}>
             {/* TAB: BILLETERA */}
             {tabActual === "billetera" && (
               <div className="animate-fade-in">
@@ -876,7 +876,7 @@ function MiObjetiaContent() {
 
             {/* TAB: MIS MENSAJES */}
             {tabActual === "chat" && (
-              <div className="animate-fade-in">
+              <div className="animate-fade-in flex-1 h-full min-h-0 flex flex-col overflow-hidden">
                 <ChatTab initialRoomId={searchParams.get("room_id")} />
               </div>
             )}

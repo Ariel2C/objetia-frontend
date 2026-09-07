@@ -70,7 +70,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
   const [conectado, setConectado] = useState(false);
   const [filtroBusqueda, setFiltroBusqueda] = useState('');
 
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   // Modal de confirmación estilizado
   const [confirmModal, setConfirmModal] = useState<{
@@ -258,9 +258,23 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
     return () => clearInterval(interval);
   }, [selectedRoomId, usuario, conectado]);
 
-  // Scroll automático al final
+  // Scroll automático SOLO del contenedor interno de mensajes (evita desplazar la página)
+  const scrollToBottom = (smooth = true) => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto'
+      });
+    }
+  };
+
   useEffect(() => {
-    scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (mensajes.length > 0) {
+      const timer = setTimeout(() => {
+        scrollToBottom(true);
+      }, 50);
+      return () => clearTimeout(timer);
+    }
   }, [mensajes]);
 
   // Enviar mensaje (híbrido WebSocket con fallback automático por HTTP)
@@ -346,7 +360,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
     : "Conversación";
 
   return (
-    <div className="bg-white rounded-2xl border border-[#dadce0] shadow-2xs overflow-hidden flex flex-col h-[calc(100vh-140px)] min-h-[580px] max-h-[850px] font-sans antialiased">
+    <div className="bg-white rounded-2xl border border-[#dadce0] shadow-2xs overflow-hidden flex flex-col h-full w-full flex-1 min-h-0 font-sans antialiased">
       <div className="flex flex-1 overflow-hidden h-full">
         
         {/* ==================================================================== */}
@@ -448,14 +462,13 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                       {formatearTituloProducto(sala.product_title)}
                     </p>
 
-                    <div className="flex items-center justify-between mt-1 text-[10px] text-[#80868b]">
-                      <span className="truncate">Chat #{sala.id}</span>
-                      {sala.last_message_time && (
+                    {sala.last_message_time && (
+                      <div className="flex items-center justify-end mt-1 text-[10px] text-[#80868b]">
                         <span className="font-mono">
                           {new Date(sala.last_message_time).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })}
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 );
               })
@@ -521,16 +534,6 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
 
                 {/* Acciones de cabecera */}
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  {/* Estado de conexión en vivo */}
-                  <div className={`hidden sm:inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-full border ${
-                    conectado 
-                      ? "bg-[#e6f4ea] text-[#137333] border-[#ceead6]" 
-                      : "bg-[#f1f3f4] text-[#5f6368] border-[#dadce0]"
-                  }`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${conectado ? "bg-[#137333] animate-pulse" : "bg-[#80868b]"}`} />
-                    <span>{conectado ? "En vivo" : "Sincronizando"}</span>
-                  </div>
-
                   <button
                     type="button"
                     onClick={handleEliminarSala}
@@ -543,7 +546,10 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
               </div>
 
               {/* Contenedor de mensajes */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+              <div 
+                ref={messagesContainerRef}
+                className="flex-1 min-h-0 overflow-y-auto p-4 space-y-3 custom-scrollbar"
+              >
                 {/* Banner de Garantía Objetia */}
                 <div className="p-2.5 rounded-xl bg-white border border-[#dadce0] shadow-2xs flex items-center gap-2 text-xs text-[#3c4043] max-w-xl mx-auto">
                   <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
@@ -615,11 +621,10 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                     );
                   })
                 )}
-                <div ref={scrollRef} />
               </div>
 
               {/* Barra de entrada de texto */}
-              <form onSubmit={handleEnviarMensaje} className="p-3 bg-white border-t border-[#dadce0] flex items-center gap-2">
+              <form onSubmit={handleEnviarMensaje} className="p-2.5 sm:p-3 bg-white border-t border-[#dadce0] flex items-center gap-2 flex-shrink-0">
                 <input
                   type="text"
                   value={nuevoMensaje}
