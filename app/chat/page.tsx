@@ -6,7 +6,7 @@ import { useToast } from '../../components/ToastContext';
 import { getApiUrl } from '../../lib/config';
 import { apiFetch, getToken } from '../../lib/api';
 import { formatearTituloProducto } from '../../lib/format';
-import { Send, MessageSquare, AlertCircle, ShieldAlert, Wifi, WifiOff, ArrowLeft, Trash2 } from 'lucide-react';
+import { Send, MessageSquare, AlertCircle, ShieldAlert, Wifi, WifiOff, ArrowLeft, Trash2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface Mensaje {
@@ -30,6 +30,7 @@ function ChatContent() {
   const [nuevoMensaje, setNuevoMensaje] = useState('');
   const [conectado, setConectado] = useState(false);
   const [errorConexion, setErrorConexion] = useState<string | null>(null);
+  const [enviando, setEnviando] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Formateador de tiempo relativo al estilo WhatsApp
@@ -252,12 +253,45 @@ function ChatContent() {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [mensajes]);
 
-  const enviarMensaje = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!ws || !nuevoMensaje.trim() || !conectado) return;
+  // Polling de respaldo cada 4 segundos si el WebSocket no está conectado
+  useEffect(() => {
+    if (!roomIdParam || !usuario || !usuario.id || conectado) return;
+    const interval = setInterval(async () => {
+      try {
+        const data = await apiFetch<Mensaje[]>(`/chat/rooms/${roomIdParam}/messages/`);
+        setMensajes(data);
+      } catch {}
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [roomIdParam, usuario, conectado]);
 
-    ws.send(nuevoMensaje.trim());
-    setNuevoMensaje('');
+  const enviarMensaje = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const texto = nuevoMensaje.trim();
+    if (!texto || !roomIdParam) return;
+
+    if (ws && conectado && ws.readyState === WebSocket.OPEN) {
+      ws.send(texto);
+      setNuevoMensaje('');
+    } else {
+      setEnviando(true);
+      try {
+        const msg = await apiFetch<Mensaje>(`/chat/rooms/${roomIdParam}/messages/`, {
+          method: 'POST',
+          body: JSON.stringify({ message: texto })
+        });
+        setMensajes((prev) => {
+          const exists = prev.some((m) => m.id === msg.id);
+          if (exists) return prev;
+          return [...prev, msg];
+        });
+        setNuevoMensaje('');
+      } catch (err: any) {
+        toast.error(err.message || "Error al enviar mensaje.");
+      } finally {
+        setEnviando(false);
+      }
+    }
   };
 
   const handleEliminarMensaje = (messageId: number) => {
@@ -491,16 +525,15 @@ function ChatContent() {
                   value={nuevoMensaje}
                   onChange={(e) => setNuevoMensaje(e.target.value)}
                   placeholder="Escribí tu mensaje acá..."
-                  disabled={!conectado}
-                  className="flex-grow bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:border-gray-400 transition disabled:opacity-50"
+                  className="flex-grow bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-900 focus:outline-none focus:border-gray-400 transition"
                 />
                 <button
                   type="submit"
-                  disabled={!conectado || !nuevoMensaje.trim()}
-                  style={{ backgroundColor: conectado ? 'var(--color-primary)' : '#9CA3AF' }}
-                  className="p-3.5 rounded-xl text-white font-bold hover:brightness-105 active:scale-95 transition disabled:opacity-50 cursor-pointer flex items-center justify-center shadow-sm"
+                  disabled={!nuevoMensaje.trim() || enviando}
+                  style={{ backgroundColor: 'var(--color-primary, #1a73e8)' }}
+                  className="p-3.5 rounded-xl text-white font-bold hover:brightness-105 active:scale-95 transition disabled:opacity-50 cursor-pointer flex items-center justify-center shadow-sm min-w-[46px]"
                 >
-                  <Send className="h-4 w-4" />
+                  {enviando ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                 </button>
               </form>
             </div>
