@@ -677,28 +677,33 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         )}
 
                         {/* ==================================================================== */}
-                        {/* TARJETA MI OBJETIA: BORDE DESTACADO, ANCHO COMPACTO Y TEXTO "Entrá a" */}
+                        {/* TARJETA MI OBJETIA: FULL NEGRO CON BLUR PÚRPURA (COLOR BOTÓN USAR)   */}
                         {/* ==================================================================== */}
-                        <Link 
-                          href="/mi-objetia" 
-                          onClick={() => setMenuAbierto(false)}
-                          className="group relative block px-2.5 py-2.5 rounded-xl bg-[#282a2c]/80 hover:bg-[#282a2c] border border-[#555a60] hover:border-white/60 shadow-md shadow-black/30 transition-all duration-200 cursor-pointer text-center overflow-hidden"
-                        >
-                          {/* Texto superior fino y más chico: "Entrá a" */}
-                          <span className="block text-[11px] font-normal text-[#9aa0a6] tracking-wide mb-0.5 group-hover:text-[#c4c7c5] transition-colors">
-                            Entrá a
-                          </span>
+                        <div className="relative group p-0.5">
+                          {/* Halo blur del color púrpura del botón "Usar en el catálogo" (purple-700 / purple-600) en el borde */}
+                          <div className="absolute inset-0 bg-gradient-to-r from-purple-700 via-purple-600 to-purple-800 rounded-xl blur-[4px] opacity-75 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-                          {/* Transformación 2D fluida en tiempo real (Palabra MI OBJETIA <-> Cuadrado de 4 cuadrados) */}
-                          <MiObjetiaMorph />
+                          <Link 
+                            href="/mi-objetia" 
+                            onClick={() => setMenuAbierto(false)}
+                            className="relative block px-2.5 py-2.5 rounded-xl bg-black border border-purple-500/50 hover:border-purple-400 transition-all duration-200 cursor-pointer text-center overflow-hidden z-10"
+                          >
+                            {/* Texto superior en mayúsculas: "ENTRÁ A" */}
+                            <span className="block text-[10px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6] mb-0.5 group-hover:text-white transition-colors">
+                              ENTRÁ A
+                            </span>
 
-                          {/* 4. Gestioná tus compras... bien abajo */}
-                          <div className="mt-1 pt-1.5 border-t border-[#3c4043]">
-                            <p className="text-[10px] text-[#9aa0a6] leading-snug group-hover:text-[#c4c7c5] transition-colors text-center">
-                              Gestioná tus compras, ventas, publicaciones y perfil personal.
-                            </p>
-                          </div>
-                        </Link>
+                            {/* Transformación 2D fluida en tiempo real (Palabra MI OBJETIA <-> Cuadrado de 4 cuadrados) */}
+                            <MiObjetiaMorph />
+
+                            {/* Sin divisor entre Mi Objetia y gestiona */}
+                            <div className="mt-1">
+                              <p className="text-[10px] text-[#9aa0a6] leading-snug group-hover:text-[#c4c7c5] transition-colors text-center">
+                                Gestioná tus compras, ventas, publicaciones y perfil personal.
+                              </p>
+                            </div>
+                          </Link>
+                        </div>
 
                         {/* Cerrar Sesión centrado abajo */}
                         <div className="pt-0.5">
