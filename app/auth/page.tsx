@@ -15,12 +15,13 @@ function LoginContent() {
   const searchParams = useSearchParams();
   
   const modeParam = searchParams.get('mode');
+  const tokenParam = searchParams.get('token');
   const redirectUrl = searchParams.get('redirect') || '/';
 
   const [montado, setMontado] = useState(false);
   
-  // Modos de vista: 'auth' (login/registro), 'vendedor_intro', 'forgot_password'
-  const [viewMode, setViewMode] = useState<'auth' | 'vendedor_intro' | 'forgot_password'>('auth');
+  // Modos de vista: 'auth' (login/registro), 'vendedor_intro', 'forgot_password', 'reset_password'
+  const [viewMode, setViewMode] = useState<'auth' | 'vendedor_intro' | 'forgot_password' | 'reset_password'>('auth');
   const [esLogin, setEsLogin] = useState(true);
 
   // Campos de formulario (Email con autocompletado por teclado/mouse al escribir @)
@@ -29,6 +30,7 @@ function LoginContent() {
   const [indiceSeleccionadoEmail, setIndiceSeleccionadoEmail] = useState(0);
 
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [aceptoTerminos, setAceptoTerminos] = useState(false);
   const [quieroNovedades, setQuieroNovedades] = useState(true);
@@ -44,12 +46,15 @@ function LoginContent() {
   const [cargando, setCargando] = useState(false);
   const [mensajeError, setMensajeError] = useState<string | null>(null);
   const [enlaceEnviado, setEnlaceEnviado] = useState(false);
+  const [passwordRestablecida, setPasswordRestablecida] = useState(false);
 
   const dominiosSugeridos = ['@gmail.com', '@hotmail.com', '@outlook.com', '@yahoo.com', '@icloud.com'];
 
   useEffect(() => {
     setMontado(true);
-    if (modeParam === 'seller' || redirectUrl.includes('/products/new')) {
+    if (modeParam === 'reset_password' && tokenParam) {
+      setViewMode('reset_password');
+    } else if (modeParam === 'seller' || redirectUrl.includes('/products/new')) {
       setViewMode('vendedor_intro');
     } else if (modeParam === 'register') {
       setViewMode('auth');
@@ -58,7 +63,7 @@ function LoginContent() {
       setViewMode('auth');
       setEsLogin(true);
     }
-  }, [modeParam, redirectUrl]);
+  }, [modeParam, tokenParam, redirectUrl]);
 
   // Al escribir en el cuadro de texto de email: activa sugerencias ÚNICAMENTE si termina en @ (ej: marisa@)
   const manejarInputEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -229,12 +234,64 @@ function LoginContent() {
       return;
     }
     setCargando(true);
+    setMensajeError(null);
     try {
-      await new Promise(r => setTimeout(r, 1000));
+      const resp = await fetch(`${getApiUrl()}/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailFinal })
+      });
+      const data = await resp.json();
+      if (!resp.ok) {
+        throw new Error(data.detail || "No pudimos procesar la solicitud.");
+      }
       setEnlaceEnviado(true);
       toast.success("Te enviamos las instrucciones a tu correo electrónico.", "¡Enlace Enviado!");
-    } catch {
-      toast.error("No pudimos enviar el enlace de recuperación.");
+    } catch (err: any) {
+      toast.error(err.message || "No pudimos enviar el enlace de recuperación.");
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const manejarRestablecimientoPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setMensajeError(null);
+
+    if (!tokenParam) {
+      toast.error("Token de recuperación no encontrado.");
+      return;
+    }
+
+    if (password.length < 6) {
+      toast.warning("La contraseña debe contener al menos 6 caracteres.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.warning("Las contraseñas no coinciden.");
+      return;
+    }
+
+    setCargando(true);
+    try {
+      const resp = await fetch(`${getApiUrl()}/auth/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          token: tokenParam,
+          new_password: password
+        })
+      });
+      const data = await resp.json();
+      if (!resp.ok) {
+        throw new Error(data.detail || "No pudimos restablecer tu contraseña.");
+      }
+      setPasswordRestablecida(true);
+      toast.success("¡Tu contraseña ha sido actualizada con éxito!", "¡Listo!");
+    } catch (err: any) {
+      setMensajeError(err.message || "Error al restablecer la contraseña.");
+      toast.error(err.message || "Error al restablecer la contraseña.");
     } finally {
       setCargando(false);
     }
@@ -426,6 +483,94 @@ function LoginContent() {
                     className="text-xs font-bold text-gray-500 hover:text-gray-800 transition cursor-pointer"
                   >
                     Volver
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        )}
+
+        {/* ============================================================================== */}
+        {/* VISTA 2B: RESTABLECER CONTRASEÑA CON TOKEN */}
+        {/* ============================================================================== */}
+        {viewMode === 'reset_password' && (
+          <div className="space-y-6 animate-fade-in">
+            <div className="text-center space-y-2">
+              <div className="mx-auto h-12 w-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+                <Lock className="h-6 w-6" />
+              </div>
+              <h2 className="text-xl font-black text-gray-900">Restablecé tu contraseña</h2>
+              <p className="text-xs text-gray-600 leading-relaxed max-w-xs mx-auto">
+                Ingresá tu nueva clave segura para volver a entrar a tu cuenta.
+              </p>
+            </div>
+
+            {mensajeError && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs font-bold rounded-xl text-center">
+                {mensajeError}
+              </div>
+            )}
+
+            {passwordRestablecida ? (
+              <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-200 text-center space-y-3">
+                <p className="text-xs font-extrabold text-emerald-900">¡Contraseña actualizada con éxito!</p>
+                <p className="text-[11px] text-emerald-700">Ya podés iniciar sesión con tus nuevas credenciales.</p>
+                <button
+                  onClick={() => { setViewMode('auth'); setEsLogin(true); setPassword(''); setConfirmPassword(''); }}
+                  className="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md cursor-pointer"
+                >
+                  INICIAR SESIÓN
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={manejarRestablecimientoPassword} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Nueva Contraseña</label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <input 
+                      type="password" 
+                      required
+                      minLength={6}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Mínimo 6 caracteres"
+                      className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 mb-1">Confirmar Nueva Contraseña</label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <input 
+                      type="password" 
+                      required
+                      minLength={6}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Repetí la contraseña"
+                      className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={cargando}
+                  className="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md cursor-pointer"
+                >
+                  {cargando ? "GUARDANDO..." : "CAMBIAR CONTRASEÑA"}
+                </button>
+
+                <div className="text-center pt-2">
+                  <button
+                    type="button"
+                    onClick={() => { setViewMode('auth'); setEsLogin(true); }}
+                    className="text-xs font-bold text-gray-500 hover:text-gray-800 transition cursor-pointer"
+                  >
+                    Volver al login
                   </button>
                 </div>
               </form>
