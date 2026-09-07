@@ -683,7 +683,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="group relative block p-2.5 rounded-xl bg-[#282a2c]/70 hover:bg-[#282a2c] border border-[#3c4043] hover:border-[#87a9ff]/40 transition-colors duration-200 cursor-pointer text-center overflow-hidden"
+                          className="group relative block p-2.5 rounded-xl bg-[#282a2c]/70 hover:bg-[#282a2c] border border-[#3c4043] hover:border-white/40 transition-colors duration-200 cursor-pointer text-center overflow-hidden"
                         >
                           {/* Transformación 2D fluida en tiempo real (Palabra MI OBJETIA <-> Cuadrado de 4 cuadrados) */}
                           <MiObjetiaMorph />
