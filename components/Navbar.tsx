@@ -660,7 +660,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
 
                     {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN - GOOGLE AI STUDIO DARK */}
                     {menuAbierto && (
-                      <div className="absolute right-0 mt-2 w-52 sm:w-56 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1.5 animate-scale-in origin-top-right">
+                      <div className="absolute right-0 mt-2 w-48 sm:w-52 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1.5 animate-scale-in origin-top-right">
                         {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'administrador') && (
                           <div className="px-1 pt-0.5">
                             <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#282a2c] text-[#87a9ff] border border-[#3c4043]">
@@ -682,7 +682,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="group relative block px-2.5 pt-2 pb-2.5 rounded-xl bg-black border border-purple-500/20 hover:border-purple-500/40 shadow-[0_0_5px_rgba(126,34,206,0.18)] hover:shadow-[0_0_9px_rgba(126,34,206,0.32)] transition-all duration-300 cursor-pointer text-center overflow-hidden"
+                          className="group relative block px-2.5 pt-3.5 pb-2.5 rounded-xl bg-black border border-purple-500/20 hover:border-purple-500/40 shadow-[0_0_5px_rgba(126,34,206,0.18)] hover:shadow-[0_0_9px_rgba(126,34,206,0.32)] transition-all duration-300 cursor-pointer text-center overflow-hidden"
                         >
                           {/* Texto superior en mayúsculas: "ENTRÁ A" */}
                           <span className="block text-[9.5px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6] leading-none mb-0.5 group-hover:text-white transition-colors">
