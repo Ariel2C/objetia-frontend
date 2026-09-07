@@ -682,10 +682,10 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="group relative block px-2.5 py-2.5 rounded-xl bg-black border border-purple-500/25 hover:border-purple-500/45 shadow-[0_0_7px_rgba(126,34,206,0.2)] hover:shadow-[0_0_11px_rgba(126,34,206,0.38)] transition-all duration-300 cursor-pointer text-center overflow-hidden"
+                          className="group relative block px-2.5 pt-2 pb-2.5 rounded-xl bg-black border border-purple-500/20 hover:border-purple-500/40 shadow-[0_0_5px_rgba(126,34,206,0.18)] hover:shadow-[0_0_9px_rgba(126,34,206,0.32)] transition-all duration-300 cursor-pointer text-center overflow-hidden"
                         >
                           {/* Texto superior en mayúsculas: "ENTRÁ A" */}
-                          <span className="block text-[10px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6] mb-0.5 group-hover:text-white transition-colors">
+                          <span className="block text-[9.5px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6] leading-none mb-0.5 group-hover:text-white transition-colors">
                             ENTRÁ A
                           </span>
 
