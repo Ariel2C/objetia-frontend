@@ -677,25 +677,20 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                         )}
 
                         {/* ==================================================================== */}
-                        {/* TARJETA MI OBJETIA: ANCHO COMPACTO, MÁS ESPACIO SUPERIOR (pt-5)      */}
+                        {/* TARJETA MI OBJETIA                                                  */}
                         {/* ==================================================================== */}
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="group relative block px-2.5 pt-5 pb-2.5 rounded-xl bg-[#131314] hover:bg-[#18191b] border border-[#3c4043] hover:border-[#87a9ff]/50 transition-all duration-200 cursor-pointer text-center overflow-hidden"
+                          className="group relative block px-2.5 py-2.5 rounded-xl bg-[#131314] hover:bg-[#18191b] border border-[#3c4043] hover:border-[#87a9ff]/50 transition-all duration-200 cursor-pointer text-center overflow-hidden"
                         >
-                          {/* Texto superior en mayúsculas: "ENTRÁ A" */}
-                          <span className="block text-[9.5px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6] leading-none mb-0.5 group-hover:text-[#87a9ff] transition-colors">
-                            ENTRÁ A
-                          </span>
-
                           {/* Transformación 2D fluida en tiempo real (Palabra MI OBJETIA <-> Cuadrado de 4 cuadrados) */}
                           <MiObjetiaMorph />
 
                           {/* Sin divisor entre Mi Objetia y gestiona */}
                           <div className="mt-1">
                             <p className="text-[10px] text-[#9aa0a6] leading-snug group-hover:text-[#c4c7c5] transition-colors text-center">
-                              Gestioná tus compras, ventas, publicaciones y perfil personal.
+                              Gestioná tus compras y ventas
                             </p>
                           </div>
                         </Link>
