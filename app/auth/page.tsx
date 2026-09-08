@@ -126,12 +126,12 @@ function LoginContent() {
     const emailFinal = obtenerEmailCompleto();
 
     if (!emailFinal || !emailFinal.includes('@')) {
-      toast.warning("Por favor, ingresá un correo electrónico válido para continuar.", "Revisá tu correo");
+      toast.warning("Por favor, ingresá un correo electrónico válido para continuar.");
       return;
     }
 
     if (!esLogin && !aceptoTerminos) {
-      toast.warning("Para poder brindarte un servicio seguro, necesitamos que aceptes los Términos y Condiciones.", "Un detalle más");
+      toast.warning("Para poder brindarte un servicio seguro, necesitamos que aceptes los Términos y Condiciones.");
       return;
     }
 
@@ -155,12 +155,12 @@ function LoginContent() {
         }
         const nombre = datos.user?.full_name?.split(" ")[0] || "";
         const saludo = nombre ? `¡Qué alegría tenerte con nosotros, ${nombre}! Tu cuenta con Google ya está activa.` : "¡Qué alegría tenerte con nosotros! Tu cuenta con Google ya está activa.";
-        toast.success(saludo, "¡Bienvenido a Objetia!");
+        toast.success(saludo);
         login(datos.access_token, datos.user);
         router.push(redirectUrl);
       } catch (error: any) {
         setMensajeError(error.message);
-        toast.error(error.message || "Tuvimos un inconveniente al conectar con Google. Probemos de nuevo.", "No pudimos conectar");
+        toast.error(error.message || "Tuvimos un inconveniente al conectar con Google. Probemos de nuevo.");
       } finally {
         setCargando(false);
       }
@@ -208,13 +208,13 @@ function LoginContent() {
       if (esLogin) {
         const nombre = datos.user?.full_name?.split(" ")[0] || "";
         const saludo = nombre ? `¡Hola de nuevo, ${nombre}! Qué lindo tenerte de vuelta.` : "¡Hola de nuevo! Qué lindo tenerte de vuelta.";
-        toast.success(saludo, "¡Bienvenido a casa!");
+        toast.success(saludo);
         login(datos.access_token, datos.user);
         router.push(redirectUrl);
       } else {
         const nombre = datos.user?.full_name?.split(" ")[0] || "";
         const saludo = nombre ? `¡Qué alegría tenerte con nosotros, ${nombre}! Tu espacio ya está listo.` : "¡Qué alegría tenerte con nosotros! Tu espacio ya está listo.";
-        toast.success(saludo, "¡Bienvenido a Objetia!");
+        toast.success(saludo);
         if (datos.access_token && datos.user) {
           login(datos.access_token, datos.user);
         }
@@ -226,7 +226,7 @@ function LoginContent() {
         msg = "No logramos conectar con el servidor o los datos ingresados no coinciden. Verificalos e intentemos otra vez.";
       }
       setMensajeError(msg);
-      toast.error(msg, "¿Necesitás ayuda?");
+      toast.error(msg);
     } finally {
       setCargando(false);
     }
@@ -236,7 +236,7 @@ function LoginContent() {
     e.preventDefault();
     const emailFinal = obtenerEmailCompleto();
     if (!emailFinal || !emailFinal.includes('@')) {
-      toast.warning("Por favor, ingresá un correo electrónico válido para que podamos ayudarte.", "Revisá tu correo");
+      toast.warning("Por favor, ingresá un correo electrónico válido para que podamos ayudarte.");
       return;
     }
     setCargando(true);
@@ -252,9 +252,9 @@ function LoginContent() {
         throw new Error(data.detail || "No pudimos procesar la solicitud en este momento.");
       }
       setEnlaceEnviado(true);
-      toast.success(`Ya te enviamos el enlace para restablecer tu clave a ${emailFinal}. Revisá tu bandeja de entrada o Spam.`, "¡Enlace en camino!");
+      toast.success(`Ya te enviamos el enlace para restablecer tu clave a ${emailFinal}. Revisá tu bandeja de entrada o Spam.`);
     } catch (err: any) {
-      toast.error(err.message || "Tuvimos un inconveniente al enviar el correo. Por favor, probá de nuevo en unos momentos.", "No pudimos enviar el correo");
+      toast.error(err.message || "Tuvimos un inconveniente al enviar el correo. Por favor, probá de nuevo en unos momentos.");
     } finally {
       setCargando(false);
     }
@@ -265,17 +265,17 @@ function LoginContent() {
     setMensajeError(null);
 
     if (!tokenParam) {
-      toast.error("Parece que el enlace no incluye el código de seguridad o está incompleto. Solicitá uno nuevo.", "Enlace incompleto");
+      toast.error("Parece que el enlace no incluye el código de seguridad o está incompleto. Solicitá uno nuevo.");
       return;
     }
 
     if (password.length < 6) {
-      toast.warning("Para cuidar la seguridad de tu cuenta, la contraseña debe tener al menos 6 caracteres.", "Contraseña muy corta");
+      toast.warning("Para cuidar la seguridad de tu cuenta, la contraseña debe tener al menos 6 caracteres.");
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.warning("Las contraseñas no coinciden. Por favor, escribilas de nuevo para asegurarte.", "Verificá la contraseña");
+      toast.warning("Las contraseñas no coinciden. Por favor, escribilas de nuevo para asegurarte.");
       return;
     }
 
@@ -294,10 +294,10 @@ function LoginContent() {
         throw new Error(data.detail || "No pudimos restablecer tu contraseña en este momento.");
       }
       setPasswordRestablecida(true);
-      toast.success("¡Excelente! Tu nueva contraseña ya está activa. Podés ingresar a tu cuenta cuando quieras.", "¡Contraseña renovada!");
+      toast.success("¡Excelente! Tu nueva contraseña ya está activa. Podés ingresar a tu cuenta cuando quieras.");
     } catch (err: any) {
       setMensajeError(err.message || "Tuvimos un inconveniente al actualizar tu clave.");
-      toast.error(err.message || "Tuvimos un inconveniente al actualizar tu clave. Si el enlace expiró, podés pedir uno nuevo.", "Atención");
+      toast.error(err.message || "Tuvimos un inconveniente al actualizar tu clave. Si el enlace expiró, podés pedir uno nuevo.");
     } finally {
       setCargando(false);
     }
@@ -327,13 +327,13 @@ function LoginContent() {
         setEmailInput(googleEmail);
         setGoogleAvatarUrl(payloadDecoded.picture || null);
         setFullName(dataCheck.full_name || payloadDecoded.name || '');
-        toast.info("Encontramos tu cuenta de Google en Objetia. Hacé clic en ingresar para entrar directamente.", "¡Te reconocimos!");
+        toast.info("Encontramos tu cuenta de Google en Objetia. Hacé clic en ingresar para entrar directamente.");
         return;
       }
 
       if (esLogin) {
         // Si el usuario intentó iniciar sesión pero NO existía la cuenta en la DB:
-        toast.warning("Aún no tenés una cuenta creada con este correo de Google. ¡Completá el registro en un instante!", "Te damos la bienvenida");
+        toast.warning("Aún no tenés una cuenta creada con este correo de Google. ¡Completá el registro en un instante!");
         setEsLogin(false);
       }
 
@@ -344,9 +344,9 @@ function LoginContent() {
       setEmailInput(googleEmail);
       setGoogleAvatarUrl(payloadDecoded.picture || null);
 
-      toast.info("Completamos tus datos básicos desde Google. Solo resta aceptar los términos para finalizar.", "¡Casi listo!");
+      toast.info("Completamos tus datos básicos desde Google. Solo resta aceptar los términos para finalizar.");
     } catch (err: any) {
-      toast.error("No pudimos conectar con Google. Por favor, probemos de nuevo.", "Conexión interrumpida");
+      toast.error("No pudimos conectar con Google. Por favor, probemos de nuevo.");
     } finally {
       setCargando(false);
     }

@@ -10,6 +10,7 @@ interface Toast {
   title?: string;
   message: string;
   saliendo?: boolean;
+  creadoEn: number;
 }
 
 interface ConfirmOptions {
@@ -31,14 +32,92 @@ interface ToastContextType {
 
 const ToastContext = createContext<ToastContextType | null>(null);
 
-const DURACION_MS = 4500;
+const DURACION_MS = 4000;
 
-const ESTILOS: Record<ToastType, { icon: React.ElementType; iconClass: string; barClass: string }> = {
-  success: { icon: CheckCircle2, iconClass: "text-emerald-400", barClass: "bg-emerald-400" },
-  error: { icon: XCircle, iconClass: "text-red-400", barClass: "bg-red-400" },
-  info: { icon: Info, iconClass: "text-blue-400", barClass: "bg-blue-400" },
-  warning: { icon: AlertTriangle, iconClass: "text-amber-400", barClass: "bg-amber-400" },
+const ESTILOS: Record<ToastType, { icon: React.ElementType; iconClass: string; badgeClass: string; borderClass: string }> = {
+  success: { 
+    icon: CheckCircle2, 
+    iconClass: "text-emerald-400", 
+    badgeClass: "text-emerald-400/90 bg-emerald-950/60 border-emerald-800/60",
+    borderClass: "border-emerald-500/20"
+  },
+  error: { 
+    icon: XCircle, 
+    iconClass: "text-rose-400", 
+    badgeClass: "text-rose-400/90 bg-rose-950/60 border-rose-800/60",
+    borderClass: "border-rose-500/20"
+  },
+  info: { 
+    icon: Info, 
+    iconClass: "text-sky-400", 
+    badgeClass: "text-sky-400/90 bg-sky-950/60 border-sky-800/60",
+    borderClass: "border-sky-500/20"
+  },
+  warning: { 
+    icon: AlertTriangle, 
+    iconClass: "text-amber-400", 
+    badgeClass: "text-amber-400/90 bg-amber-950/60 border-amber-800/60",
+    borderClass: "border-amber-500/20"
+  },
 };
+
+function ToastItem({ toast, onCerrar }: { toast: Toast; onCerrar: (id: number) => void }) {
+  const [segundosRestantes, setSegundosRestantes] = React.useState(() => {
+    const transcurrido = Date.now() - toast.creadoEn;
+    const restante = Math.max(1, Math.ceil((DURACION_MS - transcurrido) / 1000));
+    return restante;
+  });
+
+  React.useEffect(() => {
+    const intervalo = setInterval(() => {
+      const transcurrido = Date.now() - toast.creadoEn;
+      const restante = Math.max(1, Math.ceil((DURACION_MS - transcurrido) / 1000));
+      setSegundosRestantes(restante);
+    }, 250);
+
+    return () => clearInterval(intervalo);
+  }, [toast.creadoEn]);
+
+  const estilo = ESTILOS[toast.type];
+  const Icono = estilo.icon;
+
+  return (
+    <div
+      role="status"
+      style={{
+        animation: toast.saliendo
+          ? "va-toast-out 0.22s ease forwards"
+          : "va-toast-in 0.3s var(--ease-spring) both",
+      }}
+      className={`pointer-events-auto relative overflow-hidden w-full sm:w-[380px] max-w-md bg-[#18181b]/95 backdrop-blur-md border ${estilo.borderClass} rounded-2xl shadow-2xl shadow-black/60 transition-all`}
+    >
+      <div className="flex items-start gap-3 p-4 pr-10">
+        <Icono className={`h-5 w-5 flex-shrink-0 mt-0.5 ${estilo.iconClass}`} />
+        <div className="min-w-0 flex-1 pr-6">
+          <p className="text-[13px] font-medium text-gray-100 leading-relaxed break-words">
+            {toast.message}
+          </p>
+        </div>
+      </div>
+
+      {/* Botón cerrar */}
+      <button
+        onClick={() => onCerrar(toast.id)}
+        aria-label="Cerrar notificación"
+        className="absolute top-3 right-3 p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
+      >
+        <X className="h-3.5 w-3.5" />
+      </button>
+
+      {/* Contador numérico de segundos abajo a la derecha */}
+      <div className="absolute bottom-2.5 right-3 select-none pointer-events-none">
+        <span className={`inline-flex items-center justify-center text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md border ${estilo.badgeClass} tracking-tight tabular-nums`}>
+          {segundosRestantes}s
+        </span>
+      </div>
+    </div>
+  );
+}
 
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -46,16 +125,17 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [confirmState, setConfirmState] = useState<(ConfirmOptions & { resolve: (v: boolean) => void }) | null>(null);
 
   const cerrar = useCallback((id: number) => {
-    // Primero animamos la salida y recién después quitamos el toast del DOM
-    setToasts(prev => prev.map(t => t.id === id ? { ...t, saliendo: true } : t));
+    // Animamos la salida y luego removemos del DOM
+    setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, saliendo: true } : t)));
     setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
+      setToasts((prev) => prev.filter((t) => t.id !== id));
     }, 220);
   }, []);
 
   const notify = useCallback((type: ToastType, message: string, title?: string) => {
     const id = nextId.current++;
-    setToasts(prev => [...prev.slice(-3), { id, type, message, title }]);
+    const creadoEn = Date.now();
+    setToasts((prev) => [...prev.slice(-3), { id, type, message, title, creadoEn }]);
     setTimeout(() => cerrar(id), DURACION_MS);
   }, [cerrar]);
 
@@ -92,42 +172,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         aria-live="polite"
         className="fixed z-[100] bottom-6 left-0 right-0 flex flex-col gap-2.5 items-center pointer-events-none px-4"
       >
-        {toasts.map((toast) => {
-          const estilo = ESTILOS[toast.type];
-          const Icono = estilo.icon;
-          return (
-            <div
-              key={toast.id}
-              role="status"
-              style={{ animation: toast.saliendo ? 'va-toast-out 0.22s ease forwards' : 'va-toast-in 0.3s var(--ease-spring) both' }}
-              className="pointer-events-auto relative overflow-hidden w-full sm:w-[380px] max-w-md bg-gray-900 border border-gray-700/60 rounded-2xl shadow-2xl shadow-black/40"
-            >
-              <div className="flex items-start gap-3 p-4 pr-10">
-                <Icono className={`h-5 w-5 flex-shrink-0 mt-0.5 ${estilo.iconClass}`} />
-                <div className="min-w-0">
-                  {toast.title && (
-                    <p className="text-sm font-bold text-white">{toast.title}</p>
-                  )}
-                  <p className="text-xs text-gray-300 leading-relaxed break-words">{toast.message}</p>
-                </div>
-              </div>
-              <button
-                onClick={() => cerrar(toast.id)}
-                aria-label="Cerrar notificación"
-                className="absolute top-3 right-3 p-1 rounded-lg text-gray-500 hover:text-white hover:bg-white/10 transition cursor-pointer"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-              {/* Barra de progreso del tiempo restante */}
-              {!toast.saliendo && (
-                <div
-                  className={`absolute bottom-0 left-0 h-0.5 ${estilo.barClass} opacity-80`}
-                  style={{ animation: `va-progress ${DURACION_MS}ms linear forwards` }}
-                />
-              )}
-            </div>
-          );
-        })}
+        {toasts.map((toast) => (
+          <ToastItem key={toast.id} toast={toast} onCerrar={cerrar} />
+        ))}
       </div>
 
       {/* Modal de confirmación global */}
