@@ -126,12 +126,12 @@ function LoginContent() {
     const emailFinal = obtenerEmailCompleto();
 
     if (!emailFinal || !emailFinal.includes('@')) {
-      toast.warning("Ingresá un correo electrónico válido.");
+      toast.warning("Por favor, ingresá un correo electrónico válido para continuar.", "Revisá tu correo");
       return;
     }
 
     if (!esLogin && !aceptoTerminos) {
-      toast.warning("Debés aceptar los Términos y Condiciones para poder continuar.");
+      toast.warning("Para poder brindarte un servicio seguro, necesitamos que aceptes los Términos y Condiciones.", "Un detalle más");
       return;
     }
 
@@ -153,12 +153,14 @@ function LoginContent() {
         if (!respuesta.ok) {
           throw new Error(datos.detail || "Error al registrarse con Google.");
         }
-        toast.success(`¡Bienvenido a Objetia, ${datos.user?.full_name?.split(" ")[0] || ""}!`, "¡Cuenta creada e inicio automático!");
+        const nombre = datos.user?.full_name?.split(" ")[0] || "";
+        const saludo = nombre ? `¡Qué alegría tenerte con nosotros, ${nombre}! Tu cuenta con Google ya está activa.` : "¡Qué alegría tenerte con nosotros! Tu cuenta con Google ya está activa.";
+        toast.success(saludo, "¡Bienvenido a Objetia!");
         login(datos.access_token, datos.user);
         router.push(redirectUrl);
       } catch (error: any) {
         setMensajeError(error.message);
-        toast.error(error.message || "Falló el registro con Google.");
+        toast.error(error.message || "Tuvimos un inconveniente al conectar con Google. Probemos de nuevo.", "No pudimos conectar");
       } finally {
         setCargando(false);
       }
@@ -204,11 +206,15 @@ function LoginContent() {
       }
 
       if (esLogin) {
-        toast.success(`Hola de nuevo, ${datos.user?.full_name?.split(" ")[0] || ""}.`, "¡Inicio de sesión exitoso!");
+        const nombre = datos.user?.full_name?.split(" ")[0] || "";
+        const saludo = nombre ? `¡Hola de nuevo, ${nombre}! Qué lindo tenerte de vuelta.` : "¡Hola de nuevo! Qué lindo tenerte de vuelta.";
+        toast.success(saludo, "¡Bienvenido a casa!");
         login(datos.access_token, datos.user);
         router.push(redirectUrl);
       } else {
-        toast.success(`¡Bienvenido a Objetia, ${datos.user?.full_name?.split(" ")[0] || ""}!`, "¡Cuenta creada e inicio automático!");
+        const nombre = datos.user?.full_name?.split(" ")[0] || "";
+        const saludo = nombre ? `¡Qué alegría tenerte con nosotros, ${nombre}! Tu espacio ya está listo.` : "¡Qué alegría tenerte con nosotros! Tu espacio ya está listo.";
+        toast.success(saludo, "¡Bienvenido a Objetia!");
         if (datos.access_token && datos.user) {
           login(datos.access_token, datos.user);
         }
@@ -217,10 +223,10 @@ function LoginContent() {
     } catch (error: any) {
       let msg = error.message || "No pudimos completar la operación.";
       if (msg === "Failed to fetch") {
-        msg = "Correo electrónico o contraseña incorrectos, o el servidor no respondió.";
+        msg = "No logramos conectar con el servidor o los datos ingresados no coinciden. Verificalos e intentemos otra vez.";
       }
       setMensajeError(msg);
-      toast.error(msg);
+      toast.error(msg, "¿Necesitás ayuda?");
     } finally {
       setCargando(false);
     }
@@ -230,7 +236,7 @@ function LoginContent() {
     e.preventDefault();
     const emailFinal = obtenerEmailCompleto();
     if (!emailFinal || !emailFinal.includes('@')) {
-      toast.warning("Ingresá un correo electrónico válido.");
+      toast.warning("Por favor, ingresá un correo electrónico válido para que podamos ayudarte.", "Revisá tu correo");
       return;
     }
     setCargando(true);
@@ -243,12 +249,12 @@ function LoginContent() {
       });
       const data = await resp.json();
       if (!resp.ok) {
-        throw new Error(data.detail || "No pudimos procesar la solicitud.");
+        throw new Error(data.detail || "No pudimos procesar la solicitud en este momento.");
       }
       setEnlaceEnviado(true);
-      toast.success("Te enviamos las instrucciones a tu correo electrónico.", "¡Enlace Enviado!");
+      toast.success(`Ya te enviamos el enlace para restablecer tu clave a ${emailFinal}. Revisá tu bandeja de entrada o Spam.`, "¡Enlace en camino!");
     } catch (err: any) {
-      toast.error(err.message || "No pudimos enviar el enlace de recuperación.");
+      toast.error(err.message || "Tuvimos un inconveniente al enviar el correo. Por favor, probá de nuevo en unos momentos.", "No pudimos enviar el correo");
     } finally {
       setCargando(false);
     }
@@ -259,17 +265,17 @@ function LoginContent() {
     setMensajeError(null);
 
     if (!tokenParam) {
-      toast.error("Token de recuperación no encontrado.");
+      toast.error("Parece que el enlace no incluye el código de seguridad o está incompleto. Solicitá uno nuevo.", "Enlace incompleto");
       return;
     }
 
     if (password.length < 6) {
-      toast.warning("La contraseña debe contener al menos 6 caracteres.");
+      toast.warning("Para cuidar la seguridad de tu cuenta, la contraseña debe tener al menos 6 caracteres.", "Contraseña muy corta");
       return;
     }
 
     if (password !== confirmPassword) {
-      toast.warning("Las contraseñas no coinciden.");
+      toast.warning("Las contraseñas no coinciden. Por favor, escribilas de nuevo para asegurarte.", "Verificá la contraseña");
       return;
     }
 
@@ -285,13 +291,13 @@ function LoginContent() {
       });
       const data = await resp.json();
       if (!resp.ok) {
-        throw new Error(data.detail || "No pudimos restablecer tu contraseña.");
+        throw new Error(data.detail || "No pudimos restablecer tu contraseña en este momento.");
       }
       setPasswordRestablecida(true);
-      toast.success("¡Tu contraseña ha sido actualizada con éxito!", "¡Listo!");
+      toast.success("¡Excelente! Tu nueva contraseña ya está activa. Podés ingresar a tu cuenta cuando quieras.", "¡Contraseña renovada!");
     } catch (err: any) {
-      setMensajeError(err.message || "Error al restablecer la contraseña.");
-      toast.error(err.message || "Error al restablecer la contraseña.");
+      setMensajeError(err.message || "Tuvimos un inconveniente al actualizar tu clave.");
+      toast.error(err.message || "Tuvimos un inconveniente al actualizar tu clave. Si el enlace expiró, podés pedir uno nuevo.", "Atención");
     } finally {
       setCargando(false);
     }
@@ -321,13 +327,13 @@ function LoginContent() {
         setEmailInput(googleEmail);
         setGoogleAvatarUrl(payloadDecoded.picture || null);
         setFullName(dataCheck.full_name || payloadDecoded.name || '');
-        toast.info("Este correo de Google ya se encuentra registrado. Ingresá a tu cuenta.", "Cuenta existente");
+        toast.info("Encontramos tu cuenta de Google en Objetia. Hacé clic en ingresar para entrar directamente.", "¡Te reconocimos!");
         return;
       }
 
       if (esLogin) {
         // Si el usuario intentó iniciar sesión pero NO existía la cuenta en la DB:
-        toast.warning("No encontramos una cuenta registrada con este correo de Google. Por favor registrate primero.");
+        toast.warning("Aún no tenés una cuenta creada con este correo de Google. ¡Completá el registro en un instante!", "Te damos la bienvenida");
         setEsLogin(false);
       }
 
@@ -338,9 +344,9 @@ function LoginContent() {
       setEmailInput(googleEmail);
       setGoogleAvatarUrl(payloadDecoded.picture || null);
 
-      toast.info("Datos de Google precargados. Aceptá los Términos para finalizar tu registro.", "¡Casi listo!");
+      toast.info("Completamos tus datos básicos desde Google. Solo resta aceptar los términos para finalizar.", "¡Casi listo!");
     } catch (err: any) {
-      toast.error("No pudimos conectar con Google. Intentá nuevamente.");
+      toast.error("No pudimos conectar con Google. Por favor, probemos de nuevo.", "Conexión interrumpida");
     } finally {
       setCargando(false);
     }
@@ -411,12 +417,17 @@ function LoginContent() {
             </div>
 
             {enlaceEnviado ? (
-              <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-200 text-center space-y-3">
-                <p className="text-xs font-extrabold text-emerald-900">¡Enlace enviado a {obtenerEmailCompleto()}!</p>
-                <p className="text-[11px] text-emerald-700">Revisá tu bandeja de entrada o carpeta de Spam.</p>
+              <div className="bg-emerald-50/80 p-5 rounded-2xl border border-emerald-200 text-center space-y-3">
+                <div className="mx-auto w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                  ✓
+                </div>
+                <p className="text-sm font-extrabold text-emerald-950">¡Todo listo! Te enviamos las instrucciones</p>
+                <p className="text-xs text-emerald-800 leading-relaxed max-w-xs mx-auto">
+                  Revisá la bandeja de entrada de <span className="font-bold text-emerald-950">{obtenerEmailCompleto()}</span> (o tu carpeta de Spam) para restablecer tu clave en un clic.
+                </p>
                 <button
                   onClick={() => { setViewMode('auth'); setEsLogin(true); setEnlaceEnviado(false); }}
-                  className="text-xs font-bold text-purple-700 hover:underline pt-2 block mx-auto cursor-pointer"
+                  className="text-xs font-bold text-purple-700 hover:text-purple-900 transition pt-2 block mx-auto cursor-pointer"
                 >
                   Volver al inicio de sesión
                 </button>
@@ -512,14 +523,19 @@ function LoginContent() {
             )}
 
             {passwordRestablecida ? (
-              <div className="bg-emerald-50 p-4 rounded-2xl border border-emerald-200 text-center space-y-3">
-                <p className="text-xs font-extrabold text-emerald-900">¡Contraseña actualizada con éxito!</p>
-                <p className="text-[11px] text-emerald-700">Ya podés iniciar sesión con tus nuevas credenciales.</p>
+              <div className="bg-emerald-50/80 p-5 rounded-2xl border border-emerald-200 text-center space-y-3">
+                <div className="mx-auto w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+                  ✓
+                </div>
+                <p className="text-sm font-extrabold text-emerald-950">¡Tu nueva clave ya está lista!</p>
+                <p className="text-xs text-emerald-800 leading-relaxed max-w-xs mx-auto">
+                  Actualizamos tu contraseña de forma segura. Ya podés ingresar y seguir disfrutando de Objetia.
+                </p>
                 <button
                   onClick={() => { setViewMode('auth'); setEsLogin(true); setPassword(''); setConfirmPassword(''); }}
                   className="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md cursor-pointer"
                 >
-                  INICIAR SESIÓN
+                  INGRESAR A MI CUENTA
                 </button>
               </div>
             ) : (
