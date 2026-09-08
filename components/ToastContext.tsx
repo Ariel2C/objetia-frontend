@@ -34,30 +34,22 @@ const ToastContext = createContext<ToastContextType | null>(null);
 
 const DURACION_MS = 4000;
 
-const ESTILOS: Record<ToastType, { icon: React.ElementType; iconClass: string; badgeClass: string; borderClass: string }> = {
+const ESTILOS: Record<ToastType, { borderClass: string; dotClass: string }> = {
   success: { 
-    icon: CheckCircle2, 
-    iconClass: "text-emerald-400", 
-    badgeClass: "text-emerald-400/90 bg-emerald-950/60 border-emerald-800/60",
-    borderClass: "border-emerald-500/20"
+    borderClass: "border-gray-800 hover:border-gray-700",
+    dotClass: "bg-emerald-400"
   },
   error: { 
-    icon: XCircle, 
-    iconClass: "text-rose-400", 
-    badgeClass: "text-rose-400/90 bg-rose-950/60 border-rose-800/60",
-    borderClass: "border-rose-500/20"
+    borderClass: "border-gray-800 hover:border-gray-700",
+    dotClass: "bg-rose-400"
   },
   info: { 
-    icon: Info, 
-    iconClass: "text-sky-400", 
-    badgeClass: "text-sky-400/90 bg-sky-950/60 border-sky-800/60",
-    borderClass: "border-sky-500/20"
+    borderClass: "border-gray-800 hover:border-gray-700",
+    dotClass: "bg-sky-400"
   },
   warning: { 
-    icon: AlertTriangle, 
-    iconClass: "text-amber-400", 
-    badgeClass: "text-amber-400/90 bg-amber-950/60 border-amber-800/60",
-    borderClass: "border-amber-500/20"
+    borderClass: "border-gray-800 hover:border-gray-700",
+    dotClass: "bg-amber-400"
   },
 };
 
@@ -79,7 +71,6 @@ function ToastItem({ toast, onCerrar }: { toast: Toast; onCerrar: (id: number) =
   }, [toast.creadoEn]);
 
   const estilo = ESTILOS[toast.type];
-  const Icono = estilo.icon;
 
   return (
     <div
@@ -89,31 +80,28 @@ function ToastItem({ toast, onCerrar }: { toast: Toast; onCerrar: (id: number) =
           ? "va-toast-out 0.22s ease forwards"
           : "va-toast-in 0.3s var(--ease-spring) both",
       }}
-      className={`pointer-events-auto relative overflow-hidden w-full sm:w-[380px] max-w-md bg-[#18181b]/95 backdrop-blur-md border ${estilo.borderClass} rounded-2xl shadow-2xl shadow-black/60 transition-all`}
+      className={`pointer-events-auto relative flex items-center justify-between gap-3 px-4 py-2.5 w-fit max-w-[92vw] sm:max-w-xl bg-[#131314]/95 backdrop-blur-md border ${estilo.borderClass} rounded-xl shadow-xl shadow-black/50 transition-all`}
     >
-      <div className="flex items-start gap-3 p-4 pr-10">
-        <Icono className={`h-5 w-5 flex-shrink-0 mt-0.5 ${estilo.iconClass}`} />
-        <div className="min-w-0 flex-1 pr-6">
-          <p className="text-[13px] font-medium text-gray-100 leading-relaxed break-words">
-            {toast.message}
-          </p>
-        </div>
-      </div>
+      {/* Mensaje en una sola línea */}
+      <p className="text-[13px] font-medium text-gray-200 whitespace-nowrap overflow-hidden text-ellipsis select-none">
+        {toast.message}
+      </p>
 
-      {/* Botón cerrar */}
-      <button
-        onClick={() => onCerrar(toast.id)}
-        aria-label="Cerrar notificación"
-        className="absolute top-3 right-3 p-1 rounded-lg text-gray-400 hover:text-white hover:bg-white/10 transition cursor-pointer"
-      >
-        <X className="h-3.5 w-3.5" />
-      </button>
-
-      {/* Contador numérico de segundos abajo a la derecha */}
-      <div className="absolute bottom-2.5 right-3 select-none pointer-events-none">
-        <span className={`inline-flex items-center justify-center text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md border ${estilo.badgeClass} tracking-tight tabular-nums`}>
+      {/* Acciones: segundos en texto limpio discreto + botón cerrar */}
+      <div className="flex items-center gap-2.5 flex-shrink-0 pl-1 select-none">
+        {/* Contador discreto: sin fondo, texto gris sutil */}
+        <span className="text-[11px] font-mono text-gray-500 font-medium tabular-nums">
           {segundosRestantes}s
         </span>
+
+        {/* Botón cerrar */}
+        <button
+          onClick={() => onCerrar(toast.id)}
+          aria-label="Cerrar notificación"
+          className="p-0.5 rounded-md text-gray-500 hover:text-gray-200 transition cursor-pointer"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
       </div>
     </div>
   );
