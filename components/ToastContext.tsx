@@ -80,17 +80,17 @@ function ToastItem({ toast, onCerrar }: { toast: Toast; onCerrar: (id: number) =
           ? "va-toast-out 0.22s ease forwards"
           : "va-toast-in 0.3s var(--ease-spring) both",
       }}
-      className={`pointer-events-auto relative flex items-center justify-between gap-3 px-4 py-2.5 w-fit max-w-[92vw] sm:max-w-xl bg-[#131314]/95 backdrop-blur-md border ${estilo.borderClass} rounded-xl shadow-xl shadow-black/50 transition-all`}
+      className={`pointer-events-auto relative flex items-center justify-between gap-4 px-5 py-3.5 sm:py-4 min-h-[50px] sm:min-h-[54px] w-fit max-w-[92vw] sm:max-w-2xl bg-[#131314]/95 backdrop-blur-md border ${estilo.borderClass} rounded-2xl shadow-2xl shadow-black/60 transition-all`}
     >
       {/* Mensaje en una sola línea */}
-      <p className="text-[13px] font-medium text-gray-200 whitespace-nowrap overflow-hidden text-ellipsis select-none">
+      <p className="text-[13.5px] sm:text-sm font-medium text-gray-200 whitespace-nowrap overflow-hidden text-ellipsis select-none leading-none">
         {toast.message}
       </p>
 
       {/* Acciones: segundos en texto limpio discreto + botón cerrar */}
-      <div className="flex items-center gap-2.5 flex-shrink-0 pl-1 select-none">
+      <div className="flex items-center gap-3 flex-shrink-0 pl-1 select-none">
         {/* Contador discreto: sin fondo, texto gris sutil */}
-        <span className="text-[11px] font-mono text-gray-500 font-medium tabular-nums">
+        <span className="text-[11.5px] font-mono text-gray-500 font-medium tabular-nums">
           {segundosRestantes}s
         </span>
 
@@ -98,9 +98,9 @@ function ToastItem({ toast, onCerrar }: { toast: Toast; onCerrar: (id: number) =
         <button
           onClick={() => onCerrar(toast.id)}
           aria-label="Cerrar notificación"
-          className="p-0.5 rounded-md text-gray-500 hover:text-gray-200 transition cursor-pointer"
+          className="p-1 rounded-md text-gray-500 hover:text-gray-200 hover:bg-white/5 transition cursor-pointer"
         >
-          <X className="h-3.5 w-3.5" />
+          <X className="h-4 w-4" />
         </button>
       </div>
     </div>
