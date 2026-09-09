@@ -239,11 +239,12 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
       });
       const data = await res.json();
       if (res.ok) {
+        const nextStatus = (data.moderation_status || '').toLowerCase().trim();
         setProducts(prev => prev.map(p => {
           if (p.id === id) {
             return {
               ...p,
-              moderation_status: data.moderation_status,
+              moderation_status: nextStatus,
               updated_at: new Date().toISOString()
             };
           }
@@ -308,7 +309,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
       });
       if (res.ok) {
         const dataEdit = await res.json();
-        // Actualizar local
+        const nextStatus = (dataEdit.moderation_status || editingProduct.moderation_status || '').toLowerCase().trim();
         setProducts(prev => prev.map(p => {
           if (p.id === editingProduct.id) {
             return {
@@ -318,8 +319,8 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               category: editCategoria,
               condition: editCondicion,
               stock: editStock,
-              moderation_status: dataEdit.moderation_status || p.moderation_status,
-              ai_moderation_notes: dataEdit.moderation_status === 'pending' ? null : p.ai_moderation_notes,
+              moderation_status: nextStatus,
+              ai_moderation_notes: nextStatus === 'pending' ? null : p.ai_moderation_notes,
               updated_at: new Date().toISOString()
             };
           }
@@ -327,7 +328,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
         }));
         setEditingProduct(null);
         toast.success(
-          dataEdit.moderation_status === 'pending'
+          nextStatus === 'pending'
             ? "Publicación modificada y enviada a revisión."
             : "Los cambios de tu publicación fueron guardados."
         );
@@ -774,7 +775,9 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                     </td>
                   </tr>
                 ) : (
-                  productosPaginados.map((item) => (
+                  productosPaginados.map((item) => {
+                    const itemStatus = (item.moderation_status || '').toLowerCase().trim();
+                    return (
                     <tr key={item.id} className="hover:bg-[#f8f9fa] transition">
                       <td className="py-4 px-5">
                         <div className="flex items-center gap-3">
@@ -801,7 +804,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                       </td>
 
                       <td className="py-4 px-5">
-                        {item.moderation_status === 'rejected' ? (
+                        {itemStatus === 'rejected' ? (
                           <div className="space-y-1">
                             <span
                               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-red-50 text-red-700 border border-red-200"
@@ -823,7 +826,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                               Editar para corregir →
                             </button>
                           </div>
-                        ) : item.moderation_status === 'paused' ? (
+                        ) : itemStatus === 'paused' ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#fef7e0] text-[#b06000] border border-[#feefc3]">
                             <Pause className="h-2.5 w-2.5" />
                             Pausada
@@ -832,7 +835,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                           <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#f1f3f4] text-[#5f6368] border border-[#edf0f2]">
                             Vendido
                           </span>
-                        ) : item.moderation_status === 'approved' ? (
+                        ) : itemStatus === 'approved' ? (
                           <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-[#e6f4ea] text-[#137333] border border-[#ceead6]">
                             Publicado
                           </span>
@@ -882,18 +885,18 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                           </Link>
                           
                           {/* Botón Pausar / Reactivar */}
-                          {(item.moderation_status === 'approved' || item.moderation_status === 'paused') && item.stock > 0 && (
+                          {(itemStatus === 'approved' || itemStatus === 'paused') && item.stock > 0 && (
                             <button
                               type="button"
                               onClick={(e) => handleTogglePausa(item.id, e)}
-                              title={item.moderation_status === 'approved' ? "Pausar publicación" : "Reactivar publicación"}
+                              title={itemStatus === 'approved' ? "Pausar publicación" : "Reactivar publicación"}
                               className={`p-1.5 rounded-lg transition cursor-pointer ${
-                                item.moderation_status === 'paused'
+                                itemStatus === 'paused'
                                   ? "text-[#137333] hover:text-[#0d5924] hover:bg-[#e6f4ea]"
                                   : "text-[#b06000] hover:text-[#8a4b00] hover:bg-[#fef7e0]"
                               }`}
                             >
-                              {item.moderation_status === 'paused' ? (
+                              {itemStatus === 'paused' ? (
                                 <Play className="h-4 w-4" />
                               ) : (
                                 <Pause className="h-4 w-4" />
@@ -904,13 +907,13 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                           {/* Botón Editar */}
                           <button
                             onClick={() => handleOpenEdit(item)}
-                            title={item.moderation_status === 'rejected' ? "Editar para corregir rechazo" : "Editar publicación"}
+                            title={itemStatus === 'rejected' ? "Editar para corregir rechazo" : "Editar publicación"}
                             className="p-1.5 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#e8f0fe] rounded-lg transition cursor-pointer"
                           >
                             <Edit2 className="h-4 w-4" />
                           </button>
 
-                          {item.moderation_status === 'approved' && item.stock > 0 && (
+                          {itemStatus === 'approved' && item.stock > 0 && (
                             <button
                               onClick={() => handleCopiarEnlace(item.id)}
                               title="Copiar enlace"
@@ -934,7 +937,8 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                         </div>
                       </td>
                     </tr>
-                  ))
+                    );
+                  })
                 )}
               </tbody>
             </table>
