@@ -41,6 +41,46 @@ export interface ChatRoomItem {
   unread_count?: number;
 }
 
+const parsearFechaMensaje = (fecha: string): Date => {
+  if (!fecha) return new Date();
+  let normalizada = fecha.trim();
+  if (normalizada.includes(' ') && !normalizada.includes('T')) {
+    normalizada = normalizada.replace(' ', 'T');
+  }
+  if (!normalizada.endsWith('Z') && !normalizada.includes('+')) {
+    normalizada = `${normalizada}Z`;
+  }
+  const d = new Date(normalizada);
+  return isNaN(d.getTime()) ? new Date(fecha) : d;
+};
+
+const formatFechaMensaje = (timestamp?: string | null): string => {
+  if (!timestamp) return '';
+  const date = parsearFechaMensaje(timestamp);
+  const now = new Date();
+
+  const esHoy =
+    date.getDate() === now.getDate() &&
+    date.getMonth() === now.getMonth() &&
+    date.getFullYear() === now.getFullYear();
+
+  const hora = date.toLocaleTimeString('es-AR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+
+  if (esHoy) {
+    return `Hoy ${hora}`;
+  } else {
+    const diaMes = date.toLocaleDateString('es-AR', {
+      day: '2-digit',
+      month: '2-digit',
+    });
+    return `${diaMes} ${hora}`;
+  }
+};
+
 interface ChatTabProps {
   initialRoomId?: string | null;
 }
@@ -464,8 +504,8 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
 
                     {sala.last_message_time && (
                       <div className="flex items-center justify-end mt-1 text-[10px] text-[#80868b]">
-                        <span className="font-mono">
-                          {new Date(sala.last_message_time).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' })}
+                        <span suppressHydrationWarning className="font-mono">
+                          {formatFechaMensaje(sala.last_message_time)}
                         </span>
                       </div>
                     )}
@@ -594,8 +634,8 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                           <div className={`flex items-center justify-end gap-1.5 mt-1 text-[10px] ${
                             esMio ? 'text-white/75' : 'text-[#80868b]'
                           }`}>
-                            <span className="font-mono">
-                              {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                            <span suppressHydrationWarning className="font-mono">
+                              {formatFechaMensaje(msg.timestamp)}
                             </span>
                             {esMio && !msg.is_deleted && msg.id && (
                               <button
