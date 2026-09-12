@@ -178,7 +178,7 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
                 onClick={() => setCurrentIndex(index)}
                 aria-label={`Ir al banner ${index + 1}`}
                 className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  index === currentIndex ? 'w-6 bg-[var(--color-secondary)]' : 'w-2.5 bg-white/50 hover:bg-white'
+                  index === currentIndex ? 'w-6 bg-[var(--bg-marketplace,#F4EDDC)] border border-black/10 shadow-xs' : 'w-2.5 bg-white/50 hover:bg-white'
                 }`}
               />
             ))}
