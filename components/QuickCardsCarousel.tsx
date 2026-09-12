@@ -1,7 +1,9 @@
 "use client";
 import React, { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useAuth } from './AuthContext';
 import type { QuickAccessCard } from '../lib/types';
 
 // ==============================================================================
@@ -296,15 +298,18 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
+  const { usuario } = useAuth();
+  const router = useRouter();
+
   // Tarjetas por defecto si no vienen cargadas desde la BD
   const defaultCards: QuickAccessCard[] = [
     {
       id: 1,
-      title: "Ingresá a tu cuenta",
+      title: "Ingresá a mi objetia",
       subtitle: "Gestioná tus compras, ventas y mensajes.",
       icon_type: "login",
-      button_text: "Ingresá a tu cuenta",
-      link_url: "/auth?mode=login",
+      button_text: "Ingresá a mi objetia",
+      link_url: "/mi-objetia",
       orden: 0,
       is_active: true
     },
@@ -362,6 +367,13 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
 
   const displayCards = cards && cards.length > 0 ? cards : defaultCards;
 
+  const getCardLink = (card: QuickAccessCard) => {
+    if (card.icon_type === 'login' || card.id === 1 || card.link_url === '/mi-objetia' || card.link_url.startsWith('/auth')) {
+      return usuario ? '/mi-objetia' : '/auth?mode=login&redirect=/mi-objetia';
+    }
+    return card.link_url;
+  };
+
   const updateScrollButtons = () => {
     if (!scrollContainerRef.current) return;
     const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
@@ -384,7 +396,14 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
   };
 
   const handleCardClick = (e: React.MouseEvent, card: QuickAccessCard) => {
-    if (card.link_url === '#compra-protegida') {
+    if (card.icon_type === 'login' || card.id === 1 || card.link_url === '/mi-objetia' || card.link_url.startsWith('/auth')) {
+      e.preventDefault();
+      if (usuario) {
+        router.push('/mi-objetia');
+      } else {
+        router.push('/auth?mode=login&redirect=/mi-objetia');
+      }
+    } else if (card.link_url === '#compra-protegida') {
       e.preventDefault();
       window.dispatchEvent(new CustomEvent('abrir-modal-footer', { detail: 'compra_protegida' }));
     } else if (card.link_url === '#medios-de-pago') {
@@ -417,7 +436,7 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
         {displayCards.map((card) => (
           <Link
             key={card.id}
-            href={card.link_url}
+            href={getCardLink(card)}
             onClick={(e) => handleCardClick(e, card)}
             className="w-[148px] sm:w-[164px] md:w-[180px] flex-shrink-0 snap-start bg-[#FAF8F5] border border-[#EAE5DC] hover:border-[#B88D65]/50 rounded-[22px] p-4 sm:p-5 shadow-[0_4px_16px_rgba(78,66,52,0.06)] hover:shadow-[0_8px_24px_rgba(78,66,52,0.12)] hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center group/card cursor-pointer select-none"
           >
