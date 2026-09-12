@@ -31,6 +31,18 @@ input, select, textarea {
   color: var(--color-text-input, #111827) !important;
 }
 
+/* Evitar el fondo celeste/azul o amarillo del autocompletado en navegadores (Chrome, Edge, Safari) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+  box-shadow: 0 0 0 1000px #ffffff inset !important;
+  -webkit-text-fill-color: #2C2723 !important;
+  caret-color: #2C2723 !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* ---------- Animaciones globales ---------- */
 
 @keyframes va-fade-in {

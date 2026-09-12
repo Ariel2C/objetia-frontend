@@ -358,17 +358,19 @@ function LoginContent() {
     <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F5F4EF]">
       <div className="max-w-md sm:max-w-lg w-full bg-[#FAF8F5] p-6 sm:p-8 rounded-[28px] shadow-[0_8px_32px_rgba(78,66,52,0.08)] border border-[#EAE5DC] space-y-6 relative overflow-hidden">
         
-        {/* Cabecera de Marca Objetia */}
-        <div className="flex flex-col items-center text-center space-y-1 pt-1">
-          <Link href="/" className="inline-flex flex-col items-center group cursor-pointer">
-            <div className="h-11 w-11 rounded-2xl bg-[#FAF0E6] border border-[#EAE5DC] group-hover:border-[#B88D65]/40 flex items-center justify-center text-[#B88D65] shadow-xs mb-1.5 transition-colors">
-              <Sparkles className="h-5 w-5" />
-            </div>
-            <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-[#534636] group-hover:text-[#B88D65] transition-colors">
-              OBJETIA
-            </span>
-          </Link>
-        </div>
+        {/* Anular fondo celeste de autocompletado en navegadores */}
+        <style>{`
+          input:-webkit-autofill,
+          input:-webkit-autofill:hover, 
+          input:-webkit-autofill:focus, 
+          input:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0 1000px #ffffff inset !important;
+            box-shadow: 0 0 0 1000px #ffffff inset !important;
+            -webkit-text-fill-color: #2C2723 !important;
+            caret-color: #2C2723 !important;
+            transition: background-color 5000s ease-in-out 0s;
+          }
+        `}</style>
 
         {/* ============================================================================== */}
         {/* VISTA 1: INTRODUCCIÓN PARA VENDEDOR NO REGISTRADO */}
@@ -451,7 +453,7 @@ function LoginContent() {
                 <div className="relative">
                   <label className="block text-xs font-semibold text-[#534636] mb-1">Email</label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-[#A89F91]" />
+                    <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#A89F91] pointer-events-none" />
                     <input 
                       type="email" 
                       required
@@ -459,7 +461,7 @@ function LoginContent() {
                       onChange={manejarInputEmail}
                       onKeyDown={manejarKeyDownEmail}
                       placeholder="Tu correo electrónico"
-                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#E6E1DB] rounded-xl text-xs text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium"
+                      className="w-full pl-11 pr-4 py-3.5 sm:py-4 bg-white border border-[#E6E1DB] rounded-xl text-sm text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium shadow-2xs"
                     />
                   </div>
 
@@ -555,7 +557,7 @@ function LoginContent() {
                 <div>
                   <label className="block text-xs font-semibold text-[#534636] mb-1">Nueva Contraseña</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-[#A89F91]" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#A89F91] pointer-events-none" />
                     <input 
                       type="password" 
                       required
@@ -563,7 +565,7 @@ function LoginContent() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Mínimo 6 caracteres"
-                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#E6E1DB] rounded-xl text-xs text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium"
+                      className="w-full pl-11 pr-4 py-3.5 sm:py-4 bg-white border border-[#E6E1DB] rounded-xl text-sm text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium shadow-2xs"
                     />
                   </div>
                 </div>
@@ -571,7 +573,7 @@ function LoginContent() {
                 <div>
                   <label className="block text-xs font-semibold text-[#534636] mb-1">Confirmar Nueva Contraseña</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-[#A89F91]" />
+                    <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#A89F91] pointer-events-none" />
                     <input 
                       type="password" 
                       required
@@ -579,7 +581,7 @@ function LoginContent() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Repetí la contraseña"
-                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#E6E1DB] rounded-xl text-xs text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium"
+                      className="w-full pl-11 pr-4 py-3.5 sm:py-4 bg-white border border-[#E6E1DB] rounded-xl text-sm text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium shadow-2xs"
                     />
                   </div>
                 </div>
@@ -659,32 +661,6 @@ function LoginContent() {
         {/* ============================================================================== */}
         {viewMode === 'auth' && !googleCuentaExiste && (
           <div className="space-y-5 animate-fade-in">
-            {/* SELECTOR SEGMENTADO DE PESTAÑAS TIPO PÍLDORA */}
-            <div className="p-1 bg-[#EFECE6] rounded-2xl flex gap-1 border border-[#E6E1DB]">
-              <button
-                type="button"
-                onClick={() => { setEsLogin(true); setGoogleCredential(null); setGoogleCuentaExiste(false); }}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
-                  esLogin 
-                    ? 'bg-white text-[#2C2723] shadow-xs' 
-                    : 'text-[#73675C] hover:text-[#2C2723]'
-                }`}
-              >
-                Ingresar
-              </button>
-              <button
-                type="button"
-                onClick={() => { setEsLogin(false); setGoogleCredential(null); setGoogleCuentaExiste(false); }}
-                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
-                  !esLogin 
-                    ? 'bg-white text-[#2C2723] shadow-xs' 
-                    : 'text-[#73675C] hover:text-[#2C2723]'
-                }`}
-              >
-                Crear cuenta
-              </button>
-            </div>
-
             {/* CABECERA DINÁMICA */}
             <div className="text-center space-y-1">
               <h2 className="text-base sm:text-lg font-bold text-[#2C2723] tracking-tight">
@@ -726,14 +702,14 @@ function LoginContent() {
                     <div>
                       <label className="block text-xs font-semibold text-[#534636] mb-1">Nombre</label>
                       <div className="relative">
-                        <User className="absolute left-3 top-3 h-4 w-4 text-[#A89F91]" />
+                        <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#A89F91] pointer-events-none" />
                         <input 
                           type="text" 
                           required
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           placeholder="Tu nombre completo"
-                          className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#E6E1DB] rounded-xl text-xs text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium"
+                          className="w-full pl-11 pr-4 py-3.5 sm:py-4 bg-white border border-[#E6E1DB] rounded-xl text-sm text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium shadow-2xs"
                         />
                       </div>
                     </div>
@@ -743,7 +719,7 @@ function LoginContent() {
                   <div className="relative">
                     <label className="block text-xs font-semibold text-[#534636] mb-1">Email</label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-[#A89F91]" />
+                      <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#A89F91] pointer-events-none" />
                       <input 
                         type="email" 
                         required
@@ -751,7 +727,7 @@ function LoginContent() {
                         onChange={manejarInputEmail}
                         onKeyDown={manejarKeyDownEmail}
                         placeholder="Tu correo electrónico"
-                        className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#E6E1DB] rounded-xl text-xs text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium"
+                        className="w-full pl-11 pr-4 py-3.5 sm:py-4 bg-white border border-[#E6E1DB] rounded-xl text-sm text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium shadow-2xs"
                       />
                     </div>
 
@@ -798,14 +774,14 @@ function LoginContent() {
                       )}
                     </div>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-[#A89F91]" />
+                      <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#A89F91] pointer-events-none" />
                       <input 
                         type="password" 
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Tu contraseña"
-                        className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#E6E1DB] rounded-xl text-xs text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium"
+                        className="w-full pl-11 pr-4 py-3.5 sm:py-4 bg-white border border-[#E6E1DB] rounded-xl text-sm text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium shadow-2xs"
                       />
                     </div>
                   </div>
