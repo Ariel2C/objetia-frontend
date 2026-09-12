@@ -260,19 +260,19 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
   return (
     <div className="space-y-6 animate-fade-in select-none">
       {/* SECCIÓN TARJETA DE REGALO - PRIMERA COMPRA $5.000 */}
-      <div className="bg-gradient-to-r from-purple-50 via-indigo-50/40 to-white border border-purple-100 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+      <div className="bg-[#FAF0E6] border border-[#EAE5DC] rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl bg-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-500/20">
+          <div className="w-11 h-11 rounded-xl bg-[#B88D65] text-white flex items-center justify-center shrink-0 shadow-sm">
             <Gift className="w-6 h-6" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h4 className="text-sm font-bold text-gray-900">$5.000 de regalo — Primera compra</h4>
+              <h4 className="text-sm font-bold text-[#2C2723]">$5.000 de regalo — Primera compra</h4>
               <span className="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200 uppercase tracking-wider">
                 Disponible
               </span>
             </div>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-[#73675C] mt-0.5">
               Disponible · Compra mínima $50.000 (descuento automático en el checkout)
             </p>
           </div>
@@ -280,43 +280,43 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
         <Link
           href="/catalog"
-          className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold rounded-xl transition shadow-xs whitespace-nowrap cursor-pointer"
+          className="px-4 py-2 bg-[#B88D65] hover:bg-[#A37953] text-white text-xs font-bold rounded-xl transition shadow-xs whitespace-nowrap cursor-pointer"
         >
           Usar en el catálogo
         </Link>
       </div>
 
-      {/* Tarjetas Métricas Google AI Studio Light con Estética Carbón */}
+      {/* Tarjetas Métricas Organic Modern */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Card 1: Saldo total para compras */}
-        <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 sm:p-6 shadow-xs transition hover:border-[#dadce0] flex flex-col justify-between space-y-4">
+        <div className="bg-[#FAF8F5] border border-[#EAE5DC] rounded-2xl p-5 sm:p-6 shadow-xs transition hover:border-[#D5CEC4] flex flex-col justify-between space-y-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#f1f3f4] border border-[#e8eaed] flex items-center justify-center text-[#202124]">
+                <div className="w-10 h-10 rounded-xl bg-[#F2EFE9] border border-[#EAE5DC] flex items-center justify-center text-[#2C2723]">
                   <ShoppingBag className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-semibold text-[#5f6368] uppercase tracking-wider">Saldo para compras</span>
+                <span className="text-xs font-semibold text-[#73675C] uppercase tracking-wider">Saldo para compras</span>
               </div>
-              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-[6px] bg-[#f1f3f4] text-[#202124] border border-[#e8eaed]">
+              <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-[6px] bg-[#FAF0E6] text-[#B88D65] border border-[#EAE5DC]">
                 Inmediato
               </span>
             </div>
             <div>
-              <h4 className="text-2xl sm:text-3xl font-bold text-[#202124] tracking-tight leading-none font-mono">
+              <h4 className="text-2xl sm:text-3xl font-bold text-[#2C2723] tracking-tight leading-none font-mono">
                 {cargandoBalance ? "..." : formatearARS(saldoParaCompras)}
               </h4>
-              <p className="text-xs text-[#5f6368] font-medium mt-2 flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#3c4043]" />
+              <p className="text-xs text-[#73675C] font-medium mt-2 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#2C2723]" />
                 <span>Disponible para comprar dentro de la app</span>
               </p>
             </div>
           </div>
 
           {/* Gráfico de Barra Horizontal de Distribución de Saldo */}
-          <div className="pt-3 border-t border-[#edf0f2] space-y-2">
+          <div className="pt-3 border-t border-[#EAE5DC] space-y-2">
             {/* Barra tipo gráfico */}
-            <div className="w-full h-2.5 rounded-full bg-[#edf0f2] overflow-hidden flex">
+            <div className="w-full h-2.5 rounded-full bg-[#EAE5DC] overflow-hidden flex">
               {saldoParaCompras > 0 ? (
                 <>
                   <div
@@ -326,12 +326,12 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                   />
                   <div
                     style={{ width: `${pctGarantia}%` }}
-                    className="h-full bg-[#1a73e8] transition-all duration-500"
+                    className="h-full bg-[#B88D65] transition-all duration-500"
                     title={`En garantía: ${formatearARS(balance.frozen)} (${pctGarantia.toFixed(0)}%)`}
                   />
                 </>
               ) : (
-                <div className="w-full h-full bg-[#e8eaed]" />
+                <div className="w-full h-full bg-[#EAE5DC]" />
               )}
             </div>
 
@@ -339,25 +339,25 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
             <div className="flex items-center justify-between text-xs font-medium pt-0.5 flex-wrap gap-2">
               <div className="flex items-center gap-1.5">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#00a650] flex-shrink-0" />
-                <span className="text-[#5f6368]">Para retirar:</span>
+                <span className="text-[#73675C]">Para retirar:</span>
                 <span className="font-mono font-bold text-[#00a650]">
                   {cargandoBalance ? "..." : formatearARS(balance.available)}
                 </span>
                 {saldoParaCompras > 0 && (
-                  <span className="text-[10.5px] text-[#80868b] font-mono">
+                  <span className="text-[10.5px] text-[#73675C] font-mono">
                     ({pctRetirable.toFixed(0)}%)
                   </span>
                 )}
               </div>
 
               <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#1a73e8] flex-shrink-0" />
-                <span className="text-[#5f6368]">En garantía:</span>
-                <span className="font-mono font-bold text-[#1a73e8]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#B88D65] flex-shrink-0" />
+                <span className="text-[#73675C]">En garantía:</span>
+                <span className="font-mono font-bold text-[#B88D65]">
                   {cargandoBalance ? "..." : formatearARS(balance.frozen)}
                 </span>
                 {saldoParaCompras > 0 && (
-                  <span className="text-[10.5px] text-[#80868b] font-mono">
+                  <span className="text-[10.5px] text-[#73675C] font-mono">
                     ({pctGarantia.toFixed(0)}%)
                   </span>
                 )}
@@ -366,8 +366,8 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
           </div>
         </div>
 
-        {/* Card 2: Retiros y Garantía (Combinada: primero disponible para retirar y abajo en garantía) */}
-        <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 sm:p-6 shadow-xs transition hover:border-[#dadce0] flex flex-col justify-between space-y-4">
+        {/* Card 2: Retiros y Garantía */}
+        <div className="bg-[#FAF8F5] border border-[#EAE5DC] rounded-2xl p-5 sm:p-6 shadow-xs transition hover:border-[#D5CEC4] flex flex-col justify-between space-y-4">
           {/* Sección Superior: Disponible para retirar */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -375,7 +375,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                 <div className="w-10 h-10 rounded-xl bg-[#e8f8ef] border border-[#ceead6] flex items-center justify-center text-[#00a650]">
                   <Landmark className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-semibold text-[#5f6368] uppercase tracking-wider">
+                <span className="text-xs font-semibold text-[#73675C] uppercase tracking-wider">
                   Disponible para retirar
                 </span>
               </div>
@@ -385,7 +385,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                 type="button"
                 onClick={abrirModalRetiro}
                 disabled={balance.available <= 0}
-                className="text-xs font-semibold text-[#202124] hover:text-[#000000] underline underline-offset-4 flex items-center gap-1 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
+                className="text-xs font-semibold text-[#B88D65] hover:text-[#A37953] underline underline-offset-4 flex items-center gap-1 transition cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:no-underline"
               >
                 <span>Retirar fondos</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -396,7 +396,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
               <h4 className="text-2xl sm:text-3xl font-bold text-[#00a650] tracking-tight leading-none font-mono">
                 {cargandoBalance ? "..." : formatearARS(balance.available)}
               </h4>
-              <p className="text-xs text-[#5f6368] font-medium mt-2 flex items-center gap-1.5">
+              <p className="text-xs text-[#73675C] font-medium mt-2 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#00a650]" />
                 <span>Listo para transferir a tu CBU/CVU o Alias</span>
               </p>
@@ -404,25 +404,25 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
           </div>
 
           {/* Sección Inferior: En garantía */}
-          <div className="pt-3 border-t border-[#edf0f2] flex items-center justify-between gap-3 flex-wrap">
+          <div className="pt-3 border-t border-[#EAE5DC] flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-[#e8f0fe] border border-[#d2e3fc] flex items-center justify-center text-[#1a73e8]">
+              <div className="w-8 h-8 rounded-lg bg-[#FAF0E6] border border-[#EAE5DC] flex items-center justify-center text-[#B88D65]">
                 <ShieldCheck className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-xs font-semibold text-[#5f6368] uppercase tracking-wider block">
+                <span className="text-xs font-semibold text-[#73675C] uppercase tracking-wider block">
                   En garantía (7 días)
                 </span>
-                <span className="text-[11px] text-[#80868b] block">
+                <span className="text-[11px] text-[#73675C] block">
                   Se habilita para retiro a los 7 días de cada venta
                 </span>
               </div>
             </div>
             <div className="text-right">
-              <span className="text-lg sm:text-xl font-bold text-[#1a73e8] font-mono block">
+              <span className="text-lg sm:text-xl font-bold text-[#B88D65] font-mono block">
                 {cargandoBalance ? "..." : formatearARS(balance.frozen)}
               </span>
-              <span className="text-[10px] font-mono text-[#80868b]">
+              <span className="text-[10px] font-mono text-[#73675C]">
                 Retención temporal
               </span>
             </div>
@@ -432,36 +432,36 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
       {/* Detalle por venta: cuánto falta para que se libere cada una */}
       {ventasEnEspera.length > 0 && (
-        <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 sm:p-6 shadow-xs space-y-3">
+        <div className="bg-[#FAF8F5] border border-[#EAE5DC] rounded-2xl p-5 sm:p-6 shadow-xs space-y-3">
           <div className="flex items-center justify-between">
-            <h4 className="text-xs font-semibold text-[#202124] uppercase tracking-wider flex items-center gap-2">
-              <Clock className="h-4 w-4 text-[#202124]" />
+            <h4 className="text-xs font-semibold text-[#2C2723] uppercase tracking-wider flex items-center gap-2">
+              <Clock className="h-4 w-4 text-[#2C2723]" />
               <span>Próximas liberaciones de fondos</span>
             </h4>
-            <span className="text-[11px] font-semibold text-[#5f6368]">
+            <span className="text-[11px] font-semibold text-[#73675C]">
               {ventasEnEspera.length} {ventasEnEspera.length === 1 ? 'venta en garantía' : 'ventas en garantía'}
             </span>
           </div>
-          <div className="divide-y divide-[#f1f3f4]">
+          <div className="divide-y divide-[#EAE5DC]">
             {ventasEnEspera.map((tx) => (
               <div 
                 key={tx.id} 
                 onClick={() => setDetalleTx(tx)}
-                className="py-3 flex items-center justify-between gap-3 first:pt-1 last:pb-1 cursor-pointer hover:bg-[#f8f9fa] -mx-2 px-2 rounded-xl transition"
+                className="py-3 flex items-center justify-between gap-3 first:pt-1 last:pb-1 cursor-pointer hover:bg-[#F2EFE9] -mx-2 px-2 rounded-xl transition"
               >
                 <div>
-                  <p className="text-xs font-semibold text-[#202124]">
+                  <p className="text-xs font-semibold text-[#2C2723]">
                     Venta del {parsearFechaUTC(tx.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })}
                   </p>
-                  <p className="text-[11px] text-[#5f6368] font-medium mt-0.5">
+                  <p className="text-[11px] text-[#73675C] font-medium mt-0.5">
                     {tiempoRestanteLiberacion(tx.available_at)} · se libera el {parsearFechaUTC(tx.available_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })}
                   </p>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-semibold text-[#5f6368] font-mono">
+                  <span className="text-sm font-semibold text-[#2C2723] font-mono">
                     {formatearARS(tx.amount)}
                   </span>
-                  <span className="block text-[10px] text-[#80868b]">
+                  <span className="block text-[10px] text-[#73675C]">
                     En garantía
                   </span>
                 </div>
@@ -472,24 +472,24 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
       )}
 
       {/* Historial de Movimientos */}
-      <div className="bg-white border border-[#edf0f2] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
+      <div className="bg-[#FAF8F5] border border-[#EAE5DC] rounded-2xl p-5 sm:p-6 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-[#202124] flex items-center gap-2">
-            <History className="h-4 w-4 text-[#202124]" /> Historial de Movimientos
+          <h4 className="text-sm font-semibold text-[#2C2723] flex items-center gap-2">
+            <History className="h-4 w-4 text-[#2C2723]" /> Historial de Movimientos
           </h4>
-          <span className="text-xs text-[#5f6368] font-medium">
+          <span className="text-xs text-[#73675C] font-medium">
             {transacciones.length} {transacciones.length === 1 ? 'registro' : 'registros'}
           </span>
         </div>
 
         {cargandoTx ? (
           <div className="flex justify-center py-8">
-            <Loader2 className="h-5 w-5 animate-spin text-[#202124]" />
+            <Loader2 className="h-5 w-5 animate-spin text-[#B88D65]" />
           </div>
         ) : transacciones.length === 0 ? (
-          <p className="text-xs text-[#5f6368] text-center py-8">Todavía no tenés movimientos en tu billetera.</p>
+          <p className="text-xs text-[#73675C] text-center py-8">Todavía no tenés movimientos en tu billetera.</p>
         ) : (
-          <div className="divide-y divide-[#f1f3f4]">
+          <div className="divide-y divide-[#EAE5DC]">
             {transacciones.map((tx) => {
               const esIngreso = tx.amount > 0;
               const estaEnGarantia = tx.status === 'frozen';
@@ -498,45 +498,45 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
               // Tono verde MercadoPago (#00a650) si es dinero efectivamente sumado y disponible
               const colorMonto = estaEnGarantia
-                ? 'text-[#5f6368]' // En garantía no es ingreso todavía
+                ? 'text-[#73675C]' // En garantía no es ingreso todavía
                 : esIngreso
                 ? 'text-[#00a650]' // Verde MercadoPago para sumas acreditadas
-                : 'text-[#202124]'; // Retiro o gasto en carbón
+                : 'text-[#2C2723]'; // Retiro o gasto en espresso
 
               return (
                 <div 
                   key={tx.id} 
                   onClick={() => setDetalleTx(tx)}
-                  className="py-3.5 flex items-center justify-between gap-3 hover:bg-[#f8f9fa] -mx-2 px-2 rounded-xl transition cursor-pointer group"
+                  className="py-3.5 flex items-center justify-between gap-3 hover:bg-[#F2EFE9] -mx-2 px-2 rounded-xl transition cursor-pointer group"
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 border transition ${
                       estaEnGarantia
-                        ? 'bg-[#f1f3f4] text-[#80868b] border-[#e8eaed]'
+                        ? 'bg-[#F2EFE9] text-[#73675C] border-[#EAE5DC]'
                         : estaAcreditado
                         ? 'bg-[#e8f8ef] text-[#00a650] border-[#bfe8cf]'
-                        : 'bg-[#f1f3f4] text-[#202124] border-[#e8eaed]'
+                        : 'bg-[#F2EFE9] text-[#2C2723] border-[#EAE5DC]'
                     }`}>
                       <IconoTx className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-[#202124] truncate group-hover:text-[#000000]">
+                      <p className="text-xs font-semibold text-[#2C2723] truncate group-hover:text-[#2C2723]">
                         {LABEL_TIPO[tx.type] || tx.type}
                       </p>
                       <p className="text-[11px] mt-0.5 flex items-center gap-1.5 flex-wrap">
                         {/* Estado */}
                         <span className={`font-semibold ${
                           estaEnGarantia
-                            ? 'text-[#80868b] bg-[#f1f3f4] px-1.5 py-0.2 rounded text-[10px]'
+                            ? 'text-[#73675C] bg-[#F2EFE9] px-1.5 py-0.2 rounded text-[10px]'
                             : estaAcreditado
                             ? 'text-[#00a650] bg-[#e8f8ef] px-1.5 py-0.2 rounded text-[10px]'
-                            : 'text-[#202124]'
+                            : 'text-[#2C2723]'
                         }`}>
                           {LABEL_ESTADO[tx.status] || tx.status}
                         </span>
 
                         {estaEnGarantia && tx.amount > 0 && (
-                          <span className="text-[#80868b] text-[10.5px]">
+                          <span className="text-[#73675C] text-[10.5px]">
                             · {tiempoRestanteLiberacion(tx.available_at)}
                           </span>
                         )}
@@ -549,7 +549,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                     <span className={`text-sm font-bold font-mono ${colorMonto}`}>
                       {esIngreso ? '+' : ''}{formatearARS(tx.amount)}
                     </span>
-                    <span className="block text-[10.5px] text-[#80868b] font-mono mt-0.5">
+                    <span className="block text-[10.5px] text-[#73675C] font-mono mt-0.5">
                       {parsearFechaUTC(tx.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })}
                     </span>
                   </div>
@@ -569,21 +569,21 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
           onClick={() => setDetalleTx(null)}
         >
           <div 
-            className="bg-white rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl relative border border-[#edf0f2]"
+            className="bg-[#FAF8F5] rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl relative border border-[#EAE5DC]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Cabecera modal detalle */}
-            <div className="flex items-center justify-between pb-2 border-b border-[#edf0f2]">
+            <div className="flex items-center justify-between pb-2 border-b border-[#EAE5DC]">
               <div className="flex items-center gap-2">
-                <Receipt className="w-4 h-4 text-[#202124]" />
-                <h3 className="text-sm font-semibold text-[#202124]">
+                <Receipt className="w-4 h-4 text-[#2C2723]" />
+                <h3 className="text-sm font-semibold text-[#2C2723]">
                   Comprobante de movimiento
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setDetalleTx(null)}
-                className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
+                className="p-1.5 text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-lg transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -591,38 +591,38 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
             {/* Monto destacado */}
             <div className="text-center py-2">
-              <span className="text-[11px] text-[#5f6368] uppercase font-semibold block tracking-wider">
+              <span className="text-[11px] text-[#73675C] uppercase font-semibold block tracking-wider">
                 {LABEL_TIPO[detalleTx.type] || detalleTx.type}
               </span>
               <h4 className={`text-2xl font-bold font-mono mt-1 ${
                 detalleTx.status === 'frozen'
-                  ? 'text-[#5f6368]'
+                  ? 'text-[#73675C]'
                   : detalleTx.amount > 0
                   ? 'text-[#00a650]'
-                  : 'text-[#202124]'
+                  : 'text-[#2C2723]'
               }`}>
                 {detalleTx.amount > 0 ? '+' : ''}{formatearARS(detalleTx.amount)}
               </h4>
               <span className={`inline-block mt-2 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${
                 detalleTx.status === 'frozen'
-                  ? 'bg-[#f1f3f4] text-[#5f6368]'
+                  ? 'bg-[#F2EFE9] text-[#73675C]'
                   : detalleTx.amount > 0
                   ? 'bg-[#e8f8ef] text-[#00a650]'
-                  : 'bg-[#f1f3f4] text-[#202124]'
+                  : 'bg-[#F2EFE9] text-[#2C2723]'
               }`}>
                 {LABEL_ESTADO[detalleTx.status] || detalleTx.status}
               </span>
             </div>
 
             {/* Datos detallados */}
-            <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-xl p-3.5 space-y-2.5 text-xs">
+            <div className="bg-white border border-[#EAE5DC] rounded-xl p-3.5 space-y-2.5 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[#5f6368]">Nº de Operación:</span>
-                <span className="font-mono text-[#202124] font-semibold">#{detalleTx.id}</span>
+                <span className="text-[#73675C]">Nº de Operación:</span>
+                <span className="font-mono text-[#2C2723] font-semibold">#{detalleTx.id}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-[#5f6368]">Fecha y hora:</span>
-                <span className="font-mono text-[#202124]">
+                <span className="text-[#73675C]">Fecha y hora:</span>
+                <span className="font-mono text-[#2C2723]">
                   {parsearFechaUTC(detalleTx.created_at).toLocaleDateString('es-AR', {
                     day: '2-digit',
                     month: 'short',
@@ -633,9 +633,9 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                 </span>
               </div>
               {detalleTx.status === 'frozen' && (
-                <div className="flex items-center justify-between border-t border-[#edf0f2] pt-2">
-                  <span className="text-[#5f6368]">Acreditación estimada:</span>
-                  <span className="font-mono text-[#202124] font-semibold">
+                <div className="flex items-center justify-between border-t border-[#EAE5DC] pt-2">
+                  <span className="text-[#73675C]">Acreditación estimada:</span>
+                  <span className="font-mono text-[#2C2723] font-semibold">
                     {parsearFechaUTC(detalleTx.available_at).toLocaleDateString('es-AR', {
                       day: '2-digit',
                       month: 'short',
@@ -645,20 +645,20 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                 </div>
               )}
               {detalleTx.marketplace_commission > 0 && (
-                <div className="flex items-center justify-between border-t border-[#edf0f2] pt-2">
-                  <span className="text-[#5f6368]">Comisión de plataforma:</span>
-                  <span className="font-mono text-[#202124]">{formatearARS(detalleTx.marketplace_commission)}</span>
+                <div className="flex items-center justify-between border-t border-[#EAE5DC] pt-2">
+                  <span className="text-[#73675C]">Comisión de plataforma:</span>
+                  <span className="font-mono text-[#2C2723]">{formatearARS(detalleTx.marketplace_commission)}</span>
                 </div>
               )}
               {detalleTx.destination_account && (
-                <div className="flex items-center justify-between border-t border-[#edf0f2] pt-2">
-                  <span className="text-[#5f6368]">Cuenta de destino:</span>
-                  <span className="font-mono text-[#202124] font-semibold">{detalleTx.destination_account}</span>
+                <div className="flex items-center justify-between border-t border-[#EAE5DC] pt-2">
+                  <span className="text-[#73675C]">Cuenta de destino:</span>
+                  <span className="font-mono text-[#2C2723] font-semibold">{detalleTx.destination_account}</span>
                 </div>
               )}
             </div>
 
-            <p className="text-[11px] text-[#80868b] text-center">
+            <p className="text-[11px] text-[#73675C] text-center">
               {detalleTx.status === 'frozen'
                 ? "El dinero de tus ventas se retiene temporalmente durante el período de garantía de 7 días para proteger a comprador y vendedor."
                 : "Operación procesada y registrada en tu billetera Objetia."}
@@ -667,7 +667,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
             <button
               type="button"
               onClick={() => setDetalleTx(null)}
-              className="w-full py-2 bg-[#202124] hover:bg-[#000000] text-white rounded-xl text-xs font-semibold transition cursor-pointer"
+              className="w-full py-2 bg-[#2C2723] hover:bg-[#1B1816] text-white rounded-xl text-xs font-semibold transition cursor-pointer"
             >
               Cerrar
             </button>
@@ -677,7 +677,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
       )}
 
       {/* ========================================================================= */}
-      {/* MODAL DE RETIRO DE FONDOS (ESTILO GOOGLE AI STUDIO CARBÓN) */}
+      {/* MODAL DE RETIRO DE FONDOS (ESTILO ORGANIC MODERN) */}
       {/* ========================================================================= */}
       {modalRetiroAbierto && mounted && createPortal(
         <div 
@@ -685,20 +685,20 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
           onClick={cerrarModalRetiro}
         >
           <div 
-            className="bg-white rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl relative border border-[#edf0f2]"
+            className="bg-[#FAF8F5] rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl relative border border-[#EAE5DC]"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Cabecera del modal */}
-            <div className="flex items-center justify-between pb-2 border-b border-[#edf0f2]">
+            <div className="flex items-center justify-between pb-2 border-b border-[#EAE5DC]">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[#202124] text-white flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-[#FAF0E6] text-[#B88D65] border border-[#EAE5DC] flex items-center justify-center">
                   <Landmark className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-[#202124]">
+                  <h3 className="text-sm font-semibold text-[#2C2723]">
                     Retirar fondos
                   </h3>
-                  <p className="text-[11px] text-[#5f6368]">
+                  <p className="text-[11px] text-[#73675C]">
                     Transferencia a tu cuenta bancaria o billetera virtual
                   </p>
                 </div>
@@ -708,7 +708,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                 type="button"
                 onClick={cerrarModalRetiro}
                 disabled={retirando}
-                className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
+                className="p-1.5 text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-lg transition cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -725,9 +725,9 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
             {/* Formulario */}
             <form onSubmit={handleRetirar} className="space-y-4">
               {/* Información de disponibilidad */}
-              <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-xl p-3 flex items-center justify-between">
-                <span className="text-xs text-[#5f6368]">Saldo retirable:</span>
-                <span className="text-sm font-bold text-[#202124] font-mono">
+              <div className="bg-white border border-[#EAE5DC] rounded-xl p-3 flex items-center justify-between">
+                <span className="text-xs text-[#73675C]">Saldo retirable:</span>
+                <span className="text-sm font-bold text-[#00a650] font-mono">
                   {formatearARS(balance.available)}
                 </span>
               </div>
@@ -735,19 +735,19 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
               {/* Campo Monto con ajuste automático al máximo */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-semibold text-[#202124]">
+                  <label className="text-xs font-semibold text-[#2C2723]">
                     Monto a retirar
                   </label>
                   <button
                     type="button"
                     onClick={setMontoMaximo}
-                    className="text-[11px] font-semibold text-[#202124] hover:underline cursor-pointer"
+                    className="text-[11px] font-semibold text-[#B88D65] hover:text-[#A37953] hover:underline cursor-pointer"
                   >
                     Usar máximo ({formatearARS(balance.available)})
                   </button>
                 </div>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-mono text-[#5f6368]">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-mono text-[#73675C]">
                     $
                   </span>
                   <input
@@ -758,7 +758,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                     value={montoRetiro}
                     onChange={handleMontoChange}
                     placeholder="Mínimo $1.000"
-                    className="w-full pl-7 pr-3.5 py-2 text-sm rounded-xl border border-[#e8eaed] focus:outline-none focus:border-[#202124] text-[#202124] bg-white font-mono transition"
+                    className="w-full pl-7 pr-3.5 py-2 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] bg-white font-mono transition"
                     required
                   />
                 </div>
@@ -766,7 +766,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
               {/* Campo CBU / CVU / Alias */}
               <div>
-                <label className="text-xs font-semibold text-[#202124] block mb-1.5">
+                <label className="text-xs font-semibold text-[#2C2723] block mb-1.5">
                   CBU, CVU o Alias bancario
                 </label>
                 <input
@@ -777,15 +777,15 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                     setErrorRetiro(null);
                   }}
                   placeholder="Ej: 0000003100010000000001 o mi.alias"
-                  className="w-full px-3.5 py-2 text-sm rounded-xl border border-[#e8eaed] focus:outline-none focus:border-[#202124] text-[#202124] bg-white font-mono transition"
+                  className="w-full px-3.5 py-2 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] bg-white font-mono transition"
                   required
                 />
 
                 {/* Últimas 3 cuentas utilizadas guardadas en la BD (sincronizadas entre dispositivos) */}
                 {cuentasRecientes.length > 0 && (
                   <div className="mt-2.5 space-y-1.5">
-                    <div className="flex items-center gap-1.5 text-[11px] text-[#5f6368] font-medium">
-                      <History className="w-3.5 h-3.5 text-[#5f6368]" />
+                    <div className="flex items-center gap-1.5 text-[11px] text-[#73675C] font-medium">
+                      <History className="w-3.5 h-3.5 text-[#73675C]" />
                       <span>Últimas utilizadas (click para seleccionar):</span>
                     </div>
                     <div className="flex flex-wrap gap-1.5">
@@ -801,13 +801,13 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                             }}
                             className={`text-[11px] font-mono px-2.5 py-1 rounded-lg border transition cursor-pointer flex items-center gap-1.5 ${
                               seleccionada
-                                ? "bg-[#202124] text-white border-[#202124] shadow-xs"
-                                : "bg-[#f8f9fa] text-[#202124] border-[#edf0f2] hover:border-[#dadce0] hover:bg-[#f1f3f4]"
+                                ? "bg-[#B88D65] text-white border-[#B88D65] shadow-xs"
+                                : "bg-white text-[#2C2723] border-[#EAE5DC] hover:border-[#B88D65] hover:bg-[#FAF0E6]"
                             }`}
                             title="Hacé click para usar esta cuenta"
                           >
                             <span>{cuenta}</span>
-                            {seleccionada && <Check className="w-3 h-3 text-emerald-400" />}
+                            {seleccionada && <Check className="w-3 h-3 text-white" />}
                           </button>
                         );
                       })}
@@ -815,18 +815,18 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                   </div>
                 )}
 
-                <p className="text-[10.5px] text-[#80868b] mt-1.5">
+                <p className="text-[10.5px] text-[#73675C] mt-1.5">
                   Se sincroniza con tu cuenta para que esté disponible en cualquier dispositivo.
                 </p>
               </div>
 
               {/* Botones de acción del modal */}
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-[#edf0f2]">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-[#EAE5DC]">
                 <button
                   type="button"
                   onClick={cerrarModalRetiro}
                   disabled={retirando}
-                  className="px-4 py-2 rounded-xl text-xs font-medium text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] transition cursor-pointer disabled:opacity-50"
+                  className="px-4 py-2 rounded-xl text-xs font-medium text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] transition cursor-pointer disabled:opacity-50"
                 >
                   Cancelar
                 </button>
@@ -834,7 +834,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                 <button
                   type="submit"
                   disabled={retirando || balance.available <= 0}
-                  className="px-4 py-2 bg-[#202124] hover:bg-[#000000] text-white rounded-xl text-xs font-medium shadow-xs transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
+                  className="px-4 py-2 bg-[#B88D65] hover:bg-[#A37953] text-white rounded-xl text-xs font-medium shadow-xs transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 cursor-pointer"
                 >
                   {retirando ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
                   <span>{retirando ? "Procesando retiro..." : "Confirmar retiro"}</span>

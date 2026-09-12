@@ -157,18 +157,18 @@ export default function TrackingModal({
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-xl border border-[#dadce0] shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-scale-in"
+        className="bg-[#FAF8F5] rounded-3xl border border-[#EAE5DC] shadow-2xl max-w-xl w-full max-h-[90vh] flex flex-col overflow-hidden animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* ================================================================= */}
         {/* 1. CABECERA: SEGUIMIENTO DE PAQUETE ABAJO DE CORREO ARGENTINO */}
         {/* ================================================================= */}
-        <div className="px-5 py-4 border-b border-[#edf0f2] flex items-center justify-between gap-3 bg-white">
+        <div className="px-5 py-4 border-b border-[#EAE5DC] flex items-center justify-between gap-3 bg-[#FAF8F5]">
           <div className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full border border-[#d2e3fc] inline-flex items-center gap-1.5 w-fit">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#B88D65] bg-[#FAF0E6] px-2.5 py-0.5 rounded-full border border-[#EAE5DC] inline-flex items-center gap-1.5 w-fit">
               <Truck className="h-3 w-3" /> Correo Argentino
             </span>
-            <h3 className="text-base sm:text-lg font-bold text-[#202124] leading-tight">
+            <h3 className="text-base sm:text-lg font-bold text-[#2C2723] leading-tight">
               Seguimiento de paquete
             </h3>
           </div>
@@ -179,16 +179,16 @@ export default function TrackingModal({
                 type="button"
                 onClick={() => fetchTracking(trackingNumber)}
                 disabled={cargando}
-                className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer disabled:opacity-40"
+                className="p-1.5 text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-lg transition cursor-pointer disabled:opacity-40"
                 title="Actualizar estado"
               >
-                <RotateCw className={`h-4 w-4 ${cargando ? 'animate-spin text-[#1a73e8]' : ''}`} />
+                <RotateCw className={`h-4 w-4 ${cargando ? 'animate-spin text-[#B88D65]' : ''}`} />
               </button>
             )}
             <button
               type="button"
               onClick={onClose}
-              className="p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer"
+              className="p-1.5 text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-lg transition cursor-pointer"
               title="Cerrar ventana (Esc)"
             >
               <X className="h-4 w-4" />
@@ -204,9 +204,9 @@ export default function TrackingModal({
           {/* =============================================================== */}
           {/* 2. EL PRODUCTO CON LA IMAGEN EN UN CÍRCULO */}
           {/* =============================================================== */}
-          <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-xl p-3.5 flex items-center gap-3.5">
+          <div className="bg-white border border-[#EAE5DC] rounded-2xl p-3.5 flex items-center gap-3.5 shadow-2xs">
             {/* Imagen en un círculo */}
-            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-xs flex-shrink-0 bg-white flex items-center justify-center">
+            <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-[#FAF8F5] shadow-xs flex-shrink-0 bg-[#FAF8F5] flex items-center justify-center">
               {productImage ? (
                 <img
                   src={productImage}
@@ -214,7 +214,7 @@ export default function TrackingModal({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <ShoppingBag className="w-6 h-6 text-[#5f6368]" />
+                <ShoppingBag className="w-6 h-6 text-[#73675C]" />
               )}
             </div>
 
@@ -222,26 +222,26 @@ export default function TrackingModal({
             <div className="space-y-0.5 min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 {orderId && (
-                  <span className="text-[10px] font-mono font-bold text-[#1a73e8] bg-[#e8f0fe] px-2 py-0.2 rounded">
+                  <span className="text-[10px] font-mono font-bold text-[#B88D65] bg-[#FAF0E6] px-2 py-0.2 rounded border border-[#EAE5DC]">
                     Orden #{orderId}
                   </span>
                 )}
                 {trackingData?.status && (
                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.2 rounded-full ${
                     trackingData.status === 'Entregado'
-                      ? 'bg-[#e8f8ef] text-[#00a650] border border-[#ceead6]'
-                      : 'bg-[#e8f0fe] text-[#1a73e8] border border-[#d2e3fc]'
+                      ? 'bg-[#EDF7EE] text-[#1E7E34] border border-[#C3E6CB]'
+                      : 'bg-[#FAF0E6] text-[#B88D65] border border-[#EAE5DC]'
                   }`}>
                     {trackingData.status}
                   </span>
                 )}
               </div>
-              <h4 className="text-xs sm:text-sm font-bold text-[#202124] truncate leading-tight">
+              <h4 className="text-xs sm:text-sm font-bold text-[#2C2723] truncate leading-tight">
                 {productTitle || "Artículo adquirido en Objetia"}
               </h4>
               {trackingData?.date && (
-                <p className="text-[11px] text-[#5f6368]">
-                  Fecha de pedido: <strong className="font-mono text-[#202124]">{trackingData.date}</strong>
+                <p className="text-[11px] text-[#73675C]">
+                  Fecha de pedido: <strong className="font-mono text-[#2C2723]">{trackingData.date}</strong>
                 </p>
               )}
             </div>
@@ -250,10 +250,10 @@ export default function TrackingModal({
           {/* =============================================================== */}
           {/* 3. NRO DE GUÍA CON COPIAR A LA DERECHA */}
           {/* =============================================================== */}
-          <div className="bg-[#f8f9fa] px-4 py-2.5 rounded-xl border border-[#edf0f2] flex items-center justify-between gap-2 flex-wrap text-xs">
+          <div className="bg-white px-4 py-2.5 rounded-xl border border-[#EAE5DC] flex items-center justify-between gap-2 flex-wrap text-xs shadow-2xs">
             <div className="flex items-center gap-2 min-w-0">
-              <span className="text-[#5f6368] font-medium">Nº de Guía:</span>
-              <span className="font-mono font-bold text-[#202124] bg-white px-2.5 py-0.5 rounded-lg border border-[#dadce0] tracking-wider truncate">
+              <span className="text-[#73675C] font-medium">Nº de Guía:</span>
+              <span className="font-mono font-bold text-[#2C2723] bg-[#FAF8F5] px-2.5 py-0.5 rounded-lg border border-[#EAE5DC] tracking-wider truncate">
                 {trackingNumber || "—"}
               </span>
             </div>
@@ -263,8 +263,8 @@ export default function TrackingModal({
               onClick={handleCopiarGuia}
               className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition border cursor-pointer ${
                 copiado
-                  ? 'bg-[#e6f4ea] text-[#137333] border-[#ceead6]'
-                  : 'bg-white text-[#3c4043] border-[#dadce0] hover:bg-[#f1f3f4] hover:text-[#202124]'
+                  ? 'bg-[#EDF7EE] text-[#1E7E34] border-[#C3E6CB]'
+                  : 'bg-white text-[#534636] border-[#EAE5DC] hover:bg-[#FAF0E6] hover:text-[#2C2723]'
               }`}
             >
               {copiado ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
@@ -277,11 +277,11 @@ export default function TrackingModal({
           {/* =============================================================== */}
           <div className="pt-2 space-y-3">
             <div className="flex items-center justify-between">
-              <h5 className="text-xs font-semibold text-[#202124]">
+              <h5 className="text-xs font-semibold text-[#2C2723]">
                 Historial de eventos del Correo
               </h5>
               {trackingData && (
-                <span className="text-[10.5px] font-mono font-medium text-[#5f6368]">
+                <span className="text-[10.5px] font-mono font-medium text-[#73675C]">
                   {trackingData.timeline.filter(t => t.done).length} de {trackingData.timeline.length} etapas
                 </span>
               )}
@@ -290,9 +290,9 @@ export default function TrackingModal({
             {/* ESTADOS DE CARGA / ERROR */}
             {cargando && !trackingData ? (
               <div className="py-12 text-center space-y-3">
-                <Loader2 className="w-8 h-8 animate-spin text-[#1a73e8] mx-auto" />
-                <p className="text-xs font-semibold text-[#202124]">Consultando servidor logístico...</p>
-                <p className="text-[11px] text-[#5f6368]">Obteniendo los últimos movimientos de Correo Argentino</p>
+                <Loader2 className="w-8 h-8 animate-spin text-[#B88D65] mx-auto" />
+                <p className="text-xs font-semibold text-[#2C2723]">Consultando servidor logístico...</p>
+                <p className="text-[11px] text-[#73675C]">Obteniendo los últimos movimientos de Correo Argentino</p>
               </div>
             ) : errorMsg ? (
               <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 space-y-2">
@@ -315,23 +315,23 @@ export default function TrackingModal({
                   const isDelivered = trackingData.status === 'Entregado' || step.code === 'DELIVERED';
                   const isDeliveredFinal = isLast && (isDelivered || step.done);
                   const isStepCurrent = step.current && !isDeliveredFinal;
-                  const shouldHighlightBlue = isStepCurrent || isDeliveredFinal;
+                  const shouldHighlightAccent = isStepCurrent || isDeliveredFinal;
 
-                  const bgLineClass = shouldHighlightBlue
-                    ? 'bg-[#1a73e8]'
+                  const bgLineClass = shouldHighlightAccent
+                    ? 'bg-[#B88D65]'
                     : step.done
-                      ? 'bg-[#202124]'
-                      : 'bg-[#dadce0]';
+                      ? 'bg-[#2C2723]'
+                      : 'bg-[#EAE5DC]';
 
                   return (
                     <div 
                       key={step.code} 
                       className={`relative rounded-xl border transition-all flex items-stretch overflow-visible ${
                         isStepCurrent
-                          ? 'bg-white border-[#dadce0] shadow-xs ring-2 ring-[#1a73e8]/20'
+                          ? 'bg-white border-[#B88D65]/50 shadow-xs ring-2 ring-[#B88D65]/20'
                           : step.done
-                            ? 'bg-[#f8f9fa] hover:bg-white border-[#dadce0]'
-                            : 'bg-[#fafbfc] border-[#dadce0]/70 opacity-80'
+                            ? 'bg-[#FAF8F5] hover:bg-white border-[#EAE5DC]'
+                            : 'bg-[#FAF8F5]/50 border-[#EAE5DC]/70 opacity-75'
                       }`}
                     >
                       {/* LADO IZQUIERDO: SOCKET CIRCULAR CON EL CAMINO ABIERTO Y LA LÍNEA VERTICAL CONECTORA (SEGÚN CROQUIS) */}
@@ -342,8 +342,8 @@ export default function TrackingModal({
                           <div 
                             className={`absolute left-1/2 -translate-x-1/2 w-[14px] bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
                               isStepCurrent || step.done
-                                ? 'border-[#dadce0]'
-                                : 'border-[#dadce0]/70'
+                                ? 'border-[#EAE5DC]'
+                                : 'border-[#EAE5DC]/70'
                             }`}
                             style={{
                               top: '-1px',
@@ -357,8 +357,8 @@ export default function TrackingModal({
                           <div 
                             className={`absolute left-1/2 -translate-x-1/2 w-[14px] bg-white border-l-[1.5px] border-r-[1.5px] z-[2] transition-colors ${
                               isStepCurrent || step.done
-                                ? 'border-[#dadce0]'
-                                : 'border-[#dadce0]/70'
+                                ? 'border-[#EAE5DC]'
+                                : 'border-[#EAE5DC]/70'
                             }`}
                             style={{
                               top: 'calc(50% + 24px)',
@@ -371,8 +371,8 @@ export default function TrackingModal({
                         <div 
                           className={`absolute w-[50px] h-[50px] rounded-full border-[1.5px] bg-white z-[1] transition-colors ${
                             isStepCurrent || step.done
-                              ? 'border-[#dadce0]'
-                              : 'border-[#dadce0]/70'
+                              ? 'border-[#EAE5DC]'
+                              : 'border-[#EAE5DC]/70'
                           }`}
                           style={{
                             top: '50%',
@@ -394,7 +394,7 @@ export default function TrackingModal({
                         {!isFirst && (
                           <div 
                             className={`absolute left-1/2 -translate-x-1/2 w-[3px] z-[3] ${
-                              shouldHighlightBlue ? 'bg-[#1a73e8]' : step.done ? 'bg-[#202124]' : 'bg-[#dadce0]'
+                              shouldHighlightAccent ? 'bg-[#B88D65]' : step.done ? 'bg-[#2C2723]' : 'bg-[#EAE5DC]'
                             }`}
                             style={{
                               top: '-15px',
@@ -417,11 +417,11 @@ export default function TrackingModal({
                         {/* Ícono redondo interior concéntrico (39px, unido a la línea, sin tocar la cavidad) */}
                         <div 
                           className={`relative w-[39px] h-[39px] rounded-full flex items-center justify-center border-2 transition-all z-[4] ${
-                            shouldHighlightBlue
-                              ? 'bg-[#1a73e8] border-[#1a73e8] text-white shadow-sm ring-2 ring-[#1a73e8]/20 scale-105'
+                            shouldHighlightAccent
+                              ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-sm ring-2 ring-[#B88D65]/20 scale-105'
                               : step.done
-                                ? 'bg-[#202124] border-[#202124] text-white'
-                                : 'bg-white border-[#dadce0] text-[#9aa0a6]'
+                                ? 'bg-[#2C2723] border-[#2C2723] text-white'
+                                : 'bg-[#FAF8F5] border-[#EAE5DC] text-[#73675C]'
                           }`}
                         >
                           <Icono className="h-4 w-4 stroke-[2.2]" />
@@ -433,30 +433,30 @@ export default function TrackingModal({
                         <div className="flex items-center gap-2 flex-wrap">
                           <h6
                             className={`text-xs sm:text-sm font-bold leading-tight ${
-                              shouldHighlightBlue
-                                ? 'text-[#1a73e8]'
+                              shouldHighlightAccent
+                                ? 'text-[#B88D65]'
                                 : step.done
-                                  ? 'text-[#202124]'
-                                  : 'text-[#80868b]'
+                                  ? 'text-[#2C2723]'
+                                  : 'text-[#73675C]'
                             }`}
                           >
                             {step.title}
                           </h6>
                           {isStepCurrent && (
-                            <span className="text-[9.5px] font-bold uppercase tracking-wider bg-[#1a73e8] text-white px-1.5 py-0.2 rounded">
+                            <span className="text-[9.5px] font-bold uppercase tracking-wider bg-[#B88D65] text-white px-1.5 py-0.2 rounded">
                               En curso
                             </span>
                           )}
                         </div>
 
                         {step.description && step.done && (
-                          <p className="text-[11px] text-[#5f6368] leading-tight">
+                          <p className="text-[11px] text-[#73675C] leading-tight">
                             {step.description}
                           </p>
                         )}
 
                         {step.done ? (
-                          <div className="flex items-center gap-2 text-[10.5px] text-[#80868b] font-mono flex-wrap pt-0.5">
+                          <div className="flex items-center gap-2 text-[10.5px] text-[#73675C] font-mono flex-wrap pt-0.5">
                             {fecha && (
                               <span className="flex items-center gap-1">
                                 <Clock className="h-3 w-3" />
@@ -471,7 +471,7 @@ export default function TrackingModal({
                             )}
                           </div>
                         ) : (
-                          <span className="text-[10px] text-[#9aa0a6] block pt-0.5">
+                          <span className="text-[10px] text-[#73675C] block pt-0.5">
                             Pendiente de procesamiento
                           </span>
                         )}
@@ -487,23 +487,23 @@ export default function TrackingModal({
           {/* DIRECCIÓN DE ENTREGA AL FINAL */}
           {/* =============================================================== */}
           {trackingData && (
-            <div className="bg-[#f8f9fa] border border-[#edf0f2] rounded-xl p-3.5 space-y-2">
+            <div className="bg-white border border-[#EAE5DC] rounded-2xl p-3.5 space-y-2 shadow-2xs">
               <div className="flex items-center justify-between text-xs">
-                <span className="font-semibold text-[#202124] flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5 text-[#1a73e8]" />
+                <span className="font-semibold text-[#2C2723] flex items-center gap-1.5">
+                  <MapPin className="h-3.5 w-3.5 text-[#B88D65]" />
                   Dirección de Entrega
                 </span>
-                <span className="text-[11px] text-[#5f6368] flex items-center gap-1">
-                  <ShieldCheck className="h-3.5 w-3.5 text-[#137333]" />
+                <span className="text-[11px] text-[#73675C] flex items-center gap-1">
+                  <ShieldCheck className="h-3.5 w-3.5 text-[#1E7E34]" />
                   Garantía Objetia
                 </span>
               </div>
 
-              <div className="text-xs text-[#3c4043] space-y-0.5 bg-white p-3 rounded-lg border border-[#edf0f2]">
-                <p className="font-semibold text-[#202124]">
+              <div className="text-xs text-[#534636] space-y-0.5 bg-[#FAF8F5] p-3 rounded-xl border border-[#EAE5DC]">
+                <p className="font-semibold text-[#2C2723]">
                   {trackingData.recipient_name || "Destinatario"}
                 </p>
-                <p className="text-[#5f6368]">
+                <p className="text-[#73675C]">
                   {[
                     trackingData.street ? `${trackingData.street} ${trackingData.number_addr || ''}`.trim() : null,
                     trackingData.floor_dept ? `(${trackingData.floor_dept})` : null,
@@ -511,7 +511,7 @@ export default function TrackingModal({
                     trackingData.province
                   ].filter(Boolean).join(', ')}
                   {trackingData.postal_code && (
-                    <span className="font-mono ml-1 font-semibold text-[#202124]">
+                    <span className="font-mono ml-1 font-semibold text-[#2C2723]">
                       · CP {trackingData.postal_code}
                     </span>
                   )}
@@ -524,16 +524,16 @@ export default function TrackingModal({
         {/* ================================================================= */}
         {/* PIE DEL MODAL */}
         {/* ================================================================= */}
-        <div className="px-5 py-3 border-t border-[#edf0f2] bg-[#fafbfc] flex items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 text-[11px] text-[#5f6368]">
+        <div className="px-5 py-3 border-t border-[#EAE5DC] bg-[#FAF8F5] flex items-center justify-between gap-3">
+          <div className="flex items-center gap-1.5 text-[11px] text-[#73675C]">
             <span>Logística oficial</span>
-            <span className="font-semibold text-[#202124]">Correo Argentino Paq.ar</span>
+            <span className="font-semibold text-[#2C2723]">Correo Argentino Paq.ar</span>
           </div>
 
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 bg-[#202124] hover:bg-black text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-2xs"
+            className="px-4 py-1.5 bg-[#2C2723] hover:bg-[#1B1816] text-white text-xs font-semibold rounded-xl transition cursor-pointer shadow-2xs"
           >
             Cerrar
           </button>

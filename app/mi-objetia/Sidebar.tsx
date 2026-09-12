@@ -168,14 +168,14 @@ export default function Sidebar({
 
   const badgeText = esEsRoot ? 'Root' : 'Admin';
   const badgeClasses = esEsRoot
-    ? 'bg-amber-50 text-amber-800 border-amber-200 font-bold'
-    : 'bg-[#e8f0fe] text-[#1a73e8] border-[#d2e3fc] font-bold';
+    ? 'bg-[#FAF0E6] text-[#7B6858] border-[#EAE5DC] font-bold'
+    : 'bg-[#FAF0E6] text-[#B88D65] border-[#EAE5DC] font-bold';
 
   const renderNavContent = () => (
     <div className="flex flex-col h-full justify-between overflow-hidden">
       {/* Cabecera con título Mi OBJETIA y línea divisoria inferior alineada con la topbar */}
-      <div className="h-[60px] min-h-[60px] flex items-center justify-between px-4 border-b border-[#dadce0] flex-shrink-0">
-        <span className="px-2 font-bold text-[16px] tracking-tight text-[#202124] font-sans">
+      <div className="h-[60px] min-h-[60px] flex items-center justify-between px-4 border-b border-[#EAE5DC] flex-shrink-0">
+        <span className="px-2 font-bold text-[16px] tracking-tight text-[#2C2723] font-sans">
           Mi OBJETIA
         </span>
 
@@ -183,7 +183,7 @@ export default function Sidebar({
           {/* Botón cerrar en móvil */}
           <button 
             onClick={() => setMenuMovilAbierto && setMenuMovilAbierto(false)} 
-            className="lg:hidden text-[#5f6368] hover:text-[#202124] p-1 rounded-lg cursor-pointer"
+            className="lg:hidden text-[#7D756D] hover:text-[#2C2723] p-1 rounded-lg cursor-pointer"
           >
             <X className="h-5 w-5" />
           </button>
@@ -200,31 +200,31 @@ export default function Sidebar({
             <button
               key={item.id}
               onClick={() => cambiarTab(item)}
-              className={`w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] font-medium transition-all text-left cursor-pointer group ${
+              className={`w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] transition-all text-left cursor-pointer group ${
                 activo
-                  ? 'bg-[#e8f0fe] text-[#1a73e8] shadow-2xs font-semibold'
-                  : 'text-[#3c4043] hover:bg-[#f1f3f4] hover:text-[#1f1f1f]'
+                  ? 'bg-[#FAF0E6] text-[#B88D65] shadow-xs font-bold border border-[#EAE5DC]'
+                  : 'text-[#534636] font-medium hover:bg-[#F2EFE9] hover:text-[#2C2723]'
               }`}
             >
               <div className="flex items-center gap-3 min-w-0">
                 <Icono 
                   className={`h-4 w-4 flex-shrink-0 transition-transform duration-150 ${
                     activo 
-                      ? 'text-[#1a73e8]' 
-                      : 'text-[#5f6368] group-hover:text-[#1f1f1f]'
+                      ? 'text-[#B88D65]' 
+                      : 'text-[#7D756D] group-hover:text-[#2C2723]'
                   }`} 
                 />
                 <span className="truncate">{item.label}</span>
               </div>
 
               {item.badge ? (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider ${item.badgeColor || 'bg-gray-100 text-gray-700'}`}>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider ${item.badgeColor || 'bg-[#FAF0E6] text-[#B88D65] border border-[#EAE5DC]'}`}>
                   {item.badge}
                 </span>
               ) : item.isExternalLink ? (
-                <ExternalLink className="h-3.5 w-3.5 text-[#9aa0a6] group-hover:text-[#5f6368]" />
+                <ExternalLink className="h-3.5 w-3.5 text-[#7D756D] group-hover:text-[#2C2723]" />
               ) : activo ? (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#1a73e8]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#B88D65]" />
               ) : null}
             </button>
           );
@@ -232,14 +232,14 @@ export default function Sidebar({
 
         {/* SECCIÓN OBJETIA STUDIO (Sólo para Administradores / Root) */}
         {esUsuarioAdmin && (
-          <div className="pt-4 mt-4 border-t border-[#dadce0]">
+          <div className="pt-4 mt-4 border-t border-[#EAE5DC]">
             <button
               onClick={abrirAdminStudio}
-              className="w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] font-semibold text-[#202124] hover:bg-[#e8f0fe] hover:text-[#1a73e8] transition-all text-left cursor-pointer group"
+              className="w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] font-semibold text-[#2C2723] hover:bg-[#FAF0E6] hover:text-[#B88D65] transition-all text-left cursor-pointer group border border-transparent hover:border-[#EAE5DC]"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <ShieldCheck className={`h-4 w-4 flex-shrink-0 transition-transform group-hover:scale-110 ${
-                  esEsRoot ? 'text-amber-600' : 'text-[#1a73e8]'
+                  esEsRoot ? 'text-amber-700' : 'text-[#B88D65]'
                 }`} />
                 <span className="truncate">OBJETIA studio</span>
               </div>
@@ -262,7 +262,7 @@ export default function Sidebar({
             className="fixed inset-0 bg-black/30 backdrop-blur-xs transition-opacity" 
             onClick={() => setMenuMovilAbierto && setMenuMovilAbierto(false)} 
           />
-          <div className="fixed inset-y-0 left-0 w-[280px] bg-white border-r border-[#dadce0] shadow-2xl flex flex-col z-10 animate-slide-right overflow-hidden">
+          <div className="fixed inset-y-0 left-0 w-[280px] bg-[#FAF8F5] border-r border-[#EAE5DC] shadow-2xl flex flex-col z-10 animate-slide-right overflow-hidden">
             {renderNavContent()}
           </div>
         </div>
@@ -270,7 +270,7 @@ export default function Sidebar({
 
       {/* SIDEBAR ESCRITORIO (Deslizamiento físico a la izquierda sin deformación) */}
       <aside 
-        className={`hidden lg:flex flex-col bg-white border-r border-[#dadce0] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-64 h-full min-h-[calc(100vh-64px)] overflow-hidden ${
+        className={`hidden lg:flex flex-col bg-[#FAF8F5] border-r border-[#EAE5DC] transition-all duration-300 ease-in-out select-none flex-shrink-0 w-64 h-full min-h-[calc(100vh-64px)] overflow-hidden ${
           sidebarOculto ? '-ml-64 pointer-events-none' : 'ml-0'
         }`}
       >

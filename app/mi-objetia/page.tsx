@@ -732,14 +732,14 @@ function MiObjetiaContent() {
   const TabIcon = currentTabMeta.icon;
 
   return (
-    <div className={`bg-[#f8f9fa] flex flex-col font-sans text-[#202124] antialiased ${
+    <div className={`bg-[#F5F4EF] flex flex-col font-sans text-[#2C2723] antialiased ${
       tabActual === "chat" 
         ? "h-[calc(100dvh-64px)] max-h-[calc(100dvh-64px)] -mb-20 md:mb-0 overflow-hidden" 
         : "min-h-screen"
     }`}>
-      {/* Workspace Shell Google AI Studio Light */}
+      {/* Workspace Shell Organic Modern */}
       <div className="flex flex-1 overflow-hidden h-full">
-        {/* Sidebar Lateral Google AI Studio Light */}
+        {/* Sidebar Lateral */}
         <Sidebar 
           tabActual={tabActual}
           setTabActual={setTabActual}
@@ -754,13 +754,13 @@ function MiObjetiaContent() {
 
         {/* Área Principal de Contenido */}
         <div className={`flex-1 flex flex-col min-w-0 ${tabActual === "chat" ? "h-full overflow-hidden" : "overflow-y-auto"}`}>
-          {/* Top Bar Google AI Studio Light */}
-          <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-xs border-b border-[#dadce0] px-4 sm:px-6 h-[60px] min-h-[60px] flex items-center justify-between flex-shrink-0 gap-3">
+          {/* Top Bar Organic Modern */}
+          <header className="sticky top-0 z-30 bg-[#FAF8F5]/95 backdrop-blur-xs border-b border-[#EAE5DC] px-4 sm:px-6 h-[60px] min-h-[60px] flex items-center justify-between flex-shrink-0 gap-3">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               {/* Botón menú móvil */}
               <button
                 onClick={() => setMenuMovilAbierto(true)}
-                className="lg:hidden p-1.5 text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-lg transition cursor-pointer flex-shrink-0"
+                className="lg:hidden p-1.5 text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-lg transition cursor-pointer flex-shrink-0"
                 title="Abrir menú"
               >
                 <MenuIcon className="h-5 w-5" />
@@ -769,7 +769,7 @@ function MiObjetiaContent() {
               {/* Botón interactivo animado menú <-> colapso según diseño exacto */}
               <button
                 onClick={() => setSidebarOculto(!sidebarOculto)}
-                className="hidden lg:flex items-center justify-center w-10 h-10 text-[#5f6368] hover:text-[#1a73e8] hover:bg-[#f1f3f4] active:bg-[#e8f0fe] active:scale-95 rounded-xl transition-all cursor-pointer flex-shrink-0 group"
+                className="hidden lg:flex items-center justify-center w-10 h-10 text-[#73675C] hover:text-[#B88D65] hover:bg-[#F2EFE9] active:bg-[#FAF0E6] active:scale-95 rounded-xl transition-all cursor-pointer flex-shrink-0 group"
                 title={sidebarOculto ? "Mostrar barra lateral" : "Ocultar barra lateral"}
                 aria-label={sidebarOculto ? "Mostrar barra lateral" : "Ocultar barra lateral"}
               >
@@ -823,10 +823,10 @@ function MiObjetiaContent() {
 
               {/* Título y Descripción de la Pestaña en Top Bar (Sin Icono) */}
               <div className="flex flex-col min-w-0">
-                <span className="text-sm sm:text-base font-bold text-[#202124] leading-tight truncate">
+                <span className="text-sm sm:text-base font-bold text-[#2C2723] leading-tight truncate">
                   {currentTabMeta.label}
                 </span>
-                <span className="hidden md:inline text-[11px] text-[#5f6368] truncate leading-tight mt-0.5">
+                <span className="hidden md:inline text-[11px] text-[#73675C] truncate leading-tight mt-0.5">
                   {currentTabMeta.description}
                 </span>
               </div>

@@ -775,24 +775,24 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
       {/* Formulario de Información Personal */}
       <form id="perfil-form" onSubmit={handleSubmitProfile} className="space-y-6 w-full">
         {/* Información Personal */}
-        <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs w-full">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#f1f3f4] pb-3.5">
+        <div className="bg-[#FAF8F5] border border-[#EAE5DC] rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs w-full">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#EAE5DC] pb-3.5">
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
-                <h4 className="text-sm font-semibold text-[#202124] flex items-center gap-2">
-                  <User className="h-4 w-4 text-[#1a73e8]" /> Información Personal
+                <h4 className="text-sm font-semibold text-[#2C2723] flex items-center gap-2">
+                  <User className="h-4 w-4 text-[#B88D65]" /> Información Personal
                 </h4>
                 <span className="inline-flex items-center" title={loadingProfile ? "Guardando..." : hasProfileChanges ? "Editando..." : "Al día"}>
                   {loadingProfile ? (
-                    <Loader2 className="w-3.5 h-3.5 text-[#202124] animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 text-[#B88D65] animate-spin" />
                   ) : hasProfileChanges ? (
-                    <Pencil className="w-3.5 h-3.5 text-[#202124] animate-pulse" />
+                    <Pencil className="w-3.5 h-3.5 text-[#B88D65] animate-pulse" />
                   ) : (
-                    <Check className="w-3.5 h-3.5 text-[#202124]" strokeWidth={2.5} />
+                    <Check className="w-3.5 h-3.5 text-[#B88D65]" strokeWidth={2.5} />
                   )}
                 </span>
               </div>
-              <p className="text-xs text-[#5f6368]">
+              <p className="text-xs text-[#73675C]">
                 Gestioná tu nombre, teléfono y datos de contacto de tu cuenta
               </p>
             </div>
@@ -804,7 +804,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                   type="button"
                   onClick={handleDiscardProfileChanges}
                   disabled={loadingProfile}
-                  className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] border border-[#dadce0] transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
+                  className="px-3 py-1.5 rounded-xl text-xs font-semibold text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] border border-[#EAE5DC] transition flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                   title="Descartar cambios no guardados"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
@@ -817,8 +817,8 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                 disabled={!hasProfileChanges || loadingProfile}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-2xs ${
                   hasProfileChanges && !loadingProfile
-                    ? 'bg-[#1a73e8] text-white hover:bg-[#1557b0] cursor-pointer active:scale-98 shadow-xs'
-                    : 'bg-[#f1f3f4] text-[#9aa0a6] border border-[#dadce0]/60 cursor-not-allowed'
+                    ? 'bg-[#B88D65] text-white hover:bg-[#A37953] cursor-pointer active:scale-98 shadow-xs'
+                    : 'bg-[#F2EFE9] text-[#73675C] border border-[#EAE5DC]/60 cursor-not-allowed'
                 }`}
               >
                 {loadingProfile ? (
@@ -828,7 +828,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                   </>
                 ) : (
                   <>
-                    <Save className={`w-3.5 h-3.5 ${hasProfileChanges ? 'text-white' : 'text-[#9aa0a6]'}`} />
+                    <Save className={`w-3.5 h-3.5 ${hasProfileChanges ? 'text-white' : 'text-[#73675C]'}`} />
                     <span>Guardar cambios</span>
                   </>
                 )}
@@ -838,8 +838,8 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-1">
             <div>
-              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5 flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-[#5f6368]" /> Nombre Completo *
+              <label className="text-xs font-semibold text-[#534636] block mb-1.5 flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-[#73675C]" /> Nombre Completo *
               </label>
               <input
                 type="text"
@@ -847,40 +847,40 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                 placeholder="Ingresá tu nombre y apellido"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                className={`w-full px-3.5 py-2.5 text-sm rounded-xl border transition text-[#202124] placeholder:text-[#9aa0a6] ${
+                className={`w-full px-3.5 py-2.5 text-sm rounded-xl border transition text-[#2C2723] placeholder:text-[#9aa0a6] ${
                   fullName !== initialFullName
-                    ? 'border-[#1a73e8] bg-[#f8faff] ring-2 ring-[#1a73e8]/10'
-                    : 'border-[#dadce0] bg-[#f8f9fa] focus:bg-white focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20'
+                    ? 'border-[#B88D65] bg-[#FAF0E6]/30 ring-2 ring-[#B88D65]/10'
+                    : 'border-[#E6E1DB] bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20'
                 } focus:outline-none`}
               />
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5 flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-[#5f6368]" /> Teléfono de contacto
+              <label className="text-xs font-semibold text-[#534636] block mb-1.5 flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-[#73675C]" /> Teléfono de contacto
               </label>
               <input
                 type="tel"
                 placeholder="Ej: +54 9 351 123-4567"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className={`w-full px-3.5 py-2.5 text-sm rounded-xl border transition text-[#202124] placeholder:text-[#9aa0a6] ${
+                className={`w-full px-3.5 py-2.5 text-sm rounded-xl border transition text-[#2C2723] placeholder:text-[#9aa0a6] ${
                   phone !== initialPhone
-                    ? 'border-[#1a73e8] bg-[#f8faff] ring-2 ring-[#1a73e8]/10'
-                    : 'border-[#dadce0] bg-[#f8f9fa] focus:bg-white focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20'
+                    ? 'border-[#B88D65] bg-[#FAF0E6]/30 ring-2 ring-[#B88D65]/10'
+                    : 'border-[#E6E1DB] bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20'
                 } focus:outline-none`}
               />
             </div>
 
             <div>
-              <label className="text-xs font-semibold text-[#3c4043] block mb-1.5 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-[#5f6368]" /> Correo Electrónico
+              <label className="text-xs font-semibold text-[#534636] block mb-1.5 flex items-center gap-1.5">
+                <Mail className="w-3.5 h-3.5 text-[#73675C]" /> Correo Electrónico
               </label>
               <input
                 type="email"
                 disabled
                 value={usuario?.email || ""}
-                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0]/60 bg-[#f1f3f4] text-[#5f6368] font-medium cursor-not-allowed"
+                className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#EAE5DC]/60 bg-[#F2EFE9] text-[#73675C] font-medium cursor-not-allowed"
                 title="El correo no puede modificarse"
               />
             </div>
@@ -889,14 +889,14 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
       </form>
 
       {/* Sección de Direcciones de Entrega */}
-      <div className="bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs w-full">
+      <div className="bg-[#FAF8F5] border border-[#EAE5DC] rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs w-full">
         {/* Cabecera con título y botón Agregar */}
-        <div className="flex items-center justify-between border-b border-[#f1f3f4] pb-3">
+        <div className="flex items-center justify-between border-b border-[#EAE5DC] pb-3">
           <div className="space-y-0.5">
-            <h4 className="text-sm font-semibold text-[#202124] flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-[#1a73e8]" /> Direcciones de Entrega
+            <h4 className="text-sm font-semibold text-[#2C2723] flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-[#B88D65]" /> Direcciones de Entrega
             </h4>
-            <p className="text-xs text-[#5f6368]">
+            <p className="text-xs text-[#73675C]">
               Tus domicilios guardados para recibir compras y envíos
             </p>
           </div>
@@ -905,7 +905,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
             <button
               type="button"
               onClick={handleOpenCreateForm}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#1a73e8] bg-[#e8f0fe] hover:bg-[#d2e3fc] border border-[#d2e3fc] transition cursor-pointer active:scale-98 shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#B88D65] bg-[#FAF0E6] hover:bg-[#F4E6D8] border border-[#EAE5DC] transition cursor-pointer active:scale-98 shadow-2xs"
               title="Agregar nueva dirección"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -931,7 +931,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div className="sm:col-span-2 relative" ref={streetWrapperRef}>
-                      <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
+                      <label className="text-xs font-semibold text-[#534636] block mb-1.5">
                         Calle *
                       </label>
                       <div className="relative">
@@ -961,34 +961,34 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                               setShowPredictionsDropdown(false);
                             }
                           }}
-                          className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition"
                           autoComplete="off"
                         />
                         {loadingPredictions && (
                           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                            <Loader2 className="w-4 h-4 text-[#1a73e8] animate-spin" />
+                            <Loader2 className="w-4 h-4 text-[#B88D65] animate-spin" />
                           </div>
                         )}
                       </div>
 
                       {/* Menú desplegable de sugerencias */}
                       {showPredictionsDropdown && predictions.length > 0 && (
-                        <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-[#dadce0] rounded-xl shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
+                        <div className="absolute left-0 right-0 top-full mt-1 bg-[#FAF8F5] border border-[#EAE5DC] rounded-xl shadow-xl z-50 overflow-hidden max-h-60 overflow-y-auto">
                           {predictions.map((p, idx) => (
                             <button
                               key={p.id || idx}
                               type="button"
                               onClick={() => handleSelectPrediction(p)}
                               onMouseEnter={() => setHighlightedIndex(idx)}
-                              className={`w-full text-left px-3.5 py-2.5 flex items-start gap-2.5 transition border-b border-[#f1f3f4] last:border-0 cursor-pointer ${
-                                highlightedIndex === idx ? "bg-[#e8f0fe] text-[#1a73e8]" : "hover:bg-[#f8f9fa] text-[#202124]"
+                              className={`w-full text-left px-3.5 py-2.5 flex items-start gap-2.5 transition border-b border-[#EAE5DC] last:border-0 cursor-pointer ${
+                                highlightedIndex === idx ? "bg-[#FAF0E6] text-[#B88D65]" : "hover:bg-[#F2EFE9] text-[#2C2723]"
                               }`}
                             >
-                              <MapPin className={`w-4 h-4 mt-0.5 shrink-0 ${highlightedIndex === idx ? "text-[#1a73e8]" : "text-[#5f6368]"}`} />
+                              <MapPin className={`w-4 h-4 mt-0.5 shrink-0 ${highlightedIndex === idx ? "text-[#B88D65]" : "text-[#73675C]"}`} />
                               <div className="flex-1 min-w-0">
-                                <p className="text-xs font-semibold truncate text-[#202124]">{p.main_text}</p>
+                                <p className="text-xs font-semibold truncate text-[#2C2723]">{p.main_text}</p>
                                 {p.secondary_text && (
-                                  <p className="text-[11px] text-[#5f6368] truncate">{p.secondary_text}</p>
+                                  <p className="text-[11px] text-[#73675C] truncate">{p.secondary_text}</p>
                                 )}
                               </div>
                             </button>
@@ -997,7 +997,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                       )}
                     </div>
                     <div>
-                      <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
+                      <label className="text-xs font-semibold text-[#534636] block mb-1.5">
                         Número *
                       </label>
                       <input
@@ -1009,27 +1009,27 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         onBlur={() => {
                           if (!formPostalCode.trim()) autoDetectPostalCode();
                         }}
-                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition"
                       />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
-                        Piso / Depto <span className="text-[#80868b] font-normal">(Opcional)</span>
+                      <label className="text-xs font-semibold text-[#534636] block mb-1.5">
+                        Piso / Depto <span className="text-[#73675C] font-normal">(Opcional)</span>
                       </label>
                       <input
                         type="text"
                         placeholder="Ej: 2° B"
                         value={formFloorDept}
                         onChange={(e) => setFormFloorDept(e.target.value)}
-                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition"
                       />
                     </div>
                     <div>
                       <div className="flex items-center justify-between mb-1.5">
-                        <label className="text-xs font-semibold text-[#3c4043]">
+                        <label className="text-xs font-semibold text-[#534636]">
                           Código Postal
                         </label>
                         {!formPostalCode && (formStreet || formLat) && (
@@ -1037,7 +1037,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                             type="button"
                             onClick={() => autoDetectPostalCode()}
                             disabled={loadingPostalCode}
-                            className="text-[11px] font-medium text-[#1a73e8] hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                            className="text-[11px] font-medium text-[#B88D65] hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
                           >
                             {loadingPostalCode ? (
                               <>
@@ -1059,11 +1059,11 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                           onBlur={() => {
                             if (!formPostalCode.trim()) autoDetectPostalCode();
                           }}
-                          className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition font-mono font-semibold"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition font-mono font-semibold"
                         />
                         {loadingPostalCode && (
                           <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <Loader2 className="w-4 h-4 text-[#1a73e8] animate-spin" />
+                            <Loader2 className="w-4 h-4 text-[#B88D65] animate-spin" />
                           </div>
                         )}
                       </div>
@@ -1072,7 +1072,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
+                      <label className="text-xs font-semibold text-[#534636] block mb-1.5">
                         Provincia *
                       </label>
                       <select
@@ -1082,7 +1082,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         onBlur={() => {
                           if (!formPostalCode.trim()) autoDetectPostalCode();
                         }}
-                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] bg-[#f8f9fa] focus:bg-white transition cursor-pointer"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] bg-white transition cursor-pointer"
                       >
                         <option value="">Seleccioná tu provincia...</option>
                         {PROVINCIAS_ARGENTINA.map((p) => (
@@ -1091,7 +1091,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                       </select>
                     </div>
                     <div>
-                      <label className="text-xs font-semibold text-[#3c4043] block mb-1.5">
+                      <label className="text-xs font-semibold text-[#534636] block mb-1.5">
                         Ciudad / Localidad *
                       </label>
                       <input
@@ -1103,7 +1103,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         onBlur={() => {
                           if (!formPostalCode.trim()) autoDetectPostalCode();
                         }}
-                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition"
                       />
                     </div>
                   </div>
@@ -1114,7 +1114,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                       <button
                         type="submit"
                         disabled={savingAddress}
-                        className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded-xl transition cursor-pointer disabled:opacity-60 shadow-xs active:scale-98"
+                        className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-[#B88D65] hover:bg-[#A37953] rounded-xl transition cursor-pointer disabled:opacity-60 shadow-xs active:scale-98"
                       >
                         {savingAddress ? (
                           <>
@@ -1131,7 +1131,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                     ) : (
                       <button
                         type="submit"
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded-xl transition cursor-pointer shadow-xs active:scale-98"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-[#B88D65] hover:bg-[#A37953] rounded-xl transition cursor-pointer shadow-xs active:scale-98"
                       >
                         <span>Siguiente</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -1145,7 +1145,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         setEditingAddressId(null);
                         setAddressFormStep(1);
                       }}
-                      className="px-3.5 py-2.5 text-xs font-medium text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-xl transition cursor-pointer"
+                      className="px-3.5 py-2.5 text-xs font-medium text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-xl transition cursor-pointer"
                     >
                       Cancelar
                     </button>
@@ -1154,49 +1154,49 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
 
                 {/* COLUMNA DERECHA: Mapa Interactivo con Pin Arrastrable */}
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs text-[#5f6368]">
-                    <span className="font-semibold text-[#3c4043] flex items-center gap-1.5">
-                      <Navigation className="w-3.5 h-3.5 text-[#1a73e8]" />
+                  <div className="flex items-center justify-between text-xs text-[#73675C]">
+                    <span className="font-semibold text-[#534636] flex items-center gap-1.5">
+                      <Navigation className="w-3.5 h-3.5 text-[#B88D65]" />
                       Ubicación en el mapa
                     </span>
-                    <span className="text-[11px] text-[#80868b]">
+                    <span className="text-[11px] text-[#73675C]">
                       Arrastrá el pin para afinar el punto exacto
                     </span>
                   </div>
 
-                  <div className="relative w-full h-[380px] rounded-2xl overflow-hidden border border-[#dadce0] bg-[#f8f9fa] shadow-2xs">
+                  <div className="relative w-full h-[380px] rounded-2xl overflow-hidden border border-[#EAE5DC] bg-[#FAF8F5] shadow-2xs">
                     <div ref={mapContainerRef} className="w-full h-full" />
 
                     {!googleMapsLoaded && (
-                      <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#f8f9fa]/95 text-[#5f6368]">
-                        <MapPin className="w-8 h-8 text-[#9aa0a6] mb-2 animate-bounce" />
-                        <p className="text-xs font-medium text-[#202124]">Cargando mapa interactivo...</p>
-                        <p className="text-[11px] text-[#80868b] mt-1 max-w-xs">
+                      <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#FAF8F5]/95 text-[#73675C]">
+                        <MapPin className="w-8 h-8 text-[#B88D65] mb-2 animate-bounce" />
+                        <p className="text-xs font-medium text-[#2C2723]">Cargando mapa interactivo...</p>
+                        <p className="text-[11px] text-[#73675C] mt-1 max-w-xs">
                           Podés completar los campos a la izquierda o buscar la calle directamente.
                         </p>
                       </div>
                     )}
                   </div>
 
-                  <p className="text-[11px] text-[#80868b] italic">
+                  <p className="text-[11px] text-[#73675C] italic">
                     💡 Tip: Al mover el pin en el mapa o hacer clic en una calle, los campos de la izquierda se actualizan automáticamente.
                   </p>
                 </div>
               </form>
             ) : (
               /* PASO 2: Etiqueta de la dirección y Guardado */
-              <form onSubmit={handleSaveAddress} className="max-w-xl mx-auto space-y-5 animate-fade-in bg-white border border-[#dadce0] rounded-2xl p-5 sm:p-6 shadow-xs">
+              <form onSubmit={handleSaveAddress} className="max-w-xl mx-auto space-y-5 animate-fade-in bg-[#FAF8F5] border border-[#EAE5DC] rounded-2xl p-5 sm:p-6 shadow-xs">
                 {/* Resumen visual de la dirección ingresada */}
-                <div className="bg-[#f8f9fa] border border-[#dadce0]/70 rounded-xl p-4 flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center shrink-0 mt-0.5">
+                <div className="bg-[#FAF0E6] border border-[#EAE5DC] rounded-xl p-4 flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#FAF8F5] text-[#B88D65] border border-[#EAE5DC] flex items-center justify-center shrink-0 mt-0.5">
                     <MapPin className="w-4 h-4" />
                   </div>
                   <div className="space-y-1 min-w-0 flex-1">
-                    <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5f6368]">Dirección ingresada</p>
-                    <p className="text-sm font-semibold text-[#202124] truncate">
+                    <p className="text-[11px] font-semibold uppercase tracking-wider text-[#73675C]">Dirección ingresada</p>
+                    <p className="text-sm font-semibold text-[#2C2723] truncate">
                       {formStreet} {formNumber} {formFloorDept ? `(${formFloorDept})` : ''}
                     </p>
-                    <p className="text-xs text-[#5f6368] truncate">
+                    <p className="text-xs text-[#73675C] truncate">
                       {[formCity, formProvince].filter(Boolean).join(', ')} {formPostalCode ? `· CP ${formPostalCode}` : ''}
                     </p>
                   </div>
@@ -1205,8 +1205,8 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                 {/* Campo para la Etiqueta */}
                 <div className="space-y-3">
                   <div>
-                    <label className="text-xs font-semibold text-[#3c4043] flex items-center gap-1.5 mb-1.5">
-                      <Tag className="w-3.5 h-3.5 text-[#1a73e8]" />
+                    <label className="text-xs font-semibold text-[#534636] flex items-center gap-1.5 mb-1.5">
+                      <Tag className="w-3.5 h-3.5 text-[#B88D65]" />
                       Etiqueta de la dirección *
                     </label>
                     <input
@@ -1215,14 +1215,14 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                       placeholder="Ej: Mi casa, Oficina, Depto"
                       value={formTitle}
                       onChange={(e) => setFormTitle(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#dadce0] focus:outline-none focus:border-[#1a73e8] focus:ring-2 focus:ring-[#1a73e8]/20 text-[#202124] placeholder:text-[#9aa0a6] bg-[#f8f9fa] focus:bg-white transition font-medium"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition font-medium"
                       autoFocus
                     />
                   </div>
 
                   {/* Sugerencias rápidas de etiquetas */}
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[11px] text-[#5f6368]">Sugerencias:</span>
+                    <span className="text-[11px] text-[#73675C]">Sugerencias:</span>
                     {["Mi casa", "Trabajo", "Depto", "Casa de campo", "Otro"].map((sug) => (
                       <button
                         key={sug}
@@ -1230,8 +1230,8 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         onClick={() => setFormTitle(sug)}
                         className={`px-2.5 py-1 text-xs rounded-lg border transition cursor-pointer ${
                           formTitle === sug
-                            ? "bg-[#e8f0fe] text-[#1a73e8] border-[#1a73e8] font-semibold"
-                            : "bg-white text-[#5f6368] border-[#dadce0] hover:bg-[#f8f9fa]"
+                            ? "bg-[#FAF0E6] text-[#B88D65] border-[#B88D65] font-semibold"
+                            : "bg-white text-[#73675C] border-[#EAE5DC] hover:bg-[#F2EFE9]"
                         }`}
                       >
                         {sug}
@@ -1241,24 +1241,24 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                 </div>
 
                 {/* Checkbox para fijar como activa */}
-                <label className="flex items-center gap-2.5 pt-2 cursor-pointer select-none border-t border-[#f1f3f4]">
+                <label className="flex items-center gap-2.5 pt-2 cursor-pointer select-none border-t border-[#EAE5DC]">
                   <input
                     type="checkbox"
                     checked={formIsDefault}
                     onChange={(e) => setFormIsDefault(e.target.checked)}
-                    className="w-4 h-4 text-[#1a73e8] rounded-md border-[#dadce0] focus:ring-[#1a73e8] cursor-pointer"
+                    className="w-4 h-4 text-[#B88D65] rounded-md border-[#E6E1DB] focus:ring-[#B88D65] cursor-pointer"
                   />
-                  <span className="text-xs font-medium text-[#3c4043]">
+                  <span className="text-xs font-medium text-[#534636]">
                     Establecer como dirección activa para envíos
                   </span>
                 </label>
 
                 {/* Botones de acción del Paso 2 */}
-                <div className="flex items-center gap-2.5 pt-3 border-t border-[#f1f3f4]">
+                <div className="flex items-center gap-2.5 pt-3 border-t border-[#EAE5DC]">
                   <button
                     type="submit"
                     disabled={savingAddress}
-                    className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded-xl transition cursor-pointer disabled:opacity-60 shadow-xs active:scale-98"
+                    className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-[#B88D65] hover:bg-[#A37953] rounded-xl transition cursor-pointer disabled:opacity-60 shadow-xs active:scale-98"
                   >
                     {savingAddress ? (
                       <>
@@ -1276,7 +1276,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                   <button
                     type="button"
                     onClick={() => setAddressFormStep(1)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-medium text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-xl transition cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 text-xs font-medium text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-xl transition cursor-pointer"
                   >
                     <ArrowLeft className="w-3.5 h-3.5" />
                     <span>Atrás</span>
@@ -1289,7 +1289,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                       setEditingAddressId(null);
                       setAddressFormStep(1);
                     }}
-                    className="px-3.5 py-2.5 text-xs font-medium text-[#5f6368] hover:text-[#202124] hover:bg-[#f1f3f4] rounded-xl transition cursor-pointer"
+                    className="px-3.5 py-2.5 text-xs font-medium text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-xl transition cursor-pointer"
                   >
                     Cancelar
                   </button>
@@ -1301,25 +1301,25 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
           /* 2. VISTA DE LISTA DE DIRECCIONES GUARDADAS */
           <div className="space-y-3">
             {loadingAddresses ? (
-              <div className="p-8 text-center text-[#5f6368] flex flex-col items-center justify-center gap-2">
-                <Loader2 className="w-5 h-5 animate-spin text-[#1a73e8]" />
+              <div className="p-8 text-center text-[#73675C] flex flex-col items-center justify-center gap-2">
+                <Loader2 className="w-5 h-5 animate-spin text-[#B88D65]" />
                 <span className="text-xs">Cargando tus direcciones...</span>
               </div>
             ) : addresses.length === 0 ? (
-              <div className="p-8 rounded-2xl border border-dashed border-[#dadce0] bg-[#f8f9fa] text-center space-y-3">
-                <div className="w-10 h-10 rounded-full bg-[#e8f0fe] text-[#1a73e8] flex items-center justify-center mx-auto">
+              <div className="p-8 rounded-2xl border border-dashed border-[#EAE5DC] bg-[#FAF8F5] text-center space-y-3">
+                <div className="w-10 h-10 rounded-full bg-[#FAF0E6] text-[#B88D65] flex items-center justify-center mx-auto border border-[#EAE5DC]">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div className="space-y-1">
-                  <p className="text-sm font-semibold text-[#202124]">No tenés direcciones guardadas aún</p>
-                  <p className="text-xs text-[#5f6368] max-w-md mx-auto">
+                  <p className="text-sm font-semibold text-[#2C2723]">No tenés direcciones guardadas aún</p>
+                  <p className="text-xs text-[#73675C] max-w-md mx-auto">
                     Agregá tu domicilio de entrega para recibir tus compras de manera rápida y sin volver a escribir tus datos.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={handleOpenCreateForm}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-[#1a73e8] hover:bg-[#1557b0] rounded-xl transition cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-[#B88D65] hover:bg-[#A37953] rounded-xl transition cursor-pointer shadow-2xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Agregar mi primera dirección</span>
@@ -1334,19 +1334,19 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                       key={addr.id}
                       className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
                         isActiva
-                          ? "bg-[#f8fafd] border-[#1a73e8]/40 shadow-xs"
-                          : "bg-[#f8f9fa] border-[#dadce0]/80 hover:border-[#bdc1c6]"
+                          ? "bg-[#FAF0E6]/40 border-[#B88D65]/40 shadow-xs"
+                          : "bg-white border-[#EAE5DC] hover:border-[#D5CEC4]"
                       }`}
                     >
                       {/* Datos de la dirección */}
                       <div className="space-y-1 flex-1">
                         <div className="flex items-center gap-2.5 flex-wrap">
-                          <span className="text-sm font-semibold text-[#202124]">
+                          <span className="text-sm font-semibold text-[#2C2723]">
                             {addr.title || "Dirección de Entrega"}
                           </span>
 
                           {isActiva ? (
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#1a73e8] bg-[#e8f0fe] px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#B88D65] bg-[#FAF0E6] border border-[#EAE5DC] px-2.5 py-0.5 rounded-full flex items-center gap-1">
                               <Check className="w-3 h-3" />
                               Activa para envíos
                             </span>
@@ -1354,34 +1354,34 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                             <button
                               type="button"
                               onClick={() => handleSetDefault(addr.id)}
-                              className="text-[11px] font-medium text-[#1a73e8] hover:underline cursor-pointer"
+                              className="text-[11px] font-medium text-[#B88D65] hover:underline cursor-pointer"
                             >
                               Usar para envíos
                             </button>
                           )}
                         </div>
 
-                          <p className="text-xs font-medium text-[#3c4043]">
-                            {addr.street} {addr.number}{' '}
-                            {addr.floor_dept && (
-                              <span className="text-[#5f6368] font-normal">({addr.floor_dept})</span>
-                            )}
-                          </p>
+                        <p className="text-xs font-medium text-[#534636]">
+                          {addr.street} {addr.number}{' '}
+                          {addr.floor_dept && (
+                            <span className="text-[#73675C] font-normal">({addr.floor_dept})</span>
+                          )}
+                        </p>
 
-                          <p className="text-xs text-[#5f6368]">
-                            {[addr.city, addr.province].filter(Boolean).join(', ')}{' '}
-                            {addr.postal_code && (
-                              <span className="font-mono font-medium">· CP {addr.postal_code}</span>
-                            )}
-                          </p>
-                        </div>
+                        <p className="text-xs text-[#73675C]">
+                          {[addr.city, addr.province].filter(Boolean).join(', ')}{' '}
+                          {addr.postal_code && (
+                            <span className="font-mono font-medium">· CP {addr.postal_code}</span>
+                          )}
+                        </p>
+                      </div>
 
                       {/* Lado derecho: Iconos para Editar y Eliminar */}
                       <div className="flex items-center gap-1 self-end sm:self-center border-t sm:border-t-0 pt-2 sm:pt-0 w-full sm:w-auto justify-end">
                         <button
                           type="button"
                           onClick={() => handleOpenEditForm(addr)}
-                          className="p-2 text-[#5f6368] hover:text-[#1a73e8] hover:bg-white rounded-xl border border-transparent hover:border-[#dadce0] transition cursor-pointer"
+                          className="p-2 text-[#73675C] hover:text-[#B88D65] hover:bg-[#FAF0E6] rounded-xl border border-transparent hover:border-[#EAE5DC] transition cursor-pointer"
                           title="Editar dirección"
                         >
                           <Pencil className="h-4 w-4" />
@@ -1389,7 +1389,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         <button
                           type="button"
                           onClick={() => handleDeleteAddress(addr.id)}
-                          className="p-2 text-[#5f6368] hover:text-[#d93025] hover:bg-red-50 rounded-xl border border-transparent hover:border-red-200 transition cursor-pointer"
+                          className="p-2 text-[#73675C] hover:text-[#d93025] hover:bg-red-50 rounded-xl border border-transparent hover:border-red-200 transition cursor-pointer"
                           title="Eliminar dirección"
                         >
                           <Trash2 className="h-4 w-4" />
