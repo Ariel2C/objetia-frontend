@@ -32,30 +32,42 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
   if (!banners || banners.length === 0) {
     return (
       <div 
-        className="relative w-full aspect-square md:aspect-[1920/432] bg-contain bg-no-repeat bg-center bg-black flex items-center shadow-inner"
-        style={{ backgroundImage: `url(https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1200)` }}
+        className="relative w-full aspect-[1/1.22] md:aspect-[1920/580] overflow-hidden group/hero"
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-white">
-          <h1 className="text-2xl md:text-5xl font-extrabold tracking-tight max-w-2xl leading-tight">
-            Renová tus Espacios con Piezas Únicas
-          </h1>
-          <p className="mt-2 md:mt-4 text-xs md:text-xl max-w-xl text-gray-200">
-            Artículos de decoración premium, nuevos y usados seleccionados por curadores.
-          </p>
+        <div 
+          className="absolute inset-0 w-full h-full bg-cover bg-top"
+          style={{ 
+            backgroundImage: `url(https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=1200)`,
+            WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 100%)',
+            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 100%)'
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent" />
+        </div>
+        <div className="relative w-full aspect-square md:aspect-[1920/432] flex items-center z-20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-white">
+            <h1 className="text-2xl md:text-5xl font-extrabold tracking-tight max-w-2xl leading-tight">
+              Renová tus Espacios con Piezas Únicas
+            </h1>
+            <p className="mt-2 md:mt-4 text-xs md:text-xl max-w-xl text-gray-200">
+              Artículos de decoración premium, nuevos y usados seleccionados por curadores.
+            </p>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="relative w-full aspect-square md:aspect-[1920/432] overflow-hidden shadow-inner bg-black group/hero">
-      {/* CONTENEDOR DE DESLIZAMIENTO (SLIDER) */}
+    <div className="relative w-full aspect-[1/1.22] md:aspect-[1920/580] overflow-hidden group/hero">
+      {/* CONTENEDOR DE DESLIZAMIENTO (SLIDER CON DESVANECIMIENTO HACIA ABAJO) */}
       <div 
         className="flex h-full transition-transform duration-500 ease-in-out" 
         style={{ 
           transform: `translateX(-${currentIndex * (100 / banners.length)}%)`, 
-          width: `${banners.length * 100}%` 
+          width: `${banners.length * 100}%`,
+          WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 100%)',
+          maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 68%, rgba(0,0,0,0) 100%)'
         }}
       >
         {banners.map((banner, index) => {
@@ -75,8 +87,8 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
           const bgImageMobile = resolveUrl(banner.mobile_cloudfront_url || banner.image_url) || bgImageDesktop;
 
           const SlideContent = (
-            <div className="h-full w-full flex items-center relative overflow-hidden bg-black">
-              {/* Picture Tag para diseño responsivo */}
+            <div className="h-full w-full relative overflow-hidden">
+              {/* Picture Tag para diseño responsivo: la imagen ocupa todo el alto y se desvanece al pie */}
               <picture className="absolute inset-0 w-full h-full">
                 <source media="(max-width: 768px)" srcSet={encodeURI(bgImageMobile)} />
                 <img 
@@ -84,7 +96,7 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
                   alt={banner.title || "Banner"} 
                   loading={index === 0 ? "eager" : "lazy"}
                   fetchPriority={index === 0 ? "high" : "auto"}
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-cover object-top"
                 />
               </picture>
 
@@ -93,17 +105,20 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
                 <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-transparent z-10" />
               )}
               
-              <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-white z-20">
-                {banner.title && (
-                  <h1 className="text-2xl md:text-5xl font-extrabold tracking-tight max-w-2xl leading-tight">
-                    {banner.title}
-                  </h1>
-                )}
-                {banner.subtitle && (
-                  <p className="mt-2 md:mt-4 text-xs md:text-xl max-w-xl text-gray-200 font-medium">
-                    {banner.subtitle}
-                  </p>
-                )}
+              {/* Textos: mantienen exactamente su posición vertical original */}
+              <div className="relative w-full aspect-square md:aspect-[1920/432] flex items-center z-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-white">
+                  {banner.title && (
+                    <h1 className="text-2xl md:text-5xl font-extrabold tracking-tight max-w-2xl leading-tight">
+                      {banner.title}
+                    </h1>
+                  )}
+                  {banner.subtitle && (
+                    <p className="mt-2 md:mt-4 text-xs md:text-xl max-w-xl text-gray-200 font-medium">
+                      {banner.subtitle}
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
           );
@@ -130,43 +145,46 @@ export default function BannerCarousel({ banners }: { banners: Banner[] }) {
         })}
       </div>
 
-      {/* FLECHAS DE NAVEGACIÓN LATERALES (VISIBLES SOLO AL PASAR EL MOUSE POR EL BANNER) */}
-      {banners.length > 1 && (
-        <>
-          <button 
-            type="button"
-            onClick={handlePrev}
-            aria-label="Banner anterior"
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-black/40 hover:bg-black/75 text-white backdrop-blur-md transition-all duration-300 opacity-0 group-hover/hero:opacity-100 pointer-events-none group-hover/hero:pointer-events-auto cursor-pointer border border-white/20 shadow-lg group/btn active:scale-95"
-          >
-            <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 group-hover/btn:-translate-x-0.5 transition-transform" />
-          </button>
-          <button 
-            type="button"
-            onClick={handleNext}
-            aria-label="Banner siguiente"
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-2.5 sm:p-3 rounded-full bg-black/40 hover:bg-black/75 text-white backdrop-blur-md transition-all duration-300 opacity-0 group-hover/hero:opacity-100 pointer-events-none group-hover/hero:pointer-events-auto cursor-pointer border border-white/20 shadow-lg group/btn active:scale-95"
-          >
-            <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 group-hover/btn:translate-x-0.5 transition-transform" />
-          </button>
-        </>
-      )}
+      {/* CONTENEDOR DE CONTROLES: MANTIENE LA POSICIÓN EXACTA ORIGINAL (NO SE DESPLAZAN HACIA ABAJO) */}
+      <div className="absolute inset-x-0 top-0 aspect-square md:aspect-[1920/432] pointer-events-none z-30">
+        {/* FLECHAS DE NAVEGACIÓN LATERALES (VISIBLES SOLO AL PASAR EL MOUSE POR EL BANNER) */}
+        {banners.length > 1 && (
+          <>
+            <button 
+              type="button"
+              onClick={handlePrev}
+              aria-label="Banner anterior"
+              className="absolute left-4 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-black/40 hover:bg-black/75 text-white backdrop-blur-md transition-all duration-300 opacity-0 group-hover/hero:opacity-100 pointer-events-auto cursor-pointer border border-white/20 shadow-lg group/btn active:scale-95"
+            >
+              <ChevronLeft className="h-5 w-5 sm:h-6 sm:w-6 group-hover/btn:-translate-x-0.5 transition-transform" />
+            </button>
+            <button 
+              type="button"
+              onClick={handleNext}
+              aria-label="Banner siguiente"
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-2.5 sm:p-3 rounded-full bg-black/40 hover:bg-black/75 text-white backdrop-blur-md transition-all duration-300 opacity-0 group-hover/hero:opacity-100 pointer-events-auto cursor-pointer border border-white/20 shadow-lg group/btn active:scale-95"
+            >
+              <ChevronRight className="h-5 w-5 sm:h-6 sm:w-6 group-hover/btn:translate-x-0.5 transition-transform" />
+            </button>
+          </>
+        )}
 
-      {/* DOTS DE NAVEGACIÓN (PUNTOS DEL MEDIO) */}
-      {banners.length > 1 && (
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-          {banners.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              aria-label={`Ir al banner ${index + 1}`}
-              className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                index === currentIndex ? 'w-6 bg-[var(--color-secondary)]' : 'w-2.5 bg-white/50 hover:bg-white'
-              }`}
-            />
-          ))}
-        </div>
-      )}
+        {/* DOTS DE NAVEGACIÓN (PUNTOS DEL MEDIO) */}
+        {banners.length > 1 && (
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 pointer-events-auto">
+            {banners.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                aria-label={`Ir al banner ${index + 1}`}
+                className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                  index === currentIndex ? 'w-6 bg-[var(--color-secondary)]' : 'w-2.5 bg-white/50 hover:bg-white'
+                }`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
