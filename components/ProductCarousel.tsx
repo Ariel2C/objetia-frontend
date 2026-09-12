@@ -9,9 +9,10 @@ interface ProductCarouselProps {
   title: string;
   categoryFilter?: string | null;
   productos: Producto[];
+  className?: string;
 }
 
-export default function ProductCarousel({ title, categoryFilter, productos }: ProductCarouselProps) {
+export default function ProductCarousel({ title, categoryFilter, productos, className }: ProductCarouselProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -80,7 +81,7 @@ export default function ProductCarousel({ title, categoryFilter, productos }: Pr
   if (!productos || productos.length === 0) return null;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 animate-slide-up">
+    <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-slide-up ${className || 'mt-6'}`}>
       <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm relative group/carousel">
         
         {/* CABECERA: TÍTULO E INDICADORES DE PÁGINA */}

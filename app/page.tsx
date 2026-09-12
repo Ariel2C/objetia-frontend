@@ -46,28 +46,34 @@ export default async function HomePage() {
           ============================================================================== */}
       <BannerCarousel banners={banners} />
 
-      {/* BANNER PROMOCIONAL DE BIENVENIDA (Solo para no logueados) */}
-      <WelcomeBanner />
-
       {/* ==============================================================================
           2. SECCIONES DE PRODUCTOS DINÁMICAS (Carruseles configurables)
+          El primer carrusel (Destacados) se superpone por encima del pie del banner hero
           ============================================================================== */}
       {secciones && secciones.length > 0 ? (
-        secciones.map((seccion) => (
-          <ProductCarousel 
-            key={seccion.id}
-            title={seccion.title}
-            categoryFilter={seccion.category_filter}
-            productos={seccion.productos}
-          />
+        secciones.map((seccion, idx) => (
+          <React.Fragment key={seccion.id}>
+            <ProductCarousel 
+              title={seccion.title}
+              categoryFilter={seccion.category_filter}
+              productos={seccion.productos}
+              className={idx === 0 ? "relative z-20 -mt-16 sm:-mt-20 md:-mt-28 lg:-mt-32" : "mt-6"}
+            />
+            {/* BANNER PROMOCIONAL DE BIENVENIDA (Solo para no logueados, tras el primer carrusel) */}
+            {idx === 0 && <WelcomeBanner />}
+          </React.Fragment>
         ))
       ) : (
-        // Fallback si no hay secciones cargadas en la base de datos
-        <ProductCarousel 
-          title="Destacados de la Semana"
-          categoryFilter="Todos"
-          productos={productos}
-        />
+        <>
+          <ProductCarousel 
+            title="Destacados de la Semana"
+            categoryFilter="Todos"
+            productos={productos}
+            className="relative z-20 -mt-16 sm:-mt-20 md:-mt-28 lg:-mt-32"
+          />
+          {/* BANNER PROMOCIONAL DE BIENVENIDA (Solo para no logueados) */}
+          <WelcomeBanner />
+        </>
       )}
     </div>
   );
