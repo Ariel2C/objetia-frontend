@@ -11,7 +11,9 @@ import {
   Search,
   MessageSquare,
   ChevronRight,
-  LayoutGrid
+  LayoutGrid,
+  User,
+  LogOut
 } from 'lucide-react';
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '../lib/config';
@@ -658,47 +660,35 @@ export default function Navbar({ logoUrl }: NavbarProps) {
 
                     {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN */}
                     {menuAbierto && (
-                      <div className="absolute right-0 mt-2 w-48 sm:w-52 bg-[#FAF8F5] border border-[#EAE5DC] rounded-2xl shadow-[0_8px_32px_rgba(78,66,52,0.12)] z-50 p-2 space-y-1 animate-scale-in origin-top-right">
-                        {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'administrador') && (
-                          <div className="px-2 pt-0.5 pb-1">
-                            <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#FAF0E6] text-[#B88D65] border border-[#EAE5DC]">
-                              Administrador
-                            </span>
-                          </div>
-                        )}
-                        {(usuario.role?.toLowerCase() === 'root') && (
-                          <div className="px-2 pt-0.5 pb-1">
-                            <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#FAF0E6] text-[#7B6858] border border-[#EAE5DC]">
-                              Programador Root
-                            </span>
-                          </div>
-                        )}
-
+                      <div className="absolute right-0 mt-2 w-48 sm:w-52 bg-[#FAF8F5] border border-[#EAE5DC] rounded-2xl shadow-[0_8px_32px_rgba(78,66,52,0.12)] z-50 p-1.5 space-y-0.5 animate-scale-in origin-top-right">
                         {/* 1. Mi OBJETIA */}
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="w-full px-3 py-2 text-left text-xs font-medium text-[#2C2723] hover:text-[#B88D65] hover:bg-[#F2EFE9] rounded-xl transition cursor-pointer block"
+                          className="flex items-center gap-2.5 w-full px-3 py-2 text-left text-xs font-medium text-[#2C2723] hover:text-[#B88D65] hover:bg-[#F2EFE9] rounded-xl transition cursor-pointer group"
                         >
-                          Mi OBJETIA
+                          <LayoutGrid className="h-4 w-4 text-[#7D756D] group-hover:text-[#B88D65] transition-colors shrink-0" />
+                          <span>Mi OBJETIA</span>
                         </Link>
 
                         {/* 2. Mi Perfil */}
                         <Link 
                           href="/mi-objetia?tab=perfil" 
                           onClick={() => setMenuAbierto(false)}
-                          className="w-full px-3 py-2 text-left text-xs font-medium text-[#2C2723] hover:text-[#B88D65] hover:bg-[#F2EFE9] rounded-xl transition cursor-pointer block"
+                          className="flex items-center gap-2.5 w-full px-3 py-2 text-left text-xs font-medium text-[#2C2723] hover:text-[#B88D65] hover:bg-[#F2EFE9] rounded-xl transition cursor-pointer group"
                         >
-                          Mi Perfil
+                          <User className="h-4 w-4 text-[#7D756D] group-hover:text-[#B88D65] transition-colors shrink-0" />
+                          <span>Mi Perfil</span>
                         </Link>
 
-                        {/* 3. Cerrar Sesión */}
-                        <div className="pt-1 border-t border-[#EAE5DC]">
+                        {/* 3. Cerrar Sesión (mismo estilo y color que las otras opciones) */}
+                        <div className="pt-1 mt-1 border-t border-[#EAE5DC]">
                           <button 
                             onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}
-                            className="w-full px-3 py-2 text-left text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition cursor-pointer block"
+                            className="flex items-center gap-2.5 w-full px-3 py-2 text-left text-xs font-medium text-[#2C2723] hover:text-[#B88D65] hover:bg-[#F2EFE9] rounded-xl transition cursor-pointer group"
                           >
-                            Cerrar Sesión
+                            <LogOut className="h-4 w-4 text-[#7D756D] group-hover:text-[#B88D65] transition-colors shrink-0" />
+                            <span>Cerrar Sesión</span>
                           </button>
                         </div>
                       </div>
