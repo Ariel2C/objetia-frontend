@@ -43,9 +43,7 @@ function LoginIllustration() {
     <path d="M93 44 V50" stroke="#362C24" strokeWidth="2.1" strokeLinecap="round" />
   </g>
 
-  {/* Destellos de bienvenida / seguridad */}
-  <path d="M82 22 L83.5 17 L85 22 L90 23.5 L85 25 L83.5 30 L82 25 L77 23.5 Z" fill="#D69760" stroke="#362C24" strokeWidth="1.2" />
-  <path d="M19 40 L20 36 L21 40 L25 41 L21 42 L20 46 L19 42 L15 41 Z" fill="#D69760" stroke="#362C24" strokeWidth="1.2" />
+  
 </svg>
   );
 }
@@ -79,10 +77,7 @@ function BestsellersIllustration() {
   {/* Borde superior de la copa */}
   <rect x="30" y="21" width="45" height="5" rx="2.5" fill="#FFFFFF" stroke="#362C24" strokeWidth="2.1" />
 
-  {/* Destellos de campeón / más vendido */}
-  <path d="M52.5 10 L54 6 L55.5 10 L59.5 11.5 L55.5 13 L54 17 L52.5 13 L48.5 11.5 Z" fill="#D69760" stroke="#362C24" strokeWidth="1.2" />
-  <path d="M21 24 L22 20 L23 24 L27 25 L23 26 L22 30 L21 26 L17 25 Z" fill="#D69760" stroke="#362C24" strokeWidth="1.2" />
-  <path d="M83 24 L84 20 L85 24 L89 25 L85 26 L84 30 L83 26 L79 25 Z" fill="#D69760" stroke="#362C24" strokeWidth="1.2" />
+  
 </svg>
   );
 }
@@ -129,9 +124,7 @@ function Under30kIllustration() {
     <path d="M48.5 16 V30 M45 19.5 C45 17.5 51.5 17.5 51.5 21 C51.5 25.5 45.5 24 45.5 27 C45.5 30 52 30 52 27" fill="none" stroke="#FFFFFF" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
   </g>
 
-  {/* Destellos de ahorro */}
-  <path d="M22 28 L23 24 L24 28 L28 29 L24 30 L23 34 L22 30 L18 29 Z" fill="#D69760" stroke="#362C24" strokeWidth="1.2" />
-  <path d="M83 34 L84.5 29 L86 34 L91 35.5 L86 37 L84.5 42 L83 37 L78 35.5 Z" fill="#D69760" stroke="#362C24" strokeWidth="1.2" />
+  
 </svg>
   );
 }
@@ -179,8 +172,7 @@ function PaymentsIllustration() {
   <path d="M22 47 C20 43 20 38 23 34" fill="none" stroke="#D69760" strokeWidth="2" strokeLinecap="round" />
   <path d="M17 49 C14 42 14 35 18 29" fill="none" stroke="#D69760" strokeWidth="2" strokeLinecap="round" />
 
-  {/* Destello de pago confirmado */}
-  <path d="M83 26 L84.5 21 L86 26 L91 27.5 L86 29 L84.5 34 L83 29 L78 27.5 Z" fill="#D69760" stroke="#362C24" strokeWidth="1.2" />
+  
 </svg>
   );
 }
@@ -220,8 +212,7 @@ function SecureShoppingIllustration() {
     <path d="M25 18 C23 13 28 12 29 16 C29 18 27 19 25 18 Z" fill="#78886D" stroke="#362C24" strokeWidth="1" />
   </g>
 
-  {/* Destellos de protección */}
-  <path d="M83 22 L84.5 17 L86 22 L91 23.5 L86 25 L84.5 30 L83 25 L78 23.5 Z" fill="#D69760" stroke="#362C24" strokeWidth="1.2" />
+  
 </svg>
   );
 }
@@ -260,10 +251,7 @@ function OffersIllustration() {
     <path d="M72 34 L66 43 H72 L68 52 L78 41 H72 Z" fill="#FFFFFF" stroke="#362C24" strokeWidth="1.3" strokeLinejoin="round" />
   </g>
 
-  {/* Destellos de rebaja */}
-  <path d="M19 28 L20 24 L21 28 L25 29 L21 30 L20 34 L19 30 L15 29 Z" fill="#D69760" stroke="#362C24" strokeWidth="1.2" />
-  <path d="M84 20 L85.5 15 L87 20 L92 21.5 L87 23 L85.5 28 L84 23 L79 21.5 Z" fill="#D69760" stroke="#362C24" strokeWidth="1.2" />
-  <path d="M21 68 L22 65 L23 68 L26 69 L23 70 L22 73 L21 70 L18 69 Z" fill="#D69760" stroke="#362C24" strokeWidth="1.2" />
+  
 </svg>
   );
 }
@@ -431,10 +419,10 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
             key={card.id}
             href={card.link_url}
             onClick={(e) => handleCardClick(e, card)}
-            className="w-[148px] sm:w-[164px] md:w-[180px] min-h-[246px] sm:min-h-[256px] flex-shrink-0 snap-start bg-[#FAF8F5] border border-[#EAE5DC] hover:border-[#B88D65]/50 rounded-[22px] p-3.5 sm:p-4 shadow-[0_4px_16px_rgba(78,66,52,0.06)] hover:shadow-[0_8px_24px_rgba(78,66,52,0.12)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between items-center text-center group/card cursor-pointer select-none"
+            className="w-[148px] sm:w-[164px] md:w-[180px] flex-shrink-0 snap-start bg-[#FAF8F5] border border-[#EAE5DC] hover:border-[#B88D65]/50 rounded-[22px] p-4 sm:p-5 shadow-[0_4px_16px_rgba(78,66,52,0.06)] hover:shadow-[0_8px_24px_rgba(78,66,52,0.12)] hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center group/card cursor-pointer select-none"
           >
             {/* 1. Dibujo / Ilustración Exclusiva Objetia (Sin fondo circular y ampliada) */}
-            <div className="h-[96px] sm:h-[104px] w-full flex items-center justify-center transition-transform duration-300 group-hover/card:scale-105">
+            <div className="h-[96px] sm:h-[104px] w-full flex items-center justify-center transition-transform duration-300 group-hover/card:scale-105 mb-2">
               <CardIllustration 
                 iconType={card.icon_type} 
                 imageUrl={card.image_url} 
@@ -443,7 +431,7 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
             </div>
 
             {/* 2. Título y Descripción de la Tarjeta */}
-            <div className="my-1 flex flex-col items-center justify-center w-full px-1">
+            <div className="flex flex-col items-center justify-center w-full px-1">
               <h3 className="text-xs sm:text-[13px] font-semibold text-[#2C2723] group-hover/card:text-[#A97950] transition-colors leading-snug tracking-tight text-center line-clamp-1">
                 {card.title}
               </h3>
@@ -454,11 +442,7 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
               )}
             </div>
 
-            {/* 3. Botón Píldora */}
-            <div className="w-full py-1.5 sm:py-2 px-2 rounded-full bg-[#B88D65] group-hover/card:bg-[#A37953] text-white text-[10px] sm:text-[11px] font-medium text-center transition-colors shadow-2xs">
-              <span className="truncate block">{card.button_text || "Ver más"}</span>
-            </div>
-          </Link>
+            </Link>
         ))}
       </div>
 
