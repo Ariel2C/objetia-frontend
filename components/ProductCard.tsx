@@ -128,10 +128,10 @@ export default function ProductCard({
   return (
     <Link
       href={`/products/${producto.id}`}
-      className="group relative bg-white border border-gray-100 rounded-none overflow-hidden shadow-xs hover:shadow-md transition-all duration-300 flex flex-col justify-between h-full cursor-pointer select-none"
+      className="group relative bg-[#FAF8F5] border border-[#EAE5DC] hover:border-[#B88D65]/40 rounded-2xl overflow-hidden shadow-2xs hover:shadow-[0_8px_24px_rgba(78,66,52,0.1)] transition-all duration-300 flex flex-col justify-between h-full cursor-pointer select-none"
     >
       {/* SECCIÓN DE IMAGEN DE PRODUCTO (Fotografía vertical 4:5 un poco más alta) */}
-      <div className="relative aspect-[4/5] w-full bg-gray-50 overflow-hidden">
+      <div className="relative aspect-[4/5] w-full bg-[#F5F2EB] overflow-hidden">
         <Image
           src={producto.image_url || "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=600"}
           alt={formatearTituloProducto(producto.title)}
@@ -152,28 +152,28 @@ export default function ProductCard({
             const end = new Date(campanaActiva.fin).getTime();
             if (now < start || now > end) return null;
             return (
-              <span className="px-2 py-0.5 text-[8.5px] sm:text-[9px] font-bold uppercase tracking-wider rounded-full bg-[#F5F0E1] text-gray-900 shadow-xs border border-amber-200/50">
+              <span className="px-2 py-0.5 text-[8.5px] sm:text-[9px] font-bold uppercase tracking-wider rounded-full bg-[#FAF0E6] text-[#2C2723] shadow-xs border border-[#EAE5DC]">
                 {campanaActiva.badgeTexto}
               </span>
             );
           })()}
           {producto.is_new && (
-            <span className="px-2 py-0.5 text-[8.5px] sm:text-[9px] font-bold uppercase tracking-wider rounded-full bg-[#F5F0E1] text-gray-900 shadow-xs border border-amber-200/50">
+            <span className="px-2 py-0.5 text-[8.5px] sm:text-[9px] font-bold uppercase tracking-wider rounded-full bg-[#FAF0E6] text-[#2C2723] shadow-xs border border-[#EAE5DC]">
               NUEVO INGRESO
             </span>
           )}
           {producto.condition === "USED" && (
-            <span className="px-2 py-0.5 text-[8.5px] sm:text-[9px] font-bold uppercase tracking-wider rounded-full bg-[#F5F0E1] text-gray-900 shadow-xs border border-amber-200/50">
+            <span className="px-2 py-0.5 text-[8.5px] sm:text-[9px] font-bold uppercase tracking-wider rounded-full bg-[#FAF0E6] text-[#2C2723] shadow-xs border border-[#EAE5DC]">
               USADO ÚNICO
             </span>
           )}
         </div>
 
-        {/* BOTÓN FAVORITO FLOTANTE CIRCULAR BLANCO */}
+        {/* BOTÓN FAVORITO FLOTANTE CIRCULAR */}
         <button 
           onClick={handleFavorito}
           aria-label={esFavorito ? "Quitar de favoritos" : "Agregar a favoritos"}
-          className="absolute top-2.5 right-2.5 p-1.5 bg-white/90 backdrop-blur-xs rounded-full text-gray-700 hover:text-red-500 transition-all shadow-sm z-20 cursor-pointer flex items-center justify-center"
+          className="absolute top-2.5 right-2.5 p-1.5 bg-[#FAF8F5]/90 backdrop-blur-xs rounded-full border border-[#EAE5DC] text-[#5C4A3A] hover:text-red-500 transition-all shadow-xs z-20 cursor-pointer flex items-center justify-center"
         >
           <Heart className={`h-3.5 w-3.5 transition-colors ${esFavorito ? "fill-red-500 text-red-500" : ""}`} />
         </button>
@@ -193,15 +193,15 @@ export default function ProductCard({
       </div>
 
       {/* SECCIÓN INFERIOR DE TEXTO (ESTILO E-COMMERCE MODERNO COMO LA FOTO) */}
-      <div className="p-2.5 sm:p-3 bg-white flex flex-col justify-between flex-grow space-y-1 text-left">
+      <div className="p-2.5 sm:p-3 bg-[#FAF8F5] flex flex-col justify-between flex-grow space-y-1 text-left">
         {/* TÍTULO DEL PRODUCTO EN 2 LÍNEAS LIMPIAS */}
-        <h3 className="text-xs sm:text-[13px] font-normal text-gray-700 text-left line-clamp-2 leading-snug tracking-normal group-hover:text-purple-700 transition">
+        <h3 className="text-xs sm:text-[13px] font-medium text-[#2C2723] text-left line-clamp-2 leading-snug tracking-normal group-hover:text-[#B88D65] transition-colors">
           {formatearTituloProducto(producto.title)}
         </h3>
 
         {/* PRECIO */}
         <div className="flex flex-col text-left space-y-0.5 pt-0.5">
-          <FormattedPrice price={producto.price} showCents={false} className="text-base sm:text-lg font-semibold text-gray-900 text-left tracking-tight leading-none" />
+          <FormattedPrice price={producto.price} showCents={false} className="text-base sm:text-lg font-bold text-[#2C2723] text-left tracking-tight leading-none" />
         </div>
       </div>
     </Link>

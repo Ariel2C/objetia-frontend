@@ -3,7 +3,7 @@ import React from 'react';
 
 export default function SkeletonCard() {
   return (
-    <div className="border border-gray-100 rounded-2xl overflow-hidden p-4 bg-white space-y-4">
+    <div className="border border-[#EAE5DC] rounded-2xl overflow-hidden p-4 bg-[#FAF8F5] space-y-4 shadow-2xs">
       <div className="aspect-square skeleton-shimmer rounded-xl w-full" />
       <div className="h-4 skeleton-shimmer rounded w-1/3" />
       <div className="h-4 skeleton-shimmer rounded w-3/4" />

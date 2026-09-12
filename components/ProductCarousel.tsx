@@ -82,21 +82,19 @@ export default function ProductCarousel({ title, categoryFilter, productos, clas
 
   return (
     <div className={`max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-slide-up ${className || 'mt-6'}`}>
-      <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm relative group/carousel">
+      <div className="bg-[#FAF8F5] border border-[#EAE5DC] rounded-3xl p-5 sm:p-6 shadow-[0_4px_24px_rgba(78,66,52,0.06)] relative group/carousel">
         
         {/* CABECERA: TÍTULO E INDICADORES DE PÁGINA */}
         <div className="flex justify-between items-baseline mb-4">
           <div className="flex items-baseline gap-3">
             <h2 
-              className="text-base md:text-lg font-bold tracking-tight"
-              style={{ color: 'var(--color-section-title, #111827)' }}
+              className="text-base md:text-lg font-bold tracking-tight text-[#2C2723]"
             >
               {title}
             </h2>
             <Link 
               href={`/catalog?category=${encodeURIComponent(categoryFilter || 'Todos')}`}
-              className="text-xs font-bold hover:underline"
-              style={{ color: 'var(--color-catalog-link, #3B82F6)' }}
+              className="text-xs font-bold text-[#B88D65] hover:text-[#A37953] hover:underline"
             >
               Ver catálogo &rarr;
             </Link>
@@ -110,8 +108,8 @@ export default function ProductCarousel({ title, categoryFilter, productos, clas
                   key={index}
                   className={`h-1 rounded-full transition-all duration-500 ${
                     index === currentPage 
-                      ? 'w-7 bg-[var(--color-secondary)]' 
-                      : 'w-2.5 bg-gray-200'
+                      ? 'w-7 bg-[#B88D65]' 
+                      : 'w-2.5 bg-[#EAE5DC]'
                   }`}
                 />
               ))}
@@ -128,7 +126,7 @@ export default function ProductCarousel({ title, categoryFilter, productos, clas
               type="button"
               onClick={() => scroll('left')}
               aria-label="Ver productos anteriores"
-              className="absolute left-0 top-1/2 -translate-y-1/2 -ml-6 z-20 p-3 rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:bg-gray-50 active:scale-95 transition opacity-0 group-hover/carousel:opacity-100 cursor-pointer hidden md:flex"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -ml-3 sm:-ml-5 z-20 p-2.5 sm:p-3 rounded-full bg-[#FAF8F5] shadow-md border border-[#EAE5DC] text-[#5C4A3A] hover:bg-white active:scale-95 transition opacity-0 group-hover/carousel:opacity-100 cursor-pointer hidden md:flex items-center justify-center"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
@@ -140,7 +138,7 @@ export default function ProductCarousel({ title, categoryFilter, productos, clas
               type="button"
               onClick={() => scroll('right')}
               aria-label="Ver más productos"
-              className="absolute right-0 top-1/2 -translate-y-1/2 -mr-6 z-20 p-3 rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:bg-gray-50 active:scale-95 transition opacity-0 group-hover/carousel:opacity-100 cursor-pointer hidden md:flex"
+              className="absolute right-0 top-1/2 -translate-y-1/2 -mr-3 sm:-mr-5 z-20 p-2.5 sm:p-3 rounded-full bg-[#FAF8F5] shadow-md border border-[#EAE5DC] text-[#5C4A3A] hover:bg-white active:scale-95 transition opacity-0 group-hover/carousel:opacity-100 cursor-pointer hidden md:flex items-center justify-center"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
