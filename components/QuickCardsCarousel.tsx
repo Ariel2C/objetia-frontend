@@ -5,16 +5,13 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { QuickAccessCard } from '../lib/types';
 
 // ==============================================================================
-// ILUSTRACIONES VECTORIALES EXCLUSIVAS DE OBJETIA (PALETA CÁLIDA ORGÁNICA)
+// ILUSTRACIONES VECTORIALES EXCLUSIVAS DE OBJETIA (SIN FONDO CIRCULAR, GRAN ESCALA)
 // ==============================================================================
 
 // 1. Ingresá a tu cuenta: Dispositivo móvil con tarjeta de perfil, avatar cálido y llave de acceso
 function LoginIllustration() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105 105" fill="none" className="w-20 h-20 sm:w-22 sm:h-22 md:w-[90px] md:h-[90px]">
-  {/* Fondo circular suave orgánico */}
-  <circle cx="52.5" cy="52.5" r="45" fill="#EDE7DD" />
-
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="5 5 95 95" overflow="visible" className="w-22 h-22 sm:w-24 sm:h-24 md:w-[96px] md:h-[96px]" fill="none">
   {/* Smartphone / Dispositivo móvil de acceso */}
   <rect x="25" y="16" width="46" height="74" rx="8" fill="#FFFFFF" stroke="#362C24" strokeWidth="2.1" />
   
@@ -56,10 +53,7 @@ function LoginIllustration() {
 // 2. Más vendidos: Trofeo de victoria con estrella central, base pedestal y cintas de gala
 function BestsellersIllustration() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105 105" fill="none" className="w-20 h-20 sm:w-22 sm:h-22 md:w-[90px] md:h-[90px]">
-  {/* Fondo circular suave orgánico */}
-  <circle cx="52.5" cy="52.5" r="45" fill="#EDE7DD" />
-
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="5 5 95 95" overflow="visible" className="w-22 h-22 sm:w-24 sm:h-24 md:w-[96px] md:h-[96px]" fill="none">
   {/* Cintas decorativas de premiación detrás del trofeo */}
   <path d="M37 66 L25 82 L35 79 L42 84 L39 68" fill="#C48B5E" stroke="#362C24" strokeWidth="2" strokeLinejoin="round" />
   <path d="M68 66 L80 82 L70 79 L63 84 L66 68" fill="#C48B5E" stroke="#362C24" strokeWidth="2" strokeLinejoin="round" />
@@ -96,10 +90,7 @@ function BestsellersIllustration() {
 // 3. Menos de $30.000: Alcancía / Cerdito de ahorro moderno con gran moneda $ en tono miel
 function Under30kIllustration() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105 105" fill="none" className="w-20 h-20 sm:w-22 sm:h-22 md:w-[90px] md:h-[90px]">
-  {/* Fondo circular suave orgánico */}
-  <circle cx="52.5" cy="52.5" r="45" fill="#EDE7DD" />
-
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="5 5 95 95" overflow="visible" className="w-22 h-22 sm:w-24 sm:h-24 md:w-[96px] md:h-[96px]" fill="none">
   {/* Alcancía / Piggy Bank estilizada moderna */}
   {/* Patitas */}
   <rect x="31" y="70" width="8" height="12" rx="3" fill="#FFFFFF" stroke="#362C24" strokeWidth="2" />
@@ -148,10 +139,7 @@ function Under30kIllustration() {
 // 4. Medios de pago: Tarjeta de crédito contactless con chip EMV sobre terminal de pago POS
 function PaymentsIllustration() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105 105" fill="none" className="w-20 h-20 sm:w-22 sm:h-22 md:w-[90px] md:h-[90px]">
-  {/* Fondo circular suave orgánico */}
-  <circle cx="52.5" cy="52.5" r="45" fill="#EDE7DD" />
-
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="5 5 95 95" overflow="visible" className="w-22 h-22 sm:w-24 sm:h-24 md:w-[96px] md:h-[96px]" fill="none">
   {/* Terminal de cobro / Datáfono (POS) en la base */}
   <rect x="32" y="44" width="45" height="42" rx="6" fill="#FFFFFF" stroke="#362C24" strokeWidth="2.1" />
   
@@ -200,10 +188,7 @@ function PaymentsIllustration() {
 // 5. Compra protegida: Paquete de entrega sellado con escudo de seguridad, checkmark y detalle botánico
 function SecureShoppingIllustration() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105 105" fill="none" className="w-20 h-20 sm:w-22 sm:h-22 md:w-[90px] md:h-[90px]">
-  {/* Fondo circular suave orgánico */}
-  <circle cx="52.5" cy="52.5" r="45" fill="#EDE7DD" />
-
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="5 5 95 95" overflow="visible" className="w-22 h-22 sm:w-24 sm:h-24 md:w-[96px] md:h-[96px]" fill="none">
   {/* Paquete de entrega / Caja de envío en perspectiva frontal */}
   <rect x="22" y="38" width="46" height="42" rx="4" fill="#FFFFFF" stroke="#362C24" strokeWidth="2.1" />
   
@@ -244,10 +229,7 @@ function SecureShoppingIllustration() {
 // 6. En oferta: Bolsa boutique de compras con sello de % de descuento, etiqueta flash y destellos
 function OffersIllustration() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 105 105" fill="none" className="w-20 h-20 sm:w-22 sm:h-22 md:w-[90px] md:h-[90px]">
-  {/* Fondo circular suave orgánico */}
-  <circle cx="52.5" cy="52.5" r="45" fill="#EDE7DD" />
-
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="5 5 95 95" overflow="visible" className="w-22 h-22 sm:w-24 sm:h-24 md:w-[96px] md:h-[96px]" fill="none">
   {/* Bolsa de compras de boutique (Shopping Bag) */}
   {/* Manijas de la bolsa */}
   <path d="M37 32 C37 20 49 20 49 32" fill="none" stroke="#362C24" strokeWidth="2.2" strokeLinecap="round" />
@@ -290,7 +272,7 @@ function OffersIllustration() {
 function CardIllustration({ iconType, imageUrl, title }: { iconType?: string | null; imageUrl?: string | null; title: string }) {
   if (imageUrl && imageUrl.trim() !== "" && imageUrl !== "null") {
     return (
-      <div className="h-20 w-20 sm:h-22 sm:w-22 md:h-[90px] md:w-[90px] flex items-center justify-center overflow-hidden rounded-xl">
+      <div className="h-22 w-22 sm:h-24 sm:w-24 md:h-[96px] md:w-[96px] flex items-center justify-center overflow-hidden rounded-xl">
         <img src={imageUrl} alt={title} className="max-h-full max-w-full object-contain" />
       </div>
     );
@@ -331,7 +313,7 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
     {
       id: 1,
       title: "Ingresá a tu cuenta",
-      subtitle: "",
+      subtitle: "Gestioná tus compras, ventas y mensajes.",
       icon_type: "login",
       button_text: "Ingresá a tu cuenta",
       link_url: "/auth?mode=login",
@@ -341,7 +323,7 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
     {
       id: 2,
       title: "Más vendidos",
-      subtitle: "",
+      subtitle: "Explorá las piezas más elegidas y en tendencia.",
       icon_type: "bestsellers",
       button_text: "Ver más",
       link_url: "/catalog?sort=popular",
@@ -351,7 +333,7 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
     {
       id: 3,
       title: "Menos de $30.000",
-      subtitle: "",
+      subtitle: "Descubrí objetos de diseño a precios accesibles.",
       icon_type: "under_30k",
       button_text: "Ver productos",
       link_url: "/catalog?max_price=30000",
@@ -361,7 +343,7 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
     {
       id: 4,
       title: "Medios de pago",
-      subtitle: "",
+      subtitle: "Pagá tus compras de forma rápida y segura.",
       icon_type: "payments",
       button_text: "Ver medios",
       link_url: "#medios-de-pago",
@@ -371,7 +353,7 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
     {
       id: 5,
       title: "Compra protegida",
-      subtitle: "",
+      subtitle: "Tu compra y envíos están 100% protegidos.",
       icon_type: "secure_shopping",
       button_text: "Cómo funciona",
       link_url: "#compra-protegida",
@@ -381,7 +363,7 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
     {
       id: 6,
       title: "En oferta",
-      subtitle: "",
+      subtitle: "Oportunidades únicas con descuentos especiales.",
       icon_type: "offers",
       button_text: "Ver ofertas",
       link_url: "/catalog?on_sale=true",
@@ -449,10 +431,10 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
             key={card.id}
             href={card.link_url}
             onClick={(e) => handleCardClick(e, card)}
-            className="w-[144px] sm:w-[158px] md:w-[174px] aspect-[4/5] flex-shrink-0 snap-start bg-[#FAF8F5] border border-[#EAE5DC] hover:border-[#B88D65]/50 rounded-[22px] p-3.5 sm:p-4 shadow-[0_4px_16px_rgba(78,66,52,0.06)] hover:shadow-[0_8px_24px_rgba(78,66,52,0.12)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between items-center text-center group/card cursor-pointer select-none"
+            className="w-[148px] sm:w-[164px] md:w-[180px] min-h-[246px] sm:min-h-[256px] flex-shrink-0 snap-start bg-[#FAF8F5] border border-[#EAE5DC] hover:border-[#B88D65]/50 rounded-[22px] p-3.5 sm:p-4 shadow-[0_4px_16px_rgba(78,66,52,0.06)] hover:shadow-[0_8px_24px_rgba(78,66,52,0.12)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between items-center text-center group/card cursor-pointer select-none"
           >
-            {/* 1. Dibujo / Ilustración Exclusiva Objetia */}
-            <div className="flex-1 w-full flex items-center justify-center transition-transform duration-300 group-hover/card:scale-105">
+            {/* 1. Dibujo / Ilustración Exclusiva Objetia (Sin fondo circular y ampliada) */}
+            <div className="h-[96px] sm:h-[104px] w-full flex items-center justify-center transition-transform duration-300 group-hover/card:scale-105">
               <CardIllustration 
                 iconType={card.icon_type} 
                 imageUrl={card.image_url} 
@@ -460,11 +442,16 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
               />
             </div>
 
-            {/* 2. Título de la Tarjeta */}
-            <div className="my-1.5 flex items-center justify-center w-full min-h-[26px]">
+            {/* 2. Título y Descripción de la Tarjeta */}
+            <div className="my-1 flex flex-col items-center justify-center w-full px-1">
               <h3 className="text-xs sm:text-[13px] font-semibold text-[#2C2723] group-hover/card:text-[#A97950] transition-colors leading-snug tracking-tight text-center line-clamp-1">
                 {card.title}
               </h3>
+              {card.subtitle && (
+                <p className="text-[10.5px] sm:text-[11px] text-[#73675C] leading-snug text-center line-clamp-2 mt-1 min-h-[26px]">
+                  {card.subtitle}
+                </p>
+              )}
             </div>
 
             {/* 3. Botón Píldora */}
