@@ -465,7 +465,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
           </div>
 
           {/* CUADRO DE BÚSQUEDA INTEGRADO ESTILO GOOGLE AI STUDIO */}
-          <div className="flex-1 max-w-md mx-4 hidden md:block">
+          <div className="flex-1 max-w-md mx-auto hidden md:block px-4">
             <form onSubmit={handleNavbarSearch} className="flex items-center bg-[#1e1f20] border border-[#333538] hover:border-[#444746] focus-within:border-[#87a9ff] rounded-xl transition shadow-xs overflow-hidden">
               <div className="pl-3.5 pr-1 flex items-center text-[#9aa0a6]">
                 <Search className="h-4 w-4" />
@@ -739,7 +739,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
       {!pathname?.startsWith('/mi-objetia') && !pathname?.startsWith('/mi-espacio') && !pathname?.startsWith('/root') && (
         <div className="border-t border-[#282a2c] bg-[#18181a]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center space-x-1 sm:space-x-2 py-1.5 text-[9.5px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6] overflow-x-auto no-scrollbar scrollbar-none whitespace-nowrap">
+            <div className="flex items-center justify-start sm:justify-center space-x-1 sm:space-x-2 py-1.5 text-[9.5px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6] overflow-x-auto no-scrollbar scrollbar-none whitespace-nowrap">
               
               {/* 1. NUEVOS INGRESOS */}
               <Link href="/catalog?sort=newest" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0 text-[9.5px] font-medium uppercase tracking-[0.2em]">
