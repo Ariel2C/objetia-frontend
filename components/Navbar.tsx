@@ -435,12 +435,12 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     return true;
   }, [navBgColorState]);
 
-  const iconBtnClass = "relative text-[#c4c7c5] hover:text-[#f1f3f4] hover:bg-[#282a2c] p-2 rounded-xl transition cursor-pointer flex items-center justify-center";
+  const iconBtnClass = "relative text-[#4A433E] hover:text-[#1A1614] hover:bg-[#EFECE6] p-2 rounded-full transition cursor-pointer flex items-center justify-center";
 
   if (isRootTab) return null;
 
   return (
-    <nav className="bg-[#131314] border-b border-[#282a2c] sticky top-0 z-50 transition-colors duration-200 shadow-sm">
+    <nav className="bg-[#FAF8F5] border-b border-[#EAE6DF] sticky top-0 z-50 transition-colors duration-200 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center gap-4">
           
@@ -457,17 +457,17 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   fontFamily: `var(--font-family-brand, ${brandFontFamilyState})`,
                   fontSize: `var(--font-size-brand, ${brandFontSizeState})`
                 }} 
-                className="font-black tracking-wider uppercase leading-none text-[#f1f3f4]"
+                className="font-black tracking-wider uppercase leading-none text-[#231F1D]"
               >
                 {brandNameState || 'OBJETIA'}
               </span>
             </Link>
           </div>
 
-          {/* CUADRO DE BÚSQUEDA INTEGRADO ESTILO GOOGLE AI STUDIO */}
+          {/* CUADRO DE BÚSQUEDA INTEGRADO EN PÍLDORA */}
           <div className="flex-1 max-w-md mx-auto hidden md:block px-4">
-            <form onSubmit={handleNavbarSearch} className="flex items-center bg-[#1e1f20] border border-[#333538] hover:border-[#444746] focus-within:border-[#87a9ff] rounded-xl transition shadow-xs overflow-hidden">
-              <div className="pl-3.5 pr-1 flex items-center text-[#9aa0a6]">
+            <form onSubmit={handleNavbarSearch} className="flex items-center bg-white border border-[#E2DDD5] hover:border-[#CDC7BD] focus-within:border-[#B58A63] focus-within:ring-1 focus-within:ring-[#B58A63]/30 rounded-full transition shadow-xs overflow-hidden">
+              <div className="pl-4 pr-1.5 flex items-center text-[#7D756D]">
                 <Search className="h-4 w-4" />
               </div>
               <input 
@@ -475,13 +475,13 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                 value={navbarSearch}
                 onChange={(e) => setNavbarSearch(e.target.value)}
                 placeholder="Buscar muebles, iluminación, decoración..." 
-                className="w-full bg-transparent px-2.5 py-2 text-xs text-[#e3e3e3] placeholder-[#80868b] focus:outline-none"
+                className="w-full bg-transparent px-2 py-2 text-xs text-[#231F1D] placeholder-[#8E867E] focus:outline-none"
               />
               {navbarSearch.trim() && (
                 <button 
                   type="submit"
                   aria-label="Buscar"
-                  className="px-3 py-1 mr-1 text-[11px] font-medium text-[#87a9ff] hover:text-[#a8c7fa] cursor-pointer"
+                  className="px-3.5 py-1 mr-1 text-[11px] font-medium text-[#B58A63] hover:text-[#9A704A] cursor-pointer"
                 >
                   Buscar
                 </button>
@@ -492,11 +492,11 @@ export default function Navbar({ logoUrl }: NavbarProps) {
           {/* SECCIÓN USUARIO Y ACCIONES DE CABECERA */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             
-            {/* BOTÓN VENDER (ESTILO GOOGLE AI STUDIO ACCENT) */}
+            {/* BOTÓN VENDER (PÍLDORA EN TONO CARAMELO/TOSTADO SUAVE) */}
             {(!usuario || tienePermiso('sell_products') || tienePermiso('publications') || tienePermiso('sales') || tienePermiso('full_access') || ['root', 'admin', 'seller', 'cliente', 'client'].includes(usuario?.role?.toLowerCase() || '')) && (
               <button 
                 onClick={handleBotonVender}
-                className="inline-flex items-center justify-center bg-[#87a9ff] hover:bg-[#a8c7fa] text-[#131314] text-[9.5px] font-semibold uppercase tracking-[0.2em] px-3.5 py-1.5 rounded-lg transition shadow-xs active:scale-98 cursor-pointer"
+                className="inline-flex items-center justify-center bg-[#B58A63] hover:bg-[#A37953] text-white text-[9.5px] font-semibold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full transition shadow-xs active:scale-98 cursor-pointer"
               >
                 VENDER
               </button>
@@ -512,7 +512,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   <Link href="/products/favorites" className={iconBtnClass} title="Mis Favoritos">
                     <Heart className="h-5 w-5" />
                     {favoritosCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center border border-[#131314] shadow-xs animate-pulse">
+                      <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-rose-500 text-white text-[9px] font-bold flex items-center justify-center border border-[#FAF8F5] shadow-xs">
                         {favoritosCount}
                       </span>
                     )}
@@ -522,7 +522,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   <Link href="/mi-objetia?tab=chat" className={iconBtnClass} title="Mis Mensajes">
                     <MessageSquare className="h-5 w-5" />
                     {unreadChatsCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-[#87a9ff] text-[#131314] text-[9px] font-bold flex items-center justify-center border border-[#131314] shadow-xs animate-pulse">
+                      <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full bg-[#B58A63] text-white text-[9px] font-bold flex items-center justify-center border border-[#FAF8F5] shadow-xs">
                         {unreadChatsCount}
                       </span>
                     )}
@@ -533,28 +533,27 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                     <button 
                       onClick={() => setNotifAbierto(!notifAbierto)}
                       aria-label="Notificaciones"
-                      className={`${iconBtnClass} ${notifAbierto ? 'bg-[#282a2c] text-[#f1f3f4]' : ''} focus:outline-none`}
+                      className={`${iconBtnClass} ${notifAbierto ? 'bg-[#EFECE6] text-[#1A1614]' : ''} focus:outline-none`}
                       title="Notificaciones"
                     >
                       <Bell className="h-5 w-5" />
                       {unreadNotifsCount > 0 && (
                         <span 
-                          className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full text-[9px] font-bold text-[#131314] bg-[#87a9ff] border border-[#131314] flex items-center justify-center shadow-xs leading-none"
+                          className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full text-[9px] font-bold text-white bg-[#B58A63] border border-[#FAF8F5] flex items-center justify-center shadow-xs leading-none"
                         >
                           {unreadNotifsCount}
                         </span>
                       )}
                     </button>
 
-                    {/* DROPDOWN NOTIFICACIONES - GOOGLE AI STUDIO DARK STYLE */}
+                    {/* DROPDOWN NOTIFICACIONES */}
                     {notifAbierto && (
-                      <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 overflow-hidden animate-scale-in origin-top-right">
-                        {/* Cabecera estilo Google AI Studio */}
-                        <div className="flex justify-between items-center px-4 py-3 border-b border-[#282a2c] bg-[#1e1f20]">
+                      <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white border border-[#EAE6DF] rounded-2xl shadow-2xl shadow-black/10 z-50 overflow-hidden animate-scale-in origin-top-right">
+                        <div className="flex justify-between items-center px-4 py-3 border-b border-[#EAE6DF] bg-[#FAF8F5]">
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-semibold text-[#e3e3e3]">Notificaciones</span>
+                            <span className="text-xs font-semibold text-[#231F1D]">Notificaciones</span>
                             {unreadNotifsCount > 0 && (
-                              <span className="text-[10px] font-semibold bg-[#282a2c] text-[#87a9ff] px-1.5 py-0.5 rounded-md border border-[#3c4043]">
+                              <span className="text-[10px] font-semibold bg-[#EFECE6] text-[#B58A63] px-1.5 py-0.5 rounded-md border border-[#E2DDD5]">
                                 {unreadNotifsCount}
                               </span>
                             )}
@@ -562,18 +561,18 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                           {unreadNotifsCount > 0 && (
                             <button 
                               onClick={marcarTodasComoLeidas}
-                              className="text-[11px] text-[#87a9ff] hover:text-[#a8c7fa] font-medium transition cursor-pointer"
+                              className="text-[11px] text-[#B58A63] hover:text-[#9A704A] font-medium transition cursor-pointer"
                             >
                               Marcar leídas
                             </button>
                           )}
                         </div>
 
-                        {/* Lista de Notificaciones estilo Google AI Studio Dark */}
+                        {/* Lista de Notificaciones */}
                         <div className="p-2 space-y-1.5 max-h-[320px] overflow-y-auto custom-scrollbar">
                           {notificaciones.length === 0 ? (
                             <div className="py-8 text-center">
-                              <p className="text-xs text-[#8e918f]">No tienes notificaciones pendientes</p>
+                              <p className="text-xs text-[#8E867E]">No tienes notificaciones pendientes</p>
                             </div>
                           ) : (
                             notificaciones.map(n => (
@@ -588,12 +587,12 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                                 }}
                                 className={`p-3 rounded-xl transition cursor-pointer text-left border ${
                                   n.leida 
-                                    ? 'bg-[#1e1f20] hover:bg-[#282a2c]/60 border-transparent text-[#8e918f]' 
-                                    : 'bg-[#282a2c]/50 hover:bg-[#282a2c] border-[#3c4043] text-[#e3e3e3]'
+                                    ? 'bg-white hover:bg-[#FAF8F5] border-transparent text-[#7D756D]' 
+                                    : 'bg-[#FAF8F5] hover:bg-[#F4EFE8] border-[#EAE6DF] text-[#231F1D]'
                                 }`}
                               >
                                 <div className="flex items-start justify-between gap-2">
-                                  <span className={`text-[11px] font-semibold ${n.leida ? 'text-[#c4c7c5]' : 'text-white'}`}>
+                                  <span className={`text-[11px] font-semibold ${n.leida ? 'text-[#5A524C]' : 'text-[#231F1D]'}`}>
                                     {n.tipo === 'telefono' 
                                       ? 'Teléfono de contacto' 
                                       : n.tipo === 'direccion' 
@@ -602,18 +601,18 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                                       ? 'Moderación'
                                       : 'Aviso'}
                                   </span>
-                                  <span className="text-[10px] text-[#8e918f] font-normal shrink-0">
+                                  <span className="text-[10px] text-[#8E867E] font-normal shrink-0">
                                     {n.fecha}
                                   </span>
                                 </div>
 
-                                <p className={`text-xs leading-relaxed mt-1.5 ${n.leida ? 'text-[#8e918f]' : 'text-[#c4c7c5]'}`}>
+                                <p className={`text-xs leading-relaxed mt-1.5 ${n.leida ? 'text-[#7D756D]' : 'text-[#4A433E]'}`}>
                                   {n.texto}
                                 </p>
 
                                 {n.link && (
-                                  <div className="mt-2 pt-2 border-t border-[#333538] flex justify-end">
-                                    <span className="text-[11px] font-medium text-[#87a9ff] hover:text-[#a8c7fa] transition">
+                                  <div className="mt-2 pt-2 border-t border-[#EAE6DF] flex justify-end">
+                                    <span className="text-[11px] font-medium text-[#B58A63] hover:text-[#9A704A] transition">
                                       Completar en mi perfil
                                     </span>
                                   </div>
@@ -630,7 +629,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   <Link href="/cart" className={iconBtnClass} title="Carrito">
                     <ShoppingCart className="h-5 w-5" />
                     {cartCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-[#131314] bg-emerald-500 shadow-xs animate-pulse">
+                      <span className="absolute -top-0.5 -right-0.5 h-4 min-w-[16px] px-1 rounded-full text-[9px] font-bold text-white flex items-center justify-center border border-[#FAF8F5] bg-emerald-600 shadow-xs">
                         {cartCount}
                       </span>
                     )}
@@ -640,66 +639,62 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   <div className="relative" ref={dropdownRef}>
                     <button 
                       onClick={() => setMenuAbierto(!menuAbierto)}
-                      className={`flex items-center gap-2 cursor-pointer focus:outline-none py-1 px-2 rounded-xl hover:bg-[#282a2c] transition group ${menuAbierto ? 'bg-[#282a2c]' : ''}`}
+                      className={`flex items-center gap-2 cursor-pointer focus:outline-none py-1 px-2.5 rounded-full hover:bg-[#EFECE6] transition group ${menuAbierto ? 'bg-[#EFECE6]' : ''}`}
                       title={usuario.full_name || "Mi Perfil"}
                     >
                       <div className="relative shrink-0">
                         {usuario.avatar_url ? (
-                          <img src={usuario.avatar_url} alt="Avatar" className="h-7 w-7 sm:h-8 sm:w-8 rounded-full border border-[#3c4043] object-cover" />
+                          <img src={usuario.avatar_url} alt="Avatar" className="h-7 w-7 sm:h-8 sm:w-8 rounded-full border border-[#D5CFC6] object-cover" />
                         ) : (
-                          <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-[#282a2c] text-[#87a9ff] font-bold flex items-center justify-center border border-[#3c4043] text-xs">
+                          <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-full bg-[#7B6858] text-white font-bold flex items-center justify-center border border-[#D5CFC6] text-xs">
                             {usuario.full_name?.charAt(0).toUpperCase() || 'U'}
                           </div>
                         )}
                       </div>
-                      <span className="text-[9.5px] font-medium uppercase tracking-[0.2em] text-[#e3e3e3] max-w-[100px] sm:max-w-[140px] truncate">
+                      <span className="text-[9.5px] font-semibold uppercase tracking-[0.18em] text-[#231F1D] max-w-[100px] sm:max-w-[140px] truncate">
                         {usuario.full_name || usuario.email?.split('@')[0]}
                       </span>
-                      <ChevronDown className={`h-3.5 w-3.5 transition-transform text-[#9aa0a6] shrink-0 ${menuAbierto ? 'rotate-180 text-white' : ''}`} />
+                      <ChevronDown className={`h-3.5 w-3.5 transition-transform text-[#7D756D] shrink-0 ${menuAbierto ? 'rotate-180 text-[#231F1D]' : ''}`} />
                     </button>
 
-                    {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN - GOOGLE AI STUDIO DARK */}
+                    {/* MENÚ DESPLEGABLE DE MI OBJETIA Y CONFIGURACIÓN */}
                     {menuAbierto && (
-                      <div className="absolute right-0 mt-2 w-44 sm:w-48 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-2 space-y-1.5 animate-scale-in origin-top-right">
+                      <div className="absolute right-0 mt-2 w-44 sm:w-48 bg-white border border-[#EAE6DF] rounded-2xl shadow-2xl shadow-black/10 z-50 p-2 space-y-1.5 animate-scale-in origin-top-right">
                         {(usuario.role?.toLowerCase() === 'admin' || usuario.role?.toLowerCase() === 'administrador') && (
                           <div className="px-1 pt-0.5">
-                            <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#282a2c] text-[#87a9ff] border border-[#3c4043]">
+                            <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-[#FAF8F5] text-[#B58A63] border border-[#EAE6DF]">
                               Administrador
                             </span>
                           </div>
                         )}
                         {(usuario.role?.toLowerCase() === 'root') && (
                           <div className="px-1 pt-0.5">
-                            <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                            <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider rounded-md bg-amber-50 text-amber-700 border border-amber-200">
                               Programador Root
                             </span>
                           </div>
                         )}
 
-                        {/* ==================================================================== */}
-                        {/* TARJETA MI OBJETIA                                                  */}
-                        {/* ==================================================================== */}
+                        {/* TARJETA MI OBJETIA */}
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="group relative block px-2.5 py-2.5 rounded-xl bg-[#131314] hover:bg-[#18191b] border border-[#3c4043] hover:border-[#87a9ff]/50 transition-all duration-200 cursor-pointer text-center overflow-hidden"
+                          className="group relative block px-2.5 py-2.5 rounded-xl bg-[#FAF8F5] hover:bg-[#F2EFE9] border border-[#EAE6DF] hover:border-[#B58A63]/50 transition-all duration-200 cursor-pointer text-center overflow-hidden"
                         >
-                          {/* Transformación 2D fluida en tiempo real (Palabra MI OBJETIA <-> Cuadrado de 4 cuadrados) */}
-                          <MiObjetiaMorph />
+                          <MiObjetiaMorph color="#231F1D" />
 
-                          {/* Sin divisor entre Mi Objetia y gestiona */}
                           <div className="mt-1">
-                            <p className="text-[10px] text-[#9aa0a6] leading-snug group-hover:text-[#c4c7c5] transition-colors text-center">
+                            <p className="text-[10px] text-[#7D756D] leading-snug group-hover:text-[#231F1D] transition-colors text-center">
                               Gestioná tus compras y ventas
                             </p>
                           </div>
                         </Link>
 
-                        {/* Cerrar Sesión centrado abajo */}
+                        {/* Cerrar Sesión */}
                         <div className="pt-0.5">
                           <button 
                             onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}
-                            className="w-full py-2 text-center text-xs font-medium text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 rounded-xl transition cursor-pointer"
+                            className="w-full py-2 text-center text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition cursor-pointer"
                           >
                             Cerrar Sesión
                           </button>
@@ -715,14 +710,14 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                 <div className="flex items-center space-x-3 text-[9.5px] font-medium uppercase tracking-[0.2em]">
                   <Link 
                     href="/auth?mode=register" 
-                    className="text-[#87a9ff] hover:text-[#a8c7fa] transition font-semibold"
+                    className="text-[#B58A63] hover:text-[#9A704A] transition font-semibold"
                   >
                     CREA TU CUENTA
                   </Link>
-                  <span className="text-[#3c4043]">|</span>
+                  <span className="text-[#D5CFC6]">|</span>
                   <Link 
                     href="/auth?mode=login" 
-                    className="text-[#c4c7c5] hover:text-white transition"
+                    className="text-[#5A524C] hover:text-[#1A1614] transition"
                   >
                     INGRESA
                   </Link>
@@ -737,12 +732,12 @@ export default function Navbar({ logoUrl }: NavbarProps) {
 
       {/* SUB-BARRA DE MENÚ DE NAVEGACIÓN - RESPONSIVE HORIZONTAL DESLIZABLE */}
       {!pathname?.startsWith('/mi-objetia') && !pathname?.startsWith('/mi-espacio') && !pathname?.startsWith('/root') && (
-        <div className="border-t border-[#282a2c] bg-[#18181a]">
+        <div className="border-t border-[#EAE6DF] bg-[#FAF8F5]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-start sm:justify-center space-x-1 sm:space-x-2 py-1.5 text-[9.5px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6] overflow-x-auto no-scrollbar scrollbar-none whitespace-nowrap">
+            <div className="flex items-center justify-start sm:justify-center space-x-1 sm:space-x-2 py-1.5 text-[9.5px] font-semibold uppercase tracking-[0.2em] text-[#5A524C] overflow-x-auto no-scrollbar scrollbar-none whitespace-nowrap">
               
               {/* 1. NUEVOS INGRESOS */}
-              <Link href="/catalog?sort=newest" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0 text-[9.5px] font-medium uppercase tracking-[0.2em]">
+              <Link href="/catalog?sort=newest" className="hover:text-[#1A1614] hover:bg-[#EFECE6] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
                 NUEVOS INGRESOS
               </Link>
 
@@ -754,38 +749,38 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               >
                 <button 
                   onClick={() => setDescubrirAbierto(prev => !prev)}
-                  className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer text-[9.5px] font-medium uppercase tracking-[0.2em] text-[#9aa0a6]"
+                  className="hover:text-[#1A1614] hover:bg-[#EFECE6] px-3.5 py-1.5 rounded-full transition flex items-center gap-1 cursor-pointer text-[9.5px] font-semibold uppercase tracking-[0.2em] text-[#5A524C]"
                 >
                   <span>DESCUBRIR</span>
-                  <ChevronDown className={`h-3 w-3 transition-transform ${descubrirAbierto ? 'rotate-180 text-[#87a9ff]' : ''}`} />
+                  <ChevronDown className={`h-3 w-3 transition-transform ${descubrirAbierto ? 'rotate-180 text-[#B58A63]' : ''}`} />
                 </button>
 
                 {descubrirAbierto && (
                   <div 
                     onClick={() => setDescubrirAbierto(false)}
-                    className="absolute left-0 top-full w-56 bg-[#1e1f20] border border-[#333538] rounded-2xl shadow-2xl shadow-black/60 z-50 p-1.5 space-y-0.5 animate-scale-in origin-top-left"
+                    className="absolute left-0 top-full w-56 bg-white border border-[#EAE6DF] rounded-2xl shadow-xl shadow-black/10 z-50 p-1.5 space-y-0.5 animate-scale-in origin-top-left"
                   >
                     <Link
                       href="/catalog?filter=selected"
-                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#5A524C] hover:bg-[#FAF8F5] hover:text-[#1A1614] transition"
                     >
                       Seleccionados de Objetia
                     </Link>
                     <Link
                       href="/catalog?max_price=50000"
-                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#5A524C] hover:bg-[#FAF8F5] hover:text-[#1A1614] transition"
                     >
                       Hallazgos por menos de $50.000
                     </Link>
                     <Link
                       href="/catalog?style=Vintage"
-                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#5A524C] hover:bg-[#FAF8F5] hover:text-[#1A1614] transition"
                     >
                       Vintage
                     </Link>
                     <Link
                       href="/catalog?sort=popular"
-                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#c4c7c5] hover:bg-[#282a2c] hover:text-white transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#5A524C] hover:bg-[#FAF8F5] hover:text-[#1A1614] transition"
                     >
                       Tendencias
                     </Link>
@@ -794,22 +789,22 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               </div>
 
               {/* 3. DECORACIÓN */}
-              <Link href="/catalog?category=Decoración" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0 text-[9.5px] font-medium uppercase tracking-[0.2em]">
+              <Link href="/catalog?category=Decoración" className="hover:text-[#1A1614] hover:bg-[#EFECE6] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
                 DECORACIÓN
               </Link>
 
               {/* 4. ILUMINACIÓN */}
-              <Link href="/catalog?category=Iluminación" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0 text-[9.5px] font-medium uppercase tracking-[0.2em]">
+              <Link href="/catalog?category=Iluminación" className="hover:text-[#1A1614] hover:bg-[#EFECE6] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
                 ILUMINACIÓN
               </Link>
 
               {/* 5. ALFOMBRAS */}
-              <Link href="/catalog?category=Alfombras" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0 text-[9.5px] font-medium uppercase tracking-[0.2em]">
+              <Link href="/catalog?category=Alfombras" className="hover:text-[#1A1614] hover:bg-[#EFECE6] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
                 ALFOMBRAS
               </Link>
 
               {/* 6. EXTERIOR */}
-              <Link href="/catalog?category=Exterior" className="hover:text-white hover:bg-[#282a2c] px-3 py-1.5 rounded-lg transition shrink-0 text-[9.5px] font-medium uppercase tracking-[0.2em]">
+              <Link href="/catalog?category=Exterior" className="hover:text-[#1A1614] hover:bg-[#EFECE6] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
                 EXTERIOR
               </Link>
 

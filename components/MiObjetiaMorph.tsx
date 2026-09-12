@@ -88,7 +88,11 @@ function easeInOutCubic(x: number): number {
   return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
 }
 
-export default function MiObjetiaMorph() {
+interface MiObjetiaMorphProps {
+  color?: string;
+}
+
+export default function MiObjetiaMorph({ color = "#ffffff" }: MiObjetiaMorphProps) {
   const [frame, setFrame] = useState({
     t: 0,
     rotation: 0,
@@ -160,8 +164,8 @@ export default function MiObjetiaMorph() {
       >
         {/* GRUPO PRINCIPAL: Gira 90° en 2D limpio sobre el centro (100, 20) */}
         <g transform={`rotate(${rotation} 100 20)`}>
-          {/* 4 CUADRADOS HUECOS SIN RELLENO (2 ARRIBA, 2 ABAJO - ICONO PANEL DE CONTROL / LAYOUTGRID) */}
-          <g opacity={squareOutlineOpacity} stroke="#ffffff" strokeWidth="1.9" fill="none">
+          {/* 4 CUADRADOS HUECOS SIN RELLENO (2 ARRIBA, 2 ABAJO) */}
+          <g opacity={squareOutlineOpacity} stroke={color} strokeWidth="1.9" fill="none">
             {/* 2 Arriba */}
             <rect x="85.5" y="5.5" width="13" height="13" rx="2.5" />
             <rect x="101.5" y="5.5" width="13" height="13" rx="2.5" />
@@ -170,8 +174,8 @@ export default function MiObjetiaMorph() {
             <rect x="101.5" y="21.5" width="13" height="13" rx="2.5" />
           </g>
 
-          {/* LÍNEAS VECTORIALES FINAS Y REDONDEADAS EN BLANCO PURO (#ffffff) QUE CONVERGEN EN LOS 4 BORDES */}
-          <g stroke="#ffffff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" fill="none">
+          {/* LÍNEAS VECTORIALES FINAS Y REDONDEADAS QUE CONVERGEN EN LOS 4 BORDES */}
+          <g stroke={color} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" fill="none">
             {MORPH_SEGMENTS.map((seg, i) => {
               const x1 = seg.text[0] + (seg.sq[0] - seg.text[0]) * t;
               const y1 = seg.text[1] + (seg.sq[1] - seg.text[1]) * t;
