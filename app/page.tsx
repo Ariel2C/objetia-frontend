@@ -48,7 +48,7 @@ export default async function HomePage() {
   const { productos, banners, secciones, quickCards } = await getHomepageData();
 
   return (
-    <div className="pb-16 bg-gray-50/30">
+    <div className="pb-16 bg-transparent">
       {/* ==============================================================================
           1. CARRUSEL DE BANNERS (CMS Dinámico)
           ============================================================================== */}

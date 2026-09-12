@@ -2308,9 +2308,9 @@ export default function RootTab({
                 setColorPrimary={setColorPrimary || (() => {})}
                 colorSecondary={colorSecondary || "#D4AF37"}
                 setColorSecondary={setColorSecondary || (() => {})}
-                colorBackground={colorBackground || "#FAFAFA"}
+                colorBackground={colorBackground || "#F4EDDC"}
                 setColorBackground={setColorBackground || (() => {})}
-                colorNavbar={colorNavbar || "#FFFFFF"}
+                colorNavbar={colorNavbar || "#F5F4EF"}
                 setColorNavbar={setColorNavbar || (() => {})}
                 colorSectionTitle={colorSectionTitle || "#111827"}
                 setColorSectionTitle={setColorSectionTitle || (() => {})}

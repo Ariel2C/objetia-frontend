@@ -94,9 +94,9 @@ function MiObjetiaContent() {
   const [brandName, setBrandName] = useState("Vamaar");
   const [colorPrimary, setColorPrimary] = useState("#2C3E50");
   const [colorSecondary, setColorSecondary] = useState("#D4AF37");
-  const [colorBackground, setColorBackground] = useState("#FAFAFA");
+  const [colorBackground, setColorBackground] = useState("#F4EDDC");
   const [colorTextInput, setColorTextInput] = useState("#111827");
-  const [colorNavbar, setColorNavbar] = useState("#FFFFFF");
+  const [colorNavbar, setColorNavbar] = useState("#F5F4EF");
   const [colorSectionTitle, setColorSectionTitle] = useState("#111827");
   const [colorCatalogLink, setColorCatalogLink] = useState("#3B82F6");
   const [logoUrl, setLogoUrl] = useState("");
@@ -308,9 +308,9 @@ function MiObjetiaContent() {
             setBrandName(marca.brand_name || "Vamaar");
             setColorPrimary(marca.primary_color_hex || "#2C3E50");
             setColorSecondary(marca.secondary_color_hex || "#D4AF37");
-            setColorBackground(marca.background_color_hex || "#FAFAFA");
+            setColorBackground(marca.background_color_hex || "#F4EDDC");
             setColorTextInput(marca.input_text_color_hex || "#111827");
-            setColorNavbar(marca.navbar_color_hex || "#FFFFFF");
+            setColorNavbar(marca.navbar_color_hex || "#F5F4EF");
             setColorSectionTitle(marca.section_title_color_hex || "#111827");
             setColorCatalogLink(marca.catalog_link_color_hex || "#3B82F6");
             setLogoUrl(marca.logo_cloudfront_url || "");

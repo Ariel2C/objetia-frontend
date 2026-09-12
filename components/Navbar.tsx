@@ -440,7 +440,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
   if (isRootTab) return null;
 
   return (
-    <nav className="bg-[#FAF8F5] border-b border-[#EAE6DF] sticky top-0 z-50 transition-colors duration-200 shadow-xs">
+    <nav className="bg-[#F5F4EF] border-b border-[#E6E1DB] sticky top-0 z-50 transition-colors duration-200 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center gap-4">
           
@@ -732,12 +732,12 @@ export default function Navbar({ logoUrl }: NavbarProps) {
 
       {/* SUB-BARRA DE MENÚ DE NAVEGACIÓN - RESPONSIVE HORIZONTAL DESLIZABLE */}
       {!pathname?.startsWith('/mi-objetia') && !pathname?.startsWith('/mi-espacio') && !pathname?.startsWith('/root') && (
-        <div className="border-t border-[#EAE6DF] bg-[#FAF8F5]">
+        <div className="border-t border-[#E6E1DB] bg-[#F3F0E7]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-start sm:justify-center space-x-1 sm:space-x-2 py-1.5 text-[9.5px] font-semibold uppercase tracking-[0.2em] text-[#5A524C] overflow-x-auto no-scrollbar scrollbar-none whitespace-nowrap">
+            <div className="flex items-center justify-start sm:justify-center space-x-1 sm:space-x-2 py-1.5 text-[9.5px] font-semibold uppercase tracking-[0.2em] text-[#534636] overflow-x-auto no-scrollbar scrollbar-none whitespace-nowrap">
               
               {/* 1. NUEVOS INGRESOS */}
-              <Link href="/catalog?sort=newest" className="hover:text-[#1A1614] hover:bg-[#EFECE6] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
+              <Link href="/catalog?sort=newest" className="hover:text-[#1A1614] hover:bg-[#EAE4D9] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
                 NUEVOS INGRESOS
               </Link>
 
@@ -749,7 +749,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               >
                 <button 
                   onClick={() => setDescubrirAbierto(prev => !prev)}
-                  className="hover:text-[#1A1614] hover:bg-[#EFECE6] px-3.5 py-1.5 rounded-full transition flex items-center gap-1 cursor-pointer text-[9.5px] font-semibold uppercase tracking-[0.2em] text-[#5A524C]"
+                  className="hover:text-[#1A1614] hover:bg-[#EAE4D9] px-3.5 py-1.5 rounded-full transition flex items-center gap-1 cursor-pointer text-[9.5px] font-semibold uppercase tracking-[0.2em] text-[#534636]"
                 >
                   <span>DESCUBRIR</span>
                   <ChevronDown className={`h-3 w-3 transition-transform ${descubrirAbierto ? 'rotate-180 text-[#B58A63]' : ''}`} />
@@ -758,29 +758,29 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                 {descubrirAbierto && (
                   <div 
                     onClick={() => setDescubrirAbierto(false)}
-                    className="absolute left-0 top-full w-56 bg-white border border-[#EAE6DF] rounded-2xl shadow-xl shadow-black/10 z-50 p-1.5 space-y-0.5 animate-scale-in origin-top-left"
+                    className="absolute left-0 top-full w-56 bg-[#F3F0E7] border border-[#E6E1DB] rounded-2xl shadow-xl shadow-black/10 z-50 p-1.5 space-y-0.5 animate-scale-in origin-top-left"
                   >
                     <Link
                       href="/catalog?filter=selected"
-                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#5A524C] hover:bg-[#FAF8F5] hover:text-[#1A1614] transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#534636] hover:bg-[#EAE4D9] hover:text-[#1A1614] transition"
                     >
                       Seleccionados de Objetia
                     </Link>
                     <Link
                       href="/catalog?max_price=50000"
-                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#5A524C] hover:bg-[#FAF8F5] hover:text-[#1A1614] transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#534636] hover:bg-[#EAE4D9] hover:text-[#1A1614] transition"
                     >
                       Hallazgos por menos de $50.000
                     </Link>
                     <Link
                       href="/catalog?style=Vintage"
-                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#5A524C] hover:bg-[#FAF8F5] hover:text-[#1A1614] transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#534636] hover:bg-[#EAE4D9] hover:text-[#1A1614] transition"
                     >
                       Vintage
                     </Link>
                     <Link
                       href="/catalog?sort=popular"
-                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#5A524C] hover:bg-[#FAF8F5] hover:text-[#1A1614] transition"
+                      className="block px-3 py-2 rounded-xl text-xs font-medium normal-case tracking-normal text-[#534636] hover:bg-[#EAE4D9] hover:text-[#1A1614] transition"
                     >
                       Tendencias
                     </Link>
@@ -789,22 +789,22 @@ export default function Navbar({ logoUrl }: NavbarProps) {
               </div>
 
               {/* 3. DECORACIÓN */}
-              <Link href="/catalog?category=Decoración" className="hover:text-[#1A1614] hover:bg-[#EFECE6] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
+              <Link href="/catalog?category=Decoración" className="hover:text-[#1A1614] hover:bg-[#EAE4D9] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
                 DECORACIÓN
               </Link>
 
               {/* 4. ILUMINACIÓN */}
-              <Link href="/catalog?category=Iluminación" className="hover:text-[#1A1614] hover:bg-[#EFECE6] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
+              <Link href="/catalog?category=Iluminación" className="hover:text-[#1A1614] hover:bg-[#EAE4D9] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
                 ILUMINACIÓN
               </Link>
 
               {/* 5. ALFOMBRAS */}
-              <Link href="/catalog?category=Alfombras" className="hover:text-[#1A1614] hover:bg-[#EFECE6] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
+              <Link href="/catalog?category=Alfombras" className="hover:text-[#1A1614] hover:bg-[#EAE4D9] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
                 ALFOMBRAS
               </Link>
 
               {/* 6. EXTERIOR */}
-              <Link href="/catalog?category=Exterior" className="hover:text-[#1A1614] hover:bg-[#EFECE6] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
+              <Link href="/catalog?category=Exterior" className="hover:text-[#1A1614] hover:bg-[#EAE4D9] px-3.5 py-1.5 rounded-full transition shrink-0 text-[9.5px] font-semibold uppercase tracking-[0.2em]">
                 EXTERIOR
               </Link>
 

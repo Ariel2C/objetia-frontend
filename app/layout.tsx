@@ -69,9 +69,9 @@ async function getLiveBranding(): Promise<BrandingResponse> {
     return {
       primary_color: marca.primary_color_hex || '#2C3E50',
       secondary_color: marca.secondary_color_hex || '#D4AF37',
-      background_color: marca.background_color_hex || '#FAFAFA',
+      background_color: marca.background_color_hex || '#F4EDDC',
       text_input_color: marca.input_text_color_hex || '#111827',
-      navbar_color: marca.navbar_color_hex || '#FFFFFF',
+      navbar_color: marca.navbar_color_hex || '#F5F4EF',
       section_title_color: marca.section_title_color_hex || '#111827',
       catalog_link_color: marca.catalog_link_color_hex || '#3B82F6',
       brand_font_family: marca.brand_font_family || 'Outfit',
@@ -82,9 +82,9 @@ async function getLiveBranding(): Promise<BrandingResponse> {
     return {
       primary_color: '#2C3E50',
       secondary_color: '#D4AF37',
-      background_color: '#FAFAFA',
+      background_color: '#F4EDDC',
       text_input_color: '#111827',
-      navbar_color: '#FFFFFF',
+      navbar_color: '#F5F4EF',
       section_title_color: '#111827',
       catalog_link_color: '#3B82F6',
       brand_font_family: 'Outfit',
