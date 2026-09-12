@@ -355,44 +355,56 @@ function LoginContent() {
   if (!montado) return null;
 
   return (
-    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-gray-50/50">
-      <div className="max-w-md sm:max-w-lg w-full bg-white p-6 sm:p-8 rounded-3xl shadow-xl border border-gray-100 space-y-6 relative overflow-hidden">
+    <div className="min-h-[85vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-[#F5F4EF]">
+      <div className="max-w-md sm:max-w-lg w-full bg-[#FAF8F5] p-6 sm:p-8 rounded-[28px] shadow-[0_8px_32px_rgba(78,66,52,0.08)] border border-[#EAE5DC] space-y-6 relative overflow-hidden">
         
+        {/* Cabecera de Marca Objetia */}
+        <div className="flex flex-col items-center text-center space-y-1 pt-1">
+          <Link href="/" className="inline-flex flex-col items-center group cursor-pointer">
+            <div className="h-11 w-11 rounded-2xl bg-[#FAF0E6] border border-[#EAE5DC] group-hover:border-[#B88D65]/40 flex items-center justify-center text-[#B88D65] shadow-xs mb-1.5 transition-colors">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-[#534636] group-hover:text-[#B88D65] transition-colors">
+              OBJETIA
+            </span>
+          </Link>
+        </div>
+
         {/* ============================================================================== */}
         {/* VISTA 1: INTRODUCCIÓN PARA VENDEDOR NO REGISTRADO */}
         {/* ============================================================================== */}
         {viewMode === 'vendedor_intro' && (
           <div className="space-y-6 text-center animate-fade-in">
-            <div className="mx-auto h-16 w-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 flex items-center justify-center text-white shadow-lg shadow-purple-500/20">
+            <div className="mx-auto h-16 w-16 rounded-2xl bg-[#FAF0E6] border border-[#EAE5DC] flex items-center justify-center text-[#B88D65] shadow-sm">
               <Sparkles className="h-8 w-8" />
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+              <h2 className="text-2xl font-bold text-[#2C2723] tracking-tight">
                 Vendé en Objetia
               </h2>
-              <p className="text-xs text-gray-600 leading-relaxed max-w-xs mx-auto">
+              <p className="text-xs text-[#73675C] leading-relaxed max-w-xs mx-auto">
                 Dale una nueva historia a eso que ya no usás. <br />
-                <span className="font-bold text-gray-900">Publicar es simple y gratis.</span>
+                <span className="font-semibold text-[#2C2723]">Publicar es simple y gratis.</span>
               </p>
             </div>
 
-            <div className="space-y-4 pt-2 border-t border-gray-100">
-              <div className="bg-purple-50/70 p-4 rounded-2xl border border-purple-100 space-y-2">
-                <p className="text-xs font-extrabold text-purple-900">¿Ya tenés una cuenta?</p>
+            <div className="space-y-4 pt-2 border-t border-[#EAE5DC]">
+              <div className="bg-[#FAF0E6] p-4 rounded-2xl border border-[#EAE5DC] space-y-2">
+                <p className="text-xs font-bold text-[#534636]">¿Ya tenés una cuenta?</p>
                 <button
                   onClick={() => { setViewMode('auth'); setEsLogin(true); setGoogleCuentaExiste(false); }}
-                  className="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-black tracking-wider uppercase transition shadow-sm cursor-pointer"
+                  className="w-full py-3 bg-[#B88D65] hover:bg-[#A37953] text-white rounded-xl text-xs font-bold tracking-wider uppercase transition shadow-sm cursor-pointer"
                 >
                   INGRESAR
                 </button>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200 space-y-2">
-                <p className="text-xs font-extrabold text-gray-800">¿Sos nuevo por acá?</p>
+              <div className="bg-white p-4 rounded-2xl border border-[#EAE5DC] space-y-2">
+                <p className="text-xs font-bold text-[#534636]">¿Sos nuevo por acá?</p>
                 <button
                   onClick={() => { setViewMode('auth'); setEsLogin(false); setGoogleCuentaExiste(false); }}
-                  className="w-full py-3 bg-gray-900 hover:bg-black text-white rounded-xl text-xs font-black tracking-wider uppercase transition shadow-sm cursor-pointer"
+                  className="w-full py-3 bg-[#2C2723] hover:bg-[#1A1614] text-white rounded-xl text-xs font-bold tracking-wider uppercase transition shadow-sm cursor-pointer"
                 >
                   CREAR MI CUENTA
                 </button>
@@ -407,27 +419,27 @@ function LoginContent() {
         {viewMode === 'forgot_password' && (
           <div className="space-y-6 animate-fade-in">
             <div className="text-center space-y-2">
-              <div className="mx-auto h-12 w-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+              <div className="mx-auto h-12 w-12 rounded-xl bg-[#FAF0E6] border border-[#EAE5DC] text-[#B88D65] flex items-center justify-center">
                 <KeyRound className="h-6 w-6" />
               </div>
-              <h2 className="text-xl font-black text-gray-900">¿Olvidaste tu contraseña?</h2>
-              <p className="text-xs text-gray-600 leading-relaxed max-w-xs mx-auto">
+              <h2 className="text-xl font-bold text-[#2C2723]">¿Olvidaste tu contraseña?</h2>
+              <p className="text-xs text-[#73675C] leading-relaxed max-w-xs mx-auto">
                 Te ayudamos a volver a tu cuenta. Ingresá tu email y te enviaremos un enlace para crear una nueva contraseña.
               </p>
             </div>
 
             {enlaceEnviado ? (
-              <div className="bg-emerald-50/80 p-5 rounded-2xl border border-emerald-200 text-center space-y-3">
-                <div className="mx-auto w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+              <div className="bg-emerald-50/90 p-5 rounded-2xl border border-emerald-200 text-center space-y-3">
+                <div className="mx-auto w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
                   ✓
                 </div>
-                <p className="text-sm font-extrabold text-emerald-950">¡Todo listo! Te enviamos las instrucciones</p>
+                <p className="text-sm font-bold text-emerald-950">¡Todo listo! Te enviamos las instrucciones</p>
                 <p className="text-xs text-emerald-800 leading-relaxed max-w-xs mx-auto">
                   Revisá la bandeja de entrada de <span className="font-bold text-emerald-950">{obtenerEmailCompleto()}</span> (o tu carpeta de Spam) para restablecer tu clave en un clic.
                 </p>
                 <button
                   onClick={() => { setViewMode('auth'); setEsLogin(true); setEnlaceEnviado(false); }}
-                  className="text-xs font-bold text-purple-700 hover:text-purple-900 transition pt-2 block mx-auto cursor-pointer"
+                  className="text-xs font-bold text-[#B88D65] hover:text-[#A37953] transition pt-2 block mx-auto cursor-pointer"
                 >
                   Volver al inicio de sesión
                 </button>
@@ -437,9 +449,9 @@ function LoginContent() {
                 
                 {/* CAMPO EMAIL CON DESPLEGABLE INTELIGENTE */}
                 <div className="relative">
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Email</label>
+                  <label className="block text-xs font-semibold text-[#534636] mb-1">Email</label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-[#A89F91]" />
                     <input 
                       type="email" 
                       required
@@ -447,13 +459,13 @@ function LoginContent() {
                       onChange={manejarInputEmail}
                       onKeyDown={manejarKeyDownEmail}
                       placeholder="Tu correo electrónico"
-                      className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition font-medium"
+                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#E6E1DB] rounded-xl text-xs text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium"
                     />
                   </div>
 
                   {/* DESPLEGABLE DE SERVIDORES CON PREVIEW Y TECLADO/MOUSE */}
                   {mostrarSugerenciasEmail && (
-                    <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-purple-100 rounded-2xl shadow-xl z-50 p-1.5 space-y-1 animate-scale-in">
+                    <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-[#EAE5DC] rounded-2xl shadow-xl z-50 p-1.5 space-y-1 animate-scale-in">
                       {dominiosSugeridos.map((dom, index) => {
                         const prefix = emailInput.split('@')[0];
                         const fullEmailOption = `${prefix}${dom}`;
@@ -465,10 +477,10 @@ function LoginContent() {
                             type="button"
                             onMouseEnter={() => setIndiceSeleccionadoEmail(index)}
                             onClick={() => seleccionarDominioEmail(dom)}
-                            className={`w-full text-left px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer flex items-center justify-between ${
+                            className={`w-full text-left px-3 py-2 rounded-xl text-xs transition cursor-pointer flex items-center justify-between ${
                               esSeleccionado 
-                                ? 'bg-purple-100 text-purple-900 shadow-2xs font-extrabold' 
-                                : 'text-gray-700 hover:bg-purple-50 hover:text-purple-700'
+                                ? 'bg-[#FAF0E6] text-[#A97950] font-bold shadow-2xs' 
+                                : 'text-[#534636] font-semibold hover:bg-[#F5F4EF] hover:text-[#2C2723]'
                             }`}
                           >
                             <span>{fullEmailOption}</span>
@@ -482,7 +494,7 @@ function LoginContent() {
                 <button
                   type="submit"
                   disabled={cargando}
-                  className="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md cursor-pointer"
+                  className="w-full py-3.5 bg-[#B88D65] hover:bg-[#A37953] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm hover:shadow-md cursor-pointer disabled:opacity-50"
                 >
                   {cargando ? "ENVIANDO..." : "ENVIAR ENLACE"}
                 </button>
@@ -491,7 +503,7 @@ function LoginContent() {
                   <button
                     type="button"
                     onClick={() => setViewMode('auth')}
-                    className="text-xs font-bold text-gray-500 hover:text-gray-800 transition cursor-pointer"
+                    className="text-xs font-semibold text-[#73675C] hover:text-[#2C2723] transition cursor-pointer"
                   >
                     Volver
                   </button>
@@ -507,11 +519,11 @@ function LoginContent() {
         {viewMode === 'reset_password' && (
           <div className="space-y-6 animate-fade-in">
             <div className="text-center space-y-2">
-              <div className="mx-auto h-12 w-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center">
+              <div className="mx-auto h-12 w-12 rounded-xl bg-[#FAF0E6] border border-[#EAE5DC] text-[#B88D65] flex items-center justify-center">
                 <Lock className="h-6 w-6" />
               </div>
-              <h2 className="text-xl font-black text-gray-900">Restablecé tu contraseña</h2>
-              <p className="text-xs text-gray-600 leading-relaxed max-w-xs mx-auto">
+              <h2 className="text-xl font-bold text-[#2C2723]">Restablecé tu contraseña</h2>
+              <p className="text-xs text-[#73675C] leading-relaxed max-w-xs mx-auto">
                 Ingresá tu nueva clave segura para volver a entrar a tu cuenta.
               </p>
             </div>
@@ -523,17 +535,17 @@ function LoginContent() {
             )}
 
             {passwordRestablecida ? (
-              <div className="bg-emerald-50/80 p-5 rounded-2xl border border-emerald-200 text-center space-y-3">
-                <div className="mx-auto w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+              <div className="bg-emerald-50/90 p-5 rounded-2xl border border-emerald-200 text-center space-y-3">
+                <div className="mx-auto w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
                   ✓
                 </div>
-                <p className="text-sm font-extrabold text-emerald-950">¡Tu nueva clave ya está lista!</p>
+                <p className="text-sm font-bold text-emerald-950">¡Tu nueva clave ya está lista!</p>
                 <p className="text-xs text-emerald-800 leading-relaxed max-w-xs mx-auto">
                   Actualizamos tu contraseña de forma segura. Ya podés ingresar y seguir disfrutando de Objetia.
                 </p>
                 <button
                   onClick={() => { setViewMode('auth'); setEsLogin(true); setPassword(''); setConfirmPassword(''); }}
-                  className="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md cursor-pointer"
+                  className="w-full py-3.5 bg-[#B88D65] hover:bg-[#A37953] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm hover:shadow-md cursor-pointer"
                 >
                   INGRESAR A MI CUENTA
                 </button>
@@ -541,9 +553,9 @@ function LoginContent() {
             ) : (
               <form onSubmit={manejarRestablecimientoPassword} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Nueva Contraseña</label>
+                  <label className="block text-xs font-semibold text-[#534636] mb-1">Nueva Contraseña</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-[#A89F91]" />
                     <input 
                       type="password" 
                       required
@@ -551,15 +563,15 @@ function LoginContent() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Mínimo 6 caracteres"
-                      className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition"
+                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#E6E1DB] rounded-xl text-xs text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-gray-700 mb-1">Confirmar Nueva Contraseña</label>
+                  <label className="block text-xs font-semibold text-[#534636] mb-1">Confirmar Nueva Contraseña</label>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-[#A89F91]" />
                     <input 
                       type="password" 
                       required
@@ -567,7 +579,7 @@ function LoginContent() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Repetí la contraseña"
-                      className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition"
+                      className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#E6E1DB] rounded-xl text-xs text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium"
                     />
                   </div>
                 </div>
@@ -575,7 +587,7 @@ function LoginContent() {
                 <button
                   type="submit"
                   disabled={cargando}
-                  className="w-full py-3 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md cursor-pointer"
+                  className="w-full py-3.5 bg-[#B88D65] hover:bg-[#A37953] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm hover:shadow-md cursor-pointer disabled:opacity-50"
                 >
                   {cargando ? "GUARDANDO..." : "CAMBIAR CONTRASEÑA"}
                 </button>
@@ -584,7 +596,7 @@ function LoginContent() {
                   <button
                     type="button"
                     onClick={() => { setViewMode('auth'); setEsLogin(true); }}
-                    className="text-xs font-bold text-gray-500 hover:text-gray-800 transition cursor-pointer"
+                    className="text-xs font-semibold text-[#73675C] hover:text-[#2C2723] transition cursor-pointer"
                   >
                     Volver al login
                   </button>
@@ -599,23 +611,23 @@ function LoginContent() {
         {/* ============================================================================== */}
         {viewMode === 'auth' && googleCuentaExiste && (
           <div className="space-y-6 text-center animate-fade-in">
-            <div className="mx-auto h-14 w-14 rounded-2xl bg-purple-100 text-purple-700 flex items-center justify-center">
+            <div className="mx-auto h-14 w-14 rounded-2xl bg-[#FAF0E6] border border-[#EAE5DC] text-[#B88D65] flex items-center justify-center">
               <AlertCircle className="h-7 w-7" />
             </div>
 
             <div className="space-y-2">
-              <h2 className="text-xl font-black text-gray-900">¡Tu cuenta ya existe!</h2>
-              <p className="text-xs text-gray-600 leading-relaxed max-w-xs mx-auto">
-                El correo electrónico <span className="font-bold text-gray-900">{emailInput}</span> ya está registrado en Objetia.
+              <h2 className="text-xl font-bold text-[#2C2723]">¡Tu cuenta ya existe!</h2>
+              <p className="text-xs text-[#73675C] leading-relaxed max-w-xs mx-auto">
+                El correo electrónico <span className="font-bold text-[#2C2723]">{emailInput}</span> ya está registrado en Objetia.
               </p>
             </div>
 
             {googleAvatarUrl && (
-              <div className="flex items-center justify-center gap-3 p-3 bg-gray-50 rounded-2xl border border-gray-100 max-w-xs mx-auto">
-                <img src={googleAvatarUrl} alt="Avatar" className="h-10 w-10 rounded-full border border-purple-400 object-cover" />
+              <div className="flex items-center justify-center gap-3 p-3 bg-white rounded-2xl border border-[#EAE5DC] max-w-xs mx-auto">
+                <img src={googleAvatarUrl} alt="Avatar" className="h-10 w-10 rounded-full border-2 border-[#B88D65] object-cover" />
                 <div className="text-left text-xs">
-                  <p className="font-bold text-gray-900">{fullName}</p>
-                  <p className="text-[11px] text-gray-500">{emailInput}</p>
+                  <p className="font-bold text-[#2C2723]">{fullName}</p>
+                  <p className="text-[11px] text-[#73675C]">{emailInput}</p>
                 </div>
               </div>
             )}
@@ -626,7 +638,7 @@ function LoginContent() {
                   setGoogleCuentaExiste(false);
                   setEsLogin(true);
                 }}
-                className="w-full py-3.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 bg-[#B88D65] hover:bg-[#A37953] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 <LogIn className="h-4 w-4" />
                 <span>INGRESAR A MI CUENTA</span>
@@ -634,7 +646,7 @@ function LoginContent() {
 
               <button
                 onClick={() => setGoogleCuentaExiste(false)}
-                className="text-xs font-bold text-gray-500 hover:text-gray-800 transition block mx-auto cursor-pointer"
+                className="text-xs font-semibold text-[#73675C] hover:text-[#2C2723] transition block mx-auto cursor-pointer"
               >
                 Probar con otro correo
               </button>
@@ -646,16 +658,42 @@ function LoginContent() {
         {/* VISTA 4: LOGIN / REGISTRO PRINCIPAL */}
         {/* ============================================================================== */}
         {viewMode === 'auth' && !googleCuentaExiste && (
-          <div className="space-y-6 animate-fade-in">
+          <div className="space-y-5 animate-fade-in">
+            {/* SELECTOR SEGMENTADO DE PESTAÑAS TIPO PÍLDORA */}
+            <div className="p-1 bg-[#EFECE6] rounded-2xl flex gap-1 border border-[#E6E1DB]">
+              <button
+                type="button"
+                onClick={() => { setEsLogin(true); setGoogleCredential(null); setGoogleCuentaExiste(false); }}
+                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                  esLogin 
+                    ? 'bg-white text-[#2C2723] shadow-xs' 
+                    : 'text-[#73675C] hover:text-[#2C2723]'
+                }`}
+              >
+                Ingresar
+              </button>
+              <button
+                type="button"
+                onClick={() => { setEsLogin(false); setGoogleCredential(null); setGoogleCuentaExiste(false); }}
+                className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer ${
+                  !esLogin 
+                    ? 'bg-white text-[#2C2723] shadow-xs' 
+                    : 'text-[#73675C] hover:text-[#2C2723]'
+                }`}
+              >
+                Crear cuenta
+              </button>
+            </div>
+
             {/* CABECERA DINÁMICA */}
             <div className="text-center space-y-1">
-              <h2 className="text-[12px] min-[390px]:text-[13px] sm:text-[15px] md:text-base font-black text-gray-900 tracking-tight whitespace-nowrap">
-                {esLogin ? "Qué bueno verte de nuevo" : "¡Estás a un paso de formar parte de la comunidad Objetia!"}
+              <h2 className="text-base sm:text-lg font-bold text-[#2C2723] tracking-tight">
+                {esLogin ? "Qué bueno verte de nuevo" : "Unite a la comunidad Objetia"}
               </h2>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-[#73675C]">
                 {esLogin 
-                  ? "Ingresá a tu cuenta para empezar a vender en Objetia." 
-                  : "Creá tu cuenta de forma rápida y segura."}
+                  ? "Ingresá con tus datos para gestionar tu cuenta." 
+                  : "Completá tus datos para comprar y vender sin límites."}
               </p>
             </div>
 
@@ -667,17 +705,17 @@ function LoginContent() {
             )}
 
             {/* FORMULARIO */}
-            <form onSubmit={manejarEnvioClasico} className="space-y-4">
+            <form onSubmit={manejarEnvioClasico} className="space-y-3.5">
               
               {/* VÍA A: REGISTRO CON GOOGLE (SOLO MUESTRA TARJETA CON FOTO, NOMBRE Y EMAIL) */}
               {!esLogin && googleCredential ? (
-                <div className="bg-purple-50/80 p-4 rounded-2xl border border-purple-200 flex items-center gap-3.5 animate-scale-in shadow-2xs">
+                <div className="bg-[#FAF0E6] p-4 rounded-2xl border border-[#EAE5DC] flex items-center gap-3.5 animate-scale-in shadow-2xs">
                   {googleAvatarUrl && (
-                    <img src={googleAvatarUrl} alt="Avatar Google" className="h-12 w-12 rounded-full border-2 border-purple-500 object-cover shadow-xs" />
+                    <img src={googleAvatarUrl} alt="Avatar Google" className="h-12 w-12 rounded-full border-2 border-[#B88D65] object-cover shadow-xs" />
                   )}
                   <div className="text-left text-xs">
-                    <p className="font-black text-purple-950 text-sm">{fullName}</p>
-                    <p className="text-xs text-purple-700 font-medium">{emailInput}</p>
+                    <p className="font-bold text-[#2C2723] text-sm">{fullName}</p>
+                    <p className="text-xs text-[#B88D65] font-semibold">{emailInput}</p>
                   </div>
                 </div>
               ) : (
@@ -686,16 +724,16 @@ function LoginContent() {
                   {/* 1. CAMPO NOMBRE */}
                   {!esLogin && (
                     <div>
-                      <label className="block text-xs font-bold text-gray-700 mb-1">Nombre</label>
+                      <label className="block text-xs font-semibold text-[#534636] mb-1">Nombre</label>
                       <div className="relative">
-                        <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <User className="absolute left-3 top-3 h-4 w-4 text-[#A89F91]" />
                         <input 
                           type="text" 
                           required
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
-                          placeholder="Tu nombre"
-                          className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition font-medium"
+                          placeholder="Tu nombre completo"
+                          className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#E6E1DB] rounded-xl text-xs text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium"
                         />
                       </div>
                     </div>
@@ -703,9 +741,9 @@ function LoginContent() {
 
                   {/* 2. CAMPO EMAIL (CON AUTOCOMPLETADO POR TECLADO/MOUSE AL ESCRIBIR @) */}
                   <div className="relative">
-                    <label className="block text-xs font-bold text-gray-700 mb-1">Email</label>
+                    <label className="block text-xs font-semibold text-[#534636] mb-1">Email</label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-[#A89F91]" />
                       <input 
                         type="email" 
                         required
@@ -713,13 +751,13 @@ function LoginContent() {
                         onChange={manejarInputEmail}
                         onKeyDown={manejarKeyDownEmail}
                         placeholder="Tu correo electrónico"
-                        className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition font-medium"
+                        className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#E6E1DB] rounded-xl text-xs text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium"
                       />
                     </div>
 
                     {/* MENU DESPLEGABLE DE SERVIDORES DE CORREO CON PREVIEW COMPLETO */}
                     {mostrarSugerenciasEmail && (
-                      <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-purple-100 rounded-2xl shadow-xl z-50 p-1.5 space-y-1 animate-scale-in">
+                      <div className="absolute left-0 right-0 top-full mt-1.5 bg-white border border-[#EAE5DC] rounded-2xl shadow-xl z-50 p-1.5 space-y-1 animate-scale-in">
                         {dominiosSugeridos.map((dom, index) => {
                           const prefix = emailInput.split('@')[0];
                           const fullEmailOption = `${prefix}${dom}`;
@@ -733,8 +771,8 @@ function LoginContent() {
                               onClick={() => seleccionarDominioEmail(dom)}
                               className={`w-full text-left px-3 py-2 rounded-xl text-xs transition cursor-pointer flex items-center justify-between ${
                                 esSeleccionado 
-                                  ? 'bg-purple-100 text-purple-900 shadow-2xs font-black' 
-                                  : 'text-gray-700 font-bold hover:bg-purple-50 hover:text-purple-700'
+                                  ? 'bg-[#FAF0E6] text-[#A97950] font-bold shadow-2xs' 
+                                  : 'text-[#534636] font-semibold hover:bg-[#F5F4EF] hover:text-[#2C2723]'
                               }`}
                             >
                               <span>{fullEmailOption}</span>
@@ -748,36 +786,36 @@ function LoginContent() {
                   {/* 3. CAMPO CONTRASEÑA */}
                   <div>
                     <div className="flex justify-between items-center mb-1">
-                      <label className="block text-xs font-bold text-gray-700">Contraseña</label>
+                      <label className="block text-xs font-semibold text-[#534636]">Contraseña</label>
                       {esLogin && (
                         <button
                           type="button"
                           onClick={() => setViewMode('forgot_password')}
-                          className="text-[10px] font-bold text-purple-700 hover:underline cursor-pointer"
+                          className="text-[11px] font-semibold text-[#B88D65] hover:text-[#A37953] hover:underline cursor-pointer"
                         >
                           ¿Olvidaste tu contraseña?
                         </button>
                       )}
                     </div>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-[#A89F91]" />
                       <input 
                         type="password" 
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="Tu contraseña"
-                        className="w-full pl-9 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:bg-white focus:border-purple-600 focus:outline-none transition"
+                        className="w-full pl-9 pr-3 py-2.5 bg-white border border-[#E6E1DB] rounded-xl text-xs text-[#2C2723] placeholder:text-[#A89F91] focus:bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 focus:outline-none transition font-medium"
                       />
                     </div>
                   </div>
                 </>
               )}
 
-              {/* 4. OPCIÓN DE CONEXIÓN CON GOOGLE (SOLO SI NO TIENE TOKEN PRECARGADO) */}
+              {/* 4. OPCIÓN DE CONEXIÓN CON GOOGLE */}
               {!googleCredential && (
-                <div className="space-y-2 pt-2 border-t border-gray-100">
-                  <p className="text-[11px] font-bold text-gray-500 text-center uppercase tracking-wider">
+                <div className="space-y-2 pt-2 border-t border-[#EAE5DC]">
+                  <p className="text-[10.5px] font-semibold text-[#73675C] text-center uppercase tracking-wider">
                     {esLogin ? "O ingresá directamente con" : "O registrate con Google"}
                   </p>
                   <div className="flex flex-col items-center justify-center">
@@ -794,21 +832,21 @@ function LoginContent() {
 
               {/* 5. CHECKBOXES LEGALES Y DE NEWSLETTER */}
               {!esLogin && (
-                <div className="space-y-2 pt-3 border-t border-gray-100 text-xs">
+                <div className="space-y-2 pt-2.5 border-t border-[#EAE5DC] text-xs">
                   <label className="flex items-start gap-2 cursor-pointer">
                     <input 
-                      type="checkbox"
+                      type="checkbox" 
                       required
                       checked={aceptoTerminos}
                       onChange={(e) => setAceptoTerminos(e.target.checked)}
-                      className="mt-0.5 rounded text-purple-600 focus:ring-purple-500 cursor-pointer"
+                      className="mt-0.5 rounded text-[#B88D65] focus:ring-[#B88D65] border-[#E6E1DB] cursor-pointer"
                     />
-                    <span className="text-[11px] text-gray-600 leading-tight">
+                    <span className="text-[11px] text-[#73675C] leading-tight">
                       Acepto los{" "}
                       <button
                         type="button"
                         onClick={() => setModalLegalAbierto('terminos')}
-                        className="font-bold text-purple-700 hover:underline cursor-pointer"
+                        className="font-bold text-[#B88D65] hover:text-[#A37953] hover:underline cursor-pointer"
                       >
                         Términos y Condiciones
                       </button>{" "}
@@ -816,7 +854,7 @@ function LoginContent() {
                       <button
                         type="button"
                         onClick={() => setModalLegalAbierto('privacidad')}
-                        className="font-bold text-purple-700 hover:underline cursor-pointer"
+                        className="font-bold text-[#B88D65] hover:text-[#A37953] hover:underline cursor-pointer"
                       >
                         Política de Privacidad
                       </button>{" "}
@@ -826,23 +864,23 @@ function LoginContent() {
 
                   <label className="flex items-start gap-2 cursor-pointer">
                     <input 
-                      type="checkbox"
+                      type="checkbox" 
                       checked={quieroNovedades}
                       onChange={(e) => setQuieroNovedades(e.target.checked)}
-                      className="mt-0.5 rounded text-purple-600 focus:ring-purple-500 cursor-pointer"
+                      className="mt-0.5 rounded text-[#B88D65] focus:ring-[#B88D65] border-[#E6E1DB] cursor-pointer"
                     />
-                    <span className="text-[11px] text-gray-600 leading-tight">
+                    <span className="text-[11px] text-[#73675C] leading-tight">
                       Quiero recibir novedades, nuevos ingresos y hallazgos de Objetia.
                     </span>
                   </label>
                 </div>
               )}
 
-              {/* 6. BOTÓN SUBMIT FINAL (CREAR MI CUENTA / INGRESAR) */}
+              {/* 6. BOTÓN SUBMIT FINAL */}
               <button
                 type="submit"
                 disabled={cargando}
-                className="w-full py-3.5 bg-purple-700 hover:bg-purple-800 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-2"
+                className="w-full py-3.5 bg-[#B88D65] hover:bg-[#A37953] text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-sm hover:shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-2"
               >
                 <span>{esLogin ? "INGRESAR" : "CREAR MI CUENTA"}</span>
                 <ArrowRight className="h-4 w-4" />
@@ -851,23 +889,23 @@ function LoginContent() {
             </form>
 
             {/* PIE Y ALTERNANCIA LOGIN <-> REGISTRO */}
-            <div className="text-center pt-2 border-t border-gray-100">
+            <div className="text-center pt-2 border-t border-[#EAE5DC]">
               {esLogin ? (
-                <p className="text-xs text-gray-600 font-medium">
+                <p className="text-xs text-[#73675C] font-medium">
                   ¿Todavía no tenés cuenta?{" "}
                   <button 
                     onClick={() => { setEsLogin(false); setGoogleCredential(null); setGoogleCuentaExiste(false); }}
-                    className="font-black text-purple-700 hover:underline cursor-pointer ml-1"
+                    className="font-bold text-[#B88D65] hover:text-[#A37953] hover:underline cursor-pointer ml-1"
                   >
                     CREAR MI CUENTA
                   </button>
                 </p>
               ) : (
-                <p className="text-xs text-gray-600 font-medium">
+                <p className="text-xs text-[#73675C] font-medium">
                   ¿Ya tenés una cuenta?{" "}
                   <button 
                     onClick={() => { setEsLogin(true); setGoogleCredential(null); setGoogleCuentaExiste(false); }}
-                    className="font-black text-purple-700 hover:underline cursor-pointer ml-1"
+                    className="font-bold text-[#B88D65] hover:text-[#A37953] hover:underline cursor-pointer ml-1"
                   >
                     INGRESAR
                   </button>
@@ -880,55 +918,55 @@ function LoginContent() {
       </div>
 
       {/* ============================================================================== */}
-      {/* MODAL FLOTANTE DE TÉRMINOS Y PRIVACIDAD (SIN PERDER LO COMPLETADO) */}
+      {/* MODAL FLOTANTE DE TÉRMINOS Y PRIVACIDAD */}
       {/* ============================================================================== */}
       {modalLegalAbierto && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in"
           onClick={() => setModalLegalAbierto(null)}
         >
           <div 
-            className="relative w-full max-w-lg bg-white rounded-3xl overflow-hidden shadow-2xl border border-gray-100 p-6 space-y-4 max-h-[85vh] flex flex-col text-gray-800 animate-scale-up"
+            className="relative w-full max-w-lg bg-[#FAF8F5] rounded-3xl overflow-hidden shadow-2xl border border-[#EAE5DC] p-6 space-y-4 max-h-[85vh] flex flex-col text-[#2C2723] animate-scale-up"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center pb-2 border-b border-gray-100">
-              <h3 className="text-base font-extrabold text-gray-900 flex items-center gap-2">
-                <FileText className="h-5 w-5 text-purple-600" />
+            <div className="flex justify-between items-center pb-3 border-b border-[#EAE5DC]">
+              <h3 className="text-base font-bold text-[#2C2723] flex items-center gap-2">
+                <FileText className="h-5 w-5 text-[#B88D65]" />
                 {modalLegalAbierto === 'terminos' ? "Términos y Condiciones (v1.0)" : "Política de Privacidad"}
               </h3>
               <button 
                 onClick={() => setModalLegalAbierto(null)}
-                className="text-gray-400 hover:text-gray-700 p-1 rounded-full hover:bg-gray-100 transition cursor-pointer"
+                className="text-[#73675C] hover:text-[#2C2723] p-1.5 rounded-full hover:bg-[#F0ECE6] transition cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="overflow-y-auto text-xs space-y-3 pr-1 text-gray-600 leading-relaxed">
+            <div className="overflow-y-auto text-xs space-y-3 pr-1 text-[#534636] leading-relaxed">
               {modalLegalAbierto === 'terminos' ? (
                 <>
-                  <p className="font-bold text-gray-900">1. Aceptación de los Términos</p>
+                  <p className="font-bold text-[#2C2723]">1. Aceptación de los Términos</p>
                   <p>Al registrarse y crear una cuenta en Objetia, el usuario acepta de manera libre e incondicional los presentes Términos y Condiciones de Uso del Marketplace.</p>
-                  <p className="font-bold text-gray-900">2. Publicación de Productos y Reglas de la Comunidad</p>
-                  <p>Cada publicación debe incluir fotografías reales del producto. Queda strictly prohibida la divulgación de datos de contacto externo (teléfonos, WhatsApp, redes sociales) en las imágenes o descripciones de los artículos.</p>
-                  <p className="font-bold text-gray-900">3. Auditoría de Seguridad y Modificaciones</p>
+                  <p className="font-bold text-[#2C2723]">2. Publicación de Productos y Reglas de la Comunidad</p>
+                  <p>Cada publicación debe incluir fotografías reales del producto. Queda estrictamente prohibida la divulgación de datos de contacto externo (teléfonos, WhatsApp, redes sociales) en las imágenes o descripciones de los artículos.</p>
+                  <p className="font-bold text-[#2C2723]">3. Auditoría de Seguridad y Modificaciones</p>
                   <p>Objetia almacena de forma inalterable la fecha, hora exacta y versión legal (v1.0) aceptada por cada cuenta registrada.</p>
                 </>
               ) : (
                 <>
-                  <p className="font-bold text-gray-900">1. Protección de Datos Personales</p>
+                  <p className="font-bold text-[#2C2723]">1. Protección de Datos Personales</p>
                   <p>En Objetia garantizamos la privacidad de tus datos de acuerdo con las normativas vigentes. La información recopilada se utiliza exclusivamente para validar transacciones, gestionar envíos y ofrecerte una experiencia personalizada.</p>
-                  <p className="font-bold text-gray-900">2. Comunicaciones y Preferencias</p>
+                  <p className="font-bold text-[#2C2723]">2. Comunicaciones y Preferencias</p>
                   <p>Podés gestionar tus preferencias de correo electrónico y novedades en cualquier momento desde tu panel de usuario en Mi Objetia.</p>
                 </>
               )}
             </div>
 
-            <div className="pt-2 border-t border-gray-100 text-right">
+            <div className="pt-2 border-t border-[#EAE5DC] text-right">
               <button
                 type="button"
                 onClick={() => setModalLegalAbierto(null)}
-                className="px-5 py-2 bg-purple-700 text-white rounded-xl text-xs font-bold hover:bg-purple-800 transition cursor-pointer"
+                className="px-5 py-2.5 bg-[#B88D65] hover:bg-[#A37953] text-white rounded-xl text-xs font-bold transition cursor-pointer shadow-xs"
               >
                 Entendido y Cerrar
               </button>
@@ -946,8 +984,8 @@ export default function AuthPage() {
   return (
     <GoogleOAuthProvider clientId={googleClientId}>
       <Suspense fallback={
-        <div className="min-h-[85vh] flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+        <div className="min-h-[85vh] flex items-center justify-center bg-[#F5F4EF]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#B88D65]"></div>
         </div>
       }>
         <LoginContent />
