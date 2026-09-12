@@ -1,12 +1,16 @@
 "use client";
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Check, 
   Upload, 
-  Download,
+  Download, 
   Trash2, 
-  Info
+  Info,
+  Loader2
 } from 'lucide-react';
+import { useToast } from '../../components/ToastContext';
+import { useAuth } from '../../components/AuthContext';
+import { getApiUrl } from '../../lib/config';
 
 interface AppearanceTabProps {
   tieneCambiosMarca?: boolean;
@@ -65,6 +69,81 @@ export default function AppearanceTab({
   setLogoUrl = () => {},
   handleEliminarLogoHistorial = () => {}
 }: AppearanceTabProps) {
+  const { token } = useAuth();
+  const toast = useToast();
+  const [subiendoLogo, setSubiendoLogo] = useState(false);
+  const inputDirectRef = useRef<HTMLInputElement>(null);
+  const inputMasterRef = useRef<HTMLInputElement>(null);
+
+  const handleSubirLogoDirecto = async (file: File) => {
+    if (!file) return;
+    try {
+      setSubiendoLogo(true);
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const authToken = localStorage.getItem('vamaar_token') || token;
+      const res = await fetch(`${getApiUrl()}/cms/branding/logo/`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${authToken}`
+        },
+        body: formData
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        const nuevaUrl = data.logo_url;
+        setLogoUrl(nuevaUrl);
+        
+        // Agregar al historial de logos inmediatamente
+        const nuevoItem = {
+          id: data.id || Date.now(),
+          logo_url: nuevaUrl,
+          label: file.name || "Logotipo"
+        };
+        setLogoHistory(prev => [nuevoItem, ...prev.filter(l => l.id > 0 && l.logo_url !== nuevaUrl)]);
+
+        // Notificar a toda la aplicación y navbar
+        window.dispatchEvent(new CustomEvent('actualizar-logo-navbar', { detail: { logoUrl: nuevaUrl } }));
+        window.dispatchEvent(new CustomEvent('branding_updated', { detail: { logoUrl: nuevaUrl } }));
+        
+        toast.success("¡Logotipo subido y guardado exitosamente!");
+      } else {
+        const errText = await res.text().catch(() => "");
+        toast.error(`Error al subir logotipo (${res.status}): ${errText || "No se pudo guardar en el servidor"}`);
+      }
+    } catch (err: any) {
+      toast.error(`Error de conexión: ${err?.message || "No se pudo conectar con el servidor"}`);
+    } finally {
+      setSubiendoLogo(false);
+      if (inputDirectRef.current) inputDirectRef.current.value = '';
+      if (inputMasterRef.current) inputMasterRef.current.value = '';
+    }
+  };
+
+  const handleSeleccionarLogo = async (logo: any) => {
+    try {
+      setLogoUrl(logo.logo_url);
+      window.dispatchEvent(new CustomEvent('actualizar-logo-navbar', { detail: { logoUrl: logo.logo_url } }));
+      window.dispatchEvent(new CustomEvent('branding_updated', { detail: { logoUrl: logo.logo_url } }));
+
+      if (logo.id && logo.id > 0) {
+        const authToken = localStorage.getItem('vamaar_token') || token;
+        const res = await fetch(`${getApiUrl()}/cms/logo/select/${logo.id}`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${authToken}`
+          }
+        });
+        if (res.ok) {
+          toast.success("Logotipo activo actualizado con éxito.");
+        }
+      }
+    } catch (e) {
+      console.error("Error al seleccionar logo:", e);
+    }
+  };
 
   const notifyBrandingChange = (updates: { logoUrl?: string }) => {
     setTieneCambiosMarca(true);
@@ -210,23 +289,24 @@ export default function AppearanceTab({
 
           {/* Subir archivo directo */}
           <label 
-            className="flex items-center gap-2 px-4 py-2 bg-[#252525] hover:bg-[#303030] text-white border border-[#3a3a3a] hover:border-[#87a9ff] rounded-xl text-xs font-medium cursor-pointer transition shadow-xs"
+            className={`flex items-center gap-2 px-4 py-2 bg-[#252525] hover:bg-[#303030] text-white border border-[#3a3a3a] hover:border-[#87a9ff] rounded-xl text-xs font-medium transition shadow-xs ${subiendoLogo ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
           >
-            <Upload className="h-4 w-4 text-[#87a9ff]" />
-            <span>Subir nuevo logo</span>
+            {subiendoLogo ? (
+              <Loader2 className="h-4 w-4 animate-spin text-[#87a9ff]" />
+            ) : (
+              <Upload className="h-4 w-4 text-[#87a9ff]" />
+            )}
+            <span>{subiendoLogo ? 'Subiendo y guardando...' : 'Subir nuevo logo'}</span>
             <input 
+              ref={inputDirectRef}
               id="inputUploadLogoDirect"
               name="inputUploadLogoDirect"
               type="file" 
               accept="image/*"
+              disabled={subiendoLogo}
               onChange={(e) => {
                 if (e.target.files && e.target.files[0]) {
-                  const file = e.target.files[0];
-                  const objectUrl = URL.createObjectURL(file);
-                  const draftItem = { id: -Date.now(), logo_url: objectUrl, label: "Nuevo Logo", file: file };
-                  setLogoHistory(prev => [draftItem, ...prev]);
-                  setLogoUrl(objectUrl);
-                  notifyBrandingChange({ logoUrl: objectUrl });
+                  handleSubirLogoDirecto(e.target.files[0]);
                 }
               }}
               className="hidden"
@@ -248,26 +328,29 @@ export default function AppearanceTab({
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3.5">
             {/* Tarjeta para Subir Cuadrada */}
             <label 
-              className="aspect-square flex flex-col items-center justify-center border border-dashed border-[#444444] hover:border-[#87a9ff] rounded-xl cursor-pointer bg-[#18181a] hover:bg-[#252525] transition group p-3 text-center"
+              className={`aspect-square flex flex-col items-center justify-center border border-dashed border-[#444444] hover:border-[#87a9ff] rounded-xl bg-[#18181a] hover:bg-[#252525] transition group p-3 text-center ${subiendoLogo ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'}`}
             >
               <div className="p-2.5 bg-[#252525] group-hover:bg-[#87a9ff]/20 rounded-full text-[#87a9ff] transition-transform group-hover:scale-110 mb-2">
-                <Upload className="h-5 w-5" />
+                {subiendoLogo ? (
+                  <Loader2 className="h-5 w-5 animate-spin text-[#87a9ff]" />
+                ) : (
+                  <Upload className="h-5 w-5" />
+                )}
               </div>
-              <span className="text-[11px] font-semibold text-[#8c8c8c] group-hover:text-white">Subir Logotipo</span>
+              <span className="text-[11px] font-semibold text-[#8c8c8c] group-hover:text-white">
+                {subiendoLogo ? 'Subiendo...' : 'Subir Logotipo'}
+              </span>
               <span className="text-[9px] text-[#555] mt-1">PNG, SVG o JPG</span>
               <input 
+                ref={inputMasterRef}
                 id="inputUploadLogoMaster"
                 name="inputUploadLogoMaster"
                 type="file" 
                 accept="image/*"
+                disabled={subiendoLogo}
                 onChange={(e) => {
                   if (e.target.files && e.target.files[0]) {
-                    const file = e.target.files[0];
-                    const objectUrl = URL.createObjectURL(file);
-                    const draftItem = { id: -Date.now(), logo_url: objectUrl, label: "Nuevo Logo", file: file };
-                    setLogoHistory(prev => [draftItem, ...prev]);
-                    setLogoUrl(objectUrl);
-                    notifyBrandingChange({ logoUrl: objectUrl });
+                    handleSubirLogoDirecto(e.target.files[0]);
                   }
                 }}
                 className="hidden"
@@ -300,10 +383,7 @@ export default function AppearanceTab({
                   <div className="w-full flex items-center gap-1.5 mt-2 shrink-0">
                     <button 
                       type="button"
-                      onClick={() => { 
-                        setLogoUrl(logo.logo_url); 
-                        notifyBrandingChange({ logoUrl: logo.logo_url }); 
-                      }}
+                      onClick={() => handleSeleccionarLogo(logo)}
                       title={esActivo ? "Logo activo" : "Usar como logo activo"}
                       className={`flex-1 py-1 px-1.5 text-[10px] font-bold rounded-lg border transition cursor-pointer flex items-center justify-center gap-1 min-w-0 ${
                         esActivo 

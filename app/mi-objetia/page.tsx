@@ -269,7 +269,10 @@ function MiObjetiaContent() {
           const deletedItem = logoHistory.find(item => item.id === id);
           if (deletedItem && deletedItem.logo_url === prevUrl) {
             const remaining = logoHistory.filter(item => item.id !== id);
-            return remaining.length > 0 ? remaining[0].logo_url : "";
+            const fallbackUrl = remaining.length > 0 ? remaining[0].logo_url : "";
+            window.dispatchEvent(new CustomEvent('actualizar-logo-navbar', { detail: { logoUrl: fallbackUrl } }));
+            window.dispatchEvent(new CustomEvent('branding_updated', { detail: { logoUrl: fallbackUrl } }));
+            return fallbackUrl;
           }
           return prevUrl;
         });

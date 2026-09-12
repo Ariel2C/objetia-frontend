@@ -158,7 +158,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {/* Contenedor de notificaciones: abajo centrado */}
       <div
         aria-live="polite"
-        className="fixed z-[100] bottom-6 left-0 right-0 flex flex-col gap-2.5 items-center pointer-events-none px-4"
+        className="fixed z-[9999999] bottom-6 left-0 right-0 flex flex-col gap-2.5 items-center pointer-events-none px-4"
       >
         {toasts.map((toast) => (
           <ToastItem key={toast.id} toast={toast} onCerrar={cerrar} />
@@ -168,7 +168,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {/* Modal de confirmación global */}
       {confirmState && (
         <div
-          className="fixed inset-0 z-[110] bg-black/50 backdrop-blur-[2px] flex items-center justify-center p-4 animate-fade-in"
+          className="fixed inset-0 z-[9999999] bg-black/70 backdrop-blur-[4px] flex items-center justify-center p-4 animate-fade-in"
           onClick={() => resolverConfirm(false)}
         >
           <div
