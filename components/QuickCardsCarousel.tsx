@@ -1,7 +1,7 @@
 "use client";
 import React, { useRef, useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { QuickAccessCard } from '../lib/types';
 
 // ==============================================================================
@@ -10,7 +10,7 @@ import type { QuickAccessCard } from '../lib/types';
 
 function LoginIllustration() {
   return (
-    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-24 h-24 drop-shadow-sm">
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 drop-shadow-sm">
       <defs>
         <linearGradient id="grad-login-bg" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#e8f0fe" />
@@ -40,7 +40,7 @@ function LoginIllustration() {
 
 function BestsellersIllustration() {
   return (
-    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-24 h-24 drop-shadow-sm">
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 drop-shadow-sm">
       <defs>
         <linearGradient id="grad-best-bg" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#fef3c7" />
@@ -66,7 +66,7 @@ function BestsellersIllustration() {
 
 function Under30kIllustration() {
   return (
-    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-24 h-24 drop-shadow-sm">
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 drop-shadow-sm">
       <defs>
         <linearGradient id="grad-price-bg" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#ecfdf5" />
@@ -93,7 +93,7 @@ function Under30kIllustration() {
 
 function PaymentsIllustration() {
   return (
-    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-24 h-24 drop-shadow-sm">
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 drop-shadow-sm">
       <defs>
         <linearGradient id="grad-pay-bg" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#eff6ff" />
@@ -123,7 +123,7 @@ function PaymentsIllustration() {
 
 function SecureShoppingIllustration() {
   return (
-    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-24 h-24 drop-shadow-sm">
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 drop-shadow-sm">
       <defs>
         <linearGradient id="grad-sec-bg" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#f0fdf4" />
@@ -148,7 +148,7 @@ function SecureShoppingIllustration() {
 
 function OffersIllustration() {
   return (
-    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-24 h-24 drop-shadow-sm">
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-20 h-20 drop-shadow-sm">
       <defs>
         <linearGradient id="grad-offer-bg" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#fff1f2" />
@@ -176,7 +176,7 @@ function OffersIllustration() {
 function CardIllustration({ iconType, imageUrl, title }: { iconType?: string | null; imageUrl?: string | null; title: string }) {
   if (imageUrl && imageUrl.trim() !== "" && imageUrl !== "null") {
     return (
-      <div className="h-24 w-24 flex items-center justify-center overflow-hidden rounded-xl">
+      <div className="h-20 w-20 flex items-center justify-center overflow-hidden rounded-xl">
         <img src={imageUrl} alt={title} className="max-h-full max-w-full object-contain" />
       </div>
     );
@@ -293,7 +293,7 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
 
   const handleScroll = (direction: 'left' | 'right') => {
     if (!scrollContainerRef.current) return;
-    const cardWidth = 260; // Ancho aproximado de tarjeta + gap
+    const cardWidth = 205; // Ancho más angosto de tarjeta + gap
     const scrollAmount = direction === 'left' ? -cardWidth * 2 : cardWidth * 2;
     scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
   };
@@ -310,15 +310,15 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
 
   return (
     <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 z-20 -mt-16 sm:-mt-20 md:-mt-28 lg:-mt-32 mb-8 animate-slide-up group/quickcards">
-      {/* Botón Flotante Anterior (Estilo Circular) */}
+      {/* Botón Flecha Izquierda: Idéntico al de ProductCarousel */}
       {canScrollLeft && (
-        <button
+        <button 
           type="button"
           onClick={() => handleScroll('left')}
-          aria-label="Tarjetas anteriores"
-          className="absolute -left-1 sm:left-2 top-1/2 -translate-y-1/2 z-30 h-11 w-11 rounded-full bg-white hover:bg-gray-50 text-[#1a73e8] shadow-[0_4px_14px_rgba(0,0,0,0.15)] border border-gray-200/80 flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95"
+          aria-label="Ver tarjetas anteriores"
+          className="absolute left-0 top-1/2 -translate-y-1/2 -ml-3 sm:-ml-5 z-30 p-3 rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:bg-gray-50 active:scale-95 transition opacity-0 group-hover/quickcards:opacity-100 cursor-pointer hidden md:flex items-center justify-center"
         >
-          <ChevronLeft className="h-6 w-6 stroke-[2.5]" />
+          <ChevronLeft className="h-5 w-5" />
         </button>
       )}
 
@@ -326,23 +326,25 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
       <div
         ref={scrollContainerRef}
         onScroll={updateScrollButtons}
-        className="flex items-stretch gap-3 sm:gap-4 overflow-x-auto no-scrollbar scrollbar-none py-2 px-1 scroll-smooth snap-x snap-mandatory"
+        className="flex items-stretch gap-3 sm:gap-3.5 overflow-x-auto no-scrollbar scrollbar-none py-2 px-1 scroll-smooth snap-x snap-mandatory"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {displayCards.map((card) => (
-          <div
+          <Link
             key={card.id}
-            className="w-[220px] sm:w-[235px] md:w-[245px] flex-shrink-0 snap-start bg-white border border-[#eaeaea] hover:border-[#87a9ff]/40 rounded-2xl p-4 sm:p-5 shadow-[0_4px_18px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_26px_rgba(0,0,0,0.12)] transition-all duration-300 flex flex-col justify-between items-center text-center group/card"
+            href={card.link_url}
+            onClick={(e) => handleCardClick(e, card)}
+            className="w-[165px] sm:w-[180px] md:w-[195px] flex-shrink-0 snap-start bg-white border border-[#eaeaea] hover:border-[#87a9ff]/50 rounded-2xl p-3 sm:p-4 shadow-[0_4px_18px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_26px_rgba(0,0,0,0.12)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between items-center text-center group/card cursor-pointer block select-none"
           >
             {/* Título de la Tarjeta */}
-            <div className="min-h-[44px] flex items-center justify-center w-full">
-              <h3 className="text-[15px] sm:text-[16px] font-bold text-[#1f2937] group-hover/card:text-[#1a73e8] transition-colors leading-snug tracking-tight">
+            <div className="min-h-[38px] flex items-center justify-center w-full">
+              <h3 className="text-[13px] sm:text-[14px] font-bold text-[#1f2937] group-hover/card:text-[#1a73e8] transition-colors leading-snug tracking-tight line-clamp-2">
                 {card.title}
               </h3>
             </div>
 
-            {/* Ilustración Central al estilo Objetia */}
-            <div className="my-2 h-24 w-24 flex items-center justify-center transition-transform duration-300 group-hover/card:scale-105">
+            {/* Ilustración Central al estilo Objetia (Más compacta) */}
+            <div className="my-1.5 h-20 w-20 flex items-center justify-center transition-transform duration-300 group-hover/card:scale-105">
               <CardIllustration 
                 iconType={card.icon_type} 
                 imageUrl={card.image_url} 
@@ -351,33 +353,29 @@ export default function QuickCardsCarousel({ cards }: QuickCardsCarouselProps) {
             </div>
 
             {/* Subtítulo o Descripción Breve */}
-            <div className="min-h-[36px] flex items-center justify-center px-1 mb-3 w-full">
-              <p className="text-[11.5px] text-[#6b7280] leading-snug">
+            <div className="min-h-[30px] flex items-center justify-center px-0.5 mb-2.5 w-full">
+              <p className="text-[10.5px] sm:text-[11px] text-[#6b7280] leading-tight line-clamp-2">
                 {card.subtitle || ""}
               </p>
             </div>
 
-            {/* Botón de Acción */}
-            <Link
-              href={card.link_url}
-              onClick={(e) => handleCardClick(e, card)}
-              className="w-full py-2.5 px-3 rounded-xl text-xs font-bold text-[#1a73e8] bg-[#f0f4fd] hover:bg-[#e1ecfc] border border-[#d2e3fc]/60 transition-all duration-200 flex items-center justify-center gap-1.5 group-hover/card:bg-[#1a73e8] group-hover/card:text-white shadow-2xs cursor-pointer"
-            >
-              <span>{card.button_text || "Ingresar"}</span>
-            </Link>
-          </div>
+            {/* Botón de Acción integrado a la tarjeta */}
+            <div className="w-full py-2 px-2.5 rounded-xl text-[11px] font-bold text-[#1a73e8] bg-[#f0f4fd] group-hover/card:bg-[#1a73e8] group-hover/card:text-white border border-[#d2e3fc]/60 transition-all duration-200 flex items-center justify-center gap-1 shadow-2xs">
+              <span className="truncate">{card.button_text || "Ingresar"}</span>
+            </div>
+          </Link>
         ))}
       </div>
 
-      {/* Botón Flotante Siguiente (Estilo Circular como referencia) */}
+      {/* Botón Flecha Derecha: Idéntico al de ProductCarousel */}
       {canScrollRight && (
-        <button
+        <button 
           type="button"
           onClick={() => handleScroll('right')}
-          aria-label="Tarjetas siguientes"
-          className="absolute -right-1 sm:right-2 top-1/2 -translate-y-1/2 z-30 h-11 w-11 rounded-full bg-white hover:bg-gray-50 text-[#1a73e8] shadow-[0_4px_14px_rgba(0,0,0,0.15)] border border-gray-200/80 flex items-center justify-center transition-all duration-200 cursor-pointer hover:scale-105 active:scale-95"
+          aria-label="Ver más tarjetas"
+          className="absolute right-0 top-1/2 -translate-y-1/2 -mr-3 sm:-mr-5 z-30 p-3 rounded-full bg-white shadow-lg border border-gray-100 text-gray-700 hover:bg-gray-50 active:scale-95 transition opacity-0 group-hover/quickcards:opacity-100 cursor-pointer hidden md:flex items-center justify-center"
         >
-          <ChevronRight className="h-6 w-6 stroke-[2.5]" />
+          <ChevronRight className="h-5 w-5" />
         </button>
       )}
     </div>
