@@ -96,7 +96,7 @@ export default function ProductCarousel({ title, categoryFilter, productos, clas
               href={`/catalog?category=${encodeURIComponent(categoryFilter || 'Todos')}`}
               className="text-xs font-bold text-[#B88D65] hover:text-[#A37953] hover:underline"
             >
-              Ver catálogo &rarr;
+              Ver catálogo
             </Link>
           </div>
 
