@@ -16,7 +16,6 @@ import {
 import { useAuth } from './AuthContext';
 import { getApiUrl } from '../lib/config';
 import NewProductModal from './NewProductModal';
-import MiObjetiaMorph from './MiObjetiaMorph';
 
 interface NavbarProps {
   logoUrl?: string;
@@ -675,26 +674,29 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                           </div>
                         )}
 
-                        {/* TARJETA MI OBJETIA */}
+                        {/* 1. Mi Objetia */}
                         <Link 
                           href="/mi-objetia" 
                           onClick={() => setMenuAbierto(false)}
-                          className="group relative block px-2.5 py-2.5 rounded-xl bg-[#FAF8F5] hover:bg-[#F2EFE9] border border-[#EAE6DF] hover:border-[#B58A63]/50 transition-all duration-200 cursor-pointer text-center overflow-hidden"
+                          className="w-full py-2 text-center text-xs font-medium text-[#2C2723] hover:text-[#B58A63] hover:bg-[#FAF8F5] rounded-xl transition cursor-pointer block"
                         >
-                          <MiObjetiaMorph color="#231F1D" />
-
-                          <div className="mt-1">
-                            <p className="text-[10px] text-[#7D756D] leading-snug group-hover:text-[#231F1D] transition-colors text-center">
-                              Gestioná tus compras y ventas
-                            </p>
-                          </div>
+                          Mi Objetia
                         </Link>
 
-                        {/* Cerrar Sesión */}
-                        <div className="pt-0.5">
+                        {/* 2. Mi Perfil */}
+                        <Link 
+                          href="/mi-objetia?tab=perfil" 
+                          onClick={() => setMenuAbierto(false)}
+                          className="w-full py-2 text-center text-xs font-medium text-[#2C2723] hover:text-[#B88D65] hover:bg-[#FAF8F5] rounded-xl transition cursor-pointer block"
+                        >
+                          Mi Perfil
+                        </Link>
+
+                        {/* 3. Cerrar Sesión */}
+                        <div className="pt-1 border-t border-[#EAE6DF]">
                           <button 
                             onClick={() => { logout(); setMenuAbierto(false); router.push("/"); }}
-                            className="w-full py-2 text-center text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition cursor-pointer"
+                            className="w-full py-2 text-center text-xs font-medium text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition cursor-pointer block"
                           >
                             Cerrar Sesión
                           </button>
