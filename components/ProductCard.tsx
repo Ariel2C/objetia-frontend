@@ -128,7 +128,7 @@ export default function ProductCard({
   return (
     <Link
       href={`/products/${producto.id}`}
-      className="group relative bg-[#FAF8F5] border border-[#EAE5DC] hover:border-[#B88D65]/40 rounded-2xl overflow-hidden shadow-2xs hover:shadow-[0_8px_24px_rgba(78,66,52,0.1)] transition-all duration-300 flex flex-col justify-between h-full cursor-pointer select-none"
+      className="group relative bg-[#FAF8F5] border border-[#EAE5DC] hover:border-[#B88D65]/40 rounded-md overflow-hidden shadow-2xs hover:shadow-[0_8px_24px_rgba(78,66,52,0.1)] transition-all duration-300 flex flex-col justify-between h-full cursor-pointer select-none"
     >
       {/* SECCIÓN DE IMAGEN DE PRODUCTO (Fotografía vertical 4:5 un poco más alta) */}
       <div className="relative aspect-[4/5] w-full bg-[#F5F2EB] overflow-hidden">
