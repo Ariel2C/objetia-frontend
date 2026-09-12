@@ -435,7 +435,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
     return true;
   }, [navBgColorState]);
 
-  const iconBtnClass = "relative text-[#4A433E] hover:text-[#1A1614] hover:bg-[#EFECE6] p-2 rounded-full transition cursor-pointer flex items-center justify-center";
+  const iconBtnClass = "relative h-10 w-10 text-[#4A433E] hover:text-[#1A1614] hover:bg-[#EFECE6] rounded-full transition cursor-pointer flex items-center justify-center shrink-0";
 
   if (isRootTab) return null;
 
@@ -466,7 +466,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
 
           {/* CUADRO DE BÚSQUEDA INTEGRADO EN PÍLDORA */}
           <div className="flex-1 max-w-md mx-auto hidden md:block px-4">
-            <form onSubmit={handleNavbarSearch} className="flex items-center bg-white border border-[#E2DDD5] hover:border-[#CDC7BD] focus-within:border-[#B58A63] focus-within:ring-1 focus-within:ring-[#B58A63]/30 rounded-full transition shadow-xs overflow-hidden">
+            <form onSubmit={handleNavbarSearch} className="h-10 flex items-center bg-white border border-[#E2DDD5] hover:border-[#CDC7BD] focus-within:border-[#B58A63] focus-within:ring-1 focus-within:ring-[#B58A63]/30 rounded-full transition shadow-xs overflow-hidden">
               <div className="pl-4 pr-1.5 flex items-center text-[#7D756D]">
                 <Search className="h-4 w-4" />
               </div>
@@ -475,13 +475,13 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                 value={navbarSearch}
                 onChange={(e) => setNavbarSearch(e.target.value)}
                 placeholder="Buscar muebles, iluminación, decoración..." 
-                className="w-full bg-transparent px-2 py-2 text-xs text-[#231F1D] placeholder-[#8E867E] focus:outline-none"
+                className="w-full h-full bg-transparent px-2 text-xs text-[#231F1D] placeholder-[#8E867E] focus:outline-none"
               />
               {navbarSearch.trim() && (
                 <button 
-                  type="submit"
+                  type="submit" 
                   aria-label="Buscar"
-                  className="px-3.5 py-1 mr-1 text-[11px] font-medium text-[#B58A63] hover:text-[#9A704A] cursor-pointer"
+                  className="h-full px-3.5 mr-1 text-[11px] font-medium text-[#B58A63] hover:text-[#9A704A] cursor-pointer"
                 >
                   Buscar
                 </button>
@@ -496,7 +496,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
             {(!usuario || tienePermiso('sell_products') || tienePermiso('publications') || tienePermiso('sales') || tienePermiso('full_access') || ['root', 'admin', 'seller', 'cliente', 'client'].includes(usuario?.role?.toLowerCase() || '')) && (
               <button 
                 onClick={handleBotonVender}
-                className="inline-flex items-center justify-center bg-[#B58A63] hover:bg-[#A37953] text-white text-[9.5px] font-semibold uppercase tracking-[0.2em] px-4 py-1.5 rounded-full transition shadow-xs active:scale-98 cursor-pointer"
+                className="h-10 inline-flex items-center justify-center bg-[#B58A63] hover:bg-[#A37953] text-white text-[9.5px] font-semibold uppercase tracking-[0.2em] px-5 rounded-full transition shadow-xs active:scale-98 cursor-pointer shrink-0"
               >
                 VENDER
               </button>
@@ -639,7 +639,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   <div className="relative" ref={dropdownRef}>
                     <button 
                       onClick={() => setMenuAbierto(!menuAbierto)}
-                      className={`flex items-center gap-2 cursor-pointer focus:outline-none py-1 px-2.5 rounded-full hover:bg-[#EFECE6] transition group ${menuAbierto ? 'bg-[#EFECE6]' : ''}`}
+                      className={`h-10 flex items-center gap-2 cursor-pointer focus:outline-none pl-1.5 pr-3 rounded-full bg-[#EFECE6] hover:bg-[#E2DDD5] transition group shrink-0 ${menuAbierto ? 'bg-[#E2DDD5]' : ''}`}
                       title={usuario.full_name || "Mi Perfil"}
                     >
                       <div className="relative shrink-0">
