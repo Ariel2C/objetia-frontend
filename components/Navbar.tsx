@@ -446,11 +446,11 @@ export default function Navbar({ logoUrl }: NavbarProps) {
           
           {/* LOGO DE MARCA */}
           <div className="flex-shrink-0 flex items-center">
-            <Link href="/" className="transition hover:opacity-95 flex items-center gap-2 group">
+            <Link href="/" className="transition hover:opacity-95 flex items-center gap-2.5 group">
               <img 
                 src={logoUrlState && logoUrlState !== "" && logoUrlState !== "https://" ? logoUrlState : "/objetia_logo.png"} 
                 alt="Logo" 
-                className="h-8 w-8 sm:h-9 sm:w-9 object-contain group-hover:scale-105 transition-transform" 
+                className="h-9 w-auto sm:h-10 object-contain group-hover:scale-105 transition-transform shrink-0" 
               />
               <span 
                 style={{ 
