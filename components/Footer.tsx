@@ -98,12 +98,20 @@ export default function Footer({ logoUrl }: FooterProps) {
       }
     };
 
+    const handleAbrirModalFooter = (e: any) => {
+      if (e.detail) {
+        setModalActivo(e.detail as ModalType);
+      }
+    };
+
     window.addEventListener('branding_updated', handleBrandingUpdated);
     window.addEventListener('actualizar-logo-navbar' as any, handleActualizarLogo);
+    window.addEventListener('abrir-modal-footer' as any, handleAbrirModalFooter);
 
     return () => {
       window.removeEventListener('branding_updated', handleBrandingUpdated);
       window.removeEventListener('actualizar-logo-navbar' as any, handleActualizarLogo);
+      window.removeEventListener('abrir-modal-footer' as any, handleAbrirModalFooter);
     };
   }, []);
 

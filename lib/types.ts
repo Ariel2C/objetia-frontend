@@ -43,6 +43,18 @@ export interface SeccionInicio {
   productos: Producto[];
 }
 
+export interface QuickAccessCard {
+  id: number;
+  title: string;
+  subtitle?: string | null;
+  image_url?: string | null;
+  icon_type?: string | null;
+  button_text: string;
+  link_url: string;
+  orden: number;
+  is_active: boolean;
+}
+
 export type OrderStatus =
   | 'pending_payment'
   | 'paid'
