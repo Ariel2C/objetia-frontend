@@ -82,7 +82,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
   const unreadNotifsCount = notificaciones.filter(n => !n.leida).length;
   const [logoUrlState, setLogoUrlState] = useState(logoUrl || "");
   const [brandNameState, setBrandNameState] = useState("OBJETIA");
-  const [brandFontSizeState, setBrandFontSizeState] = useState("1.5rem");
+  const [brandFontSizeState, setBrandFontSizeState] = useState("1.25rem");
   const [brandFontFamilyState, setBrandFontFamilyState] = useState("Outfit");
   const [navBgColorState, setNavBgColorState] = useState("#FFFFFF");
   const [navbarSearch, setNavbarSearch] = useState('');
@@ -446,18 +446,18 @@ export default function Navbar({ logoUrl }: NavbarProps) {
           
           {/* LOGO DE MARCA */}
           <div className="flex-shrink-0 flex items-center">
-            <Link href="/" className="text-xl font-bold tracking-tight transition hover:opacity-95 flex items-center gap-2.5 group">
+            <Link href="/" className="transition hover:opacity-95 flex items-center gap-2 group">
               <img 
                 src={logoUrlState && logoUrlState !== "" && logoUrlState !== "https://" ? logoUrlState : "/objetia_logo.png"} 
                 alt="Logo" 
-                className="h-9 w-9 sm:h-10 sm:w-10 object-contain group-hover:scale-105 transition-transform" 
+                className="h-8 w-8 sm:h-9 sm:w-9 object-contain group-hover:scale-105 transition-transform" 
               />
               <span 
                 style={{ 
                   fontFamily: `var(--font-family-brand, ${brandFontFamilyState})`,
-                  fontSize: `var(--font-size-brand, ${brandFontSizeState})`
+                  fontSize: `var(--font-size-brand, ${brandFontSizeState || '1.3rem'})`
                 }} 
-                className="font-black tracking-wider uppercase leading-none text-[#5A4838]"
+                className="font-bold tracking-wide uppercase leading-none text-[#5C4A3A]"
               >
                 {brandNameState || 'OBJETIA'}
               </span>
