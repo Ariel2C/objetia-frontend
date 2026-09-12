@@ -136,9 +136,9 @@ export default function Footer({ logoUrl }: FooterProps) {
 
   return (
     <>
-      <footer className="bg-[#121316] text-[#9aa0a6] border-t border-[#23252a] pt-14 pb-12 mt-16 font-sans">
+      <footer className="bg-[#5C4A3A] text-[#E6DBD1] border-t border-[#4A3B2E] pt-14 pb-12 mt-16 font-sans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-[#23252a]">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-12 border-b border-[#4A3B2E]">
             
             {/* ==================================================================== */}
             {/* COLUMNA 1: MARCA Y SUSCRIPCIÓN A NOVEDADES (5 cols en lg)            */}
@@ -158,7 +158,7 @@ export default function Footer({ logoUrl }: FooterProps) {
                 </span>
               </Link>
 
-              <p className="text-xs text-[#9aa0a6] leading-relaxed max-w-sm">
+              <p className="text-xs text-[#E6DBD1] leading-relaxed max-w-sm">
                 Plataforma de diseño de interiores, mobiliario y objetos exclusivos para conectar espacios con estilo propio.
               </p>
 
@@ -166,14 +166,14 @@ export default function Footer({ logoUrl }: FooterProps) {
               <div className="pt-2">
                 <p className="text-xs font-semibold text-white mb-2">Recibí novedades y promociones</p>
                 {suscrito ? (
-                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400 text-xs">
+                  <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-200 text-xs">
                     <Check className="w-4 h-4 flex-shrink-0" />
                     <span>¡Gracias por suscribirte! Ya sos parte de nuestra comunidad.</span>
                   </div>
                 ) : (
                   <form onSubmit={handleNewsletterSubmit} className="space-y-2 max-w-md">
-                    <div className="flex items-center bg-[#1a1b1e] border border-[#3c4043] focus-within:border-[#87a9ff] focus-within:ring-1 focus-within:ring-[#87a9ff]/30 rounded-xl p-1 transition-all">
-                      <div className="pl-3 pr-2 text-[#9aa0a6]">
+                    <div className="flex items-center bg-[#4C3C2E] border border-[#755F4B] focus-within:border-[#FAF8F5] focus-within:ring-1 focus-within:ring-[#FAF8F5]/30 rounded-xl p-1 transition-all">
+                      <div className="pl-3 pr-2 text-[#D5C7B8]">
                         <Mail className="w-4 h-4" />
                       </div>
                       <input
@@ -182,18 +182,18 @@ export default function Footer({ logoUrl }: FooterProps) {
                         value={emailNovedades}
                         onChange={(e) => setEmailNovedades(e.target.value)}
                         placeholder="Tu correo electrónico"
-                        className="w-full bg-transparent text-xs text-white placeholder:text-[#5f6368] focus:outline-none py-2"
+                        className="w-full bg-transparent text-xs text-white placeholder:text-[#BCAEA0] focus:outline-none py-2"
                       />
                       <button
                         type="submit"
                         disabled={cargandoNewsletter}
-                        className="px-3.5 py-2 bg-white hover:bg-[#e3e3e3] text-[#121316] rounded-lg text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0 cursor-pointer disabled:opacity-50"
+                        className="px-3.5 py-2 bg-[#FAF8F5] hover:bg-white text-[#5C4A3A] rounded-lg text-xs font-bold transition flex items-center gap-1.5 flex-shrink-0 cursor-pointer disabled:opacity-50 shadow-xs"
                       >
                         <span>Suscribirme</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
-                    <p className="text-[10.5px] text-[#5f6368]">
+                    <p className="text-[10.5px] text-[#C2B2A2]">
                       Sin spam. Podés darte de baja en cualquier momento.
                     </p>
                   </form>
@@ -211,7 +211,7 @@ export default function Footer({ logoUrl }: FooterProps) {
                   <button 
                     type="button"
                     onClick={() => setModalActivo('preguntas')} 
-                    className="text-[#9aa0a6] hover:text-white transition text-left cursor-pointer"
+                    className="text-[#E6DBD1] hover:text-white transition text-left cursor-pointer"
                   >
                     Preguntas frecuentes
                   </button>
@@ -220,23 +220,23 @@ export default function Footer({ logoUrl }: FooterProps) {
                   <button 
                     type="button"
                     onClick={() => setModalActivo('como_funciona')} 
-                    className="text-[#9aa0a6] hover:text-white transition text-left cursor-pointer"
+                    className="text-[#E6DBD1] hover:text-white transition text-left cursor-pointer"
                   >
                     Cómo comprar y vender
                   </button>
                 </li>
                 <li>
-                  <Link href="/shipping/tracking" className="text-[#9aa0a6] hover:text-white transition block">
+                  <Link href="/shipping/tracking" className="text-[#E6DBD1] hover:text-white transition block">
                     Seguimiento de envíos
                   </Link>
                 </li>
                 <li>
-                  <Link href="/simulador-correo" className="text-[#9aa0a6] hover:text-white transition block">
+                  <Link href="/simulador-correo" className="text-[#E6DBD1] hover:text-white transition block">
                     Simulador de envíos
                   </Link>
                 </li>
                 <li>
-                  <Link href="/mi-objetia?tab=chat" className="text-[#9aa0a6] hover:text-white transition block">
+                  <Link href="/mi-objetia?tab=chat" className="text-[#E6DBD1] hover:text-white transition block">
                     Contacto y soporte
                   </Link>
                 </li>
@@ -253,7 +253,7 @@ export default function Footer({ logoUrl }: FooterProps) {
                   <button 
                     type="button"
                     onClick={() => setModalActivo('sobre_objetia')} 
-                    className="text-[#9aa0a6] hover:text-white transition text-left cursor-pointer"
+                    className="text-[#E6DBD1] hover:text-white transition text-left cursor-pointer"
                   >
                     Sobre Objetia
                   </button>
@@ -262,7 +262,7 @@ export default function Footer({ logoUrl }: FooterProps) {
                   <button 
                     type="button"
                     onClick={() => setModalActivo('compra_protegida')} 
-                    className="text-[#9aa0a6] hover:text-white transition text-left cursor-pointer"
+                    className="text-[#E6DBD1] hover:text-white transition text-left cursor-pointer"
                   >
                     Compra protegida
                   </button>
@@ -271,7 +271,7 @@ export default function Footer({ logoUrl }: FooterProps) {
                   <button 
                     type="button"
                     onClick={() => setModalActivo('terminos')} 
-                    className="text-[#9aa0a6] hover:text-white transition text-left cursor-pointer"
+                    className="text-[#E6DBD1] hover:text-white transition text-left cursor-pointer"
                   >
                     Términos y condiciones
                   </button>
@@ -280,7 +280,7 @@ export default function Footer({ logoUrl }: FooterProps) {
                   <button 
                     type="button"
                     onClick={() => setModalActivo('privacidad')} 
-                    className="text-[#9aa0a6] hover:text-white transition text-left cursor-pointer"
+                    className="text-[#E6DBD1] hover:text-white transition text-left cursor-pointer"
                   >
                     Política de privacidad
                   </button>
@@ -293,7 +293,7 @@ export default function Footer({ logoUrl }: FooterProps) {
             {/* ==================================================================== */}
             <div className="lg:col-span-3 space-y-3">
               <h4 className="text-xs font-bold text-white uppercase tracking-wider">Redes</h4>
-              <p className="text-xs text-[#9aa0a6] leading-relaxed">
+              <p className="text-xs text-[#E6DBD1] leading-relaxed">
                 Seguinos para descubrir tendencias de diseño, espacios inspiradores y nuevos objetos exclusivos.
               </p>
               <div className="flex items-center gap-2 pt-1">
@@ -301,7 +301,7 @@ export default function Footer({ logoUrl }: FooterProps) {
                   href="https://instagram.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-[#1a1b1e] border border-[#3c4043] flex items-center justify-center text-[#9aa0a6] hover:text-white hover:border-[#87a9ff] hover:bg-[#202227] transition cursor-pointer"
+                  className="w-9 h-9 rounded-xl bg-[#4C3C2E] border border-[#755F4B] flex items-center justify-center text-[#E6DBD1] hover:text-white hover:border-[#FAF8F5] hover:bg-[#685341] transition cursor-pointer"
                   aria-label="Instagram"
                   title="Instagram"
                 >
@@ -311,7 +311,7 @@ export default function Footer({ logoUrl }: FooterProps) {
                   href="https://facebook.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-[#1a1b1e] border border-[#3c4043] flex items-center justify-center text-[#9aa0a6] hover:text-white hover:border-[#87a9ff] hover:bg-[#202227] transition cursor-pointer"
+                  className="w-9 h-9 rounded-xl bg-[#4C3C2E] border border-[#755F4B] flex items-center justify-center text-[#E6DBD1] hover:text-white hover:border-[#FAF8F5] hover:bg-[#685341] transition cursor-pointer"
                   aria-label="Facebook"
                   title="Facebook"
                 >
@@ -321,7 +321,7 @@ export default function Footer({ logoUrl }: FooterProps) {
                   href="https://twitter.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-[#1a1b1e] border border-[#3c4043] flex items-center justify-center text-[#9aa0a6] hover:text-white hover:border-[#87a9ff] hover:bg-[#202227] transition cursor-pointer"
+                  className="w-9 h-9 rounded-xl bg-[#4C3C2E] border border-[#755F4B] flex items-center justify-center text-[#E6DBD1] hover:text-white hover:border-[#FAF8F5] hover:bg-[#685341] transition cursor-pointer"
                   aria-label="Twitter / X"
                   title="Twitter / X"
                 >
@@ -331,7 +331,7 @@ export default function Footer({ logoUrl }: FooterProps) {
                   href="https://youtube.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-9 h-9 rounded-xl bg-[#1a1b1e] border border-[#3c4043] flex items-center justify-center text-[#9aa0a6] hover:text-white hover:border-[#87a9ff] hover:bg-[#202227] transition cursor-pointer"
+                  className="w-9 h-9 rounded-xl bg-[#4C3C2E] border border-[#755F4B] flex items-center justify-center text-[#E6DBD1] hover:text-white hover:border-[#FAF8F5] hover:bg-[#685341] transition cursor-pointer"
                   aria-label="YouTube"
                   title="YouTube"
                 >
@@ -345,27 +345,27 @@ export default function Footer({ logoUrl }: FooterProps) {
           {/* ==================================================================== */}
           {/* BARRA INFERIOR DE COPYRIGHT                                         */}
           {/* ==================================================================== */}
-          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#5f6368]">
+          <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#C2B2A2]">
             <p>© 2026 Objetia. Todos los derechos reservados.</p>
             <div className="flex items-center gap-6 text-[11.5px]">
               <button 
                 type="button" 
                 onClick={() => setModalActivo('terminos')} 
-                className="hover:text-[#9aa0a6] transition cursor-pointer"
+                className="hover:text-white transition cursor-pointer"
               >
                 Términos
               </button>
               <button 
                 type="button" 
                 onClick={() => setModalActivo('privacidad')} 
-                className="hover:text-[#9aa0a6] transition cursor-pointer"
+                className="hover:text-white transition cursor-pointer"
               >
                 Privacidad
               </button>
               <button 
                 type="button" 
                 onClick={() => setModalActivo('compra_protegida')} 
-                className="hover:text-[#9aa0a6] transition cursor-pointer"
+                className="hover:text-white transition cursor-pointer"
               >
                 Garantía
               </button>
