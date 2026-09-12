@@ -769,7 +769,7 @@ function MiObjetiaContent() {
               {/* Botón interactivo animado menú <-> colapso según diseño exacto */}
               <button
                 onClick={() => setSidebarOculto(!sidebarOculto)}
-                className="hidden lg:flex items-center justify-center w-10 h-10 text-[#73675C] hover:text-[#B88D65] hover:bg-[#F2EFE9] active:bg-[#FAF0E6] active:scale-95 rounded-xl transition-all cursor-pointer flex-shrink-0 group"
+                className="hidden lg:flex items-center justify-center w-10 h-10 text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] active:bg-[#FAF0E6] active:scale-95 rounded-xl transition-all cursor-pointer flex-shrink-0 group"
                 title={sidebarOculto ? "Mostrar barra lateral" : "Ocultar barra lateral"}
                 aria-label={sidebarOculto ? "Mostrar barra lateral" : "Ocultar barra lateral"}
               >

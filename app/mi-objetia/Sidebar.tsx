@@ -169,7 +169,7 @@ export default function Sidebar({
   const badgeText = esEsRoot ? 'Root' : 'Admin';
   const badgeClasses = esEsRoot
     ? 'bg-[#FAF0E6] text-[#7B6858] border-[#EAE5DC] font-bold'
-    : 'bg-[#FAF0E6] text-[#B88D65] border-[#EAE5DC] font-bold';
+    : 'bg-[#FAF0E6] text-[#2C2723] border-[#EAE5DC] font-bold';
 
   const renderNavContent = () => (
     <div className="flex flex-col h-full justify-between overflow-hidden">
@@ -202,7 +202,7 @@ export default function Sidebar({
               onClick={() => cambiarTab(item)}
               className={`w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] transition-all text-left cursor-pointer group ${
                 activo
-                  ? 'bg-[#FAF0E6] text-[#B88D65] shadow-xs font-bold border border-[#EAE5DC]'
+                  ? 'bg-[#FAF0E6] text-[#2C2723] shadow-xs font-bold border border-[#EAE5DC]'
                   : 'text-[#534636] font-medium hover:bg-[#F2EFE9] hover:text-[#2C2723]'
               }`}
             >
@@ -210,7 +210,7 @@ export default function Sidebar({
                 <Icono 
                   className={`h-4 w-4 flex-shrink-0 transition-transform duration-150 ${
                     activo 
-                      ? 'text-[#B88D65]' 
+                      ? 'text-[#2C2723]' 
                       : 'text-[#7D756D] group-hover:text-[#2C2723]'
                   }`} 
                 />
@@ -218,13 +218,13 @@ export default function Sidebar({
               </div>
 
               {item.badge ? (
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider ${item.badgeColor || 'bg-[#FAF0E6] text-[#B88D65] border border-[#EAE5DC]'}`}>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider ${item.badgeColor || 'bg-[#FAF0E6] text-[#2C2723] border border-[#EAE5DC]'}`}>
                   {item.badge}
                 </span>
               ) : item.isExternalLink ? (
                 <ExternalLink className="h-3.5 w-3.5 text-[#7D756D] group-hover:text-[#2C2723]" />
               ) : activo ? (
-                <span className="w-1.5 h-1.5 rounded-full bg-[#B88D65]" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[#2C2723]" />
               ) : null}
             </button>
           );
@@ -235,11 +235,11 @@ export default function Sidebar({
           <div className="pt-4 mt-4 border-t border-[#EAE5DC]">
             <button
               onClick={abrirAdminStudio}
-              className="w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] font-semibold text-[#2C2723] hover:bg-[#FAF0E6] hover:text-[#B88D65] transition-all text-left cursor-pointer group border border-transparent hover:border-[#EAE5DC]"
+              className="w-full flex items-center justify-between px-3.5 h-[42px] rounded-xl text-[13.5px] font-semibold text-[#2C2723] hover:bg-[#FAF0E6] hover:text-[#2C2723] transition-all text-left cursor-pointer group border border-transparent hover:border-[#EAE5DC]"
             >
               <div className="flex items-center gap-3 min-w-0">
                 <ShieldCheck className={`h-4 w-4 flex-shrink-0 transition-transform group-hover:scale-110 ${
-                  esEsRoot ? 'text-amber-700' : 'text-[#B88D65]'
+                  esEsRoot ? 'text-amber-700' : 'text-[#2C2723]'
                 }`} />
                 <span className="truncate">OBJETIA studio</span>
               </div>

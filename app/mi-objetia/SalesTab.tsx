@@ -400,7 +400,7 @@ export default function SalesTab({ token }: SalesTabProps) {
               value={busqueda}
               onChange={handleBusquedaChange}
               placeholder="Buscar por producto, #orden, guía o comprador..."
-              className="w-full pl-9 pr-8 h-[36px] text-xs rounded-xl border border-[#E6E1DB] bg-white text-[#2C2723] placeholder-[#73675C] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 transition"
+              className="w-full pl-9 pr-8 h-[36px] text-xs rounded-xl border border-[#E6E1DB] bg-white text-[#2C2723] placeholder-[#73675C] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 transition"
             />
             {busqueda && (
               <button
@@ -427,7 +427,7 @@ export default function SalesTab({ token }: SalesTabProps) {
             onClick={() => cambiarFiltro('all')}
             className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
               filtroEstado === 'all'
-                ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                 : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
             }`}
           >
@@ -445,7 +445,7 @@ export default function SalesTab({ token }: SalesTabProps) {
             onClick={() => cambiarFiltro('pending')}
             className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
               filtroEstado === 'pending'
-                ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                 : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
             }`}
           >
@@ -463,7 +463,7 @@ export default function SalesTab({ token }: SalesTabProps) {
             onClick={() => cambiarFiltro('shipped')}
             className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
               filtroEstado === 'shipped'
-                ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                 : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
             }`}
           >
@@ -481,7 +481,7 @@ export default function SalesTab({ token }: SalesTabProps) {
             onClick={() => cambiarFiltro('delivered')}
             className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
               filtroEstado === 'delivered'
-                ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                 : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
             }`}
           >
@@ -497,7 +497,7 @@ export default function SalesTab({ token }: SalesTabProps) {
         {/* Contenido: Estado de carga, errores o lista de ventas */}
         {loading ? (
           <div className="p-12 text-center text-[#73675C] flex flex-col items-center justify-center gap-2">
-            <Loader2 className="w-6 h-6 animate-spin text-[#B88D65]" />
+            <Loader2 className="w-6 h-6 animate-spin text-[#2C2723]" />
             <span className="text-xs">Cargando tus ventas...</span>
           </div>
         ) : error ? (
@@ -507,7 +507,7 @@ export default function SalesTab({ token }: SalesTabProps) {
         ) : sales.length === 0 ? (
           /* Estado vacío general */
           <div className="p-8 sm:p-12 rounded-2xl border border-dashed border-[#EAE5DC] bg-[#FAF8F5] text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-[#FAF0E6] text-[#B88D65] flex items-center justify-center mx-auto border border-[#EAE5DC]">
+            <div className="w-12 h-12 rounded-full bg-[#FAF0E6] text-[#2C2723] flex items-center justify-center mx-auto border border-[#EAE5DC]">
               <ShoppingBag className="w-6 h-6" />
             </div>
             <div className="space-y-1">
@@ -519,7 +519,7 @@ export default function SalesTab({ token }: SalesTabProps) {
             <button
               type="button"
               onClick={() => window.dispatchEvent(new CustomEvent('vamaar:open-vender-modal'))}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#B88D65] hover:bg-[#A37953] text-white rounded-xl text-xs font-semibold shadow-xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2C2723] hover:bg-[#1B1816] text-white rounded-xl text-xs font-semibold shadow-xs transition cursor-pointer"
             >
               Publicar un Producto
             </button>
@@ -571,7 +571,7 @@ export default function SalesTab({ token }: SalesTabProps) {
                   <div className="space-y-1 min-w-0 flex-1">
                     {/* Badges de estado superior */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[10px] font-mono font-bold text-[#B88D65] bg-[#FAF0E6] px-2 py-0.5 rounded-full border border-[#EAE5DC] uppercase tracking-wider">
+                      <span className="text-[10px] font-mono font-bold text-[#2C2723] bg-[#FAF0E6] px-2 py-0.5 rounded-full border border-[#EAE5DC] uppercase tracking-wider">
                         Venta #{venta.id}
                       </span>
 
@@ -596,7 +596,7 @@ export default function SalesTab({ token }: SalesTabProps) {
                     {/* Domicilio de entrega */}
                     {(venta.recipient_name || venta.street || venta.city) && (
                       <div className="flex items-center gap-1.5 text-xs text-[#534636] flex-wrap">
-                        <MapPin className="h-3.5 w-3.5 text-[#B88D65] flex-shrink-0" />
+                        <MapPin className="h-3.5 w-3.5 text-[#2C2723] flex-shrink-0" />
                         <span className="font-semibold text-[#2C2723]">
                           {venta.recipient_name || "Comprador"}
                         </span>
@@ -640,7 +640,7 @@ export default function SalesTab({ token }: SalesTabProps) {
                             productImage: venta.image_url || null,
                             orderId: venta.id
                           })}
-                          className="font-mono font-bold text-[#2C2723] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#EAE5DC] hover:border-[#B88D65] transition cursor-pointer"
+                          className="font-mono font-bold text-[#2C2723] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#EAE5DC] hover:border-[#2C2723] transition cursor-pointer"
                           title="Hacé clic para ver el seguimiento del paquete"
                         >
                           {venta.tracking_number}
@@ -653,8 +653,8 @@ export default function SalesTab({ token }: SalesTabProps) {
                             ["DELIVERED", "ARRIVED"].includes(venta.shipment_status)
                               ? "bg-[#e8f8ef] text-[#00a650] border-[#ceead6]"
                               : venta.shipment_status === "LABEL_GENERATED"
-                                ? "bg-[#FAF0E6] text-[#B88D65] border-[#EAE5DC]"
-                                : "bg-[#FAF0E6] text-[#B88D65] border-[#EAE5DC]"
+                                ? "bg-[#FAF0E6] text-[#2C2723] border-[#EAE5DC]"
+                                : "bg-[#FAF0E6] text-[#2C2723] border-[#EAE5DC]"
                           }`}>
                             Envío: {ESTADOS_ENVIO[venta.shipment_status]}
                           </span>
@@ -685,7 +685,7 @@ export default function SalesTab({ token }: SalesTabProps) {
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#2C2723] hover:bg-[#FAF0E6] border border-[#EAE5DC] rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
                           title="Ver seguimiento de envío"
                         >
-                          <Package className="h-3.5 w-3.5 text-[#B88D65]" />
+                          <Package className="h-3.5 w-3.5 text-[#2C2723]" />
                           <span>Seguir Envío</span>
                         </button>
 
@@ -694,7 +694,7 @@ export default function SalesTab({ token }: SalesTabProps) {
                           className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#2C2723] hover:bg-[#F2EFE9] border border-[#EAE5DC] rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
                           title="Abrir mensajes con el comprador"
                         >
-                          <MessageSquare className="h-3.5 w-3.5 text-[#B88D65]" />
+                          <MessageSquare className="h-3.5 w-3.5 text-[#2C2723]" />
                           <span>Mensajes</span>
                         </Link>
                       </div>
@@ -710,7 +710,7 @@ export default function SalesTab({ token }: SalesTabProps) {
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white text-[#2C2723] hover:bg-[#F2EFE9] border border-[#EAE5DC] rounded-xl text-xs font-semibold transition shadow-2xs cursor-pointer"
                         title="Abrir mensajes con el comprador"
                       >
-                        <MessageSquare className="h-3.5 w-3.5 text-[#B88D65]" />
+                        <MessageSquare className="h-3.5 w-3.5 text-[#2C2723]" />
                         <span>Mensajes</span>
                       </Link>
                     </div>
@@ -747,7 +747,7 @@ export default function SalesTab({ token }: SalesTabProps) {
                     onClick={() => setPaginaActual(num)}
                     className={`w-7 h-7 rounded-lg text-xs font-medium font-mono transition cursor-pointer ${
                       paginaActual === num
-                        ? 'bg-[#B88D65] text-white'
+                        ? 'bg-[#2C2723] text-white'
                         : 'text-[#73675C] hover:bg-[#FAF0E6] hover:text-[#2C2723]'
                     }`}
                   >

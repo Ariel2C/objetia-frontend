@@ -165,7 +165,7 @@ export default function TrackingModal({
         {/* ================================================================= */}
         <div className="px-5 py-4 border-b border-[#EAE5DC] flex items-center justify-between gap-3 bg-[#FAF8F5]">
           <div className="space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#B88D65] bg-[#FAF0E6] px-2.5 py-0.5 rounded-full border border-[#EAE5DC] inline-flex items-center gap-1.5 w-fit">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#2C2723] bg-[#F2EFE9] px-2.5 py-0.5 rounded-full border border-[#EAE5DC] inline-flex items-center gap-1.5 w-fit">
               <Truck className="h-3 w-3" /> Correo Argentino
             </span>
             <h3 className="text-base sm:text-lg font-bold text-[#2C2723] leading-tight">
@@ -182,7 +182,7 @@ export default function TrackingModal({
                 className="p-1.5 text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-lg transition cursor-pointer disabled:opacity-40"
                 title="Actualizar estado"
               >
-                <RotateCw className={`h-4 w-4 ${cargando ? 'animate-spin text-[#B88D65]' : ''}`} />
+                <RotateCw className={`h-4 w-4 ${cargando ? 'animate-spin text-[#2C2723]' : ''}`} />
               </button>
             )}
             <button
@@ -222,7 +222,7 @@ export default function TrackingModal({
             <div className="space-y-0.5 min-w-0 flex-1">
               <div className="flex items-center gap-2 flex-wrap">
                 {orderId && (
-                  <span className="text-[10px] font-mono font-bold text-[#B88D65] bg-[#FAF0E6] px-2 py-0.2 rounded border border-[#EAE5DC]">
+                  <span className="text-[10px] font-mono font-bold text-[#2C2723] bg-[#F2EFE9] px-2 py-0.2 rounded border border-[#EAE5DC]">
                     Orden #{orderId}
                   </span>
                 )}
@@ -230,7 +230,7 @@ export default function TrackingModal({
                   <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.2 rounded-full ${
                     trackingData.status === 'Entregado'
                       ? 'bg-[#EDF7EE] text-[#1E7E34] border border-[#C3E6CB]'
-                      : 'bg-[#FAF0E6] text-[#B88D65] border border-[#EAE5DC]'
+                      : 'bg-[#F2EFE9] text-[#2C2723] border border-[#EAE5DC]'
                   }`}>
                     {trackingData.status}
                   </span>
@@ -290,7 +290,7 @@ export default function TrackingModal({
             {/* ESTADOS DE CARGA / ERROR */}
             {cargando && !trackingData ? (
               <div className="py-12 text-center space-y-3">
-                <Loader2 className="w-8 h-8 animate-spin text-[#B88D65] mx-auto" />
+                <Loader2 className="w-8 h-8 animate-spin text-[#2C2723] mx-auto" />
                 <p className="text-xs font-semibold text-[#2C2723]">Consultando servidor logístico...</p>
                 <p className="text-[11px] text-[#73675C]">Obteniendo los últimos movimientos de Correo Argentino</p>
               </div>
@@ -318,7 +318,7 @@ export default function TrackingModal({
                   const shouldHighlightAccent = isStepCurrent || isDeliveredFinal;
 
                   const bgLineClass = shouldHighlightAccent
-                    ? 'bg-[#B88D65]'
+                    ? 'bg-[#2C2723]'
                     : step.done
                       ? 'bg-[#2C2723]'
                       : 'bg-[#EAE5DC]';
@@ -328,7 +328,7 @@ export default function TrackingModal({
                       key={step.code} 
                       className={`relative rounded-xl border transition-all flex items-stretch overflow-visible ${
                         isStepCurrent
-                          ? 'bg-white border-[#B88D65]/50 shadow-xs ring-2 ring-[#B88D65]/20'
+                          ? 'bg-white border-[#2C2723]/30 shadow-xs ring-2 ring-[#2C2723]/10'
                           : step.done
                             ? 'bg-[#FAF8F5] hover:bg-white border-[#EAE5DC]'
                             : 'bg-[#FAF8F5]/50 border-[#EAE5DC]/70 opacity-75'
@@ -394,7 +394,7 @@ export default function TrackingModal({
                         {!isFirst && (
                           <div 
                             className={`absolute left-1/2 -translate-x-1/2 w-[3px] z-[3] ${
-                              shouldHighlightAccent ? 'bg-[#B88D65]' : step.done ? 'bg-[#2C2723]' : 'bg-[#EAE5DC]'
+                              shouldHighlightAccent ? 'bg-[#2C2723]' : step.done ? 'bg-[#2C2723]' : 'bg-[#EAE5DC]'
                             }`}
                             style={{
                               top: '-15px',
@@ -418,7 +418,7 @@ export default function TrackingModal({
                         <div 
                           className={`relative w-[39px] h-[39px] rounded-full flex items-center justify-center border-2 transition-all z-[4] ${
                             shouldHighlightAccent
-                              ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-sm ring-2 ring-[#B88D65]/20 scale-105'
+                              ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-sm ring-2 ring-[#2C2723]/20 scale-105'
                               : step.done
                                 ? 'bg-[#2C2723] border-[#2C2723] text-white'
                                 : 'bg-[#FAF8F5] border-[#EAE5DC] text-[#73675C]'
@@ -434,7 +434,7 @@ export default function TrackingModal({
                           <h6
                             className={`text-xs sm:text-sm font-bold leading-tight ${
                               shouldHighlightAccent
-                                ? 'text-[#B88D65]'
+                                ? 'text-[#2C2723]'
                                 : step.done
                                   ? 'text-[#2C2723]'
                                   : 'text-[#73675C]'
@@ -443,7 +443,7 @@ export default function TrackingModal({
                             {step.title}
                           </h6>
                           {isStepCurrent && (
-                            <span className="text-[9.5px] font-bold uppercase tracking-wider bg-[#B88D65] text-white px-1.5 py-0.2 rounded">
+                            <span className="text-[9.5px] font-bold uppercase tracking-wider bg-[#2C2723] text-white px-1.5 py-0.2 rounded">
                               En curso
                             </span>
                           )}
@@ -490,7 +490,7 @@ export default function TrackingModal({
             <div className="bg-white border border-[#EAE5DC] rounded-2xl p-3.5 space-y-2 shadow-2xs">
               <div className="flex items-center justify-between text-xs">
                 <span className="font-semibold text-[#2C2723] flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5 text-[#B88D65]" />
+                  <MapPin className="h-3.5 w-3.5 text-[#2C2723]" />
                   Dirección de Entrega
                 </span>
                 <span className="text-[11px] text-[#73675C] flex items-center gap-1">

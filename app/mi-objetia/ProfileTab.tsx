@@ -780,15 +780,15 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
             <div className="space-y-0.5">
               <div className="flex items-center gap-2">
                 <h4 className="text-sm font-semibold text-[#2C2723] flex items-center gap-2">
-                  <User className="h-4 w-4 text-[#B88D65]" /> Información Personal
+                  <User className="h-4 w-4 text-[#2C2723]" /> Información Personal
                 </h4>
                 <span className="inline-flex items-center" title={loadingProfile ? "Guardando..." : hasProfileChanges ? "Editando..." : "Al día"}>
                   {loadingProfile ? (
-                    <Loader2 className="w-3.5 h-3.5 text-[#B88D65] animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 text-[#2C2723] animate-spin" />
                   ) : hasProfileChanges ? (
-                    <Pencil className="w-3.5 h-3.5 text-[#B88D65] animate-pulse" />
+                    <Pencil className="w-3.5 h-3.5 text-[#2C2723] animate-pulse" />
                   ) : (
-                    <Check className="w-3.5 h-3.5 text-[#B88D65]" strokeWidth={2.5} />
+                    <Check className="w-3.5 h-3.5 text-[#2C2723]" strokeWidth={2.5} />
                   )}
                 </span>
               </div>
@@ -817,7 +817,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                 disabled={!hasProfileChanges || loadingProfile}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition flex items-center gap-1.5 shadow-2xs ${
                   hasProfileChanges && !loadingProfile
-                    ? 'bg-[#B88D65] text-white hover:bg-[#A37953] cursor-pointer active:scale-98 shadow-xs'
+                    ? 'bg-[#2C2723] text-white hover:bg-[#1B1816] cursor-pointer active:scale-98 shadow-xs'
                     : 'bg-[#F2EFE9] text-[#73675C] border border-[#EAE5DC]/60 cursor-not-allowed'
                 }`}
               >
@@ -849,8 +849,8 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                 onChange={(e) => setFullName(e.target.value)}
                 className={`w-full px-3.5 py-2.5 text-sm rounded-xl border transition text-[#2C2723] placeholder:text-[#9aa0a6] ${
                   fullName !== initialFullName
-                    ? 'border-[#B88D65] bg-[#FAF0E6]/30 ring-2 ring-[#B88D65]/10'
-                    : 'border-[#E6E1DB] bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20'
+                    ? 'border-[#2C2723] bg-[#FAF8F5] ring-2 ring-[#2C2723]/10'
+                    : 'border-[#E6E1DB] bg-white focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20'
                 } focus:outline-none`}
               />
             </div>
@@ -866,8 +866,8 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                 onChange={(e) => setPhone(e.target.value)}
                 className={`w-full px-3.5 py-2.5 text-sm rounded-xl border transition text-[#2C2723] placeholder:text-[#9aa0a6] ${
                   phone !== initialPhone
-                    ? 'border-[#B88D65] bg-[#FAF0E6]/30 ring-2 ring-[#B88D65]/10'
-                    : 'border-[#E6E1DB] bg-white focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20'
+                    ? 'border-[#2C2723] bg-[#FAF8F5] ring-2 ring-[#2C2723]/10'
+                    : 'border-[#E6E1DB] bg-white focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20'
                 } focus:outline-none`}
               />
             </div>
@@ -894,7 +894,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
         <div className="flex items-center justify-between border-b border-[#EAE5DC] pb-3">
           <div className="space-y-0.5">
             <h4 className="text-sm font-semibold text-[#2C2723] flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-[#B88D65]" /> Direcciones de Entrega
+              <MapPin className="h-4 w-4 text-[#2C2723]" /> Direcciones de Entrega
             </h4>
             <p className="text-xs text-[#73675C]">
               Tus domicilios guardados para recibir compras y envíos
@@ -905,7 +905,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
             <button
               type="button"
               onClick={handleOpenCreateForm}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-[#B88D65] bg-[#FAF0E6] hover:bg-[#F4E6D8] border border-[#EAE5DC] transition cursor-pointer active:scale-98 shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold text-white bg-[#2C2723] hover:bg-[#1B1816] border border-[#2C2723] transition cursor-pointer active:scale-98 shadow-2xs"
               title="Agregar nueva dirección"
             >
               <Plus className="h-3.5 w-3.5" />
@@ -961,12 +961,12 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                               setShowPredictionsDropdown(false);
                             }
                           }}
-                          className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition"
                           autoComplete="off"
                         />
                         {loadingPredictions && (
                           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                            <Loader2 className="w-4 h-4 text-[#B88D65] animate-spin" />
+                            <Loader2 className="w-4 h-4 text-[#2C2723] animate-spin" />
                           </div>
                         )}
                       </div>
@@ -981,10 +981,10 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                               onClick={() => handleSelectPrediction(p)}
                               onMouseEnter={() => setHighlightedIndex(idx)}
                               className={`w-full text-left px-3.5 py-2.5 flex items-start gap-2.5 transition border-b border-[#EAE5DC] last:border-0 cursor-pointer ${
-                                highlightedIndex === idx ? "bg-[#FAF0E6] text-[#B88D65]" : "hover:bg-[#F2EFE9] text-[#2C2723]"
+                                highlightedIndex === idx ? "bg-[#F2EFE9] text-[#2C2723] font-bold" : "hover:bg-[#F2EFE9] text-[#2C2723]"
                               }`}
                             >
-                              <MapPin className={`w-4 h-4 mt-0.5 shrink-0 ${highlightedIndex === idx ? "text-[#B88D65]" : "text-[#73675C]"}`} />
+                              <MapPin className={`w-4 h-4 mt-0.5 shrink-0 ${highlightedIndex === idx ? "text-[#2C2723]" : "text-[#73675C]"}`} />
                               <div className="flex-1 min-w-0">
                                 <p className="text-xs font-semibold truncate text-[#2C2723]">{p.main_text}</p>
                                 {p.secondary_text && (
@@ -1009,7 +1009,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         onBlur={() => {
                           if (!formPostalCode.trim()) autoDetectPostalCode();
                         }}
-                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition"
                       />
                     </div>
                   </div>
@@ -1024,7 +1024,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         placeholder="Ej: 2° B"
                         value={formFloorDept}
                         onChange={(e) => setFormFloorDept(e.target.value)}
-                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition"
                       />
                     </div>
                     <div>
@@ -1037,7 +1037,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                             type="button"
                             onClick={() => autoDetectPostalCode()}
                             disabled={loadingPostalCode}
-                            className="text-[11px] font-medium text-[#B88D65] hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                            className="text-[11px] font-medium text-[#2C2723] hover:underline flex items-center gap-1 cursor-pointer disabled:opacity-50"
                           >
                             {loadingPostalCode ? (
                               <>
@@ -1059,11 +1059,11 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                           onBlur={() => {
                             if (!formPostalCode.trim()) autoDetectPostalCode();
                           }}
-                          className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition font-mono font-semibold"
+                          className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition font-mono font-semibold"
                         />
                         {loadingPostalCode && (
                           <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <Loader2 className="w-4 h-4 text-[#B88D65] animate-spin" />
+                            <Loader2 className="w-4 h-4 text-[#2C2723] animate-spin" />
                           </div>
                         )}
                       </div>
@@ -1082,7 +1082,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         onBlur={() => {
                           if (!formPostalCode.trim()) autoDetectPostalCode();
                         }}
-                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] bg-white transition cursor-pointer"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 text-[#2C2723] bg-white transition cursor-pointer"
                       >
                         <option value="">Seleccioná tu provincia...</option>
                         {PROVINCIAS_ARGENTINA.map((p) => (
@@ -1103,7 +1103,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         onBlur={() => {
                           if (!formPostalCode.trim()) autoDetectPostalCode();
                         }}
-                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition"
+                        className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition"
                       />
                     </div>
                   </div>
@@ -1114,7 +1114,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                       <button
                         type="submit"
                         disabled={savingAddress}
-                        className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-[#B88D65] hover:bg-[#A37953] rounded-xl transition cursor-pointer disabled:opacity-60 shadow-xs active:scale-98"
+                        className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-[#2C2723] hover:bg-[#1B1816] rounded-xl transition cursor-pointer disabled:opacity-60 shadow-xs active:scale-98"
                       >
                         {savingAddress ? (
                           <>
@@ -1131,7 +1131,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                     ) : (
                       <button
                         type="submit"
-                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-[#B88D65] hover:bg-[#A37953] rounded-xl transition cursor-pointer shadow-xs active:scale-98"
+                        className="inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-semibold text-white bg-[#2C2723] hover:bg-[#1B1816] rounded-xl transition cursor-pointer shadow-xs active:scale-98"
                       >
                         <span>Siguiente</span>
                         <ArrowRight className="w-3.5 h-3.5" />
@@ -1156,7 +1156,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-xs text-[#73675C]">
                     <span className="font-semibold text-[#534636] flex items-center gap-1.5">
-                      <Navigation className="w-3.5 h-3.5 text-[#B88D65]" />
+                      <Navigation className="w-3.5 h-3.5 text-[#2C2723]" />
                       Ubicación en el mapa
                     </span>
                     <span className="text-[11px] text-[#73675C]">
@@ -1169,7 +1169,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
 
                     {!googleMapsLoaded && (
                       <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-[#FAF8F5]/95 text-[#73675C]">
-                        <MapPin className="w-8 h-8 text-[#B88D65] mb-2 animate-bounce" />
+                        <MapPin className="w-8 h-8 text-[#2C2723] mb-2 animate-bounce" />
                         <p className="text-xs font-medium text-[#2C2723]">Cargando mapa interactivo...</p>
                         <p className="text-[11px] text-[#73675C] mt-1 max-w-xs">
                           Podés completar los campos a la izquierda o buscar la calle directamente.
@@ -1188,7 +1188,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
               <form onSubmit={handleSaveAddress} className="max-w-xl mx-auto space-y-5 animate-fade-in bg-[#FAF8F5] border border-[#EAE5DC] rounded-2xl p-5 sm:p-6 shadow-xs">
                 {/* Resumen visual de la dirección ingresada */}
                 <div className="bg-[#FAF0E6] border border-[#EAE5DC] rounded-xl p-4 flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#FAF8F5] text-[#B88D65] border border-[#EAE5DC] flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-9 h-9 rounded-xl bg-[#F2EFE9] text-[#2C2723] border border-[#EAE5DC] flex items-center justify-center shrink-0 mt-0.5">
                     <MapPin className="w-4 h-4" />
                   </div>
                   <div className="space-y-1 min-w-0 flex-1">
@@ -1206,7 +1206,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                 <div className="space-y-3">
                   <div>
                     <label className="text-xs font-semibold text-[#534636] flex items-center gap-1.5 mb-1.5">
-                      <Tag className="w-3.5 h-3.5 text-[#B88D65]" />
+                      <Tag className="w-3.5 h-3.5 text-[#2C2723]" />
                       Etiqueta de la dirección *
                     </label>
                     <input
@@ -1215,7 +1215,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                       placeholder="Ej: Mi casa, Oficina, Depto"
                       value={formTitle}
                       onChange={(e) => setFormTitle(e.target.value)}
-                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition font-medium"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 text-[#2C2723] placeholder:text-[#9aa0a6] bg-white transition font-medium"
                       autoFocus
                     />
                   </div>
@@ -1230,7 +1230,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         onClick={() => setFormTitle(sug)}
                         className={`px-2.5 py-1 text-xs rounded-lg border transition cursor-pointer ${
                           formTitle === sug
-                            ? "bg-[#FAF0E6] text-[#B88D65] border-[#B88D65] font-semibold"
+                            ? "bg-[#2C2723] text-white border-[#2C2723] font-semibold"
                             : "bg-white text-[#73675C] border-[#EAE5DC] hover:bg-[#F2EFE9]"
                         }`}
                       >
@@ -1246,7 +1246,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                     type="checkbox"
                     checked={formIsDefault}
                     onChange={(e) => setFormIsDefault(e.target.checked)}
-                    className="w-4 h-4 text-[#B88D65] rounded-md border-[#E6E1DB] focus:ring-[#B88D65] cursor-pointer"
+                    className="w-4 h-4 text-[#2C2723] rounded-md border-[#E6E1DB] focus:ring-[#2C2723] cursor-pointer accent-[#2C2723]"
                   />
                   <span className="text-xs font-medium text-[#534636]">
                     Establecer como dirección activa para envíos
@@ -1258,7 +1258,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                   <button
                     type="submit"
                     disabled={savingAddress}
-                    className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-[#B88D65] hover:bg-[#A37953] rounded-xl transition cursor-pointer disabled:opacity-60 shadow-xs active:scale-98"
+                    className="inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-xs font-semibold text-white bg-[#2C2723] hover:bg-[#1B1816] rounded-xl transition cursor-pointer disabled:opacity-60 shadow-xs active:scale-98"
                   >
                     {savingAddress ? (
                       <>
@@ -1302,12 +1302,12 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
           <div className="space-y-3">
             {loadingAddresses ? (
               <div className="p-8 text-center text-[#73675C] flex flex-col items-center justify-center gap-2">
-                <Loader2 className="w-5 h-5 animate-spin text-[#B88D65]" />
+                <Loader2 className="w-5 h-5 animate-spin text-[#2C2723]" />
                 <span className="text-xs">Cargando tus direcciones...</span>
               </div>
             ) : addresses.length === 0 ? (
               <div className="p-8 rounded-2xl border border-dashed border-[#EAE5DC] bg-[#FAF8F5] text-center space-y-3">
-                <div className="w-10 h-10 rounded-full bg-[#FAF0E6] text-[#B88D65] flex items-center justify-center mx-auto border border-[#EAE5DC]">
+                <div className="w-10 h-10 rounded-full bg-[#F2EFE9] text-[#2C2723] flex items-center justify-center mx-auto border border-[#EAE5DC]">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div className="space-y-1">
@@ -1319,7 +1319,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                 <button
                   type="button"
                   onClick={handleOpenCreateForm}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-[#B88D65] hover:bg-[#A37953] rounded-xl transition cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-semibold text-white bg-[#2C2723] hover:bg-[#1B1816] rounded-xl transition cursor-pointer shadow-2xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Agregar mi primera dirección</span>
@@ -1334,7 +1334,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                       key={addr.id}
                       className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
                         isActiva
-                          ? "bg-[#FAF0E6]/40 border-[#B88D65]/40 shadow-xs"
+                          ? "bg-[#FAF8F5] border-[#2C2723]/40 shadow-xs"
                           : "bg-white border-[#EAE5DC] hover:border-[#D5CEC4]"
                       }`}
                     >
@@ -1346,7 +1346,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                           </span>
 
                           {isActiva ? (
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#B88D65] bg-[#FAF0E6] border border-[#EAE5DC] px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#2C2723] bg-[#F2EFE9] border border-[#EAE5DC] px-2.5 py-0.5 rounded-full flex items-center gap-1">
                               <Check className="w-3 h-3" />
                               Activa para envíos
                             </span>
@@ -1354,7 +1354,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                             <button
                               type="button"
                               onClick={() => handleSetDefault(addr.id)}
-                              className="text-[11px] font-medium text-[#B88D65] hover:underline cursor-pointer"
+                              className="text-[11px] font-medium text-[#2C2723] hover:underline cursor-pointer"
                             >
                               Usar para envíos
                             </button>
@@ -1381,7 +1381,7 @@ export default function ProfileTab({ onSavingChange, onHasChangesChange }: Profi
                         <button
                           type="button"
                           onClick={() => handleOpenEditForm(addr)}
-                          className="p-2 text-[#73675C] hover:text-[#B88D65] hover:bg-[#FAF0E6] rounded-xl border border-transparent hover:border-[#EAE5DC] transition cursor-pointer"
+                          className="p-2 text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-xl border border-transparent hover:border-[#EAE5DC] transition cursor-pointer"
                           title="Editar dirección"
                         >
                           <Pencil className="h-4 w-4" />

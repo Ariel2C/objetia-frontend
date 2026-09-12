@@ -405,7 +405,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
   if (loading) {
     return (
       <div className="flex justify-center py-12">
-        <div className="h-8 w-8 border-4 border-[#B88D65] border-t-transparent rounded-full animate-spin" />
+        <div className="h-8 w-8 border-4 border-[#2C2723] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -437,7 +437,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               onClick={() => setMetricaActiva('views')}
               className={`px-3.5 h-[34px] sm:h-[36px] rounded-[10px] sm:rounded-[12px] text-[12px] sm:text-[13px] font-medium transition flex items-center gap-2 cursor-pointer border whitespace-nowrap ${
                 metricaActiva === 'views'
-                  ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                  ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                   : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
               }`}
             >
@@ -457,7 +457,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               onClick={() => setMetricaActiva('favorites')}
               className={`px-3.5 h-[34px] sm:h-[36px] rounded-[10px] sm:rounded-[12px] text-[12px] sm:text-[13px] font-medium transition flex items-center gap-2 cursor-pointer border whitespace-nowrap ${
                 metricaActiva === 'favorites'
-                  ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                  ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                   : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
               }`}
             >
@@ -477,7 +477,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               onClick={() => setMetricaActiva('sales')}
               className={`px-3.5 h-[34px] sm:h-[36px] rounded-[10px] sm:rounded-[12px] text-[12px] sm:text-[13px] font-medium transition flex items-center gap-2 cursor-pointer border whitespace-nowrap ${
                 metricaActiva === 'sales'
-                  ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                  ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                   : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
               }`}
             >
@@ -530,7 +530,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                 </div>
               </div>
 
-              {/* Barras CSS en toffee #B88D65 */}
+              {/* Barras CSS en espresso #2C2723 */}
               <div className="relative z-10 flex items-end justify-between h-40 w-full pr-12 pl-1 gap-1">
                 {activeTimelineData.map((d, idx) => {
                   const val = d.value;
@@ -545,7 +545,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                       <div
                         style={{ height: `${barH}%` }}
                         className={`w-full max-w-[22px] rounded-t-[4px] transition-all relative flex justify-center ${
-                          val > 0 ? 'bg-[#B88D65] group-hover:bg-[#A37953]' : 'bg-[#EAE5DC] hover:bg-[#D5CEC4]'
+                          val > 0 ? 'bg-[#2C2723] group-hover:bg-[#1B1816]' : 'bg-[#EAE5DC] hover:bg-[#D5CEC4]'
                         }`}
                       >
                         {/* Tooltip dinámico */}
@@ -622,7 +622,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                 value={busqueda}
                 onChange={handleBusquedaChange}
                 placeholder="Buscar por título o ID..."
-                className="w-full pl-9 pr-8 h-[34px] text-xs rounded-xl border border-[#E6E1DB] bg-white text-[#2C2723] placeholder-[#73675C] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 transition"
+                className="w-full pl-9 pr-8 h-[34px] text-xs rounded-xl border border-[#E6E1DB] bg-white text-[#2C2723] placeholder-[#73675C] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 transition"
               />
               {busqueda && (
                 <button
@@ -649,7 +649,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               onClick={() => cambiarFiltro('all')}
               className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
                 filtroActual === 'all'
-                  ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                  ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                   : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
               }`}
             >
@@ -667,7 +667,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               onClick={() => cambiarFiltro('published')}
               className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
                 filtroActual === 'published'
-                  ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                  ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                   : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
               }`}
             >
@@ -685,7 +685,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               onClick={() => cambiarFiltro('pending')}
               className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
                 filtroActual === 'pending'
-                  ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                  ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                   : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
               }`}
             >
@@ -703,7 +703,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               onClick={() => cambiarFiltro('paused')}
               className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
                 filtroActual === 'paused'
-                  ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                  ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                   : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
               }`}
             >
@@ -721,7 +721,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               onClick={() => cambiarFiltro('rejected')}
               className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
                 filtroActual === 'rejected'
-                  ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                  ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                   : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
               }`}
             >
@@ -739,7 +739,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
               onClick={() => cambiarFiltro('sold')}
               className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
                 filtroActual === 'sold'
-                  ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                  ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                   : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
               }`}
             >
@@ -821,7 +821,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                             <button
                               type="button"
                               onClick={() => handleOpenEdit(item)}
-                              className="text-[10px] text-[#B88D65] hover:text-[#A37953] hover:underline font-semibold block"
+                              className="text-[10px] text-[#2C2723] hover:underline font-semibold block"
                             >
                               Editar para corregir →
                             </button>
@@ -879,7 +879,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                           <Link 
                             href={`/products/${item.id}`}
                             title="Ver publicación"
-                            className="p-1.5 text-[#73675C] hover:text-[#B88D65] hover:bg-[#FAF0E6] rounded-lg transition"
+                            className="p-1.5 text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-lg transition"
                           >
                             <Eye className="h-4 w-4" />
                           </Link>
@@ -908,7 +908,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                           <button
                             onClick={() => handleOpenEdit(item)}
                             title={itemStatus === 'rejected' ? "Editar para corregir rechazo" : "Editar publicación"}
-                            className="p-1.5 text-[#73675C] hover:text-[#B88D65] hover:bg-[#FAF0E6] rounded-lg transition cursor-pointer"
+                            className="p-1.5 text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-lg transition cursor-pointer"
                           >
                             <Edit2 className="h-4 w-4" />
                           </button>
@@ -917,7 +917,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                             <button
                               onClick={() => handleCopiarEnlace(item.id)}
                               title="Copiar enlace"
-                              className="p-1.5 text-[#73675C] hover:text-[#B88D65] hover:bg-[#FAF0E6] rounded-lg transition cursor-pointer"
+                              className="p-1.5 text-[#73675C] hover:text-[#2C2723] hover:bg-[#F2EFE9] rounded-lg transition cursor-pointer"
                             >
                               {copiandoId === item.id ? (
                                 <Check className="h-4 w-4 text-[#1E7E34]" />
@@ -971,7 +971,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                     onClick={() => setPaginaActual(num)}
                     className={`w-7 h-7 rounded-lg text-xs font-medium font-mono transition cursor-pointer ${
                       paginaActual === num
-                        ? 'bg-[#B88D65] text-white shadow-xs'
+                        ? 'bg-[#2C2723] text-white shadow-xs'
                         : 'text-[#73675C] hover:bg-[#FAF0E6] hover:text-[#2C2723]'
                     }`}
                   >
@@ -1018,7 +1018,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                   required
                   value={editTitulo}
                   onChange={(e) => setEditTitulo(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E6E1DB] bg-white focus:bg-white text-[#2C2723] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 font-medium transition"
+                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E6E1DB] bg-white focus:bg-white text-[#2C2723] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 font-medium transition"
                 />
               </div>
 
@@ -1029,7 +1029,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                   required
                   value={editDescripcion}
                   onChange={(e) => setEditDescripcion(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E6E1DB] bg-white focus:bg-white text-[#2C2723] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 font-medium leading-relaxed transition"
+                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E6E1DB] bg-white focus:bg-white text-[#2C2723] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 font-medium leading-relaxed transition"
                 />
               </div>
 
@@ -1042,7 +1042,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                     min="1"
                     value={editPrecio}
                     onChange={(e) => setEditPrecio(parseFloat(e.target.value) || 0)}
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E6E1DB] bg-white focus:bg-white text-[#2C2723] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 font-bold transition"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E6E1DB] bg-white focus:bg-white text-[#2C2723] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 font-bold transition"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -1053,7 +1053,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                     min="0"
                     value={editStock}
                     onChange={(e) => setEditStock(parseInt(e.target.value) || 0)}
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E6E1DB] bg-white focus:bg-white text-[#2C2723] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 font-bold transition"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E6E1DB] bg-white focus:bg-white text-[#2C2723] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 font-bold transition"
                   />
                 </div>
               </div>
@@ -1066,7 +1066,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                     required
                     value={editCategoria}
                     onChange={(e) => setEditCategoria(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E6E1DB] bg-white focus:bg-white text-[#2C2723] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 font-medium transition"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E6E1DB] bg-white focus:bg-white text-[#2C2723] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 font-medium transition"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -1074,7 +1074,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                   <select 
                     value={editCondicion}
                     onChange={(e) => setEditCondicion(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E6E1DB] bg-white focus:bg-white text-[#2C2723] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 font-medium transition"
+                    className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-[#E6E1DB] bg-white focus:bg-white text-[#2C2723] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 font-medium transition"
                   >
                     <option value="NEW">Nuevo</option>
                     <option value="USED">Usado / Restaurado</option>
@@ -1096,7 +1096,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                       min="0"
                       value={editPeso}
                       onChange={(e) => setEditPeso(parseFloat(e.target.value) || 0)}
-                      className="w-full px-2.5 py-2 text-xs border border-[#E6E1DB] bg-white focus:bg-white rounded-xl text-center font-bold text-[#2C2723] focus:outline-none focus:border-[#B88D65]"
+                      className="w-full px-2.5 py-2 text-xs border border-[#E6E1DB] bg-white focus:bg-white rounded-xl text-center font-bold text-[#2C2723] focus:outline-none focus:border-[#2C2723]"
                     />
                   </div>
                   <div>
@@ -1106,7 +1106,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                       min="0"
                       value={editAlto}
                       onChange={(e) => setEditAlto(parseInt(e.target.value) || 0)}
-                      className="w-full px-2.5 py-2 text-xs border border-[#E6E1DB] bg-white focus:bg-white rounded-xl text-center font-bold text-[#2C2723] focus:outline-none focus:border-[#B88D65]"
+                      className="w-full px-2.5 py-2 text-xs border border-[#E6E1DB] bg-white focus:bg-white rounded-xl text-center font-bold text-[#2C2723] focus:outline-none focus:border-[#2C2723]"
                     />
                   </div>
                   <div>
@@ -1116,7 +1116,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                       min="0"
                       value={editAncho}
                       onChange={(e) => setEditAncho(parseInt(e.target.value) || 0)}
-                      className="w-full px-2.5 py-2 text-xs border border-[#E6E1DB] bg-white focus:bg-white rounded-xl text-center font-bold text-[#2C2723] focus:outline-none focus:border-[#B88D65]"
+                      className="w-full px-2.5 py-2 text-xs border border-[#E6E1DB] bg-white focus:bg-white rounded-xl text-center font-bold text-[#2C2723] focus:outline-none focus:border-[#2C2723]"
                     />
                   </div>
                   <div>
@@ -1126,7 +1126,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                       min="0"
                       value={editLargo}
                       onChange={(e) => setEditLargo(parseInt(e.target.value) || 0)}
-                      className="w-full px-2.5 py-2 text-xs border border-[#E6E1DB] bg-white focus:bg-white rounded-xl text-center font-bold text-[#2C2723] focus:outline-none focus:border-[#B88D65]"
+                      className="w-full px-2.5 py-2 text-xs border border-[#E6E1DB] bg-white focus:bg-white rounded-xl text-center font-bold text-[#2C2723] focus:outline-none focus:border-[#2C2723]"
                     />
                   </div>
                 </div>
@@ -1136,7 +1136,7 @@ export default function PublicationsTab({ token }: PublicationsTabProps) {
                 <button 
                   type="submit"
                   disabled={guardandoEdit}
-                  className="w-full py-2.5 bg-[#B88D65] hover:bg-[#A37953] text-white rounded-xl text-xs font-semibold shadow-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 h-[42px]"
+                  className="w-full py-2.5 bg-[#2C2723] hover:bg-[#1B1816] text-white rounded-xl text-xs font-semibold shadow-xs transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 h-[42px]"
                 >
                   {guardandoEdit ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
                   {guardandoEdit ? "Guardando..." : "Guardar Modificaciones"}

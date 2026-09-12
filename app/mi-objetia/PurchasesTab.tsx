@@ -183,7 +183,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
               value={busqueda}
               onChange={handleBusquedaChange}
               placeholder="Buscar por producto, #orden o guía..."
-              className="w-full pl-9 pr-8 h-[36px] text-xs rounded-xl border border-[#E6E1DB] bg-white text-[#2C2723] placeholder-[#73675C] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 transition"
+              className="w-full pl-9 pr-8 h-[36px] text-xs rounded-xl border border-[#E6E1DB] bg-white text-[#2C2723] placeholder-[#73675C] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 transition"
             />
             {busqueda && (
               <button
@@ -210,7 +210,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
             onClick={() => cambiarFiltro('all')}
             className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
               filtroEstado === 'all'
-                ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                 : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
             }`}
           >
@@ -228,7 +228,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
             onClick={() => cambiarFiltro('pending')}
             className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
               filtroEstado === 'pending'
-                ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                 : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
             }`}
           >
@@ -246,7 +246,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
             onClick={() => cambiarFiltro('shipped')}
             className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
               filtroEstado === 'shipped'
-                ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                 : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
             }`}
           >
@@ -264,7 +264,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
             onClick={() => cambiarFiltro('delivered')}
             className={`px-3 h-[30px] rounded-[8px] text-[12px] font-medium transition flex items-center gap-1.5 cursor-pointer border whitespace-nowrap ${
               filtroEstado === 'delivered'
-                ? 'bg-[#B88D65] border-[#B88D65] text-white shadow-xs'
+                ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-xs'
                 : 'bg-white border-[#EAE5DC] text-[#534636] hover:bg-[#FAF0E6] hover:text-[#2C2723] hover:border-[#EAE5DC]'
             }`}
           >
@@ -280,7 +280,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
         {/* Contenido: Carga, errores o lista de compras */}
         {loading ? (
           <div className="p-12 text-center text-[#73675C] flex flex-col items-center justify-center gap-2">
-            <Loader2 className="w-6 h-6 animate-spin text-[#B88D65]" />
+            <Loader2 className="w-6 h-6 animate-spin text-[#2C2723]" />
             <span className="text-xs">Cargando tus compras...</span>
           </div>
         ) : error ? (
@@ -290,7 +290,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
         ) : purchases.length === 0 ? (
           /* Estado vacío general */
           <div className="p-8 sm:p-12 rounded-2xl border border-dashed border-[#EAE5DC] bg-[#FAF8F5] text-center space-y-3">
-            <div className="w-12 h-12 rounded-full bg-[#FAF0E6] text-[#B88D65] flex items-center justify-center mx-auto border border-[#EAE5DC]">
+            <div className="w-12 h-12 rounded-full bg-[#FAF0E6] text-[#2C2723] flex items-center justify-center mx-auto border border-[#EAE5DC]">
               <ShoppingBag className="w-6 h-6 stroke-[1.8]" />
             </div>
             <div className="space-y-1">
@@ -301,7 +301,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
             </div>
             <Link
               href="/catalog"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#B88D65] hover:bg-[#A37953] text-white rounded-xl text-xs font-semibold shadow-xs transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#2C2723] hover:bg-[#1B1816] text-white rounded-xl text-xs font-semibold shadow-xs transition cursor-pointer"
             >
               Explorar catálogo
             </Link>
@@ -353,7 +353,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                   <div className="space-y-1 min-w-0 flex-1">
                     {/* Badges de estado superior */}
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[10px] font-mono font-bold text-[#B88D65] bg-[#FAF0E6] px-2 py-0.5 rounded-full border border-[#EAE5DC] uppercase tracking-wider">
+                      <span className="text-[10px] font-mono font-bold text-[#2C2723] bg-[#FAF0E6] px-2 py-0.5 rounded-full border border-[#EAE5DC] uppercase tracking-wider">
                         Compra #{compra.id}
                       </span>
 
@@ -396,7 +396,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                   {compra.tracking_number ? (
                     <div className="space-y-1.5 w-full sm:w-auto lg:text-right">
                       <div className="flex items-center lg:justify-end gap-1.5 text-[11px] text-[#73675C]">
-                        <Truck className="h-3.5 w-3.5 text-[#B88D65]" />
+                        <Truck className="h-3.5 w-3.5 text-[#2C2723]" />
                         <span>Correo Argentino:</span>
                         <button
                           type="button"
@@ -407,7 +407,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                             productImage: compra.image_url || null,
                             orderId: compra.id
                           })}
-                          className="font-mono font-bold text-[#2C2723] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#EAE5DC] hover:border-[#B88D65] transition cursor-pointer"
+                          className="font-mono font-bold text-[#2C2723] bg-[#FAF8F5] px-2 py-0.5 rounded border border-[#EAE5DC] hover:border-[#2C2723] transition cursor-pointer"
                           title="Hacé clic para ver el seguimiento del paquete"
                         >
                           {compra.tracking_number}
@@ -420,8 +420,8 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                             ["DELIVERED", "ARRIVED"].includes(compra.shipment_status)
                               ? "bg-[#e8f8ef] text-[#00a650] border-[#ceead6]"
                               : compra.shipment_status === "LABEL_GENERATED"
-                                ? "bg-[#FAF0E6] text-[#B88D65] border-[#EAE5DC]"
-                                : "bg-[#FAF0E6] text-[#B88D65] border-[#EAE5DC]"
+                                ? "bg-[#FAF0E6] text-[#2C2723] border-[#EAE5DC]"
+                                : "bg-[#FAF0E6] text-[#2C2723] border-[#EAE5DC]"
                           }`}>
                             Envío: {ESTADOS_ENVIO[compra.shipment_status]}
                           </span>
@@ -439,7 +439,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                             productImage: compra.image_url || null,
                             orderId: compra.id
                           })}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#B88D65] hover:bg-[#A37953] text-white rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#2C2723] hover:bg-[#1B1816] text-white rounded-xl text-xs font-semibold transition shadow-xs cursor-pointer"
                           title="Ver seguimiento del paquete en tiempo real"
                         >
                           <Package className="h-3.5 w-3.5" />
@@ -448,10 +448,10 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
 
                         <Link
                           href="/mi-objetia?tab=chat"
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#F2EFE9] text-[#2C2723] rounded-xl text-xs font-semibold border border-[#EAE5DC] transition shadow-2xs cursor-pointer"
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-[#F2EFE9] text-[#2C2723] rounded-xl text-xs font-semibold border border-[#EAE5DC] transition shadow-2xs cursor-pointer"
                           title="Abrir mensajes con el vendedor"
                         >
-                          <MessageSquare className="h-3.5 w-3.5 text-[#B88D65]" />
+                          <MessageSquare className="h-3.5 w-3.5 text-[#2C2723]" />
                           <span>Mensajes</span>
                         </Link>
                       </div>
@@ -474,10 +474,10 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                       </div>
                       <Link
                         href="/mi-objetia?tab=chat"
-                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white hover:bg-[#F2EFE9] text-[#2C2723] rounded-xl text-xs font-semibold border border-[#EAE5DC] transition shadow-2xs cursor-pointer"
+                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-[#F2EFE9] text-[#2C2723] rounded-xl text-xs font-semibold border border-[#EAE5DC] transition shadow-2xs cursor-pointer"
                         title="Abrir mensajes con el vendedor"
                       >
-                        <MessageSquare className="h-3.5 w-3.5 text-[#B88D65]" />
+                        <MessageSquare className="h-3.5 w-3.5 text-[#2C2723]" />
                         <span>Mensajes</span>
                       </Link>
                     </div>
@@ -514,7 +514,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                     onClick={() => setPaginaActual(num)}
                     className={`w-7 h-7 rounded-lg text-xs font-medium font-mono transition cursor-pointer ${
                       paginaActual === num
-                        ? 'bg-[#B88D65] text-white'
+                        ? 'bg-[#2C2723] text-white'
                         : 'text-[#73675C] hover:bg-[#FAF0E6] hover:text-[#2C2723]'
                     }`}
                   >

@@ -413,7 +413,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
           <div className="p-3.5 border-b border-[#EAE5DC] space-y-2.5 bg-[#FAF8F5] flex-shrink-0">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-[#FAF0E6] text-[#B88D65] flex items-center justify-center font-bold">
+                <div className="w-7 h-7 rounded-lg bg-[#F2EFE9] text-[#2C2723] flex items-center justify-center font-bold">
                   <MessageSquare className="w-4 h-4" />
                 </div>
                 <h3 className="text-sm font-bold text-[#2C2723] tracking-tight">Conversaciones</h3>
@@ -431,7 +431,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                 placeholder="Buscar por producto o persona..."
                 value={filtroBusqueda}
                 onChange={(e) => setFiltroBusqueda(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs bg-white focus:bg-white border border-[#E6E1DB] focus:border-[#B88D65] focus:ring-1 focus:ring-[#B88D65]/20 rounded-xl text-[#2C2723] placeholder:text-[#73675C] transition outline-none"
+                className="w-full pl-8 pr-3 py-1.5 text-xs bg-white focus:bg-white border border-[#E6E1DB] focus:border-[#2C2723] focus:ring-1 focus:ring-[#2C2723]/20 rounded-xl text-[#2C2723] placeholder:text-[#73675C] transition outline-none"
               />
             </div>
           </div>
@@ -440,7 +440,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
           <div className="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar">
             {loadingSalas ? (
               <div className="flex flex-col items-center justify-center py-16 text-center space-y-2">
-                <Loader2 className="w-5 h-5 text-[#B88D65] animate-spin" />
+                <Loader2 className="w-5 h-5 text-[#2C2723] animate-spin" />
                 <span className="text-xs text-[#73675C]">Cargando mensajes...</span>
               </div>
             ) : salasFiltradas.length === 0 ? (
@@ -473,7 +473,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                     }}
                     className={`p-3 rounded-xl transition-all cursor-pointer text-left relative border ${
                       esSeleccionado
-                        ? "bg-[#FAF0E6] border-[#B88D65]/40 shadow-xs"
+                        ? "bg-[#F2EFE9] border-[#2C2723]/30 shadow-xs"
                         : tieneNoLeidos
                           ? "bg-white border-[#EAE5DC] hover:bg-[#F2EFE9] shadow-xs"
                           : "bg-white/70 border-[#EAE5DC]/80 hover:bg-[#F2EFE9] hover:border-[#D5CEC4]"
@@ -484,7 +484,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                         <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-md border uppercase tracking-wider ${
                           esMiVenta 
                             ? "bg-[#FEF6EE] text-[#B54708] border-[#F9DBAF]" 
-                            : "bg-[#FAF0E6] text-[#B88D65] border-[#EAE5DC]"
+                            : "bg-[#F2EFE9] text-[#2C2723] border-[#EAE5DC]"
                         }`}>
                           {esMiVenta ? "Venta" : "Compra"}
                         </span>
@@ -494,7 +494,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                       </div>
                       
                       {tieneNoLeidos && (
-                        <span className="h-2 w-2 rounded-full bg-[#B88D65] flex-shrink-0 animate-pulse" />
+                        <span className="h-2 w-2 rounded-full bg-[#2C2723] flex-shrink-0 animate-pulse" />
                       )}
                     </div>
 
@@ -540,7 +540,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                     <ArrowLeft className="w-4 h-4" />
                   </button>
 
-                  <div className="w-8 h-8 rounded-full bg-[#FAF0E6] text-[#B88D65] font-bold text-xs flex items-center justify-center flex-shrink-0 border border-[#EAE5DC]">
+                  <div className="w-8 h-8 rounded-full bg-[#F2EFE9] text-[#2C2723] font-bold text-xs flex items-center justify-center flex-shrink-0 border border-[#EAE5DC]">
                     {nombreOtro.charAt(0).toUpperCase()}
                   </div>
 
@@ -552,7 +552,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                       <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
                         esVendedor 
                           ? "bg-[#FEF6EE] text-[#B54708] border-[#F9DBAF]" 
-                          : "bg-[#FAF0E6] text-[#B88D65] border-[#EAE5DC]"
+                          : "bg-[#F2EFE9] text-[#2C2723] border-[#EAE5DC]"
                       }`}>
                         {esVendedor ? "Tu comprador" : "Vendedor"}
                       </span>
@@ -563,7 +563,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                       <Link 
                         href={`/products/${roomDetail.product_id}`}
                         target="_blank"
-                        className="inline-flex items-center text-[#B88D65] hover:text-[#A37953] shrink-0 ml-1"
+                        className="inline-flex items-center text-[#2C2723] hover:underline shrink-0 ml-1"
                         title="Ver publicación del producto"
                       >
                         <ExternalLink className="w-3 h-3" />
@@ -592,7 +592,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
               >
                 {loadingMensajes ? (
                   <div className="flex justify-center py-12">
-                    <Loader2 className="w-5 h-5 text-[#B88D65] animate-spin" />
+                    <Loader2 className="w-5 h-5 text-[#2C2723] animate-spin" />
                   </div>
                 ) : mensajes.length === 0 ? (
                   <div className="text-center py-12 text-[#73675C] text-xs">
@@ -608,7 +608,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                       >
                         <div className={`max-w-[85%] sm:max-w-[70%] p-3 rounded-2xl relative shadow-2xs ${
                           esMio 
-                            ? 'bg-[#B88D65] text-white rounded-tr-xs' 
+                            ? 'bg-[#2C2723] text-white rounded-tr-xs' 
                             : 'bg-white text-[#2C2723] border border-[#EAE5DC] rounded-tl-xs'
                         }`}>
                           {msg.is_deleted ? (
@@ -662,13 +662,13 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
                   value={nuevoMensaje}
                   onChange={(e) => setNuevoMensaje(e.target.value)}
                   placeholder={`Escribir un mensaje para ${nombreOtro}...`}
-                  className="flex-1 px-4 py-2.5 text-xs sm:text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#B88D65] focus:ring-2 focus:ring-[#B88D65]/20 text-[#2C2723] placeholder:text-[#73675C] bg-white transition"
+                  className="flex-1 px-4 py-2.5 text-xs sm:text-sm rounded-xl border border-[#E6E1DB] focus:outline-none focus:border-[#2C2723] focus:ring-2 focus:ring-[#2C2723]/20 text-[#2C2723] placeholder:text-[#73675C] bg-white transition"
                 />
 
                 <button
                   type="submit"
                   disabled={!nuevoMensaje.trim() || enviando}
-                  className="h-10 px-4 rounded-xl bg-[#B88D65] hover:bg-[#A37953] text-white font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50 cursor-pointer flex-shrink-0 active:scale-98"
+                  className="h-10 px-4 rounded-xl bg-[#2C2723] hover:bg-[#1B1816] text-white font-semibold text-xs transition flex items-center justify-center gap-1.5 shadow-xs disabled:opacity-50 cursor-pointer flex-shrink-0 active:scale-98"
                 >
                   {enviando ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
@@ -683,7 +683,7 @@ export default function ChatTab({ initialRoomId }: ChatTabProps) {
             </>
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8 bg-[#F5F4EF]/60">
-              <div className="w-16 h-16 rounded-2xl bg-[#FAF0E6] text-[#B88D65] flex items-center justify-center mb-3 shadow-2xs border border-[#EAE5DC]">
+              <div className="w-16 h-16 rounded-2xl bg-[#F2EFE9] text-[#2C2723] flex items-center justify-center mb-3 shadow-2xs border border-[#EAE5DC]">
                 <MessageSquare className="w-8 h-8" />
               </div>
               <h4 className="text-base font-bold text-[#2C2723]">Tus Conversaciones</h4>
