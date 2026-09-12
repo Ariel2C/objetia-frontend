@@ -457,7 +457,7 @@ export default function Navbar({ logoUrl }: NavbarProps) {
                   fontFamily: `var(--font-family-brand, ${brandFontFamilyState})`,
                   fontSize: `var(--font-size-brand, ${brandFontSizeState})`
                 }} 
-                className="font-black tracking-wider uppercase leading-none text-[#231F1D]"
+                className="font-black tracking-wider uppercase leading-none text-[#5A4838]"
               >
                 {brandNameState || 'OBJETIA'}
               </span>
