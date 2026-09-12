@@ -10,117 +10,79 @@ import type { QuickAccessCard } from '../lib/types';
 // ILUSTRACIONES VECTORIALES EXCLUSIVAS DE OBJETIA (SIN FONDO CIRCULAR, GRAN ESCALA)
 // ==============================================================================
 
-// 1. Ingresá a tu cuenta: Avatar de usuario de autor con llave de acceso flotante
+// 1. Ingresá a tu cuenta: Avatar de usuario y llave de acceso
 function LoginIllustration() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" overflow="visible" className="w-20 h-20 sm:w-22 sm:h-22 md:w-[88px] md:h-[88px]" fill="none">
-      {/* Círculo de cabeza / perfil */}
-      <circle cx="44" cy="36" r="12" stroke="#2C2723" strokeWidth="1.8" />
-      {/* Hombros en arco suave */}
-      <path d="M22 74 C22 58 32 52 44 52 C56 52 66 58 66 74" stroke="#2C2723" strokeWidth="1.8" strokeLinecap="round" />
-      {/* Llave de acceso minimalista flotante */}
-      <g transform="translate(18, 2) rotate(-15 62 48)">
-        <circle cx="62" cy="40" r="7.5" stroke="#2C2723" strokeWidth="1.8" />
-        <circle cx="62" cy="40" r="3" stroke="#2C2723" strokeWidth="1.3" />
-        <line x1="62" y1="47.5" x2="62" y2="72" stroke="#2C2723" strokeWidth="1.8" strokeLinecap="round" />
-        <line x1="62" y1="63" x2="68" y2="63" stroke="#2C2723" strokeWidth="1.8" strokeLinecap="round" />
-        <line x1="62" y1="69" x2="67" y2="69" stroke="#2C2723" strokeWidth="1.8" strokeLinecap="round" />
+      <circle cx="44" cy="33" r="14" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M19 78 C19 59 31 53 44 53 C57 53 69 59 69 78" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
+      <g transform="translate(13, 1) rotate(-18 63 48)">
+        <circle cx="63" cy="38" r="8" stroke="#2C2723" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        <line x1="63" y1="46" x2="63" y2="76" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" />
+        <line x1="63" y1="64" x2="71" y2="64" stroke="#2C2723" strokeWidth="4" strokeLinecap="round" />
+        <line x1="63" y1="72" x2="69" y2="72" stroke="#2C2723" strokeWidth="4" strokeLinecap="round" />
       </g>
     </svg>
   );
 }
 
-// 2. Más vendidos: Copa estilizada de trazo arquitectónico con estrella outline (Opción 3B)
+// 2. Más vendidos: Bolsa de compras con estrella central limpia
 function BestsellersIllustration() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" overflow="visible" className="w-20 h-20 sm:w-22 sm:h-22 md:w-[88px] md:h-[88px]" fill="none">
-      {/* Copa estilizada de trazo fino arquitectónico */}
-      <path d="M33 26 C35 50, 45 58, 48 66 L42 78 H58 L52 66 C55 58, 65 50, 67 26 Z" stroke="#2C2723" strokeWidth="1.8" strokeLinejoin="round" />
-      {/* Asas geométricas flotantes en arco puro */}
-      <path d="M28 32 A 11 11 0 0 0 28 48" stroke="#2C2723" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M72 32 A 11 11 0 0 1 72 48" stroke="#2C2723" strokeWidth="1.8" strokeLinecap="round" />
-      {/* Boca superior */}
-      <line x1="33" y1="26" x2="67" y2="26" stroke="#2C2723" strokeWidth="1.8" strokeLinecap="round" />
-      {/* Estrella 100% contorno lineal sin relleno */}
-      <path d="M50 35 L51.8 40.5 L57.5 40.5 L53 44 L54.8 49.5 L50 46 L45.2 49.5 L47 44 L42.5 40.5 L48.2 40.5 Z" stroke="#2C2723" strokeWidth="1.6" strokeLinejoin="round" />
-      {/* Base minimalista */}
-      <line x1="36" y1="84" x2="64" y2="84" stroke="#2C2723" strokeWidth="2" strokeLinecap="round" />
+      <path d="M41 38 V28 C41 21.5 45 17 50 17 C55 17 59 21.5 59 28 V38" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M33 38 H67 C68.8 38 70.3 39.3 70.6 41.1 L75.8 79.1 C76.2 81.3 74.5 83 72.3 83 H27.7 C25.5 83 23.8 81.3 24.2 79.1 L29.4 41.1 C29.7 39.3 31.2 38 33 38 Z" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M50 49 L52.8 55.4 L59.7 55.9 L54.5 60.4 L56.1 67.2 L50 63.5 L43.9 67.2 L45.5 60.4 L40.3 55.9 L47.2 55.4 Z" stroke="#2C2723" strokeWidth="3.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-// 3. Menos de $30.000: Billetera de autor con billete y símbolo de ahorro
+// 3. Menos de $30.000: Etiqueta en diagonal con círculo '-' y signo '$'
 function Under30kIllustration() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" overflow="visible" className="w-20 h-20 sm:w-22 sm:h-22 md:w-[88px] md:h-[88px]" fill="none">
-      {/* Billete emergiendo con símbolo de pesos */}
-      <rect x="33" y="22" width="34" height="24" rx="3" stroke="#2C2723" strokeWidth="1.6" />
-      <circle cx="50" cy="34" r="5.5" stroke="#2C2723" strokeWidth="1.4" />
-      <path d="M50 30.5 V37.5 M48 32 C48 31 52 31 52 33 C52 35 48 35 48 37 C48 39 52 39 52 38" stroke="#2C2723" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-      {/* Billetera / Tarjetero de autor */}
-      <rect x="22" y="38" width="56" height="42" rx="6" stroke="#2C2723" strokeWidth="1.8" />
-      <path d="M22 52 H78" stroke="#2C2723" strokeWidth="1.5" />
-      {/* Solapa con remache */}
-      <path d="M64 52 V66 C64 68 66 70 68 70 H78 V52 H64 Z" stroke="#2C2723" strokeWidth="1.6" strokeLinejoin="round" />
-      <circle cx="71" cy="61" r="2" stroke="#2C2723" strokeWidth="1.4" />
+      <path d="M44 28 H32 C27.5 28 24 31.5 24 36 V58 C24 61 25.5 63.5 27.5 65.5 L46.5 84.5 C49.5 87.5 54.5 87.5 57.5 84.5 L78.5 63.5 C81.5 60.5 81.5 55.5 78.5 52.5 L60 34" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="34" cy="38" r="4.5" stroke="#2C2723" strokeWidth="3.8" strokeLinecap="round" />
+      <line x1="34" y1="24" x2="34" y2="31" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" />
+      <circle cx="68" cy="35" r="14" stroke="#2C2723" strokeWidth="4.2" fill="#FAF8F5" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="61" y1="35" x2="75" y2="35" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" />
+      <path d="M48 44 V72 M41 50 C41 45 55 45 55 52 C55 60 41 59 41 66 C41 73 55 73 55 68" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-// 4. Medios de pago: Dos tarjetas en abanico con chip EMV y ondas contactless
+// 4. Medios de pago: Tarjeta con banda y escudo de seguridad con checkmark
 function PaymentsIllustration() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" overflow="visible" className="w-20 h-20 sm:w-22 sm:h-22 md:w-[88px] md:h-[88px]" fill="none">
-      {/* Tarjeta posterior en ángulo */}
-      <rect x="35" y="24" width="48" height="32" rx="4.5" transform="rotate(12 59 40)" stroke="#2C2723" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.6" />
-      {/* Tarjeta frontal principal */}
-      <g transform="rotate(-6 48 54)">
-        <rect x="22" y="38" width="54" height="34" rx="4.5" stroke="#2C2723" strokeWidth="1.8" />
-        {/* Chip EMV */}
-        <rect x="29" y="46" width="9" height="7" rx="1.5" stroke="#2C2723" strokeWidth="1.4" />
-        <line x1="33.5" y1="46" x2="33.5" y2="53" stroke="#2C2723" strokeWidth="1.2" />
-        {/* Línea de relieve */}
-        <line x1="29" y1="62" x2="54" y2="62" stroke="#2C2723" strokeWidth="1.5" strokeLinecap="round" />
-        {/* Ondas contactless */}
-        <path d="M64 45 C66 47 66 50 64 52" stroke="#2C2723" strokeWidth="1.4" strokeLinecap="round" />
-        <path d="M67 43 C70.5 46 70.5 51 67 54" stroke="#2C2723" strokeWidth="1.4" strokeLinecap="round" />
-      </g>
+      <path d="M42 32 H22 C18.7 32 16 34.7 16 38 V72 C16 75.3 18.7 78 22 78 H74 C77.3 78 80 75.3 80 72 V58" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="16" y1="44" x2="42" y2="44" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" />
+      <rect x="23" y="58" width="12" height="5" rx="2.5" fill="#2C2723" />
+      <path d="M62 20 L81 26 V44 C81 55 72 64 62 68 C52 64 43 55 43 44 V26 Z" stroke="#2C2723" strokeWidth="4.2" fill="#FAF8F5" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M53 43 L60 50 L72 37" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-// 5. Compra protegida: Escudo heráldico de seguridad con pespunte punteado y checkmark
+// 5. Compra protegida: Escudo heráldico con gran checkmark
 function SecureShoppingIllustration() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" overflow="visible" className="w-20 h-20 sm:w-22 sm:h-22 md:w-[88px] md:h-[88px]" fill="none">
-      {/* Escudo heráldico */}
-      <path d="M50 20 L72 28 V50 C72 64 61 74 50 80 C39 74 28 64 28 50 V28 Z" stroke="#2C2723" strokeWidth="1.8" strokeLinejoin="round" />
-      {/* Pespunte interior */}
-      <path d="M50 26 L66 32 V48 C66 59 57 67 50 72 C43 67 34 59 34 48 V32 Z" stroke="#2C2723" strokeWidth="1.2" strokeLinejoin="round" strokeDasharray="2.5 2.5" opacity="0.6" />
-      {/* Checkmark */}
-      <path d="M42 49 L47.5 54.5 L58 43" stroke="#2C2723" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M50 18 L77 26 V50 C77 66 64 77 50 83 C36 77 23 66 23 50 V26 Z" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M38 51 L46 59 L63 41" stroke="#2C2723" strokeWidth="4.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
 
-// 6. En oferta: Bolsa tote de boutique de compras con sello de % y chispa de autor
+// 6. En oferta: Sello de porcentaje '%' con líneas gruesas y chispa
 function OffersIllustration() {
   return (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" overflow="visible" className="w-20 h-20 sm:w-22 sm:h-22 md:w-[88px] md:h-[88px]" fill="none">
-      {/* Asas */}
-      <path d="M41 34 C41 22 59 22 59 34" stroke="#2C2723" strokeWidth="1.8" strokeLinecap="round" />
-      {/* Cuerpo de la bolsa */}
-      <path d="M28 34 L33 80 H67 L72 34 Z" stroke="#2C2723" strokeWidth="1.8" strokeLinejoin="round" />
-      {/* Pliegues laterales */}
-      <line x1="36" y1="34" x2="39" y2="80" stroke="#2C2723" strokeWidth="1.2" strokeLinecap="round" opacity="0.5" />
-      <line x1="64" y1="34" x2="61" y2="80" stroke="#2C2723" strokeWidth="1.2" strokeLinecap="round" opacity="0.5" />
-      {/* Sello % */}
-      <circle cx="50" cy="57" r="11" stroke="#2C2723" strokeWidth="1.5" />
-      <circle cx="46.5" cy="53.5" r="1.6" stroke="#2C2723" strokeWidth="1.3" />
-      <line x1="53.5" y1="51" x2="46.5" y2="63" stroke="#2C2723" strokeWidth="1.5" strokeLinecap="round" />
-      <circle cx="53.5" cy="60.5" r="1.6" stroke="#2C2723" strokeWidth="1.3" />
-      {/* Chispa de diseño */}
-      <path d="M75 28 L76 31 L79 32 L76 33 L75 36 L74 33 L71 32 L74 31 Z" stroke="#2C2723" strokeWidth="1" strokeLinejoin="round" />
+      <circle cx="48" cy="50" r="28" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" strokeLinejoin="round" />
+      <line x1="59" y1="37" x2="37" y2="63" stroke="#2C2723" strokeWidth="4.2" strokeLinecap="round" />
+      <circle cx="42" cy="42" r="3.6" stroke="#2C2723" strokeWidth="3.6" />
+      <circle cx="54" cy="58" r="3.6" stroke="#2C2723" strokeWidth="3.6" />
+      <path d="M78 22 L80 27 L85 28.5 L80 30 L78 35 L76 30 L71 28.5 L76 27 Z" stroke="#2C2723" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
