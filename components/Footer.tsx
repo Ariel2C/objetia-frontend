@@ -1,8 +1,8 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
+import { getApiUrl } from '../lib/config';
 import { 
   Mail, 
   ArrowRight, 
@@ -50,12 +50,18 @@ function YoutubeIcon({ className = "w-4 h-4" }: { className?: string }) {
 
 type ModalType = 'preguntas' | 'como_funciona' | 'sobre_objetia' | 'compra_protegida' | 'terminos' | 'privacidad' | null;
 
-export default function Footer() {
+interface FooterProps {
+  logoUrl?: string;
+}
+
+export default function Footer({ logoUrl }: FooterProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const tab = searchParams?.get('tab');
   const toast = useToast();
 
+  const [logoUrlState, setLogoUrlState] = useState(logoUrl || "");
+  const [brandNameState, setBrandNameState] = useState("OBJETIA");
   const [emailNovedades, setEmailNovedades] = useState('');
   const [suscrito, setSuscrito] = useState(false);
   const [cargandoNewsletter, setCargandoNewsletter] = useState(false);
@@ -63,6 +69,43 @@ export default function Footer() {
 
   const isRootTab = pathname === '/root/dashboard' || ((pathname === '/mi-objetia' || pathname === '/mi-espacio') && tab === 'root');
   const isChatTab = (pathname === '/mi-objetia' || pathname === '/mi-espacio') && tab === 'chat';
+
+  useEffect(() => {
+    if (logoUrl) setLogoUrlState(logoUrl);
+  }, [logoUrl]);
+
+  useEffect(() => {
+    if (!logoUrlState) {
+      fetch(`${getApiUrl()}/cms/layout/`)
+        .then(r => r.ok ? r.json() : null)
+        .then(data => {
+          const logo = data?.marca?.logo_cloudfront_url;
+          if (logo) setLogoUrlState(logo);
+          if (data?.marca?.brand_name) setBrandNameState(data.marca.brand_name);
+        })
+        .catch(() => {});
+    }
+
+    const handleBrandingUpdated = (e: any) => {
+      if (e.detail) {
+        if (e.detail.logoUrl !== undefined) setLogoUrlState(e.detail.logoUrl);
+        if (e.detail.brandName !== undefined) setBrandNameState(e.detail.brandName);
+      }
+    };
+    const handleActualizarLogo = (e: any) => {
+      if (e.detail?.logoUrl) {
+        setLogoUrlState(e.detail.logoUrl);
+      }
+    };
+
+    window.addEventListener('branding_updated', handleBrandingUpdated);
+    window.addEventListener('actualizar-logo-navbar' as any, handleActualizarLogo);
+
+    return () => {
+      window.removeEventListener('branding_updated', handleBrandingUpdated);
+      window.removeEventListener('actualizar-logo-navbar' as any, handleActualizarLogo);
+    };
+  }, []);
 
   if (isRootTab || isChatTab) return null;
 
@@ -94,20 +137,18 @@ export default function Footer() {
             {/* ==================================================================== */}
             <div className="lg:col-span-5 space-y-4">
               <Link href="/" className="inline-flex items-center gap-3 group">
-                <div className="relative h-9 w-9 overflow-hidden rounded-xl bg-gradient-to-tr from-[#87a9ff]/20 to-[#a8c7fa]/10 p-0.5 border border-[#3c4043] group-hover:border-[#87a9ff]/50 transition-colors">
-                  <Image
-                    src="/objetia_logo.png"
-                    alt="Objetia"
-                    width={36}
-                    height={36}
-                    className="h-full w-full object-cover rounded-[10px]"
+                <div className="relative h-9 w-9 overflow-hidden rounded-xl bg-gradient-to-tr from-[#87a9ff]/20 to-[#a8c7fa]/10 p-0.5 border border-[#3c4043] group-hover:border-[#87a9ff]/50 transition-colors flex items-center justify-center">
+                  <img
+                    src={logoUrlState && logoUrlState !== "" && logoUrlState !== "https://" ? logoUrlState : "/objetia_logo.png"}
+                    alt={brandNameState || "Objetia"}
+                    className="h-full w-full object-contain rounded-[10px]"
                   />
                 </div>
                 <span 
                   className="text-xl font-extrabold tracking-widest text-white uppercase"
                   style={{ fontFamily: 'var(--font-family-brand, Outfit)' }}
                 >
-                  OBJETIA
+                  {brandNameState || 'OBJETIA'}
                 </span>
               </Link>
 

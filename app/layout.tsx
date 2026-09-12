@@ -136,7 +136,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               {process.env.NODE_ENV === 'development' && <ErrorVisualizer />}
               <main className="pb-20 md:pb-0">{children}</main>
               <Suspense fallback={null}>
-                <Footer />
+                <Footer logoUrl={brandingDB.logo_url} />
               </Suspense>
             </ToastProvider>
           </FavoritesProvider>
