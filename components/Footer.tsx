@@ -136,14 +136,12 @@ export default function Footer({ logoUrl }: FooterProps) {
             {/* COLUMNA 1: MARCA Y SUSCRIPCIÓN A NOVEDADES (5 cols en lg)            */}
             {/* ==================================================================== */}
             <div className="lg:col-span-5 space-y-4">
-              <Link href="/" className="inline-flex items-center gap-3 group">
-                <div className="relative h-9 w-9 overflow-hidden rounded-xl bg-gradient-to-tr from-[#87a9ff]/20 to-[#a8c7fa]/10 p-0.5 border border-[#3c4043] group-hover:border-[#87a9ff]/50 transition-colors flex items-center justify-center">
-                  <img
-                    src={logoUrlState && logoUrlState !== "" && logoUrlState !== "https://" ? logoUrlState : "/objetia_logo.png"}
-                    alt={brandNameState || "Objetia"}
-                    className="h-full w-full object-contain rounded-[10px]"
-                  />
-                </div>
+              <Link href="/" className="inline-flex items-center gap-2.5 group">
+                <img
+                  src={logoUrlState && logoUrlState !== "" && logoUrlState !== "https://" ? logoUrlState : "/objetia_logo.png"}
+                  alt={brandNameState || "Objetia"}
+                  className="h-9 w-9 sm:h-10 sm:w-10 object-contain group-hover:scale-105 transition-transform"
+                />
                 <span 
                   className="text-xl font-extrabold tracking-widest text-white uppercase"
                   style={{ fontFamily: 'var(--font-family-brand, Outfit)' }}
