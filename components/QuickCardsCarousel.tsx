@@ -10,38 +10,29 @@ import type { QuickAccessCard } from '../lib/types';
 // ILUSTRACIONES VECTORIALES EXCLUSIVAS DE OBJETIA (SIN FONDO CIRCULAR, GRAN ESCALA)
 // ==============================================================================
 
-// 1. Ingresá a tu cuenta: Dispositivo móvil con tarjeta de perfil y llave de acceso (sin color)
+// 1. Ingresá a tu cuenta: Dispositivo móvil con tarjeta de perfil (sin color, sin llave)
 function LoginIllustration() {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="5 5 95 95" overflow="visible" className="w-22 h-22 sm:w-24 sm:h-24 md:w-[96px] md:h-[96px]" fill="none">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" overflow="visible" className="w-22 h-22 sm:w-24 sm:h-24 md:w-[96px] md:h-[96px]" fill="none">
       {/* Smartphone / Dispositivo móvil de acceso */}
-      <rect x="25" y="16" width="46" height="74" rx="8" fill="#FFFFFF" stroke="#362C24" strokeWidth="2.1" />
+      <rect x="27" y="15" width="46" height="70" rx="8" fill="#FFFFFF" stroke="#362C24" strokeWidth="2.1" />
       
       {/* Altavoz / notch superior */}
-      <rect x="42" y="21" width="12" height="2.5" rx="1.25" fill="#362C24" />
+      <rect x="44" y="20" width="12" height="2.5" rx="1.25" fill="#362C24" />
 
       {/* Pantalla interior con tarjeta de perfil */}
-      <rect x="30" y="28" width="36" height="54" rx="5" fill="#FFFFFF" stroke="#362C24" strokeWidth="1.2" />
+      <rect x="32" y="26" width="36" height="52" rx="5" fill="#FFFFFF" stroke="#362C24" strokeWidth="1.2" />
 
       {/* Círculo de avatar */}
-      <circle cx="48" cy="45" r="12" fill="#FFFFFF" stroke="#362C24" strokeWidth="2" />
+      <circle cx="50" cy="43" r="12" fill="#FFFFFF" stroke="#362C24" strokeWidth="2" />
       
       {/* Silueta de usuario dentro del avatar */}
-      <circle cx="48" cy="42" r="4.2" fill="#362C24" />
-      <path d="M40.5 53 C41.5 48.5 44 47.5 48 47.5 C52 47.5 54.5 48.5 55.5 53" fill="#FFFFFF" stroke="#362C24" strokeWidth="1.5" />
+      <circle cx="50" cy="40" r="4.2" fill="#362C24" />
+      <path d="M42.5 51 C43.5 46.5 46 45.5 50 45.5 C54 45.5 56.5 46.5 57.5 51" fill="#FFFFFF" stroke="#362C24" strokeWidth="1.5" />
 
       {/* Líneas de autenticación / bienvenida */}
-      <rect x="37" y="62" width="22" height="3" rx="1.5" fill="#362C24" />
-      <rect x="41" y="68" width="14" height="2.5" rx="1.25" fill="#362C24" />
-
-      {/* Llave flotante de acceso a la derecha */}
-      <g transform="rotate(-25 72 48)">
-        <circle cx="70" cy="44" r="8.5" fill="#FFFFFF" stroke="#362C24" strokeWidth="2.1" />
-        <circle cx="70" cy="44" r="4.2" fill="#FFFFFF" stroke="#362C24" strokeWidth="1.5" />
-        <path d="M78.5 44 H95" stroke="#362C24" strokeWidth="2.1" strokeLinecap="round" />
-        <path d="M89 44 V49" stroke="#362C24" strokeWidth="2.1" strokeLinecap="round" />
-        <path d="M93 44 V50" stroke="#362C24" strokeWidth="2.1" strokeLinecap="round" />
-      </g>
+      <rect x="39" y="60" width="22" height="3" rx="1.5" fill="#362C24" />
+      <rect x="43" y="66" width="14" height="2.5" rx="1.25" fill="#362C24" />
     </svg>
   );
 }
