@@ -829,11 +829,6 @@ function CartContent() {
 
                       {/* 2. Titulo */}
                       <div className="flex-1 min-w-0">
-                        {item.category && (
-                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block truncate">
-                            {item.category}
-                          </span>
-                        )}
                         <h3 className="text-sm font-semibold text-gray-900 truncate" title={item.title}>
                           {formatearTituloProducto(item.title)}
                         </h3>
