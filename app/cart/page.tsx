@@ -266,7 +266,21 @@ function CartContent() {
     setError(null);
     try {
       const data = await apiFetch<CartItem[]>(`/cart/`);
-      setItems(data);
+      const enriched = await Promise.all(
+        (data || []).map(async (item) => {
+          if (!item.image_url) {
+            try {
+              const prod = await apiFetch<any>(`/products/${item.id}`);
+              const img = (prod.images && prod.images.length > 0) ? prod.images[0] : (prod.image_url || '');
+              return { ...item, image_url: img };
+            } catch {
+              return item;
+            }
+          }
+          return item;
+        })
+      );
+      setItems(enriched);
     } catch (err: any) {
       if (err.status === 401) {
         logout();
@@ -784,179 +798,87 @@ function CartContent() {
           {/* ============================================================== */}
           <div className="lg:col-span-2 space-y-6">
 
-            {/* PASO 1: VISTA DE ARTÍCULOS EN EL CARRITO CON ENVÍOS INDIVIDUALES */}
+            {/* PASO 1: VISTA DE ARTÍCULOS EN EL CARRITO */}
             {pasoActual === 'carrito' && (
-              <div className="space-y-4">
-                
-                {/* Banner de CP estimado */}
-                <div className="bg-gradient-to-r from-gray-50 to-indigo-50/30 border border-gray-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-indigo-100/70 text-indigo-700 flex items-center justify-center shrink-0">
-                      <Truck className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <span className="font-bold text-gray-900 block">
-                        Cálculo de envío individual por artículo (Correo Argentino)
-                      </span>
-                      <span className="text-gray-500">
-                        {activePostalCode ? (
-                          <>Estimado para código postal <strong className="text-gray-800">{activePostalCode}</strong> {defaultAddress ? `(${defaultAddress.city || 'Dirección predeterminada'})` : ''}</>
+              <div className="space-y-3">
+                {items.map((item) => {
+                  const isAvailable = (item.availability ?? 'AVAILABLE') === 'AVAILABLE';
+                  const isInCheckout = item.availability === 'IN_CHECKOUT';
+                  const isSold = item.availability === 'SOLD';
+                  const isPaused = item.availability === 'PAUSED';
+
+                  return (
+                    <div 
+                      key={item.id}
+                      className={`border rounded-xl p-3 sm:p-4 shadow-xs flex items-center justify-between gap-3 sm:gap-4 transition duration-200 animate-slide-up ${
+                        !isAvailable ? 'bg-gray-50/70 border-gray-200 opacity-80' : 'bg-white border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      {/* 1. Foto */}
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-lg bg-gray-100 overflow-hidden shrink-0 border border-gray-200 flex items-center justify-center">
+                        {item.image_url ? (
+                          <img 
+                            src={item.image_url} 
+                            alt={item.title} 
+                            className={`w-full h-full object-cover ${!isAvailable ? 'grayscale' : ''}`}
+                          />
                         ) : (
-                          "Ingresá un código postal para estimar el envío de cada artículo:"
+                          <ShoppingBag className="w-6 h-6 text-gray-400" />
                         )}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Input rápido o feedback de CP */}
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      placeholder="Ej: X5000"
-                      value={postalCode}
-                      onChange={(e) => {
-                        const val = e.target.value.toUpperCase();
-                        setPostalCode(val);
-                        if (val.trim().length >= 4) {
-                          setActivePostalCode(val.trim());
-                          handleCalcularEnvios(val.trim());
-                        }
-                      }}
-                      className="w-24 px-2.5 py-1.5 text-xs font-mono font-bold bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900"
-                    />
-                    {calculandoEnvios && (
-                      <Loader2 className="w-4 h-4 animate-spin text-indigo-600" />
-                    )}
-                  </div>
-                </div>
-
-                {/* Lista de productos en el carrito */}
-                <div className="space-y-3">
-                  {items.map((item) => {
-                    const costItem = shippingCosts[item.id];
-                    const isAvailable = (item.availability ?? 'AVAILABLE') === 'AVAILABLE';
-                    const isInCheckout = item.availability === 'IN_CHECKOUT';
-                    const isSold = item.availability === 'SOLD';
-                    const isPaused = item.availability === 'PAUSED';
-
-                    return (
-                      <div 
-                        key={item.id}
-                        className={`border rounded-xl p-4 sm:p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition duration-200 animate-slide-up ${
-                          !isAvailable ? 'bg-gray-50/70 border-gray-200 opacity-80' : 'bg-white border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <div className="flex items-start gap-3.5 flex-grow">
-                          {item.image_url && (
-                            <img 
-                              src={item.image_url} 
-                              alt={item.title} 
-                              className={`w-14 h-14 rounded-lg object-cover border border-gray-200 shrink-0 ${!isAvailable ? 'grayscale' : ''}`}
-                            />
-                          )}
-                          <div className="flex-grow space-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{item.category}</span>
-                              {isInCheckout && (
-                                <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200 flex items-center gap-1">
-                                  <Clock className="w-3 h-3 text-amber-600 animate-pulse" />
-                                  En proceso de compra
-                                </span>
-                              )}
-                              {isSold && (
-                                <span className="text-[10px] font-bold text-red-700 bg-red-50 px-2 py-0.5 rounded border border-red-200">
-                                  Vendido
-                                </span>
-                              )}
-                              {isPaused && (
-                                <span className="text-[10px] font-bold text-gray-700 bg-gray-100 px-2 py-0.5 rounded border border-gray-300">
-                                  Pausado
-                                </span>
-                              )}
-                            </div>
-                            <h3 className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition line-clamp-1">
-                              {formatearTituloProducto(item.title)}
-                            </h3>
-
-                            {/* Mensajes de aviso contextuales */}
-                            {isInCheckout && (
-                              <p className="text-[11px] text-amber-700 leading-tight">
-                                Otro comprador está completando el pago de este artículo. Si no finaliza en unos minutos, volverá a habilitarse para comprar.
-                              </p>
-                            )}
-                            {isSold && (
-                              <p className="text-[11px] text-gray-500 leading-tight">
-                                Este objeto ya fue comprado por otro usuario. Podés removerlo de tu carrito.
-                              </p>
-                            )}
-                            {item.price_changed && item.price_at_add && (
-                              <p className="text-[11px] text-blue-700 leading-tight">
-                                El precio cambió desde que lo guardaste (antes ${item.price_at_add.toLocaleString('es-AR')}).
-                              </p>
-                            )}
-
-                            {/* Precios y desglose de envío de este artículo */}
-                            <div className="flex flex-wrap items-center gap-3 pt-1">
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-[11px] text-gray-400">Producto:</span>
-                                <FormattedPrice price={item.price} className="text-sm font-bold text-gray-900" />
-                              </div>
-
-                              {isAvailable && (
-                                <>
-                                  <span className="text-gray-300">·</span>
-
-                                  {/* Costo de envío individual de este artículo */}
-                                  <div className="flex items-center gap-1.5 text-xs">
-                                    <Truck className="w-3.5 h-3.5 text-indigo-600" />
-                                    <span className="text-gray-500">Envío:</span>
-                                    {calculandoEnvios ? (
-                                      <span className="text-[11px] text-indigo-600 animate-pulse font-medium">Calculando...</span>
-                                    ) : typeof costItem === 'number' ? (
-                                      <FormattedPrice price={costItem} className="font-bold text-gray-900 text-xs" />
-                                    ) : (
-                                      <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
-                                        Ingresá CP
-                                      </span>
-                                    )}
-                                  </div>
-                                </>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4 shrink-0">
-                          <button 
-                            onClick={() => handleRemoverItem(item.id)}
-                            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition cursor-pointer"
-                            title="Remover de mi carrito"
-                            aria-label="Remover de mi carrito"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
                       </div>
-                    );
-                  })}
-                </div>
 
-                {/* Banner para continuar compra */}
-                <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <h4 className="text-sm font-bold text-gray-900">¿Listo para continuar?</h4>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      En el siguiente paso podrás elegir tu dirección de envío o agregar una nueva.
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleContinuarACompra}
-                    className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-xl font-bold text-xs uppercase tracking-wider hover:bg-black transition active:scale-95 cursor-pointer shadow-xs"
-                  >
-                    <span>Continuar compra</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
+                      {/* 2. Titulo */}
+                      <div className="flex-1 min-w-0">
+                        {item.category && (
+                          <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block truncate">
+                            {item.category}
+                          </span>
+                        )}
+                        <h3 className="text-sm font-semibold text-gray-900 truncate" title={item.title}>
+                          {formatearTituloProducto(item.title)}
+                        </h3>
+                        {isInCheckout && (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-700">
+                            <Clock className="w-3 h-3 text-amber-600 animate-pulse shrink-0" />
+                            <span className="truncate">En proceso de compra por otro usuario</span>
+                          </span>
+                        )}
+                        {isSold && (
+                          <span className="text-[11px] font-medium text-red-600 block">
+                            Vendido
+                          </span>
+                        )}
+                        {isPaused && (
+                          <span className="text-[11px] font-medium text-gray-500 block">
+                            Pausado
+                          </span>
+                        )}
+                        {item.price_changed && item.price_at_add && (
+                          <span className="text-[10px] text-blue-600 block">
+                            Precio actualizado (antes ${item.price_at_add.toLocaleString('es-AR')})
+                          </span>
+                        )}
+                      </div>
+
+                      {/* 3. Precio */}
+                      <div className="shrink-0 text-right">
+                        <FormattedPrice price={item.price} className="text-sm sm:text-base font-bold text-gray-900" />
+                      </div>
+
+                      {/* 4. Boton para eliminar */}
+                      <div className="shrink-0">
+                        <button 
+                          onClick={() => handleRemoverItem(item.id)}
+                          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition cursor-pointer"
+                          title="Remover del carrito"
+                          aria-label="Remover del carrito"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
 
