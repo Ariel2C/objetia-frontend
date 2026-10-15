@@ -1,6 +1,6 @@
 // Tipos compartidos alineados con el backend (FastAPI / PostgreSQL)
 
-export type ProductoStatus = 'AVAILABLE' | 'RESERVED' | 'SOLD';
+export type ProductoStatus = 'AVAILABLE' | 'RESERVED' | 'SOLD' | 'PAUSED' | 'IN_CHECKOUT';
 
 export interface Producto {
   id: number;

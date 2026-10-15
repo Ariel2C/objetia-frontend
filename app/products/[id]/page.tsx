@@ -44,7 +44,7 @@ interface ProductDetail {
   seller_name?: string;
   image_url: string;
   images: string[];
-  status: 'AVAILABLE' | 'RESERVED' | 'SOLD' | 'PAUSED';
+  status: 'AVAILABLE' | 'RESERVED' | 'SOLD' | 'PAUSED' | 'IN_CHECKOUT';
   created_at: string;
   is_new?: boolean;
   views?: number;
@@ -159,15 +159,14 @@ export default function ProductDetailPage() {
       });
 
       if (res.status === 409) {
-        toast.warning("Este artículo único acaba de ser reservado por otro usuario.");
-        setTimeout(() => window.location.reload(), 1200);
+        toast.warning("Alguien está completando la compra de este artículo.");
       } else if (res.ok) {
-        toast.success("Reservado y agregado a tu carrito.");
+        toast.success("Agregado a tu carrito.");
         trackProductEvent(producto.id, 'cart_add');
         window.dispatchEvent(new Event('cart_updated'));
         router.push("/cart");
       } else {
-        toast.error("Ocurrió un error al reservar el producto.");
+        toast.error("Ocurrió un error al agregar el producto al carrito.");
       }
     } catch (err) {
       console.error(err);
@@ -331,14 +330,14 @@ export default function ProductDetailPage() {
               </button>
 
               {/* Overlays de Estado Bloqueado */}
-              {producto.status === 'RESERVED' && (
+              {(producto.status === 'IN_CHECKOUT' || producto.status === 'RESERVED') && (
                 <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex flex-col items-center justify-center text-white font-bold gap-2 p-4 text-center">
                   <Lock className="h-8 w-8 text-amber-400" />
                   <span className="text-xs font-bold uppercase tracking-wider bg-amber-500/30 px-3 py-1.5 rounded-xl border border-amber-400/40">
-                    Reservado temporalmente
+                    En proceso de compra
                   </span>
                   <p className="text-[11px] text-gray-200 font-normal max-w-xs">
-                    Un comprador lo tiene reservado en su proceso de pago.
+                    Un comprador está completando el pago. Si no se concreta en unos minutos, volverá a estar disponible.
                   </p>
                 </div>
               )}
@@ -475,8 +474,8 @@ export default function ProductDetailPage() {
                   >
                     <ShoppingCart className="h-4 w-4" />
                     {producto.status === 'AVAILABLE' 
-                      ? "Reservar y Agregar al Carrito" 
-                      : (producto.status === 'PAUSED' ? "Publicación Pausada" : (producto.status === 'RESERVED' ? "Producto Reservado" : "Agotado"))}
+                      ? "Agregar al Carrito" 
+                      : (producto.status === 'PAUSED' ? "Publicación Pausada" : (producto.status === 'IN_CHECKOUT' || producto.status === 'RESERVED' ? "En Proceso de Compra" : "Agotado"))}
                   </button>
 
                   {/* Acciones Secundarias: Chat + Favorito */}

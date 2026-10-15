@@ -95,11 +95,9 @@ export default function ProductCard({
       }
 
       if (res.status === 409) {
-        setEstadoStock('RESERVED');
-        toast.warning("Este artículo único acaba de ser reservado por otro usuario.");
+        toast.warning("Alguien está completando el pago de este artículo.");
       } else if (res.ok) {
-        setEstadoStock('RESERVED');
-        toast.success("Reservado y agregado a tu carrito.", formatearTituloProducto(producto.title));
+        toast.success("Agregado a tu carrito.", formatearTituloProducto(producto.title));
         window.dispatchEvent(new Event('cart_updated'));
       }
     } catch (err) {
