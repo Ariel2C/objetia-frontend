@@ -856,18 +856,20 @@ function CartContent() {
               <div className="space-y-6 animate-fade-in">
                 
                 {/* Selector de Direcciones */}
-                <div className="bg-white border border-gray-200 rounded-xl p-6 shadow-xs space-y-4">
-                  <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-                    <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
-                      <MapPin className="h-5 w-5 text-indigo-600" /> 
+                <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-xs space-y-5">
+                  <div className="flex items-center justify-between border-b border-stone-100 pb-3.5">
+                    <h3 className="text-base font-bold text-gray-900 flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-[#A28764]/10 flex items-center justify-center text-[#A28764]">
+                        <MapPin className="h-4 w-4" /> 
+                      </div>
                       Elegí la dirección de envío
                     </h3>
                     <Link
                       href="/mi-objetia?tab=perfil"
-                      className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition flex items-center gap-1"
+                      className="text-xs font-semibold text-[#A28764] hover:text-[#887050] transition flex items-center gap-1.5 bg-[#A28764]/10 hover:bg-[#A28764]/20 px-3 py-1.5 rounded-lg border border-[#A28764]/20"
                     >
                       <span>Gestionar mis direcciones</span>
-                      <ExternalLink className="w-3 h-3" />
+                      <ExternalLink className="w-3.5 h-3.5" />
                     </Link>
                   </div>
 
@@ -880,14 +882,14 @@ function CartContent() {
                       placeholder="Ej: Lucia Fernández"
                       value={recipientName}
                       onChange={(e) => setRecipientName(e.target.value)}
-                      className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 text-gray-800 bg-white transition placeholder:text-gray-400"
+                      className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-stone-200 focus:outline-none focus:ring-2 focus:ring-[#A28764]/30 focus:border-[#A28764] text-gray-900 bg-white transition placeholder:text-gray-400"
                     />
                   </div>
 
                   {/* Listado de direcciones guardadas */}
                   {loadingAddresses ? (
-                    <div className="flex items-center justify-center py-6 text-gray-400 text-xs gap-2 border border-gray-100 rounded-xl bg-gray-50/50">
-                      <Loader2 className="w-4 h-4 animate-spin text-gray-600" />
+                    <div className="flex items-center justify-center py-8 text-gray-500 text-xs gap-2.5 border border-stone-100 rounded-2xl bg-stone-50/50">
+                      <Loader2 className="w-4 h-4 animate-spin text-[#A28764]" />
                       <span>Cargando tus direcciones guardadas...</span>
                     </div>
                   ) : savedAddresses.length > 0 ? (
@@ -896,43 +898,70 @@ function CartContent() {
                         Seleccioná una dirección para recibir tus compras:
                       </label>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* Lista de direcciones una abajo de la otra (cards largas) */}
+                      <div className="flex flex-col gap-3">
                         {savedAddresses.map((addr) => {
                           const isSelected = selectedAddressId === addr.id;
                           return (
                             <div
                               key={addr.id}
                               onClick={() => applyAddress(addr)}
-                              className={`p-4 rounded-xl border-2 transition cursor-pointer flex flex-col justify-between text-left relative ${
+                              className={`group w-full p-4 sm:p-4.5 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex items-center justify-between gap-4 text-left relative ${
                                 isSelected
-                                  ? 'border-indigo-600 bg-indigo-50/30 shadow-xs'
-                                  : 'border-gray-200 hover:border-gray-300 bg-white'
+                                  ? 'border-[#A28764] bg-[#A28764]/5 shadow-sm ring-1 ring-[#A28764]/20'
+                                  : 'border-stone-200 hover:border-[#A28764]/60 bg-white hover:bg-stone-50/50'
                               }`}
                             >
-                              <div>
-                                <div className="flex items-center justify-between gap-2 mb-1.5">
-                                  <span className="text-xs font-bold text-gray-900 truncate">
-                                    {addr.title || "Dirección"}
-                                  </span>
-                                  <div className="flex items-center gap-1.5 shrink-0">
+                              <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
+                                {/* Radio button indicador */}
+                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0 transition-colors ${
+                                  isSelected 
+                                    ? 'border-[#A28764] bg-[#A28764] text-white' 
+                                    : 'border-stone-300 bg-white group-hover:border-[#A28764]/60'
+                                }`}>
+                                  {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
+                                </div>
+
+                                {/* Ícono de ubicación */}
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                                  isSelected ? 'bg-[#A28764]/15 text-[#A28764]' : 'bg-stone-100 text-stone-500 group-hover:bg-[#A28764]/10 group-hover:text-[#A28764]'
+                                }`}>
+                                  <MapPin className="w-5 h-5" />
+                                </div>
+
+                                {/* Información detallada de la dirección */}
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex flex-wrap items-center gap-2 mb-0.5">
+                                    <span className="text-sm font-bold text-gray-900 truncate">
+                                      {addr.title || "Dirección"}
+                                    </span>
                                     {addr.is_default && (
-                                      <span className="text-[10px] font-semibold bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
+                                      <span className="text-[10px] font-bold bg-[#A28764]/15 text-[#7c6648] border border-[#A28764]/30 px-2 py-0.5 rounded-full">
                                         Predeterminada
                                       </span>
                                     )}
-                                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center ${
-                                      isSelected ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-gray-300 bg-white'
-                                    }`}>
-                                      {isSelected && <Check className="w-2.5 h-2.5 stroke-[3]" />}
-                                    </div>
                                   </div>
+                                  <p className="text-sm text-gray-800 font-medium leading-snug truncate">
+                                    {addr.street} {addr.number} {addr.floor_dept ? `(${addr.floor_dept})` : ''}
+                                  </p>
+                                  <p className="text-xs text-gray-500 mt-0.5 truncate">
+                                    {addr.city}, {addr.province} {addr.postal_code ? `· CP ${addr.postal_code}` : ''}
+                                  </p>
                                 </div>
-                                <p className="text-xs text-gray-800 font-medium leading-snug">
-                                  {addr.street} {addr.number} {addr.floor_dept ? `(${addr.floor_dept})` : ''}
-                                </p>
-                                <p className="text-[11px] text-gray-500 mt-0.5">
-                                  {addr.city}, {addr.province} {addr.postal_code ? `· CP ${addr.postal_code}` : ''}
-                                </p>
+                              </div>
+
+                              {/* Badge de selección a la derecha */}
+                              <div className="shrink-0 flex items-center">
+                                {isSelected ? (
+                                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#A28764] bg-[#A28764]/10 px-3 py-1.5 rounded-xl border border-[#A28764]/30">
+                                    <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                                    <span className="hidden sm:inline">Seleccionada</span>
+                                  </span>
+                                ) : (
+                                  <span className="text-xs font-semibold text-stone-400 group-hover:text-[#A28764] transition-colors px-2 py-1">
+                                    Elegir
+                                  </span>
+                                )}
                               </div>
                             </div>
                           );
@@ -940,17 +969,19 @@ function CartContent() {
                       </div>
                     </div>
                   ) : (
-                    <div className="p-6 rounded-xl border border-dashed border-gray-300 bg-gray-50/50 text-center space-y-3">
-                      <MapPin className="w-8 h-8 text-gray-400 mx-auto" />
+                    <div className="p-8 rounded-2xl border-2 border-dashed border-[#A28764]/30 bg-[#A28764]/[0.03] text-center space-y-3.5">
+                      <div className="w-12 h-12 rounded-full bg-[#A28764]/10 text-[#A28764] flex items-center justify-center mx-auto">
+                        <MapPin className="w-6 h-6" />
+                      </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900">No tenés direcciones guardadas</p>
-                        <p className="text-xs text-gray-500 mt-1">Para recibir tus compras, registrá al menos una dirección de entrega en tu perfil.</p>
+                        <p className="text-sm font-bold text-gray-900">No tenés direcciones guardadas</p>
+                        <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto">Para recibir tus compras, registrá al menos una dirección de entrega en tu perfil.</p>
                       </div>
                       <Link
                         href="/mi-objetia?tab=perfil"
-                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition shadow-xs"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 text-xs font-bold text-white bg-[#A28764] hover:bg-[#8e7555] rounded-xl transition shadow-xs active:scale-[0.99]"
                       >
-                        <Plus className="w-3.5 h-3.5" />
+                        <Plus className="w-4 h-4" />
                         <span>Gestionar direcciones en Mi Perfil</span>
                       </Link>
                     </div>
@@ -958,14 +989,14 @@ function CartContent() {
                 </div>
 
                 {/* Desglose de despacho individual por artículo */}
-                <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-xs space-y-3">
+                <div className="bg-white border border-stone-200 rounded-2xl p-5 shadow-xs space-y-3">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <Truck className="w-4 h-4 text-indigo-600" />
+                    <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                      <Truck className="w-4 h-4 text-[#A28764]" />
                       Artículos a despachar a esta dirección ({items.length})
                     </h4>
                     {calculandoEnvios && (
-                      <span className="text-[11px] text-indigo-600 font-semibold flex items-center gap-1 animate-pulse">
+                      <span className="text-[11px] text-[#A28764] font-semibold flex items-center gap-1.5 animate-pulse">
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
                         Actualizando costos de envío...
                       </span>
@@ -1166,7 +1197,7 @@ function CartContent() {
                       </p>
                       <Link
                         href="/mi-objetia?tab=perfil"
-                        className="inline-block text-[11px] font-bold text-indigo-600 hover:text-indigo-800 underline"
+                        className="inline-block text-[11px] font-bold text-[#A28764] hover:text-[#887050] underline"
                       >
                         Ir a Mi Perfil
                       </Link>
