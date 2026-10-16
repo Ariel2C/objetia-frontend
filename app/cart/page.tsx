@@ -69,6 +69,7 @@ function CartContent() {
   const [verificandoManual, setVerificandoManual] = useState(false);
   const confirmacionIntentada = useRef(false);
   const pollingPagoRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastCancelToastTime = useRef(0);
 
   // Control de flujo de pasos: 'carrito' (revisar artículos) o 'checkout' (seleccionar dirección y pago)
   const [pasoActual, setPasoActual] = useState<'carrito' | 'checkout'>('carrito');
@@ -329,7 +330,11 @@ function CartContent() {
 
     if (statusParam === 'failure') {
       confirmacionIntentada.current = true;
-      setError("El pago fue rechazado o cancelado. No se te cobró nada: podés intentar nuevamente desde tu carrito.");
+      const now = Date.now();
+      if (now - lastCancelToastTime.current > 3000) {
+        lastCancelToastTime.current = now;
+        toast.info("Pago cancelado. Tu compra sigue guardada en el carrito.");
+      }
       router.replace('/cart');
       return;
     }
@@ -633,7 +638,7 @@ function CartContent() {
     });
   };
 
-  const handleCancelarEsperaPago = async () => {
+  const handleCancelarEsperaPago = async (mostrarToast: boolean | React.MouseEvent = true) => {
     detenerPollingConfirmacion();
     limpiarElementosMercadoPago();
     if (esperandoPago) {
@@ -645,6 +650,13 @@ function CartContent() {
     }
     setEsperandoPago(null);
     fetchCart();
+    if (mostrarToast) {
+      const now = Date.now();
+      if (now - lastCancelToastTime.current > 3000) {
+        lastCancelToastTime.current = now;
+        toast.info("Pago cancelado. Tu compra sigue guardada en el carrito.");
+      }
+    }
     setTimeout(limpiarElementosMercadoPago, 300);
     setTimeout(limpiarElementosMercadoPago, 800);
   };
@@ -820,7 +832,7 @@ function CartContent() {
           </button>
         </div>
         <button
-          onClick={handleCancelarEsperaPago}
+          onClick={() => handleCancelarEsperaPago(true)}
           className="mt-5 text-xs font-bold text-gray-400 hover:text-gray-700 underline underline-offset-4 transition cursor-pointer"
         >
           Cancelar y volver al carrito
