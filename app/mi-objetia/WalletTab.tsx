@@ -56,7 +56,7 @@ const tiempoRestanteLiberacion = (availableAt: string): string => {
   const diff = parsearFechaUTC(availableAt).getTime() - Date.now();
   if (diff <= 0) return "Liberación en proceso";
   const dias = Math.floor(diff / 86400000);
-  if (dias > 30) return "Pendiente de entrega (7 días tras recibir)";
+  if (dias > 30) return "Aguardando entrega al comprador";
   if (dias >= 1) return `Falta${dias === 1 ? '' : 'n'} ${dias} ${dias === 1 ? 'día' : 'días'}`;
   const horas = Math.ceil(diff / 3600000);
   return `Faltan ${horas} h`;
@@ -455,9 +455,17 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                   <p className="text-xs font-semibold text-[#2C2723]">
                     Venta del {parsearFechaUTC(tx.created_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })}
                   </p>
-                  <p className="text-[11px] text-[#73675C] font-medium mt-0.5">
-                    {tiempoRestanteLiberacion(tx.available_at)} · se libera el {parsearFechaUTC(tx.available_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })}
-                  </p>
+                  <div className="text-[11px] text-[#73675C] font-medium mt-0.5">
+                    {parsearFechaUTC(tx.available_at).getTime() - Date.now() > 30 * 86400000 ? (
+                      <span className="text-amber-800 font-semibold bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200 inline-block mt-0.5">
+                        Aguardando entrega al comprador · Se liberará 7 días tras ser recibido
+                      </span>
+                    ) : (
+                      <span>
+                        {tiempoRestanteLiberacion(tx.available_at)} · se libera el {parsearFechaUTC(tx.available_at).toLocaleDateString('es-AR', { day: '2-digit', month: 'short' })}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <div className="text-right">
                   <span className="text-sm font-semibold text-[#2C2723] font-mono">
