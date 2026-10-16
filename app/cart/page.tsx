@@ -584,8 +584,58 @@ function CartContent() {
     }
   };
 
+  const limpiarElementosMercadoPago = () => {
+    if (typeof document === 'undefined') return;
+
+    // 1. Selectores conocidos de Mercado Pago Checkout Pro
+    const selectores = [
+      '.mercadopago-checkout-wrapper',
+      '.mercadopago-spinner',
+      '[class*="mercadopago"]',
+      '[id*="mercadopago"]',
+      '[class*="cho-"]',
+      '[id*="cho-"]',
+      '[class*="mp-checkout"]',
+      'iframe[src*="mercadopago"]',
+      'iframe[src*="mercadolibre"]',
+    ];
+
+    selectores.forEach((sel) => {
+      try {
+        document.querySelectorAll(sel).forEach((el) => {
+          const id = el.id || '';
+          if (id !== 'mercadopago-sdk' && !id.startsWith('cart') && !id.startsWith('navbar') && !id.startsWith('toast')) {
+            el.remove();
+          }
+        });
+      } catch (e) {}
+    });
+
+    // 2. Limpieza exhaustiva de cualquier overlay, iframe o svg inyectado directo al body
+    document.querySelectorAll('body > div, body > svg, body > iframe').forEach((el) => {
+      try {
+        const id = el.id || '';
+        if (id === '__next' || id === 'mercadopago-sdk' || id.startsWith('cart') || id.startsWith('toast')) return;
+        const html = el.outerHTML.toLowerCase();
+        if (
+          html.includes('mercadopago') ||
+          html.includes('cho-') ||
+          html.includes('spinner') ||
+          html.includes('loader') ||
+          html.includes('stroke="#009ee3"') ||
+          html.includes('#009ee3') ||
+          html.includes('#00b4db') ||
+          html.includes('viewbox="0 0 100 100"')
+        ) {
+          el.remove();
+        }
+      } catch (e) {}
+    });
+  };
+
   const handleCancelarEsperaPago = async () => {
     detenerPollingConfirmacion();
+    limpiarElementosMercadoPago();
     if (esperandoPago) {
       try {
         await apiFetch(`/orders/cancel-checkout/${esperandoPago.productId}`, { method: 'POST' });
@@ -595,7 +645,22 @@ function CartContent() {
     }
     setEsperandoPago(null);
     fetchCart();
+    setTimeout(limpiarElementosMercadoPago, 300);
+    setTimeout(limpiarElementosMercadoPago, 800);
   };
+
+  // Asegurar que no quede ningún residuo de Mercado Pago cuando no hay pago en espera
+  useEffect(() => {
+    if (!esperandoPago) {
+      limpiarElementosMercadoPago();
+      const t1 = setTimeout(limpiarElementosMercadoPago, 300);
+      const t2 = setTimeout(limpiarElementosMercadoPago, 1000);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
+  }, [esperandoPago]);
 
   // Escuchar eventos de retorno o cancelación del modal de Mercado Pago y detectar cuando se cierra
   useEffect(() => {
@@ -605,6 +670,7 @@ function CartContent() {
         if (!data) return;
 
         if (data.type === 'MP_PAYMENT_SUCCESS') {
+          limpiarElementosMercadoPago();
           const oId = data.orderId || esperandoPago?.orderId;
           if (oId) verificarPagoOrden(Number(oId));
           return;
@@ -636,6 +702,7 @@ function CartContent() {
       } else if (habiaModal) {
         habiaModal = false;
         // El modal desapareció de la pantalla
+        limpiarElementosMercadoPago();
         if (esperandoPago) {
           verificarPagoOrden(esperandoPago.orderId).then((pagado) => {
             if (!pagado) {

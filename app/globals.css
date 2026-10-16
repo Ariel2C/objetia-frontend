@@ -227,6 +227,10 @@ textarea.text-white::placeholder,
   font-weight: 700 !important;
 }
 
-
-
-
+/* Ocultar cualquier spinner o loader residual de Mercado Pago si no hay iframe de pago activo */
+body:not(:has(iframe[src*="mercadopago"])) .mercadopago-spinner,
+body:not(:has(iframe[src*="mercadopago"])) [class*="cho-loading"],
+body:not(:has(iframe[src*="mercadopago"])) [class*="mercadopago-checkout-wrapper"]:empty,
+body:not(:has(iframe[src*="mercadopago"])) [class*="mercadopago"]:empty {
+  display: none !important;
+}
