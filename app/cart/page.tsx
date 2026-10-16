@@ -84,9 +84,8 @@ function CartContent() {
 
   // Direcciones guardadas del usuario
   const [savedAddresses, setSavedAddresses] = useState<UserAddress[]>([]);
-  const [selectedAddressId, setSelectedAddressId] = useState<number | 'manual' | null>(null);
+  const [selectedAddressId, setSelectedAddressId] = useState<number | null>(null);
   const [loadingAddresses, setLoadingAddresses] = useState(false);
-  const [showManualAddressForm, setShowManualAddressForm] = useState(false);
 
   // Saldo de la billetera Vamaar/Objetia
   const [saldoBilletera, setSaldoBilletera] = useState<number>(0);
@@ -156,7 +155,6 @@ function CartContent() {
    */
   const applyAddress = (addr: UserAddress) => {
     setSelectedAddressId(addr.id);
-    setShowManualAddressForm(false);
     setStreet(addr.street || "");
     setNumber(addr.number || "");
     setFloorDept(addr.floor_dept || "");
@@ -175,19 +173,6 @@ function CartContent() {
     }
   };
 
-  const handleSelectManualAddress = () => {
-    setSelectedAddressId('manual');
-    setShowManualAddressForm(true);
-    setStreet("");
-    setNumber("");
-    setFloorDept("");
-    setPostalCode("");
-    setCity("");
-    setProvince("");
-    setShippingCosts({});
-    setActivePostalCode("");
-  };
-
   const fetchAddresses = async () => {
     if (!getToken() && !token) return;
     setLoadingAddresses(true);
@@ -197,42 +182,23 @@ function CartContent() {
       setSavedAddresses(addrs);
 
       if (addrs.length > 0) {
-        // Encontrar la dirección predeterminada
+        // Encontrar la dirección predeterminada o la primera disponible
         const def = addrs.find(a => a.is_default) || addrs[0];
-        setSelectedAddressId(def.id);
-        setStreet(def.street || "");
-        setNumber(def.number || "");
-        setFloorDept(def.floor_dept || "");
-        setCity(def.city || "");
-        setProvince(def.province || "");
-        const cp = (def.postal_code || "").toUpperCase().trim();
-        setPostalCode(cp);
-        if (cp) {
-          setActivePostalCode(cp);
-          handleCalcularEnvios(cp);
-        }
+        applyAddress(def);
       } else {
-        setSelectedAddressId('manual');
-        setShowManualAddressForm(true);
-        const u = usuario as any;
-        if (u) {
-          if (u.street) setStreet(u.street);
-          if (u.number) setNumber(u.number);
-          if (u.floor_dept) setFloorDept(u.floor_dept);
-          if (u.postal_code) {
-            const cp = u.postal_code.toUpperCase().trim();
-            setPostalCode(cp);
-            setActivePostalCode(cp);
-            handleCalcularEnvios(cp);
-          }
-          if (u.city) setCity(u.city);
-          if (u.province) setProvince(u.province);
-        }
+        setSelectedAddressId(null);
+        setStreet("");
+        setNumber("");
+        setFloorDept("");
+        setCity("");
+        setProvince("");
+        setPostalCode("");
+        setActivePostalCode("");
+        setShippingCosts({});
       }
     } catch (err) {
       console.warn("Error cargando direcciones en carrito:", err);
-      setSelectedAddressId('manual');
-      setShowManualAddressForm(true);
+      setSelectedAddressId(null);
     } finally {
       setLoadingAddresses(false);
     }
@@ -463,8 +429,12 @@ function CartContent() {
 
   const handleCheckout = async (productId: number) => {
     setError(null);
-    if (!recipientName.trim() || !street.trim() || !number.trim() || !postalCode.trim() || !city.trim() || !province.trim()) {
-      setError("Por favor completá todos los campos obligatorios de la Dirección de Envío antes de realizar el pago.");
+    if (!recipientName.trim()) {
+      setError("Por favor ingresá el nombre completo de quien recibe el paquete.");
+      return;
+    }
+    if (savedAddresses.length === 0 || !selectedAddressId || !street.trim() || !number.trim() || !postalCode.trim() || !city.trim() || !province.trim()) {
+      setError("Por favor seleccioná una dirección guardada en tu perfil antes de realizar el pago.");
       return;
     }
 
@@ -527,8 +497,12 @@ function CartContent() {
 
   const handleCheckoutConSaldo = async (productId: number) => {
     setError(null);
-    if (!recipientName.trim() || !street.trim() || !number.trim() || !postalCode.trim() || !city.trim() || !province.trim()) {
-      setError("Por favor completá todos los campos obligatorios de la Dirección de Envío antes de realizar el pago.");
+    if (!recipientName.trim()) {
+      setError("Por favor ingresá el nombre completo de quien recibe el paquete.");
+      return;
+    }
+    if (savedAddresses.length === 0 || !selectedAddressId || !street.trim() || !number.trim() || !postalCode.trim() || !city.trim() || !province.trim()) {
+      setError("Por favor seleccioná una dirección guardada en tu perfil antes de realizar el pago.");
       return;
     }
 
@@ -889,7 +863,7 @@ function CartContent() {
                       Elegí la dirección de envío
                     </h3>
                     <Link
-                      href="/mi-objetia"
+                      href="/mi-objetia?tab=perfil"
                       className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition flex items-center gap-1"
                     >
                       <span>Gestionar mis direcciones</span>
@@ -918,21 +892,9 @@ function CartContent() {
                     </div>
                   ) : savedAddresses.length > 0 ? (
                     <div className="space-y-3 pt-1">
-                      <div className="flex items-center justify-between">
-                        <label className="text-xs font-bold text-gray-700">
-                          Seleccioná una dirección para recibir tus compras:
-                        </label>
-                        {selectedAddressId !== 'manual' && (
-                          <button
-                            type="button"
-                            onClick={() => setShowManualAddressForm(!showManualAddressForm)}
-                            className="text-[11px] font-medium text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer"
-                          >
-                            <Edit2 className="w-3 h-3" />
-                            <span>{showManualAddressForm ? "Ocultar edición" : "Modificar campos"}</span>
-                          </button>
-                        )}
-                      </div>
+                      <label className="text-xs font-bold text-gray-700 block">
+                        Seleccioná una dirección para recibir tus compras:
+                      </label>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {savedAddresses.map((addr) => {
@@ -975,123 +937,22 @@ function CartContent() {
                             </div>
                           );
                         })}
-
-                        {/* Opción para usar otra dirección */}
-                        <div
-                          onClick={handleSelectManualAddress}
-                          className={`p-4 rounded-xl border-2 border-dashed transition cursor-pointer flex flex-col items-center justify-center min-h-[96px] text-center ${
-                            selectedAddressId === 'manual'
-                              ? 'border-indigo-600 bg-indigo-50/30 text-indigo-700'
-                              : 'border-gray-300 hover:border-gray-400 bg-gray-50/50 text-gray-600 hover:text-gray-800'
-                          }`}
-                        >
-                          <Plus className="w-4 h-4 mb-1 text-indigo-600" />
-                          <span className="text-xs font-bold">Usar otra dirección</span>
-                          <span className="text-[10px] text-gray-400">Ingresar datos manualmente</span>
-                        </div>
                       </div>
                     </div>
-                  ) : null}
-
-                  {/* Formulario de campos de dirección */}
-                  {(showManualAddressForm || selectedAddressId === 'manual' || savedAddresses.length === 0) && (
-                    <div className={`space-y-4 pt-3 ${savedAddresses.length > 0 ? 'border-t border-gray-100 mt-3' : ''}`}>
-                      {savedAddresses.length > 0 && selectedAddressId === 'manual' && (
-                        <div className="flex items-center justify-between bg-amber-50/70 border border-amber-200/80 px-3 py-2 rounded-lg text-xs text-amber-800">
-                          <span>Ingresando una dirección alternativa para este envío.</span>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const def = savedAddresses.find(a => a.is_default) || savedAddresses[0];
-                              if (def) applyAddress(def);
-                            }}
-                            className="font-semibold text-amber-900 underline hover:no-underline ml-2 cursor-pointer"
-                          >
-                            Volver a mis direcciones
-                          </button>
-                        </div>
-                      )}
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="text-xs font-semibold text-gray-700 block mb-1">Calle *</label>
-                          <input
-                            type="text"
-                            required
-                            placeholder="Av. Colón"
-                            value={street}
-                            onChange={(e) => setStreet(e.target.value)}
-                            className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 text-gray-800 bg-white"
-                          />
-                        </div>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <label className="text-xs font-semibold text-gray-700 block mb-1">Número *</label>
-                            <input
-                              type="text"
-                              required
-                              placeholder="1234"
-                              value={number}
-                              onChange={(e) => setNumber(e.target.value)}
-                              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 text-gray-800 bg-white"
-                            />
-                          </div>
-                          <div>
-                            <label className="text-xs font-semibold text-gray-700 block mb-1">Piso/Depto</label>
-                            <input
-                              type="text"
-                              placeholder="2° B"
-                              value={floorDept}
-                              onChange={(e) => setFloorDept(e.target.value)}
-                              className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 text-gray-800 bg-white"
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="text-xs font-semibold text-gray-700 block mb-1">Código Postal *</label>
-                          <input
-                            type="text"
-                            required
-                            placeholder="X5000"
-                            value={postalCode}
-                            onChange={(e) => {
-                              const val = e.target.value.toUpperCase();
-                              setPostalCode(val);
-                              if (val.trim().length >= 4) {
-                                if (val.trim() !== activePostalCode) {
-                                  setActivePostalCode(val.trim());
-                                  handleCalcularEnvios(val.trim());
-                                }
-                              } else {
-                                setShippingCosts({});
-                              }
-                            }}
-                            className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 text-gray-800 bg-white font-mono font-bold"
-                          />
-                        </div>
-                        <div>
-                          <label className="text-xs font-semibold text-gray-700 block mb-1">Ciudad / Localidad *</label>
-                          <input
-                            type="text"
-                            required
-                            placeholder="Córdoba"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
-                            className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 text-gray-800 bg-white"
-                          />
-                        </div>
-                        <div className="md:col-span-2">
-                          <label className="text-xs font-semibold text-gray-700 block mb-1">Provincia *</label>
-                          <input
-                            type="text"
-                            required
-                            placeholder="Córdoba"
-                            value={province}
-                            onChange={(e) => setProvince(e.target.value)}
-                            className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-1 focus:ring-gray-900 text-gray-800 bg-white"
-                          />
-                        </div>
+                  ) : (
+                    <div className="p-6 rounded-xl border border-dashed border-gray-300 bg-gray-50/50 text-center space-y-3">
+                      <MapPin className="w-8 h-8 text-gray-400 mx-auto" />
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">No tenés direcciones guardadas</p>
+                        <p className="text-xs text-gray-500 mt-1">Para recibir tus compras, registrá al menos una dirección de entrega en tu perfil.</p>
                       </div>
+                      <Link
+                        href="/mi-objetia?tab=perfil"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition shadow-xs"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>Gestionar direcciones en Mi Perfil</span>
+                      </Link>
                     </div>
                   )}
                 </div>
@@ -1266,7 +1127,7 @@ function CartContent() {
                       <div key={item.id} className="space-y-2 pt-2 border-t border-gray-100 first:border-t-0 first:pt-0">
                         <button
                           onClick={() => handleCheckout(item.id)}
-                          disabled={!isAvailable || !todosEnviosCalculados || calculandoEnvios || pagandoConSaldo}
+                          disabled={!isAvailable || !todosEnviosCalculados || calculandoEnvios || pagandoConSaldo || savedAddresses.length === 0 || !selectedAddressId}
                           className="w-full flex items-center justify-between px-4 py-3 rounded-xl bg-gray-900 text-white font-bold text-xs uppercase tracking-wider hover:bg-black transition active:scale-[0.99] cursor-pointer shadow-xs disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <span className="truncate pr-2">
@@ -1284,7 +1145,7 @@ function CartContent() {
                         {alcanzaSaldo && isAvailable && (
                           <button
                             onClick={() => handleCheckoutConSaldo(item.id)}
-                            disabled={pagandoConSaldo || calculandoEnvios}
+                            disabled={pagandoConSaldo || calculandoEnvios || savedAddresses.length === 0 || !selectedAddressId}
                             className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl border border-emerald-600 text-emerald-700 bg-emerald-50/60 font-bold text-xs uppercase tracking-wider hover:bg-emerald-600 hover:text-white transition active:scale-[0.99] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <span className="flex items-center gap-1.5">
@@ -1297,6 +1158,20 @@ function CartContent() {
                       </div>
                     );
                   })}
+
+                  {savedAddresses.length === 0 && (
+                    <div className="p-3 bg-amber-50 border border-amber-200/80 rounded-xl text-center space-y-1">
+                      <p className="text-[11px] font-semibold text-amber-900">
+                        Tenés que registrar una dirección de envío en tu perfil para habilitar la compra.
+                      </p>
+                      <Link
+                        href="/mi-objetia?tab=perfil"
+                        className="inline-block text-[11px] font-bold text-indigo-600 hover:text-indigo-800 underline"
+                      >
+                        Ir a Mi Perfil
+                      </Link>
+                    </div>
+                  )}
 
                   {saldoBilletera > 0 && todosEnviosCalculados && items.some(i => saldoBilletera < i.price + (shippingCosts[i.id] || 0)) && (
                     <p className="text-[10px] text-gray-500 leading-normal flex items-center gap-1.5 pt-2">
