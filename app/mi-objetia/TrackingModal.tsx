@@ -142,6 +142,27 @@ export default function TrackingModal({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
+  const [confirmandoConformidad, setConfirmandoConformidad] = useState(false);
+  const [conformidadConfirmada, setConformidadConfirmada] = useState(false);
+
+  const handleConfirmarConformidadDesdeModal = async () => {
+    if (!orderId) return;
+    if (!window.confirm("¿Confirmás que el producto está en perfecto estado y todo llegó bien? Al confirmar, se dará por finalizada la compra y se liberará el pago inmediatamente al vendedor.")) {
+      return;
+    }
+    setConfirmandoConformidad(true);
+    try {
+      await apiFetch(`/orders/${orderId}/confirm-conformity/`, { method: 'POST' });
+      setConformidadConfirmada(true);
+      alert("¡Muchas gracias! Confirmaste que recibiste todo perfecto. El pago ha sido liberado al vendedor.");
+      if (trackingNumber) fetchTracking(trackingNumber);
+    } catch (e: any) {
+      alert(e.message || "No se pudo confirmar la conformidad.");
+    } finally {
+      setConfirmandoConformidad(false);
+    }
+  };
+
   const handleCopiarGuia = () => {
     if (!trackingNumber) return;
     navigator.clipboard.writeText(trackingNumber);
@@ -482,6 +503,40 @@ export default function TrackingModal({
               </div>
             ) : null}
           </div>
+
+          {/* =============================================================== */}
+          {/* BANNER DE CONFORMIDAD ("RECIBÍ TODO PERFECTO") */}
+          {/* =============================================================== */}
+          {trackingData && trackingData.status === "Entregado" && orderId && !conformidadConfirmada && (
+            <div className="bg-[#e8f8ef] border border-[#ceead6] rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-emerald-700 text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h6 className="text-xs font-bold text-emerald-950">¿Recibiste tu objeto en orden?</h6>
+                  <p className="text-[11px] text-emerald-800">
+                    Podés confirmar tu conformidad para liberar el dinero al vendedor de inmediato sin esperar 7 días.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleConfirmarConformidadDesdeModal}
+                disabled={confirmandoConformidad}
+                className="px-4 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition shadow-xs whitespace-nowrap cursor-pointer disabled:opacity-50"
+              >
+                {confirmandoConformidad ? "Liberando..." : "Recibí todo perfecto"}
+              </button>
+            </div>
+          )}
+
+          {conformidadConfirmada && (
+            <div className="bg-[#e8f8ef] border border-[#ceead6] rounded-2xl p-3 flex items-center gap-2.5 text-xs font-bold text-emerald-900">
+              <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
+              <span>¡Confirmaste que recibiste todo perfecto! El pago fue liberado al vendedor.</span>
+            </div>
+          )}
 
           {/* =============================================================== */}
           {/* DIRECCIÓN DE ENTREGA AL FINAL */}

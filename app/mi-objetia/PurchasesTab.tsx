@@ -16,7 +16,8 @@ import {
   ChevronRight,
   Loader2,
   MessageSquare,
-  CheckCircle2
+  CheckCircle2,
+  CheckCheck
 } from 'lucide-react';
 import Link from 'next/link';
 import { getApiUrl } from '../../lib/config';
@@ -57,6 +58,7 @@ interface PurchaseItem {
   tracking_number: string | null;
   shipment_status: string | null;
   shipping_label_url: string | null;
+  is_escrow_released?: boolean;
 }
 
 interface PurchasesTabProps {
@@ -130,6 +132,32 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
       alert(e.message || "No se pudo confirmar la entrega.");
     } finally {
       setConfirmandoId(null);
+    }
+  };
+
+  const [confirmandoConformidadId, setConfirmandoConformidadId] = useState<number | null>(null);
+
+  const handleConfirmarConformidad = async (orderId: number) => {
+    if (!window.confirm("¿Confirmás que el producto está en perfecto estado y todo llegó bien? Al confirmar, se dará por finalizada la compra y se liberará el pago inmediatamente al vendedor.")) {
+      return;
+    }
+    setConfirmandoConformidadId(orderId);
+    try {
+      const res = await fetch(`${getApiUrl()}/orders/${orderId}/confirm-conformity/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('vamaar_token') || token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Error al confirmar conformidad");
+      alert(data.mensaje || "¡Gracias! El pago fue liberado de inmediato al vendedor.");
+      await fetchPurchases();
+    } catch (e: any) {
+      alert(e.message || "No se pudo confirmar la conformidad.");
+    } finally {
+      setConfirmandoConformidadId(null);
     }
   };
 
@@ -487,6 +515,30 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                             )}
                             <span>Ya lo recibí</span>
                           </button>
+                        )}
+
+                        {(compra.status === 'delivered' || compra.shipment_status === 'DELIVERED') && !compra.is_escrow_released && (
+                          <button
+                            type="button"
+                            onClick={() => handleConfirmarConformidad(compra.id)}
+                            disabled={confirmandoConformidadId === compra.id}
+                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer disabled:opacity-50"
+                            title="Confirmar que recibiste todo perfecto para liberar los fondos al vendedor de inmediato"
+                          >
+                            {confirmandoConformidadId === compra.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <CheckCheck className="h-3.5 w-3.5" />
+                            )}
+                            <span>Recibí todo perfecto</span>
+                          </button>
+                        )}
+
+                        {compra.is_escrow_released && (
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200">
+                            <CheckCheck className="h-3 w-3 text-emerald-600" />
+                            <span>Pago liberado al vendedor</span>
+                          </span>
                         )}
 
                         <Link

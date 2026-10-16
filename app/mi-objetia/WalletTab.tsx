@@ -298,15 +298,15 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                 <div className="w-10 h-10 rounded-xl bg-[#F2EFE9] border border-[#EAE5DC] flex items-center justify-center text-[#2C2723]">
                   <ShoppingBag className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-semibold text-[#73675C] uppercase tracking-wider">Saldo disponible</span>
+                <span className="text-xs font-semibold text-[#73675C] uppercase tracking-wider">Saldo libre</span>
               </div>
               <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-[6px] bg-[#F2EFE9] text-[#2C2723] border border-[#EAE5DC]">
-                Inmediato
+                Para compras
               </span>
             </div>
             <div>
               <h4 className="text-2xl sm:text-3xl font-bold text-[#2C2723] tracking-tight leading-none font-mono">
-                {cargandoBalance ? "..." : formatearARS(saldoParaCompras)}
+                {cargandoBalance ? "..." : formatearARS(balance.available)}
               </h4>
               <p className="text-xs text-[#73675C] font-medium mt-2 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#2C2723]" />
@@ -416,7 +416,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                   En garantía (7 días tras entrega)
                 </span>
                 <span className="text-[11px] text-[#73675C] block">
-                  Se libera 7 días después de que el comprador reciba su paquete
+                  Se libera a los 7 días de entregado o antes si el comprador confirma conformidad
                 </span>
               </div>
             </div>
