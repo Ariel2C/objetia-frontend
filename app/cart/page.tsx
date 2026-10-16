@@ -110,6 +110,10 @@ function CartContent() {
     }
   };
 
+  const isInitialAddressLoad = useRef(true);
+  const lastCalculatedKeyRef = useRef<string | null>(null);
+  const inFlightCalcRef = useRef<string | null>(null);
+
   /**
    * Calcula el costo de envío individual para CADA producto del carrito
    * usando el código postal de destino proporcionado.
@@ -119,8 +123,17 @@ function CartContent() {
     const cleanCp = cp.toUpperCase().trim();
     if (cleanCp.length < 4 || activeItems.length === 0) {
       setShippingCosts({});
+      lastCalculatedKeyRef.current = null;
       return;
     }
+
+    const calcKey = `${cleanCp}_${activeItems.map(i => i.id).sort().join(',')}`;
+    // Evitar calcular dos veces si ya está en proceso o ya fue calculado para este CP e items
+    if (lastCalculatedKeyRef.current === calcKey || inFlightCalcRef.current === calcKey) {
+      return;
+    }
+
+    inFlightCalcRef.current = calcKey;
     setCalculandoEnvios(true);
     try {
       const resultados = await Promise.all(
@@ -144,14 +157,16 @@ function CartContent() {
         }
       });
       setShippingCosts(newCosts);
+      lastCalculatedKeyRef.current = calcKey;
     } finally {
+      inFlightCalcRef.current = null;
       setCalculandoEnvios(false);
     }
   };
 
   /**
    * Aplica una dirección guardada. Si el código postal difiere del que se usó
-   * previamente para calcular el envío, se vuelven a calcular los envíos de todos los artículos.
+   * previamente para calcular el envío, se actualiza el código postal activo.
    */
   const applyAddress = (addr: UserAddress) => {
     setSelectedAddressId(addr.id);
@@ -165,11 +180,14 @@ function CartContent() {
     setPostalCode(newCp);
 
     if (newCp && newCp !== activePostalCode) {
+      if (!isInitialAddressLoad.current) {
+        toast.info(`Recalculando envíos para el código postal ${newCp}...`);
+      }
       setActivePostalCode(newCp);
-      handleCalcularEnvios(newCp);
-      toast.info(`Recalculando envíos para el código postal ${newCp}...`);
     } else if (!newCp) {
+      setActivePostalCode("");
       setShippingCosts({});
+      lastCalculatedKeyRef.current = null;
     }
   };
 
@@ -185,6 +203,9 @@ function CartContent() {
         // Encontrar la dirección predeterminada o la primera disponible
         const def = addrs.find(a => a.is_default) || addrs[0];
         applyAddress(def);
+        setTimeout(() => {
+          isInitialAddressLoad.current = false;
+        }, 500);
       } else {
         setSelectedAddressId(null);
         setStreet("");
@@ -195,6 +216,7 @@ function CartContent() {
         setPostalCode("");
         setActivePostalCode("");
         setShippingCosts({});
+        lastCalculatedKeyRef.current = null;
       }
     } catch (err) {
       console.warn("Error cargando direcciones en carrito:", err);
@@ -216,13 +238,10 @@ function CartContent() {
     }
   }, [usuario]);
 
-  // Si los items se cargan o cambian, y ya tenemos un CP activo, calcular envíos
+  // Si los items se cargan o cambian, y ya tenemos un CP activo, calcular envíos una sola vez
   useEffect(() => {
-    if (items.length > 0 && activePostalCode && activePostalCode.trim().length >= 4 && !calculandoEnvios) {
-      const faltanCalcular = items.some(item => typeof shippingCosts[item.id] !== 'number');
-      if (faltanCalcular) {
-        handleCalcularEnvios(activePostalCode, items);
-      }
+    if (items.length > 0 && activePostalCode && activePostalCode.trim().length >= 4) {
+      handleCalcularEnvios(activePostalCode, items);
     }
   }, [items, activePostalCode]);
 
