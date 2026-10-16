@@ -898,70 +898,59 @@ function CartContent() {
                         Seleccioná una dirección para recibir tus compras:
                       </label>
 
-                      {/* Lista de direcciones una abajo de la otra (cards largas) */}
-                      <div className="flex flex-col gap-3">
+                      {/* Lista de direcciones una abajo de la otra (idénticas a la imagen) */}
+                      <div className="space-y-3">
                         {savedAddresses.map((addr) => {
                           const isSelected = selectedAddressId === addr.id;
                           return (
                             <div
                               key={addr.id}
                               onClick={() => applyAddress(addr)}
-                              className={`group w-full p-4 sm:p-4.5 rounded-2xl border-2 transition-all duration-200 cursor-pointer flex items-center justify-between gap-4 text-left relative ${
+                              className={`p-4 sm:p-5 rounded-2xl border transition-all flex items-center justify-between gap-4 cursor-pointer group ${
                                 isSelected
-                                  ? 'border-[#A28764] bg-[#A28764]/5 shadow-sm ring-1 ring-[#A28764]/20'
-                                  : 'border-stone-200 hover:border-[#A28764]/60 bg-white hover:bg-stone-50/50'
+                                  ? "bg-[#FAF8F5] border-[#2C2723] shadow-xs ring-1 ring-[#2C2723]/20"
+                                  : "bg-white border-[#EAE5DC] hover:border-[#D5CEC4]"
                               }`}
                             >
-                              <div className="flex items-start sm:items-center gap-3.5 min-w-0 flex-1">
-                                {/* Radio button indicador */}
-                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0 transition-colors ${
-                                  isSelected 
-                                    ? 'border-[#A28764] bg-[#A28764] text-white' 
-                                    : 'border-stone-300 bg-white group-hover:border-[#A28764]/60'
-                                }`}>
-                                  {isSelected && <Check className="w-3 h-3 stroke-[3]" />}
-                                </div>
+                              {/* Datos de la dirección exactamente como en la imagen */}
+                              <div className="space-y-1 flex-1 min-w-0">
+                                <div className="flex items-center gap-2.5 flex-wrap">
+                                  <span className="text-sm font-semibold text-[#2C2723]">
+                                    {addr.title || "Dirección de Entrega"}
+                                  </span>
 
-                                {/* Ícono de ubicación */}
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
-                                  isSelected ? 'bg-[#A28764]/15 text-[#A28764]' : 'bg-stone-100 text-stone-500 group-hover:bg-[#A28764]/10 group-hover:text-[#A28764]'
-                                }`}>
-                                  <MapPin className="w-5 h-5" />
-                                </div>
-
-                                {/* Información detallada de la dirección */}
-                                <div className="min-w-0 flex-1">
-                                  <div className="flex flex-wrap items-center gap-2 mb-0.5">
-                                    <span className="text-sm font-bold text-gray-900 truncate">
-                                      {addr.title || "Dirección"}
+                                  {addr.is_default && (
+                                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#2C2723] bg-[#F2EFE9] border border-[#EAE5DC] px-2.5 py-0.5 rounded-full flex items-center gap-1">
+                                      <Check className="w-3 h-3" />
+                                      ACTIVA PARA ENVÍOS
                                     </span>
-                                    {addr.is_default && (
-                                      <span className="text-[10px] font-bold bg-[#A28764]/15 text-[#7c6648] border border-[#A28764]/30 px-2 py-0.5 rounded-full">
-                                        Predeterminada
-                                      </span>
-                                    )}
-                                  </div>
-                                  <p className="text-sm text-gray-800 font-medium leading-snug truncate">
-                                    {addr.street} {addr.number} {addr.floor_dept ? `(${addr.floor_dept})` : ''}
-                                  </p>
-                                  <p className="text-xs text-gray-500 mt-0.5 truncate">
-                                    {addr.city}, {addr.province} {addr.postal_code ? `· CP ${addr.postal_code}` : ''}
-                                  </p>
+                                  )}
                                 </div>
+
+                                <p className="text-xs font-medium text-[#534636]">
+                                  {addr.street} {addr.number}{' '}
+                                  {addr.floor_dept && (
+                                    <span className="text-[#73675C] font-normal">({addr.floor_dept})</span>
+                                  )}
+                                </p>
+
+                                <p className="text-xs text-[#73675C]">
+                                  {[addr.city, addr.province].filter(Boolean).join(', ')}{' '}
+                                  {addr.postal_code && (
+                                    <span className="font-mono font-medium">· CP {addr.postal_code}</span>
+                                  )}
+                                </p>
                               </div>
 
-                              {/* Badge de selección a la derecha */}
-                              <div className="shrink-0 flex items-center">
-                                {isSelected ? (
-                                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#A28764] bg-[#A28764]/10 px-3 py-1.5 rounded-xl border border-[#A28764]/30">
-                                    <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                                    <span className="hidden sm:inline">Seleccionada</span>
-                                  </span>
-                                ) : (
-                                  <span className="text-xs font-semibold text-stone-400 group-hover:text-[#A28764] transition-colors px-2 py-1">
-                                    Elegir
-                                  </span>
-                                )}
+                              {/* Lado derecho: Checkbox para seleccionar (en lugar de lápiz y tacho) */}
+                              <div className="flex items-center shrink-0">
+                                <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
+                                  isSelected 
+                                    ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-2xs' 
+                                    : 'border-[#D5CEC4] bg-white group-hover:border-[#2C2723]'
+                                }`}>
+                                  {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
+                                </div>
                               </div>
                             </div>
                           );
