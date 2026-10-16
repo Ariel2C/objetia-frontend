@@ -308,6 +308,21 @@ function CartContent() {
     };
   }, [usuario, token]);
 
+  // Si Mercado Pago redirige dentro del iframe/modal, romper el marco y actualizar la ventana principal
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (window !== window.top && (statusParam === 'success' || statusParam === 'failure' || statusParam === 'pending')) {
+      try {
+        window.parent.postMessage({
+          type: statusParam === 'success' ? 'MP_PAYMENT_SUCCESS' : 'MP_PAYMENT_CANCELLED',
+          status: statusParam,
+          orderId: orderIdParam
+        }, '*');
+      } catch (e) {}
+      window.top?.location.replace(window.location.href);
+    }
+  }, [statusParam, orderIdParam]);
+
   // Confirmar pago desde el servidor tras el redirect de Mercado Pago
   useEffect(() => {
     if (!orderIdParam || !usuario || confirmacionIntentada.current) return;
@@ -581,6 +596,63 @@ function CartContent() {
     setEsperandoPago(null);
     fetchCart();
   };
+
+  // Escuchar eventos de retorno o cancelación del modal de Mercado Pago y detectar cuando se cierra
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      try {
+        const data = event.data;
+        if (!data) return;
+
+        if (data.type === 'MP_PAYMENT_SUCCESS') {
+          const oId = data.orderId || esperandoPago?.orderId;
+          if (oId) verificarPagoOrden(Number(oId));
+          return;
+        }
+
+        if (
+          data.type === 'MP_PAYMENT_CANCELLED' || 
+          data.event === 'modal_closed' || 
+          data.type === 'close' || 
+          data.action === 'close' || 
+          data === 'close'
+        ) {
+          handleCancelarEsperaPago();
+          return;
+        }
+      } catch (e) {
+        console.error("Error procesando mensaje de Mercado Pago:", e);
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    // Monitorear cuando el iframe o wrapper del modal de Mercado Pago se cierra en el DOM
+    let habiaModal = false;
+    const observer = new MutationObserver(() => {
+      const mpModal = document.querySelector('.mercadopago-checkout-wrapper, iframe[src*="mercadopago"]');
+      if (mpModal) {
+        habiaModal = true;
+      } else if (habiaModal) {
+        habiaModal = false;
+        // El modal desapareció de la pantalla
+        if (esperandoPago) {
+          verificarPagoOrden(esperandoPago.orderId).then((pagado) => {
+            if (!pagado) {
+              handleCancelarEsperaPago();
+            }
+          });
+        }
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      window.removeEventListener('message', handleMessage);
+      observer.disconnect();
+    };
+  }, [esperandoPago]);
 
   const handleCheckoutConSaldo = async (productId: number) => {
     setError(null);
