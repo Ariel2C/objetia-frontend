@@ -661,7 +661,7 @@ function CartContent() {
           </div>
           <div className="border-t border-gray-200 pt-3 flex justify-between text-base font-bold">
             <span className="text-gray-800">Total debitado (con envío):</span>
-            <FormattedPrice price={orderInfo.price} className="text-emerald-700 text-base font-black" />
+            <FormattedPrice price={orderInfo.price} showCents={false} className="text-emerald-700 text-base font-black" />
           </div>
         </div>
 
@@ -831,7 +831,7 @@ function CartContent() {
 
                       {/* 3. Precio */}
                       <div className="shrink-0 text-right">
-                        <FormattedPrice price={item.price} className="text-sm sm:text-base font-bold text-gray-900" />
+                        <FormattedPrice price={item.price} showCents={false} className="text-sm sm:text-base font-bold text-gray-900" />
                       </div>
 
                       {/* 4. Boton para eliminar */}
@@ -906,10 +906,10 @@ function CartContent() {
                             <div
                               key={addr.id}
                               onClick={() => applyAddress(addr)}
-                              className={`p-4 sm:p-5 rounded-2xl border transition-all flex items-center justify-between gap-4 cursor-pointer group ${
+                              className={`p-4 sm:p-5 rounded-2xl transition-all flex items-center justify-between gap-4 cursor-pointer group ${
                                 isSelected
-                                  ? "bg-[#FAF8F5] border-[#2C2723] shadow-xs ring-1 ring-[#2C2723]/20"
-                                  : "bg-white border-[#EAE5DC] hover:border-[#D5CEC4]"
+                                  ? "border-2 border-[#A28764] bg-[#A28764]/5 shadow-xs ring-1 ring-[#A28764]/20"
+                                  : "border border-stone-200 hover:border-[#A28764]/60 bg-white hover:bg-stone-50/50"
                               }`}
                             >
                               {/* Datos de la dirección exactamente como en la imagen */}
@@ -942,12 +942,12 @@ function CartContent() {
                                 </p>
                               </div>
 
-                              {/* Lado derecho: Checkbox para seleccionar (en lugar de lápiz y tacho) */}
+                              {/* Lado derecho: Checkbox para seleccionar */}
                               <div className="flex items-center shrink-0">
                                 <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${
                                   isSelected 
-                                    ? 'bg-[#2C2723] border-[#2C2723] text-white shadow-2xs' 
-                                    : 'border-[#D5CEC4] bg-white group-hover:border-[#2C2723]'
+                                    ? 'bg-[#A28764] border-[#A28764] text-white shadow-2xs' 
+                                    : 'border-stone-300 bg-white group-hover:border-[#A28764]'
                                 }`}>
                                   {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                                 </div>
@@ -1002,13 +1002,13 @@ function CartContent() {
                               {formatearTituloProducto(item.title)}
                             </span>
                             <span className="text-[10px] text-gray-400">
-                              Precio: <FormattedPrice price={item.price} />
+                              Precio: <FormattedPrice price={item.price} showCents={false} />
                             </span>
                           </div>
                           <div className="text-right shrink-0">
                             {typeof costItem === 'number' ? (
                               <div className="font-semibold text-gray-900">
-                                Envío: <FormattedPrice price={costItem} />
+                                Envío: <FormattedPrice price={costItem} showCents={false} />
                               </div>
                             ) : (
                               <span className="text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
@@ -1039,7 +1039,7 @@ function CartContent() {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Productos ({items.length}):</span>
-                  <FormattedPrice price={subtotal} className="font-semibold text-gray-900" />
+                  <FormattedPrice price={subtotal} showCents={false} className="font-semibold text-gray-900" />
                 </div>
 
                 {/* ========================================================== */}
@@ -1084,7 +1084,7 @@ function CartContent() {
                       <span>¡Tenés $5.000 de regalo!</span>
                     </div>
                     <p className="text-[11px] text-purple-700">
-                      Sumá <FormattedPrice price={50000 - subtotal} className="font-bold text-purple-900" /> más a tu carrito para activar tu cupón de bienvenida.
+                      Sumá <FormattedPrice price={50000 - subtotal} showCents={false} className="font-bold text-purple-900" /> más a tu carrito para activar tu cupón de bienvenida.
                     </p>
                   </div>
                 )}
@@ -1095,7 +1095,7 @@ function CartContent() {
                   {calculandoEnvios ? (
                     <span className="text-xs text-indigo-600 animate-pulse font-semibold">Calculando...</span>
                   ) : todosEnviosCalculados ? (
-                    <FormattedPrice price={totalEnvios} className="font-semibold text-gray-900" />
+                    <FormattedPrice price={totalEnvios} showCents={false} className="font-semibold text-gray-900" />
                   ) : (
                     <span className="text-xs text-amber-700 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
                       {activePostalCode ? "Calculando..." : "Ingresá CP"}
@@ -1106,10 +1106,10 @@ function CartContent() {
                 <div className="border-t border-gray-200 pt-3 flex justify-between text-base font-bold">
                   <span className="text-gray-900">Total:</span>
                   {todosEnviosCalculados ? (
-                    <FormattedPrice price={totalFinal} className="text-gray-950 text-base font-black" />
+                    <FormattedPrice price={totalFinal} showCents={false} className="text-gray-950 text-base font-black" />
                   ) : (
                     <span className="text-gray-950 text-base font-black flex items-center gap-1">
-                      <FormattedPrice price={Math.max(0, subtotal - descuentoBienvenida)} />
+                      <FormattedPrice price={Math.max(0, subtotal - descuentoBienvenida)} showCents={false} />
                       <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider relative -top-[0.2em]">+ envíos</span>
                     </span>
                   )}
@@ -1159,7 +1159,7 @@ function CartContent() {
                               ? "Pagar con Mercado Pago" 
                               : `Comprar: ${formatearTituloProducto(item.title).substring(0, 16)}...`}
                           </span>
-                          {isAvailable && <FormattedPrice price={totalItem} className="text-xs font-mono normal-case shrink-0" />}
+                          {isAvailable && <FormattedPrice price={totalItem} showCents={false} className="text-xs font-mono normal-case shrink-0" />}
                         </button>
 
                         {alcanzaSaldo && isAvailable && (
@@ -1172,7 +1172,7 @@ function CartContent() {
                               {pagandoConSaldo ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wallet className="h-3.5 w-3.5" />}
                               Pagar con saldo Objetia
                             </span>
-                            <FormattedPrice price={saldoBilletera} className="text-[10px] font-bold normal-case" />
+                            <FormattedPrice price={saldoBilletera} showCents={false} className="text-[10px] font-bold normal-case" />
                           </button>
                         )}
                       </div>
@@ -1196,7 +1196,7 @@ function CartContent() {
                   {saldoBilletera > 0 && todosEnviosCalculados && items.some(i => saldoBilletera < i.price + (shippingCosts[i.id] || 0)) && (
                     <p className="text-[10px] text-gray-500 leading-normal flex items-center gap-1.5 pt-2">
                       <Wallet className="h-3.5 w-3.5 flex-shrink-0 text-gray-400" />
-                      Tenés <FormattedPrice price={saldoBilletera} className="font-semibold text-gray-700" /> de saldo Objetia disponible.
+                      Tenés <FormattedPrice price={saldoBilletera} showCents={false} className="font-semibold text-gray-700" /> de saldo Objetia disponible.
                     </p>
                   )}
                 </div>
