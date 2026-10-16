@@ -2280,7 +2280,7 @@ export default function RootTab({
                 tieneCambiosMarca={tieneCambiosMarca || false}
                 setTieneCambiosMarca={setTieneCambiosMarca || (() => {})}
                 handlePublicarMarca={handlePublicarMarca || (() => {})}
-                brandName={brandName || "Vamaar"}
+                brandName={brandName || "Objetia"}
                 setBrandName={setBrandName || (() => {})}
                 brandFontFamily={brandFontFamily || "Outfit"}
                 setBrandFontFamily={setBrandFontFamily || (() => {})}

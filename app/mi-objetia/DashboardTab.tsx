@@ -1086,7 +1086,7 @@ export default function DashboardTab({
                 <input
                   type="email"
                   required
-                  placeholder="usuario@vamaar.com"
+                  placeholder="usuario@objetia.com"
                   value={emailAsignar}
                   onChange={(e) => setEmailAsignar(e.target.value)}
                   style={{ color: '#ffffff', backgroundColor: '#18181a', caretColor: '#ffffff' }}

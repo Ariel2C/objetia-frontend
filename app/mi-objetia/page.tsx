@@ -91,7 +91,7 @@ function MiObjetiaContent() {
   const [cargandoBalance, setCargandoBalance] = useState(false);
 
   // --- ESTADOS DE BRANDING/CMS (ADMIN) ---
-  const [brandName, setBrandName] = useState("Vamaar");
+  const [brandName, setBrandName] = useState("Objetia");
   const [colorPrimary, setColorPrimary] = useState("#2C3E50");
   const [colorSecondary, setColorSecondary] = useState("#D4AF37");
   const [colorBackground, setColorBackground] = useState("#F4EDDC");
@@ -305,7 +305,7 @@ function MiObjetiaContent() {
           if (res.ok) {
             const data = await res.json();
             const marca = data.marca || {};
-            setBrandName(marca.brand_name || "Vamaar");
+            setBrandName(marca.brand_name || "Objetia");
             setColorPrimary(marca.primary_color_hex || "#2C3E50");
             setColorSecondary(marca.secondary_color_hex || "#D4AF37");
             setColorBackground(marca.background_color_hex || "#F4EDDC");

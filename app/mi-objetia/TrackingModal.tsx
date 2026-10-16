@@ -440,7 +440,7 @@ export default function TrackingModal({
                                   : 'text-[#73675C]'
                             }`}
                           >
-                            {step.title}
+                            {step.title?.replace(/vamaar/gi, "Objetia")}
                           </h6>
                           {isStepCurrent && (
                             <span className="text-[9.5px] font-bold uppercase tracking-wider bg-[#2C2723] text-white px-1.5 py-0.2 rounded">
@@ -451,7 +451,7 @@ export default function TrackingModal({
 
                         {step.description && step.done && (
                           <p className="text-[11px] text-[#73675C] leading-tight">
-                            {step.description}
+                            {step.description.replace(/vamaar/gi, "Objetia")}
                           </p>
                         )}
 
@@ -466,7 +466,7 @@ export default function TrackingModal({
                             {step.location && (
                               <span className="flex items-center gap-1">
                                 <MapPin className="h-3 w-3" />
-                                {step.location}
+                                {step.location.replace(/vamaar/gi, "Objetia")}
                               </span>
                             )}
                           </div>

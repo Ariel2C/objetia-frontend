@@ -251,7 +251,7 @@ function TrackingContent() {
                 <div className="bg-[#F8F9FA] border border-gray-100 rounded-2xl p-5 space-y-2">
                   <h4 className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider">Dirección de entrega</h4>
                   <div className="text-xs text-gray-700 leading-relaxed font-semibold">
-                    <p className="font-bold text-gray-900">{trackingData.recipient_name || "Comprador Vamaar"}</p>
+                    <p className="font-bold text-gray-900">{trackingData.recipient_name || "Comprador Objetia"}</p>
                     <p className="mt-0.5">{trackingData.street || "Calle"} {trackingData.number_addr || ""}{trackingData.floor_dept ? `, ${trackingData.floor_dept}` : ""}</p>
                     <p>{trackingData.city || ""}, {trackingData.province || ""}{trackingData.postal_code ? `, ${trackingData.postal_code}` : ""}</p>
                   </div>
