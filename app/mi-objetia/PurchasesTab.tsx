@@ -15,7 +15,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
-  MessageSquare
+  MessageSquare,
+  CheckCircle2
 } from 'lucide-react';
 import Link from 'next/link';
 import { getApiUrl } from '../../lib/config';
@@ -104,6 +105,31 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
       setError(err.message || "Error al conectar con el servidor.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const [confirmandoId, setConfirmandoId] = useState<number | null>(null);
+
+  const handleConfirmarRecepcion = async (orderId: number) => {
+    if (!window.confirm("¿Confirmás que ya recibiste este paquete en tus manos? Al confirmar, se iniciará el período de garantía de 7 días antes de transferir el dinero al vendedor.")) {
+      return;
+    }
+    setConfirmandoId(orderId);
+    try {
+      const res = await fetch(`${getApiUrl()}/orders/${orderId}/confirm-delivery/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('vamaar_token') || token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.detail || "Error al confirmar la recepción");
+      await fetchPurchases();
+    } catch (e: any) {
+      alert(e.message || "No se pudo confirmar la entrega.");
+    } finally {
+      setConfirmandoId(null);
     }
   };
 
@@ -429,7 +455,7 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                       )}
 
                       {/* Botón de seguimiento con modal y botón de mensajes */}
-                      <div className="flex items-center gap-2 pt-1">
+                      <div className="flex items-center gap-2 pt-1 flex-wrap lg:justify-end">
                         <button
                           type="button"
                           onClick={() => setTrackingModalData({
@@ -445,6 +471,23 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                           <Package className="h-3.5 w-3.5" />
                           <span>Seguir Envío</span>
                         </button>
+
+                        {compra.status !== 'delivered' && compra.shipment_status !== 'DELIVERED' && (
+                          <button
+                            type="button"
+                            onClick={() => handleConfirmarRecepcion(compra.id)}
+                            disabled={confirmandoId === compra.id}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#e8f8ef] hover:bg-[#d4f2e1] text-[#00a650] rounded-xl text-xs font-semibold border border-[#ceead6] transition shadow-2xs cursor-pointer disabled:opacity-50"
+                            title="Confirmar que recibiste el producto"
+                          >
+                            {confirmandoId === compra.id ? (
+                              <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                            ) : (
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                            )}
+                            <span>Ya lo recibí</span>
+                          </button>
+                        )}
 
                         <Link
                           href="/mi-objetia?tab=chat"
@@ -467,11 +510,27 @@ export default function PurchasesTab({ token }: PurchasesTabProps) {
                       <span>Compra cancelada</span>
                     </div>
                   ) : (
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 flex-wrap">
                       <div className="flex items-center gap-1.5 text-xs text-[#73675C] font-semibold bg-[#FAF8F5] px-3 py-1.5 rounded-xl border border-[#EAE5DC]">
                         <Package className="h-4 w-4 text-[#73675C]" />
                         <span>Vendedor preparando el paquete</span>
                       </div>
+                      {compra.status !== 'delivered' && (
+                        <button
+                          type="button"
+                          onClick={() => handleConfirmarRecepcion(compra.id)}
+                          disabled={confirmandoId === compra.id}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#e8f8ef] hover:bg-[#d4f2e1] text-[#00a650] rounded-xl text-xs font-semibold border border-[#ceead6] transition shadow-2xs cursor-pointer disabled:opacity-50"
+                          title="Confirmar que recibiste el producto"
+                        >
+                          {confirmandoId === compra.id ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                          )}
+                          <span>Ya lo recibí</span>
+                        </button>
+                      )}
                       <Link
                         href="/mi-objetia?tab=chat"
                         className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-[#F2EFE9] text-[#2C2723] rounded-xl text-xs font-semibold border border-[#EAE5DC] transition shadow-2xs cursor-pointer"

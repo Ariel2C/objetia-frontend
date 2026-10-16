@@ -104,7 +104,7 @@ function CartContent() {
   const fetchSaldoBilletera = async () => {
     try {
       const data = await apiFetch<{ balance_spendable?: number; balance_available: number; balance_frozen: number }>(`/wallet/balance/`);
-      setSaldoBilletera(data.balance_spendable ?? (data.balance_available + data.balance_frozen));
+      setSaldoBilletera(data.balance_spendable ?? data.balance_available);
     } catch {
       setSaldoBilletera(0);
     }

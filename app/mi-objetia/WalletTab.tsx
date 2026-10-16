@@ -56,6 +56,7 @@ const tiempoRestanteLiberacion = (availableAt: string): string => {
   const diff = parsearFechaUTC(availableAt).getTime() - Date.now();
   if (diff <= 0) return "Liberación en proceso";
   const dias = Math.floor(diff / 86400000);
+  if (dias > 30) return "Pendiente de entrega (7 días tras recibir)";
   if (dias >= 1) return `Falta${dias === 1 ? '' : 'n'} ${dias} ${dias === 1 ? 'día' : 'días'}`;
   const horas = Math.ceil(diff / 3600000);
   return `Faltan ${horas} h`;
@@ -235,9 +236,10 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
     }
   };
 
-  const saldoParaCompras = balance.available + balance.frozen;
-  const pctRetirable = saldoParaCompras > 0 ? (balance.available / saldoParaCompras) * 100 : 0;
-  const pctGarantia = saldoParaCompras > 0 ? (balance.frozen / saldoParaCompras) * 100 : 0;
+  const saldoTotal = balance.available + balance.frozen;
+  const saldoParaCompras = balance.available;
+  const pctRetirable = saldoTotal > 0 ? (balance.available / saldoTotal) * 100 : 0;
+  const pctGarantia = saldoTotal > 0 ? (balance.frozen / saldoTotal) * 100 : 0;
   const ventasEnEspera = transacciones.filter(t => t.status === 'frozen' && t.amount > 0);
 
   // Obtener ícono específico según el tipo y estado de la transacción
@@ -288,7 +290,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
 
       {/* Tarjetas Métricas Organic Modern */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Card 1: Saldo total para compras */}
+        {/* Card 1: Saldo disponible para compras */}
         <div className="bg-[#FAF8F5] border border-[#EAE5DC] rounded-2xl p-5 sm:p-6 shadow-xs transition hover:border-[#D5CEC4] flex flex-col justify-between space-y-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
@@ -296,7 +298,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                 <div className="w-10 h-10 rounded-xl bg-[#F2EFE9] border border-[#EAE5DC] flex items-center justify-center text-[#2C2723]">
                   <ShoppingBag className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-semibold text-[#73675C] uppercase tracking-wider">Saldo para compras</span>
+                <span className="text-xs font-semibold text-[#73675C] uppercase tracking-wider">Saldo disponible</span>
               </div>
               <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-[6px] bg-[#F2EFE9] text-[#2C2723] border border-[#EAE5DC]">
                 Inmediato
@@ -308,7 +310,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
               </h4>
               <p className="text-xs text-[#73675C] font-medium mt-2 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#2C2723]" />
-                <span>Disponible para comprar dentro de la app</span>
+                <span>Disponible para compras dentro de la app</span>
               </p>
             </div>
           </div>
@@ -317,7 +319,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
           <div className="pt-3 border-t border-[#EAE5DC] space-y-2">
             {/* Barra tipo gráfico */}
             <div className="w-full h-2.5 rounded-full bg-[#EAE5DC] overflow-hidden flex">
-              {saldoParaCompras > 0 ? (
+              {saldoTotal > 0 ? (
                 <>
                   <div
                     style={{ width: `${pctRetirable}%` }}
@@ -343,7 +345,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                 <span className="font-mono font-bold text-[#00a650]">
                   {cargandoBalance ? "..." : formatearARS(balance.available)}
                 </span>
-                {saldoParaCompras > 0 && (
+                {saldoTotal > 0 && (
                   <span className="text-[10.5px] text-[#73675C] font-mono">
                     ({pctRetirable.toFixed(0)}%)
                   </span>
@@ -356,7 +358,7 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
                 <span className="font-mono font-bold text-[#2C2723]">
                   {cargandoBalance ? "..." : formatearARS(balance.frozen)}
                 </span>
-                {saldoParaCompras > 0 && (
+                {saldoTotal > 0 && (
                   <span className="text-[10.5px] text-[#73675C] font-mono">
                     ({pctGarantia.toFixed(0)}%)
                   </span>
@@ -411,10 +413,10 @@ export default function WalletTab({ cargandoBalance, balance, formatearARS, onBa
               </div>
               <div>
                 <span className="text-xs font-semibold text-[#73675C] uppercase tracking-wider block">
-                  En garantía (7 días)
+                  En garantía (7 días tras entrega)
                 </span>
                 <span className="text-[11px] text-[#73675C] block">
-                  Se habilita para retiro a los 7 días de cada venta
+                  Se libera 7 días después de que el comprador reciba su paquete
                 </span>
               </div>
             </div>
