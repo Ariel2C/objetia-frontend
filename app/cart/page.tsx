@@ -705,31 +705,8 @@ function CartContent() {
 
     window.addEventListener('message', handleMessage);
 
-    // Monitorear cuando el iframe o wrapper del modal de Mercado Pago se cierra en el DOM
-    let habiaModal = false;
-    const observer = new MutationObserver(() => {
-      const mpModal = document.querySelector('.mercadopago-checkout-wrapper, iframe[src*="mercadopago"]');
-      if (mpModal) {
-        habiaModal = true;
-      } else if (habiaModal) {
-        habiaModal = false;
-        // El modal desapareció de la pantalla
-        limpiarElementosMercadoPago();
-        if (esperandoPago) {
-          verificarPagoOrden(esperandoPago.orderId).then((pagado) => {
-            if (!pagado) {
-              handleCancelarEsperaPago();
-            }
-          });
-        }
-      }
-    });
-
-    observer.observe(document.body, { childList: true, subtree: true });
-
     return () => {
       window.removeEventListener('message', handleMessage);
-      observer.disconnect();
     };
   }, [esperandoPago]);
 
