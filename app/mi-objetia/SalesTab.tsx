@@ -144,176 +144,335 @@ export default function SalesTab({ token }: SalesTabProps) {
     const printWindow = window.open("", "_blank");
     if (!printWindow) return;
 
+    const rawTrack = (sale.tracking_number || "").toUpperCase().trim();
+    const formattedTrack = rawTrack.length === 13 
+      ? `${rawTrack.slice(0, 2)} ${rawTrack.slice(2, 5)} ${rawTrack.slice(5, 8)} ${rawTrack.slice(8, 11)} ${rawTrack.slice(11)}`
+      : rawTrack;
+
     printWindow.document.write(`
-      <html>
+      <!DOCTYPE html>
+      <html lang="es">
         <head>
-          <title>Etiqueta de Envío - Correo Argentino</title>
+          <meta charset="utf-8">
+          <title>Etiqueta de Envío · ${rawTrack} · Objetia</title>
           <style>
+            @page { size: auto; margin: 10mm; }
+            * { box-sizing: border-box; margin: 0; padding: 0; }
             body { 
               font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-              padding: 20px; 
-              background-color: #fff;
-              color: #000; 
+              padding: 24px; 
+              background-color: #f6f5f2; 
+              color: #2C2723;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
+            @media print {
+              body { background: #fff; padding: 0; }
+              .no-print { display: none !important; }
+              .label-card { box-shadow: none !important; border: 2px solid #000 !important; }
+            }
+            .cut-guide {
+              width: 100%;
+              max-width: 520px;
+              display: flex;
+              align-items: center;
+              gap: 10px;
+              font-size: 11px;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              color: #73675C;
+              margin-bottom: 10px;
+            }
+            .cut-guide::before, .cut-guide::after {
+              content: "";
+              flex: 1;
+              border-bottom: 1.5px dashed #A28764;
             }
             .label-card { 
-              width: 380px; 
-              border: 2px solid #000; 
-              border-radius: 12px;
-              padding: 18px; 
-              margin: auto; 
-              box-sizing: border-box;
+              width: 100%;
+              max-width: 520px; 
+              background: #fff;
+              border: 2.5px solid #2C2723; 
+              border-radius: 14px;
+              padding: 24px 26px; 
+              box-shadow: 0 4px 20px rgba(44, 39, 35, 0.08);
             }
             .header { 
               display: flex; 
               justify-content: space-between; 
-              align-items: center; 
-              border-bottom: 2px solid #000; 
-              padding-bottom: 8px; 
+              align-items: flex-start; 
+              border-bottom: 2px solid #2C2723; 
+              padding-bottom: 14px;
+              gap: 16px;
             }
-            .brand-name {
-              font-weight: 800;
-              font-size: 13px;
-              color: #111;
-            }
-            .marketplace-name {
+            .brand-title {
+              font-size: 26px;
               font-weight: 900;
-              font-size: 12px;
-              color: #555;
-              border-bottom: 1.5px solid #000;
+              letter-spacing: 3px;
+              color: #2C2723;
+              line-height: 1;
             }
-            .recipient-info {
-              margin-top: 14px;
-              font-size: 12px;
-              line-height: 1.4;
+            .brand-title span {
+              color: #A28764;
+              font-size: 20px;
+              margin-left: 2px;
             }
-            .recipient-label {
+            .brand-subtitle {
+              font-size: 10px;
+              font-weight: 700;
+              text-transform: uppercase;
+              letter-spacing: 1.2px;
+              color: #73675C;
+              margin-top: 4px;
+            }
+            .correo-pill {
+              background: #003366;
+              color: #ffffff;
+              padding: 6px 12px;
+              border-radius: 8px;
+              text-align: right;
+            }
+            .correo-name {
+              font-size: 12px;
+              font-weight: 900;
+              letter-spacing: 1px;
+            }
+            .correo-sub {
+              font-size: 9px;
+              font-weight: 700;
+              letter-spacing: 0.8px;
+              opacity: 0.9;
+              margin-top: 2px;
+            }
+            .barcode-section {
+              text-align: center;
+              padding: 18px 0 14px;
+              border-bottom: 1.5px solid #EAE5DC;
+            }
+            .tracking-label {
+              font-size: 10px;
               font-weight: 800;
-              font-size: 13px;
+              text-transform: uppercase;
+              letter-spacing: 1.5px;
+              color: #73675C;
               margin-bottom: 4px;
             }
-            .recipient-details {
-              font-weight: 500;
+            .tracking-code {
+              font-family: "Courier New", Courier, monospace;
+              font-size: 22px;
+              font-weight: 900;
+              letter-spacing: 3px;
+              color: #111;
+              margin-bottom: 8px;
             }
-            .barcode-box { 
-              margin-top: 18px; 
-              display: flex; 
-              flex-direction: column; 
-              align-items: center; 
-              justify-content: center;
-            }
-            .barcode-bars {
+            .barcode-box {
               width: 100%;
-              height: 55px;
-              background: repeating-linear-gradient(90deg, #000, #000 3px, #fff 3px, #fff 8px);
+              max-width: 380px;
+              height: 56px;
+              margin: 8px auto;
+              background: repeating-linear-gradient(90deg, #000, #000 2.5px, #fff 2.5px, #fff 5.5px, #000 5.5px, #000 9px, #fff 9px, #fff 12px);
             }
-            .barcode-text { 
-              font-family: "Courier New", Courier, monospace; 
-              font-size: 14px; 
-              font-weight: 900; 
-              letter-spacing: 2px;
-              margin-top: 6px;
+            .service-badge {
+              display: inline-block;
+              font-size: 10px;
+              font-weight: 800;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              padding: 4px 12px;
+              background: #FAF0E6;
+              border: 1px solid #EAE5DC;
+              border-radius: 20px;
+              color: #2C2723;
+            }
+            .dest-section {
+              display: flex;
+              justify-content: space-between;
+              gap: 16px;
+              padding: 16px 0;
+              border-bottom: 1.5px solid #EAE5DC;
+            }
+            .dest-left {
+              flex: 1;
+            }
+            .tag-label {
+              font-size: 10px;
+              font-weight: 800;
+              text-transform: uppercase;
+              letter-spacing: 1.2px;
+              color: #73675C;
+              margin-bottom: 4px;
+            }
+            .dest-name {
+              font-size: 17px;
+              font-weight: 800;
+              color: #2C2723;
+              line-height: 1.25;
+              margin-bottom: 4px;
+            }
+            .dest-address {
+              font-size: 14px;
+              font-weight: 600;
+              color: #333;
+              line-height: 1.35;
+            }
+            .dest-city {
+              font-size: 13px;
+              color: #666;
+              margin-top: 2px;
+            }
+            .cp-routing-box {
+              width: 140px;
+              border: 2px solid #2C2723;
+              border-radius: 10px;
+              background: #FAF8F5;
+              padding: 10px;
+              text-align: center;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              flex-shrink: 0;
+            }
+            .cp-header {
+              font-size: 9px;
+              font-weight: 800;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              color: #73675C;
+            }
+            .cp-val {
+              font-family: "Courier New", Courier, monospace;
+              font-size: 24px;
+              font-weight: 900;
+              color: #2C2723;
+              margin: 3px 0;
+              letter-spacing: 1px;
+            }
+            .cp-dest {
+              font-size: 9.5px;
+              font-weight: 800;
+              text-transform: uppercase;
+              color: #003366;
+            }
+            .grid-info {
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 16px;
+              padding: 14px 0;
+              border-bottom: 1.5px solid #EAE5DC;
+            }
+            .rem-name {
+              font-size: 13px;
+              font-weight: 700;
+              color: #2C2723;
+            }
+            .rem-badge {
+              font-size: 10px;
+              color: #73675C;
+              margin-top: 2px;
+            }
+            .pkg-info {
+              text-align: right;
+            }
+            .pkg-order {
+              font-family: monospace;
+              font-size: 12px;
+              font-weight: 800;
+              color: #2C2723;
+            }
+            .pkg-title {
+              font-size: 11px;
+              color: #555;
+              margin-top: 2px;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
             .footer {
-              margin-top: 18px;
               display: flex;
               justify-content: space-between;
               align-items: center;
-              border-top: 1px solid #ddd;
-              padding-top: 10px;
+              gap: 12px;
+              padding-top: 14px;
             }
-            .correo-logo {
-              display: flex;
-              align-items: center;
-              gap: 6px;
-            }
-            .correo-circle {
-              width: 18px;
-              height: 18px;
-              border-radius: 50%;
-              border: 2px solid #003366;
-              position: relative;
-            }
-            .correo-circle::after {
-              content: "";
-              position: absolute;
-              top: 7px;
-              left: 4px;
-              width: 12px;
-              height: 2px;
-              background-color: #003366;
-            }
-            .correo-text {
+            .instructions {
               font-size: 10px;
-              font-weight: 900;
-              color: #003366;
-              line-height: 1;
+              color: #73675C;
+              line-height: 1.4;
+              flex: 1;
             }
-            .qr-mock {
-              width: 45px;
-              height: 45px;
-              background-color: #eee;
-              border: 1px solid #ccc;
-              display: grid;
-              grid-template-columns: repeat(3, 1fr);
-              gap: 2px;
-              padding: 3px;
-              box-sizing: border-box;
-            }
-            .qr-block {
-              background-color: #000;
-            }
-            .meta-info {
-              font-size: 9px;
-              color: #777;
-              margin-top: 12px;
-              text-align: left;
-              line-height: 1.3;
+            .escrow-shield {
+              display: inline-flex;
+              align-items: center;
+              gap: 5px;
+              font-size: 10px;
+              font-weight: 800;
+              color: #00a650;
+              background: #e8f8ef;
+              border: 1px solid #ceead6;
+              padding: 5px 10px;
+              border-radius: 8px;
+              white-space: nowrap;
             }
           </style>
         </head>
         <body>
+          <div class="cut-guide no-print">✂ Doblar o cortar por aquí para adherir al paquete</div>
           <div class="label-card">
             <div class="header">
-              <span class="brand-name">🛋️ Vamaar Muebles</span>
-              <span class="marketplace-name">vamaar</span>
-            </div>
-            
-            <div class="recipient-info">
-              <div class="recipient-label">Para:</div>
-              <div class="recipient-details">
-                <strong>${sale.recipient_name || "Comprador Vamaar"}</strong><br>
-                ${sale.street || "Calle Falsa"} ${sale.number || "123"}${sale.floor_dept ? `, ${sale.floor_dept}` : ""}<br>
-                ${sale.city || "Ciudad"}, ${sale.province || "Provincia"}, ${sale.postal_code || ""}
+              <div>
+                <div class="brand-title">OBJETIA<span>✦</span></div>
+                <div class="brand-subtitle">Decoración & Muebles de Autor</div>
+              </div>
+              <div class="correo-pill">
+                <div class="correo-name">CORREO ARGENTINO</div>
+                <div class="correo-sub">PAQ.AR · ENCOMIENDA CLÁSICA</div>
               </div>
             </div>
-            
-            <div class="barcode-box">
-              <div class="barcode-bars"></div>
-              <div class="barcode-text">${sale.tracking_number}</div>
+
+            <div class="barcode-section">
+              <div class="tracking-label">Código de Seguimiento Oficial</div>
+              <div class="tracking-code">${formattedTrack}</div>
+              <div class="barcode-box"></div>
+              <div class="service-badge">Servicio Puerta a Puerta · Entrega con Firma</div>
             </div>
-            
+
+            <div class="dest-section">
+              <div class="dest-left">
+                <div class="tag-label">Destinatario</div>
+                <div class="dest-name">${sale.recipient_name || "Comprador Objetia"}</div>
+                <div class="dest-address">${sale.street || "Domicilio"} ${sale.number || ""}${sale.floor_dept ? `, ${sale.floor_dept}` : ""}</div>
+                <div class="dest-city">${sale.city || ""}, ${sale.province || ""}</div>
+              </div>
+              <div class="cp-routing-box">
+                <div class="cp-header">Código Postal</div>
+                <div class="cp-val">${(sale.postal_code || "----").toUpperCase()}</div>
+                <div class="cp-dest">${(sale.province || "ARGENTINA").toUpperCase()}</div>
+              </div>
+            </div>
+
+            <div class="grid-info">
+              <div>
+                <div class="tag-label">Remitente</div>
+                <div class="rem-name">Vendedor Oficial Objetia</div>
+                <div class="rem-badge">Vendedor Verificado</div>
+              </div>
+              <div class="pkg-info">
+                <div class="tag-label">Paquete</div>
+                <div class="pkg-order">#OBJ-000${sale.id}</div>
+                <div class="pkg-title">${sale.product_title}</div>
+              </div>
+            </div>
+
             <div class="footer">
-              <div class="correo-logo">
-                <div class="correo-circle"></div>
-                <div class="correo-text">Correo<br>Argentino</div>
+              <div class="instructions">
+                <strong>Instrucciones:</strong> Pegar en la cara superior plana del paquete sin arrugar el código de barras. Despachar en cualquier sucursal de Correo Argentino.
               </div>
-              
-              <div class="qr-mock">
-                <div class="qr-block"></div>
-                <div></div>
-                <div class="qr-block"></div>
-                <div class="qr-block"></div>
-                <div class="qr-block"></div>
-                <div></div>
-                <div></div>
-                <div class="qr-block"></div>
-                <div class="qr-block"></div>
+              <div class="escrow-shield">
+                ✓ Garantía Objetia 7 Días
               </div>
-            </div>
-            
-            <div class="meta-info">
-              Etiqueta generada<br>
-              ${new Date(sale.created_at).toLocaleDateString()} - ${new Date(sale.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} por Vamaar
             </div>
           </div>
           <script>
