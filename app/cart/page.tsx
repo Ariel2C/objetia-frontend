@@ -10,8 +10,10 @@ import {
 } from 'lucide-react';
 import { useToast } from '../../components/ToastContext';
 import Link from 'next/link';
+import Script from 'next/script';
 import FormattedPrice from '../../components/FormattedPrice';
 import { formatearTituloProducto } from '../../lib/format';
+import { getMercadoPagoPublicKey } from '../../lib/config';
 
 export interface UserAddress {
   id: number;
@@ -57,7 +59,13 @@ function CartContent() {
   const [checkoutCompletado, setCheckoutCompletado] = useState(false);
   const [orderInfo, setOrderInfo] = useState<{ id: number; price: number } | null>(null);
   const [pagoPendiente, setPagoPendiente] = useState(false);
-  const [esperandoPago, setEsperandoPago] = useState<{ orderId: number; linkPago: string; productId: number } | null>(null);
+  const [esperandoPago, setEsperandoPago] = useState<{ 
+    orderId: number; 
+    linkPago: string; 
+    productId: number;
+    preferenceId?: string;
+    publicKey?: string;
+  } | null>(null);
   const [verificandoManual, setVerificandoManual] = useState(false);
   const confirmacionIntentada = useRef(false);
   const pollingPagoRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -479,15 +487,75 @@ function CartContent() {
       }
 
       setLoadingItems(false);
-      setEsperandoPago({ orderId: data.order_id, linkPago, productId });
+      setEsperandoPago({ 
+        orderId: data.order_id, 
+        linkPago, 
+        productId,
+        preferenceId: data.preference_id,
+        publicKey: data.public_key
+      });
       iniciarPollingConfirmacion(data.order_id);
-      const ventana = window.open(linkPago, '_blank');
-      if (!ventana) {
-        window.location.href = linkPago;
-      }
+
+      // Abrir checkout de Mercado Pago en ventana modal
+      abrirMercadoPagoModal(data.preference_id, data.public_key, linkPago);
     } catch (err: any) {
       setError(err.message || "Fallo en el servidor al procesar el pago.");
       setLoadingItems(false);
+    }
+  };
+
+  /**
+   * Abre Mercado Pago en formato MODAL usando el SDK v2 oficial
+   */
+  const abrirMercadoPagoModal = async (preferenceId?: string, backendPublicKey?: string, fallbackUrl?: string) => {
+    try {
+      if (typeof window === 'undefined') return;
+
+      // Asegurar disponibilidad del SDK de Mercado Pago
+      if (!(window as any).MercadoPago) {
+        await new Promise<void>((resolve, reject) => {
+          const existente = document.getElementById('mercadopago-sdk');
+          if (existente) {
+            if ((window as any).MercadoPago) {
+              resolve();
+              return;
+            }
+            existente.addEventListener('load', () => resolve());
+            existente.addEventListener('error', () => reject(new Error('Error al cargar SDK de Mercado Pago')));
+            return;
+          }
+          const s = document.createElement('script');
+          s.id = 'mercadopago-sdk';
+          s.src = 'https://sdk.mercadopago.com/js/v2';
+          s.async = true;
+          s.onload = () => resolve();
+          s.onerror = () => reject(new Error('Error al cargar SDK de Mercado Pago'));
+          document.body.appendChild(s);
+        });
+      }
+
+      const MP = (window as any).MercadoPago;
+      const publicKey = backendPublicKey || getMercadoPagoPublicKey();
+      if (MP && preferenceId && publicKey) {
+        const mp = new MP(publicKey, { locale: 'es-AR' });
+        mp.checkout({
+          preference: {
+            id: preferenceId,
+          },
+          autoOpen: true,
+        });
+        return;
+      }
+    } catch (err) {
+      console.warn("No se pudo iniciar el modal de Mercado Pago, usando fallback:", err);
+    }
+
+    // Fallback seguro si el navegador bloquea la apertura modal
+    if (fallbackUrl) {
+      const ventana = window.open(fallbackUrl, '_blank');
+      if (!ventana) {
+        window.location.href = fallbackUrl;
+      }
     }
   };
 
@@ -590,9 +658,9 @@ function CartContent() {
         </div>
         <h1 className="text-3xl font-black text-gray-900 tracking-tight">Esperando tu pago</h1>
         <p className="text-sm text-gray-500 mt-3 leading-relaxed">
-          Completá el pago en la pestaña de <strong>Mercado Pago</strong> que se abrió.
-          Apenas se acredite lo detectamos automáticamente y vas a ver acá la confirmación
-          de tu compra, sin necesidad de volver manualmente.
+          Completá el pago en la ventana modal de <strong>Mercado Pago</strong>.
+          Apenas se confirme lo detectamos automáticamente y vas a ver acá el comprobante
+          de tu compra, sin necesidad de salir del sitio.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center mt-8">
@@ -604,14 +672,13 @@ function CartContent() {
             {verificandoManual && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             Ya pagué, verificar ahora
           </button>
-          <a
-            href={esperandoPago.linkPago}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-6 py-3 border border-gray-200 text-gray-700 rounded-2xl font-bold text-xs uppercase tracking-wider hover:border-gray-400 transition flex items-center justify-center gap-2"
+          <button
+            type="button"
+            onClick={() => abrirMercadoPagoModal(esperandoPago.preferenceId, esperandoPago.publicKey, esperandoPago.linkPago)}
+            className="px-6 py-3 border border-gray-200 text-gray-700 rounded-2xl font-bold text-xs uppercase tracking-wider hover:border-gray-400 transition flex items-center justify-center gap-2 cursor-pointer"
           >
-            <ExternalLink className="h-3.5 w-3.5" /> Reabrir Mercado Pago
-          </a>
+            <CreditCard className="h-3.5 w-3.5 text-[#009EE3]" /> Reabrir modal de Mercado Pago
+          </button>
         </div>
         <button
           onClick={handleCancelarEsperaPago}
@@ -1236,12 +1303,19 @@ function CartContent() {
 
 export default function CartPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="h-8 w-8 border-4 border-gray-900 border-t-transparent rounded-full animate-spin" />
-      </div>
-    }>
-      <CartContent />
-    </Suspense>
+    <>
+      <Script 
+        src="https://sdk.mercadopago.com/js/v2" 
+        strategy="afterInteractive" 
+        id="mercadopago-sdk" 
+      />
+      <Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="h-8 w-8 border-4 border-gray-900 border-t-transparent rounded-full animate-spin" />
+        </div>
+      }>
+        <CartContent />
+      </Suspense>
+    </>
   );
 }
