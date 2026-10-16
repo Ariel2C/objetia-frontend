@@ -98,15 +98,18 @@ function CartContent() {
 
   // Saldo de la billetera Vamaar/Objetia
   const [saldoBilletera, setSaldoBilletera] = useState<number>(0);
+  const [saldoCongelado, setSaldoCongelado] = useState<number>(0);
   const [pagandoConSaldo, setPagandoConSaldo] = useState(false);
   const [comprasPreviasCount, setComprasPreviasCount] = useState<number | null>(null);
 
   const fetchSaldoBilletera = async () => {
     try {
       const data = await apiFetch<{ balance_spendable?: number; balance_available: number; balance_frozen: number }>(`/wallet/balance/`);
-      setSaldoBilletera(data.balance_spendable ?? data.balance_available);
+      setSaldoBilletera(data.balance_available || 0);
+      setSaldoCongelado(data.balance_frozen || 0);
     } catch {
       setSaldoBilletera(0);
+      setSaldoCongelado(0);
     }
   };
 
@@ -1412,6 +1415,15 @@ function CartContent() {
                       <Wallet className="h-3.5 w-3.5 flex-shrink-0 text-gray-400" />
                       Tenés <FormattedPrice price={saldoBilletera} showCents={false} className="font-semibold text-gray-700" /> de saldo Objetia disponible.
                     </p>
+                  )}
+
+                  {saldoBilletera === 0 && saldoCongelado > 0 && (
+                    <div className="p-2.5 bg-[#FAF0E6] border border-[#EAE5DC] rounded-xl text-[11px] text-[#73675C] flex items-center gap-2 mt-2">
+                      <Lock className="h-3.5 w-3.5 text-[#2C2723] shrink-0" />
+                      <span>
+                        Tenés <FormattedPrice price={saldoCongelado} showCents={false} className="font-bold text-[#2C2723]" /> en garantía (se habilitan 7 días tras entregar el paquete).
+                      </span>
+                    </div>
                   )}
                 </div>
               )}
